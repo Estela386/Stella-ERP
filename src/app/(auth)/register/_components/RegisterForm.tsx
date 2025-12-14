@@ -15,7 +15,7 @@ export default function RegisterForm() {
           name="email"
           type="email"
           required
-          className="w-full border rounded px-3 py-2"
+          className="w-full border rounded px-3 py-2 text-[#3a2a1a] placeholder-[#a89b8a]"
           placeholder="estela@example.com"
         />
       </div>
@@ -26,7 +26,7 @@ export default function RegisterForm() {
           name="password"
           type="password"
           required
-          className="w-full border rounded px-3 py-2"
+          className="w-full border rounded px-3 py-2 text-[#3a2a1a] placeholder-[#a89b8a]"
         />
       </div>
 
@@ -38,7 +38,7 @@ export default function RegisterForm() {
           name="confirmPassword"
           type="password"
           required
-          className="w-full border rounded px-3 py-2"
+          className="w-full border rounded px-3 py-2 text-[#3a2a1a] placeholder-[#a89b8a]"
         />
       </div>
 

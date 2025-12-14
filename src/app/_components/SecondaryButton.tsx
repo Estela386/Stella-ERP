@@ -13,7 +13,7 @@ export default function SecondaryButton({
 }: SecondaryButtonProps) {
   return (
     <button
-      className={`px-4 py-1 rounded border border-[#7c5c4a] text-[#7c5c4a] bg-white transition-colors duration-200 text-base ${selected ? "bg-[#e5d3c2] font-semibold" : ""} ${className}`}
+      className={`cursor-pointer px-4 py-1 rounded border border-[#7c5c4a] text-[#7c5c4a] bg-white transition-colors duration-200 text-base ${selected ? "bg-[#e5d3c2] font-semibold" : ""} ${className}`}
       {...props}
     >
       {children}

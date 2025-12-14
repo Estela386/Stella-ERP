@@ -1,4 +1,4 @@
-import RegisterForm from "./RegisterForm";
+import RegisterForm from "./_components/RegisterForm";
 import Image from "next/image";
 
 export default async function RegisterPage({
