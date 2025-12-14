@@ -1,15 +1,46 @@
 import React from "react";
+import Image from "next/image";
 
 export default function Footer() {
   return (
     <footer className="w-full bg-[#e5d3c2] py-6 px-8 flex flex-col md:flex-row justify-between items-center text-[#7c5c4a] text-sm mt-8">
       <div className="flex flex-col items-center md:items-start mb-4 md:mb-0">
         <div className="flex gap-2 mb-2">
-          <a href="#"><img src="/icon-instagram.svg" alt="Instagram" className="h-5 w-5" /></a>
-          <a href="#"><img src="/icon-youtube.svg" alt="YouTube" className="h-5 w-5" /></a>
-          <a href="#"><img src="/icon-linkedin.svg" alt="LinkedIn" className="h-5 w-5" /></a>
+          <a href="#">
+            <Image
+              src="/icon-instagram.svg"
+              alt="Instagram"
+              width={20}
+              height={20}
+              className="h-5 w-5"
+            />
+          </a>
+          <a href="#">
+            <Image
+              src="/icon-youtube.svg"
+              alt="YouTube"
+              width={20}
+              height={20}
+              className="h-5 w-5"
+            />
+          </a>
+          <a href="#">
+            <Image
+              src="/icon-linkedin.svg"
+              alt="LinkedIn"
+              width={20}
+              height={20}
+              className="h-5 w-5"
+            />
+          </a>
         </div>
-        <img src="/logo.svg" alt="Stella Logo" className="h-8 w-8" />
+        <Image
+          src="/logo.svg"
+          alt="Stella Logo"
+          width={32}
+          height={32}
+          className="h-8 w-8"
+        />
       </div>
       <div className="flex flex-col md:flex-row gap-8">
         <div>

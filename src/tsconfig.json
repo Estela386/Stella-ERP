@@ -20,7 +20,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./app/*"]
+      "@/*": ["./app/*"],
+      "@@/*": ["./*"],
+      "@components/*": ["./app/_components/*"],
+      "@utils/*": ["./utils/*"],
+      "@auth/*": ["./app/(auth)/*"]
     }
   },
   "include": [

@@ -1,9 +1,9 @@
-
 "use client";
 import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import PrimaryButton from "@/_components/PrimaryButton";
-import SecondaryButton from "./SecondaryButton";
+import SecondaryButton from "../../_components/SecondaryButton";
+import Image from "next/image";
 
 export default function Header() {
   const pathname = usePathname();
@@ -13,7 +13,7 @@ export default function Header() {
   return (
     <header className="w-full bg-[#d6c1b1] flex items-center justify-between px-8 py-3">
       <div className="flex items-center gap-2">
-        <img src="/logo.png" alt="Stella Logo" className="h-16" />
+        <Image src="/logo.png" alt="Stella Logo" className="h-16" />
       </div>
       <div className="flex gap-2">
         <SecondaryButton
