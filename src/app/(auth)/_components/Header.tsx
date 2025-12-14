@@ -13,7 +13,7 @@ export default function Header() {
   return (
     <header className="w-full bg-[#d6c1b1] flex items-center justify-between px-8 py-3">
       <div className="flex items-center gap-2">
-        <Image src="/logo.png" alt="Stella Logo" width={16} height={16} />
+        <Image src="/logo.png" alt="Stella Logo" width={64} height={64} />
       </div>
       <div className="flex gap-2">
         <SecondaryButton

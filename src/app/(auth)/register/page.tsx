@@ -1,11 +1,13 @@
 import RegisterForm from "./RegisterForm";
 import Image from "next/image";
 
-export default function RegisterPage({
+export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
+  const { error } = await searchParams;
+
   return (
     <>
       <div className="flex flex-col items-center mb-8">
@@ -18,9 +20,11 @@ export default function RegisterPage({
         />
         <h1 className="font-serif text-5xl text-[#7c5c4a] mb-2">Stella</h1>
       </div>
-      {searchParams.error === "password_mismatch" && (
+
+      {error === "password_mismatch" && (
         <p className="text-red-500">Las contraseñas no coinciden</p>
       )}
+
       <RegisterForm />
     </>
   );

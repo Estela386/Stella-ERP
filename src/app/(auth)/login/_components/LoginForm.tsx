@@ -11,7 +11,7 @@ export default function LoginForm({ onSubmit, error, action }: LoginFormProps) {
   return (
     <form
       action={action}
-      className="bg-white rounded-lg shadow p-8 w-full max-w-md flex flex-col gap-4"
+      className="bg-white rounded-lg shadow p-8 w-full max-w-2xl flex flex-col gap-4"
       onSubmit={onSubmit}
     >
       <div>
