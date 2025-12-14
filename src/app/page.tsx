@@ -1,9 +1,16 @@
+"use client";
 import Image from "next/image";
-export default function Home() {
+import PrimaryButton from "@/_components/PrimaryButton";
+import { useRouter } from "next/navigation";
+export default function HomePage() {
+  const router = useRouter();
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+    <main className="mx-auto flex min-h-screen w-full flex-col items-center justify-center p-4">
+      <div className="">
         <Image src="/logo.png" alt="Stella Logo" width={200} height={200} />
+        <PrimaryButton className="mt-6" onClick={() => router.push("/login") }>
+          Inicia sesión
+        </PrimaryButton>
       </div>
     </main>
   );
