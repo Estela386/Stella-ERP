@@ -1,4 +1,5 @@
 import React from "react";
+import PrimaryButton from "@/_components/PrimaryButton";
 
 interface LoginFormProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -22,7 +23,7 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
           <span>{error}</span>
         </div>
       )}
-      <button type="submit" className="w-full bg-[#b97a7a] text-white py-2 rounded mt-2">Log in</button>
+      <PrimaryButton type="submit" className="w-full mt-2">Ingresar</PrimaryButton>
     </form>
   );
 }
