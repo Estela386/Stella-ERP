@@ -1,6 +1,4 @@
-import React from "react";
 import LoginForm from "./_components/LoginForm";
-import { login } from "../actions";
 import Image from "next/image";
 
 export default function LoginPage() {
@@ -15,7 +13,7 @@ export default function LoginPage() {
           className="h-24 w-24 mb-2"
         />
       </div>
-      <LoginForm action={login} />
+      <LoginForm />
     </div>
   );
 }

@@ -1,16 +1,15 @@
 import React from "react";
 import PrimaryButton from "@components/PrimaryButton";
-
+import { login } from "@auth/actions";
 interface LoginFormProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
   error?: string;
-  action?: (formData: FormData) => Promise<void>;
 }
 
-export default function LoginForm({ onSubmit, error, action }: LoginFormProps) {
+export default function LoginForm({ onSubmit, error }: LoginFormProps) {
   return (
     <form
-      action={action}
+      action={login}
       className="bg-white rounded-lg shadow p-8 w-full max-w-2xl flex flex-col gap-4"
       onSubmit={onSubmit}
     >
@@ -18,6 +17,7 @@ export default function LoginForm({ onSubmit, error, action }: LoginFormProps) {
         <label className="block text-[#7c5c4a] mb-1">Correo</label>
         <input
           type="email"
+          name="email"
           className="w-full border rounded px-3 py-2 text-[#3a2a1a] placeholder-[#a89b8a]"
           placeholder="estela@example.com"
         />
@@ -26,6 +26,7 @@ export default function LoginForm({ onSubmit, error, action }: LoginFormProps) {
         <label className="block text-[#7c5c4a] mb-1">Contraseña</label>
         <input
           type="password"
+          name="password"
           className="w-full border rounded px-3 py-2 text-[#3a2a1a] placeholder-[#a89b8a]"
           placeholder="Escribe tu contraseña"
         />
