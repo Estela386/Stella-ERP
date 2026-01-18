@@ -65,7 +65,6 @@ export default function HeaderClient({ user }: HeaderClientProps) {
         {!isClientDashboard && (
           <>
             <SecondaryButton
-              className="w-full"
               selected={isLogin}
               disabled={isLogin}
               onClick={() => router.push("/login")}
