@@ -18,7 +18,7 @@ export async function login(formData: FormData) {
     redirect("/login?error=invalid_credentials");
   }
 
-  redirect("/dashboard");
+  redirect("/dashboard/cliente");
 }
 export async function logout() {
   const supabase = await createClient();
