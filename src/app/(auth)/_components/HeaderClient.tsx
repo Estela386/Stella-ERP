@@ -21,6 +21,7 @@ export default function HeaderClient({ user }: HeaderClientProps) {
     { label: "Inicio", href: "/dashboard/cliente" },
     { label: "Catálogo", href: "/dashboard/cliente/catalogo" },
     { label: "Reseñas", href: "/dashboard/cliente/resenas" },
+    { label: "Carrito", href: "/dashboard/cliente/carrito" },
     { label: "Contacto", href: "/dashboard/cliente/contacto" },
     { label: "Redes", href: "/dashboard/cliente/redes" },
   ];

@@ -43,6 +43,7 @@ export async function register(formData: FormData) {
   });
 
   if (error) {
+    console.log(error);
     redirect("/register?error=signup_failed");
   }
 

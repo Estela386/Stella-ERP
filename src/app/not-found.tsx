@@ -1,5 +1,5 @@
-import Header from "@/(auth)/_components/Header";
-import Footer from "@/(auth)/_components/Footer";
+import Header from "@auth/_components/Header";
+import Footer from "@auth/_components/Footer";
 import Image from "next/image";
 import Link from "next/link";
 
