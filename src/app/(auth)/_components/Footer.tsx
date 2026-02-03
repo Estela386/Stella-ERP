@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { FaInstagram, FaYoutube, FaLinkedin } from "react-icons/fa";
+import { FaInstagram, FaYoutube, FaLinkedin, FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
@@ -14,14 +14,22 @@ export default function Footer() {
             <a href="#" className="hover:text-[#5c4a37] transition-colors">
               <FaXTwitter size={18} />
             </a>
-            <a href="#" className="hover:text-[#5c4a37] transition-colors">
+            <a
+              href="https://www.instagram.com/stellajoyeriar?igsh=dTQ5dWtnZ21ibXJt"
+              className="hover:text-[#5c4a37] transition-colors"
+              target="_blank"
+            >
               <FaInstagram size={18} />
             </a>
             <a href="#" className="hover:text-[#5c4a37] transition-colors">
               <FaYoutube size={18} />
             </a>
-            <a href="#" className="hover:text-[#5c4a37] transition-colors">
-              <FaLinkedin size={18} />
+            <a
+              href="https://www.facebook.com/share/17iQQTmRbi/?mibextid=wwXIfr"
+              className="hover:text-[#5c4a37] transition-colors"
+              target="_blank"
+            >
+              <FaFacebook size={18} />
             </a>
           </div>
 
