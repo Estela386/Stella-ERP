@@ -36,41 +36,51 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-lg p-6 space-y-4">
-        <h2 className="text-lg font-semibold">Editar producto</h2>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center z-50">
+      <div className="relative bg-white rounded-2xl w-full max-w-lg p-8 space-y-6 border border-black/10 shadow-[0_30px_70px_rgba(0,0,0,0.15)]">
+        {/* Accent line */}
+        <div className="absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-[#B76E79]" />
 
-        <div className="grid grid-cols-2 gap-4">
+        <h2 className="text-xl font-serif font-medium text-[#1C1C1C]">
+          Editar producto
+        </h2>
+
+        <div className="grid grid-cols-2 gap-5">
           <Input
             label="Nombre"
             name="nombre"
             value={form.nombre}
             onChange={handleChange}
           />
+
           <Input
             label="Categoría"
             name="categoria"
             value={form.categoria}
             disabled
           />
+
           <Input
             label="Precio"
             name="precio"
             value={form.precio}
             onChange={handleChange}
           />
+
           <Input
             label="Costo"
             name="costo"
             value={form.costo}
             onChange={handleChange}
           />
+
           <Input
             label="Stock actual"
             name="stock_actual"
             value={form.stock_actual}
             onChange={handleChange}
           />
+
           <Input
             label="Stock mínimo"
             name="stock_min"
@@ -79,15 +89,28 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
           />
         </div>
 
-        <div className="flex justify-end gap-2 pt-4">
+        <div className="flex justify-end gap-3 pt-6">
           <button
-            className="px-4 py-2 text-sm border rounded-lg"
+            className="
+              px-5 py-2 text-sm rounded-lg
+              border border-black/20
+              text-[#1C1C1C]
+              hover:bg-black/5
+              transition
+            "
             onClick={onClose}
           >
             Cancelar
           </button>
+
           <button
-            className="px-4 py-2 text-sm bg-orange-600 text-white rounded-lg"
+            className="
+              px-5 py-2 text-sm rounded-lg
+              bg-[#B76E79]
+              text-[#F8F6F2]
+              hover:bg-[#a95f6a]
+              transition
+            "
             onClick={handleSave}
           >
             Guardar cambios
@@ -104,11 +127,28 @@ function Input({
 }: {
   label: string;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
+  const isDisabled = props.disabled;
+
   return (
-    <div className="space-y-1">
-      <label className="text-xs text-gray-500">{label}</label>
+    <div className="space-y-1.5">
+      <label className="text-xs tracking-wide text-[#708090]">
+        {label}
+      </label>
+
       <input
-        className="border rounded-lg px-3 py-2 text-sm w-full"
+        className={`
+          w-full
+          rounded-lg
+          px-3 py-2
+          text-sm
+          text-[#1C1C1C]
+          border
+          ${isDisabled ? "bg-black/5 border-black/10" : "border-black/20"}
+          focus:outline-none
+          focus:ring-2
+          focus:ring-[#B76E79]/40
+          focus:border-[#B76E79]
+        `}
         {...props}
       />
     </div>

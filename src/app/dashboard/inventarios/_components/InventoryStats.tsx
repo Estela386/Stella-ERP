@@ -5,19 +5,53 @@ export default function InventoryStats({
 }: {
   productos: Producto[];
 }) {
-  const total = productos.length;
-  const valor = productos.reduce((acc, p) => acc + p.stock_actual * p.costo, 0);
+  const totalPiezas = productos.reduce((acc, p) => acc + p.stock_actual, 0);
+
+  const valorInventario = productos.reduce(
+    (acc, p) => acc + p.stock_actual * p.costo,
+    0
+  );
+
+  const valorFormateado = valorInventario.toLocaleString("es-MX", {
+    style: "currency",
+    currency: "MXN",
+  });
+
   const bajo = productos.filter(
     p => p.stock_actual <= p.stock_min && p.stock_actual > 0
   ).length;
+
   const agotados = productos.filter(p => p.stock_actual === 0).length;
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <Stat label="Total Piezas" value={total} />
-      <Stat label="Valor Inventario" value={`$${valor}`} />
-      <Stat label="Stock Bajo" value={bajo} highlight />
-      <Stat label="Agotados" value={agotados} danger />
+      <Stat
+        label="Total de Piezas"
+        value={totalPiezas}
+        bgColor="bg-[#708090]"
+        textColor="text-[#F8F6F2]"
+      />
+
+      <Stat
+        label="Valor del Inventario"
+        value={valorFormateado}
+        bgColor="bg-[#B76E79]"
+        textColor="text-[#F8F6F2]"
+      />
+
+      <Stat
+        label="Stock Bajo"
+        value={bajo}
+        bgColor="bg-[#708090]"
+        textColor="text-[#F8F6F2]"
+      />
+
+      <Stat
+        label="Agotados"
+        value={agotados}
+        bgColor="bg-[#B76E79]"
+        textColor="text-[#F8F6F2]"
+      />
     </div>
   );
 }
@@ -25,21 +59,46 @@ export default function InventoryStats({
 function Stat({
   label,
   value,
-  highlight,
-  danger,
+  bgColor,
+  textColor,
 }: {
   label: string;
   value: any;
-  highlight?: boolean;
-  danger?: boolean;
+  bgColor: string;
+  textColor: string;
 }) {
+  const isDark =
+    bgColor.includes("#708090") || bgColor.includes("#B76E79");
+
   return (
-    <div className="bg-white rounded-xl p-4 border">
-      <p className="text-xs text-gray-500">{label}</p>
+    <div
+      className={`
+        rounded-xl
+        p-4
+        transition-all
+        duration-200
+        ${isDark ? "border border-white/10" : "border border-black/10"}
+        ${bgColor}
+      `}
+    >
       <p
-        className={`text-xl font-semibold ${
-          highlight ? "text-orange-600" : ""
-        } ${danger ? "text-red-600" : ""}`}
+        className={`
+          text-xs
+          tracking-wide
+          ${isDark ? "text-white/70" : "text-[#111111]/70"}
+        `}
+      >
+        {label}
+      </p>
+
+      <p
+        className={`
+          mt-1
+          text-2xl
+          md:text-3xl
+          font-semibold
+          ${textColor}
+        `}
       >
         {value}
       </p>
