@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import PrimaryButton from "@/_components/PrimaryButton";
+import PrimaryButton from "./_components/PrimaryButton";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
