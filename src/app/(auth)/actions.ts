@@ -43,7 +43,8 @@ export async function register(formData: FormData) {
   });
 
   if (error) {
-    redirect("/register?error=signup_failed");
+    // redirect("/register?error=signup_failed");
+    console.log(error);
   }
 
   // Si tienes email confirmation activado:
