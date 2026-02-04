@@ -56,8 +56,8 @@ export default function InventariosPage() {
             Consulta de Inventario
           </h1>
 
-          {/* Subtle divider */}
-          <div className="h-px w-full bg-black/5" />
+          {/* Subtle divider
+          <div className="h-px w-full bg-black/5" /> */}
         </header>
 
         {/* Card principal */}
