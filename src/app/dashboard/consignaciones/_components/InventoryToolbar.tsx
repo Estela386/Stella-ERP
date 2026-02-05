@@ -1,3 +1,7 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
 export default function InventoryToolbar({
   search,
   setSearch,
@@ -7,11 +11,13 @@ export default function InventoryToolbar({
   setSearch: (value: string) => void;
   rol: "admin" | "mayorista";
 }) {
+  const router = useRouter();
+
   return (
     <div className="flex items-center justify-between gap-5">
       {/* Filtro */}
       <div className="flex items-center gap-5">
-        <span className="text-sm font-medium text-[#708090]">  Filtrar</span>
+        <span className="text-sm font-medium text-[#708090]">Filtrar</span>
 
         <input
           className="
@@ -37,11 +43,12 @@ export default function InventoryToolbar({
       {/* Botón solo para admin */}
       {rol === "admin" && (
         <button
+          onClick={() => router.push("/dashboard/consignaciones/nueva")}
           className="
             flex items-center gap-2
-            rounded-lg
+            rounded-full
             bg-[#B76E79]
-            px-4
+            px-2
             py-2
             text-sm
             font-medium
@@ -51,7 +58,7 @@ export default function InventoryToolbar({
             transition
           "
         >
-         + Nueva consignación
+          + Nueva consignación
         </button>
       )}
     </div>

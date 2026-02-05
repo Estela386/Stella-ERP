@@ -9,7 +9,7 @@ import ProductTable from "./_components/ProductTable";
 const usuarioMock: Usuario = {
   id: 1,
   nombre: "Administrador",
-  rol: "mayorista", // cambia a "mayorista" para probar
+  rol: "admin", // cambia a "mayorista" para probar
 };
 
 const consignacionesMock: Consignacion[] = [
