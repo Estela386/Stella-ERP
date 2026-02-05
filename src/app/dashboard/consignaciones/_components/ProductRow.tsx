@@ -50,6 +50,7 @@ export default function ProductRow({
                 focus:ring-2
                 focus:ring-[#708090]
               "
+              type="number"
               defaultValue={consignacion.precio_consignado}
             />
           ) : (
@@ -66,7 +67,7 @@ export default function ProductRow({
           <span
             className={`px-3 py-1 rounded-full text-xs font-medium ${
               consignacion.estado === "ACTIVA"
-                ? "bg-[#708090] text-[#f6f4ef]"
+                ? "bg-[#5f7f72] text-[#f6f4ef]"
                 : "bg-[#b76e79] text-[#f6f4ef]"
             }`}
           >

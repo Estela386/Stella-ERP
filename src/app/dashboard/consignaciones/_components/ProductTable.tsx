@@ -13,31 +13,31 @@ export default function ProductTable({
       {/* Desktop */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full rounded-xl overflow-hidden border border-[#8c9796]">
-          <thead className="bg-[#D1BBAA] border-b border-[#8c8c76]">
+          <thead className="bg-[#708090] border-b border-[#8c8c76]">
             <tr>
-              <th className="p-3 text-center text-sm font-semibold text-[#4a5d6b]">
+              <th className="p-3 text-center text-sm font-semibold text-[#f6f3ef]">
                 Producto
               </th>
 
               {usuario.rol === "admin" && (
-                <th className="p-3 text-center text-sm font-semibold text-[#4a5d6b]">
+                <th className="p-3 text-center text-sm font-semibold text-[#f6f3ef]">
                   Cliente
                 </th>
               )}
 
-              <th className="p-3 text-center text-sm font-semibold text-[#4a5d6b]">
+              <th className="p-3 text-center text-sm font-semibold text-[#f6f3ef]">
                 Cantidad
               </th>
 
-              <th className="p-3 text-center text-sm font-semibold text-[#4a5d6b]">
+              <th className="p-3 text-center text-sm font-semibold text-[#f6f3ef]">
                 Periodo
               </th>
 
-              <th className="p-3 text-center text-sm font-semibold text-[#4a5d6b]">
+              <th className="p-3 text-center text-sm font-semibold text-[#f6f3ef]">
                 Precio
               </th>
 
-              <th className="p-3 text-center text-sm font-semibold text-[#4a5d6b]">
+              <th className="p-3 text-center text-sm font-semibold text-[#f6f3ef]">
                 Estado
               </th>
             </tr>
@@ -76,7 +76,7 @@ export default function ProductTable({
               Periodo: {c.fecha_inicio} → {c.fecha_fin ?? "-"}
             </p>
 
-            <p className="text-sm font-semibold text-[#4a5d6b]">
+            <p className="text-sm font-semibold text-[#f6f3ef]">
               ${c.precio_consignado}
             </p>
 
