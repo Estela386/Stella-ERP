@@ -5,11 +5,14 @@ import { Consignacion, Usuario } from "./type";
 import InventoryStats from "./_components/InventoryStats";
 import InventoryToolbar from "./_components/InventoryToolbar";
 import ProductTable from "./_components/ProductTable";
+import SidebarMenu from "@/app/_components/SideBarMenu";
+
+/* ---------------- MOCK DATA ---------------- */
 
 const usuarioMock: Usuario = {
   id: 1,
   nombre: "Administrador",
-  rol: "admin", // cambia a "mayorista" para probar
+  rol: "admin",
 };
 
 const consignacionesMock: Consignacion[] = [
@@ -45,6 +48,8 @@ const consignacionesMock: Consignacion[] = [
   },
 ];
 
+/* ---------------- PAGE ---------------- */
+
 export default function ConsignacionesPage() {
   const [search, setSearch] = useState("");
 
@@ -55,47 +60,46 @@ export default function ConsignacionesPage() {
   );
 
   return (
-    <section className="min-h-screen bg-[#F6F3EF] px-4 py-8">
-      <div className="mx-auto max-w-6xl space-y-6">
-        {/* Header */}
-        <header className="space-y-1">
-          <div className="flex items-center gap-4">
-            <span className="h-px w-12 bg-[#B76E79]" />
-            <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
-              Consignaciones
-            </span>
+    <div className="flex min-h-screen bg-[#F6F3EF]">
+      {/* Sidebar NO fijo */}
+      <SidebarMenu />
+
+      {/* Contenido */}
+      <main className="flex-1 px-4 py-8">
+        <div className="mx-auto max-w-6xl space-y-6">
+          {/* Header */}
+          <header className="space-y-1">
+            <div className="flex items-center gap-4">
+              <span className="h-px w-12 bg-[#B76E79]" />
+              <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
+                Consignaciones
+              </span>
+            </div>
+
+            <h1 className="font-serif text-5xl md:text-6xl font-medium text-[#708090]">
+              Control de productos entregados
+            </h1>
+          </header>
+
+          {/* Card */}
+          <div className="bg-white rounded-2xl p-6 shadow border border-[#E2D6CC] space-y-6">
+            {usuarioMock.rol === "admin" && (
+              <InventoryStats consignaciones={filtradas} />
+            )}
+
+            <InventoryToolbar
+              search={search}
+              setSearch={setSearch}
+              rol={usuarioMock.rol}
+            />
+
+            <ProductTable
+              consignaciones={filtradas}
+              usuario={usuarioMock}
+            />
           </div>
-          <h1
-            className="
-              font-serif
-              text-5xl md:text-6xl
-              font-medium
-              leading-tight
-              text-[#708090]
-            "
-          >
-            Control de productos entregados
-          </h1>
-        </header>
-
-        <div className="bg-white rounded-2xl p-6 shadow border border-[#E2D6CC] space-y-6">
-          {/* Stats solo admin */}
-          {usuarioMock.rol === "admin" && (
-            <InventoryStats consignaciones={filtradas} />
-          )}
-
-          <InventoryToolbar
-            search={search}
-            setSearch={setSearch}
-            rol={usuarioMock.rol}
-          />
-
-          <ProductTable
-            consignaciones={filtradas}
-            usuario={usuarioMock}
-          />
         </div>
-      </div>
-    </section>
+      </main>
+    </div>
   );
 }
