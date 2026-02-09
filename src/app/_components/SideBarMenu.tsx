@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const menuItems = [
-  { label: "Inicio", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Inicio", href: "/dashboard/inicio", icon: LayoutDashboard },
   { label: "Inventario", href: "/dashboard/inventarios", icon: Boxes },
   {
     label: "Consignaciones",
