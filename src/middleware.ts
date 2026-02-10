@@ -8,7 +8,14 @@ export async function middleware(request: NextRequest) {
   // Rutas protegidas que requieren autenticación
   const protectedRoutes = ["/dashboard"];
 
+  // Rutas que requieren rol específico (rol 1 = admin)
+  const adminOnlyRoutes = ["/dashboard/inventarios"];
+
   const isProtectedRoute = protectedRoutes.some(route =>
+    pathname.startsWith(route)
+  );
+
+  const isAdminRoute = adminOnlyRoutes.some(route =>
     pathname.startsWith(route)
   );
 
@@ -45,9 +52,24 @@ export async function middleware(request: NextRequest) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
     if (!user) {
       return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    // Si es ruta solo para admin, verificar rol
+    if (isAdminRoute) {
+      const { data: userData } = await supabase
+        .from("usuario")
+        .select("id_rol")
+        .eq("id_auth", user.id)
+        .single();
+      console.log("Middleware - Datos del usuario:", userData);
+      // Si no tiene rol 1 (admin), redirigir al dashboard principal
+      if (!userData || userData.id_rol !== 1) {
+        return NextResponse.redirect(
+          new URL("/dashboard/cliente", request.url)
+        );
+      }
     }
 
     return supabaseResponse;
