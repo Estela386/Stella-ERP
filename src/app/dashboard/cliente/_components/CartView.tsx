@@ -1,36 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Producto } from "@/lib/models";
+import { useState, useMemo, useEffect } from "react";
+import { Producto } from "@lib/models";
+import { ProductoService } from "@lib/services";
+import { createClient } from "@utils/supabase/client";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 import EmptyCart from "./EmptyCart";
-
-// Productos estáticos para demostración
-const PRODUCTOS_DEMO: Producto[] = [
-  new Producto({
-    id: 1,
-    nombre: "Anillo Ceramista Premium",
-    costo: 45.0,
-    precio: 85.0,
-    tiempo: 45,
-    stock_actual: 10,
-    stock_min: 2,
-    url_imagen: "Anillo Premium",
-    id_categoria: 1,
-  }),
-  new Producto({
-    id: 2,
-    nombre: "Olla Sanitaria Cerámica 5Lt",
-    costo: 120.0,
-    precio: 330.0,
-    tiempo: 120,
-    stock_actual: 5,
-    stock_min: 1,
-    url_imagen: "Olla 5Lt",
-    id_categoria: 1,
-  }),
-];
 
 interface CartItemData {
   producto: Producto;
@@ -38,10 +14,43 @@ interface CartItemData {
 }
 
 export default function CartView() {
-  const [cartItems, setCartItems] = useState<CartItemData[]>([
-    { producto: PRODUCTOS_DEMO[0] as Producto, cantidad: 1 },
-    { producto: PRODUCTOS_DEMO[1] as Producto, cantidad: 1 },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItemData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cargarProductos = async () => {
+      try {
+        setLoading(true);
+        const supabase = createClient();
+        const productoService = new ProductoService(supabase);
+
+        const { productos: productosData, error: errorProductos } =
+          await productoService.obtenerTodos();
+
+        if (errorProductos || !productosData) {
+          setError(errorProductos || "No se pudieron cargar los productos");
+          return;
+        }
+
+        // Agregar los primeros 2 productos al carrito como demo
+        const itemsDemo = productosData.slice(0, 2).map(producto => ({
+          producto,
+          cantidad: 1,
+        }));
+
+        setCartItems(itemsDemo);
+        setError(null);
+      } catch (err) {
+        setError("Error al cargar productos");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarProductos();
+  }, []);
 
   // Calcular totales
   const calculos = useMemo(() => {
@@ -81,6 +90,24 @@ export default function CartView() {
   };
 
   const isEmpty = cartItems.length === 0;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f8eedc] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7c5c4a]" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#f8eedc] flex items-center justify-center">
+        <div className="text-red-600 text-center">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8eedc]">

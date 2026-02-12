@@ -1,43 +1,80 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
+import { ProductoService } from "@lib/services";
+import { createClient } from "@utils/supabase/client";
 
-const FEATURED_PRODUCTS = [
-  {
-    id: 1,
-    name: "Aretes Oro",
-    price: 5100,
-    image: "Aretes Oro",
-    category: "Aretes",
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: "Pulsera oro",
-    price: 14500,
-    image: "Pulsera oro",
-    category: "Pulseras",
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: "Collar rosado",
-    price: 18000,
-    image: "Collar rosado",
-    category: "Collares",
-    rating: 5,
-  },
-  {
-    id: 4,
-    name: "Aretes de oro",
-    price: 8800,
-    image: "Aretes de oro",
-    category: "Aretes",
-    rating: 5,
-  },
-];
+interface ProductoCard {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  category?: string;
+  rating?: number;
+}
 
 export default function ProductGrid() {
+  const [productos, setProductos] = useState<ProductoCard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cargarProductos = async () => {
+      try {
+        setLoading(true);
+        const supabase = createClient();
+        const productoService = new ProductoService(supabase);
+
+        const { productos: productosData, error: errorProductos } =
+          await productoService.obtenerTodos();
+
+        if (errorProductos || !productosData) {
+          setError(errorProductos || "No se pudieron cargar los productos");
+          return;
+        }
+
+        // Transformar datos para ProductCard
+        const productosFormatted: ProductoCard[] = productosData.map(p => ({
+          id: p.id,
+          name: p.nombre || "Producto",
+          price: p.precio || 0,
+          image: p.url_imagen || p.nombre || "Producto",
+          category: p.nombre?.split(" ")[0] || undefined,
+          rating: 5,
+        }));
+
+        setProductos(productosFormatted);
+        setError(null);
+      } catch (err) {
+        setError("Error al cargar productos");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarProductos();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7c5c4a]" />
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
+        <div className="text-center text-red-600">{error}</div>
+      </section>
+    );
+  }
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
       <div className="mb-12">
@@ -50,18 +87,26 @@ export default function ProductGrid() {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-        {FEATURED_PRODUCTS.map(product => (
-          <ProductCard key={product.id} {...product} />
-        ))}
-      </div>
+      {productos.length > 0 ? (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            {productos.map(product => (
+              <ProductCard key={product.id} {...product} />
+            ))}
+          </div>
 
-      {/* View All Button */}
-      <div className="text-center mt-12">
-        <button className="px-8 py-3 border-2 border-[#7c5c4a] text-[#7c5c4a] rounded-lg hover:bg-[#e5d3c2] transition-colors font-medium">
-          Ver Todo el Catálogo
-        </button>
-      </div>
+          {/* View All Button */}
+          <div className="text-center mt-12">
+            <button className="px-8 py-3 border-2 border-[#7c5c4a] text-[#7c5c4a] rounded-lg hover:bg-[#e5d3c2] transition-colors font-medium">
+              Ver Todo el Catálogo
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="text-center text-[#7c5c4a] py-12">
+          No hay productos disponibles
+        </div>
+      )}
     </section>
   );
 }
