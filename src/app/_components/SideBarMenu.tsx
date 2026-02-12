@@ -10,6 +10,8 @@ import {
   LogOut,
   LayoutListIcon,
 } from "lucide-react";
+import Image from "next/image";
+import { BiMoney } from "react-icons/bi";
 
 const menuItems = [
   { label: "Inicio", href: "/dashboard/inicio", icon: LayoutDashboard },
@@ -20,6 +22,7 @@ const menuItems = [
     icon: ShoppingCart,
   },
   { label: "Materiales", href: "/dashboard/materiales", icon: LayoutListIcon },
+  { label: "Cuentas", href: "/dashboard/reportes", icon: BiMoney },
   { label: "Reportes", href: "/dashboard/reportes", icon: BarChart3 },
 ];
 
@@ -29,23 +32,32 @@ export default function SidebarMenu() {
   return (
     <aside
       className="
-        w-64 min-h-screen
-        bg-[#708090]
-        text-[#f6f4ef]
-        flex flex-col
-        shadow-[6px_0_30px_rgba(140,151,102,0.35)]
-        animate-[slideIn_0.6s_ease-out]
-        perspective-[1200px]
-        preserve-3d
-      "
+  w-20 sm:w-24 md:w-56 lg:w-64
+  min-h-screen
+  bg-[#D1BBAA]
+  text-[#f6f4ef]
+  flex flex-col
+  transition-all duration-300
+  shadow-[6px_0_30px_rgba(183,110,121,0.35)]
+  animate-[slideIn_0.6s_ease-out]
+  perspective-[1200px]
+  preserve-3d
+  rounded-r-3xl
+"
     >
       {/* Logo */}
-      <div className="p-6 border-b border-[#f6f4ef]/15 animate-float">
-        <h1 className="text-lg font-semibold tracking-wide">Stella Joyería</h1>
+      <div className="p-6 border-b border-[#f6f4ef] animate-float flex flex-col items-center">
+        <Image
+          src="/logo.png"
+          alt="Stella Logo"
+          width={100}
+          height={100}
+          className="h-40 w-40 mb-2"
+        />
       </div>
 
       {/* Menú */}
-      <nav className="px-3 py-5 space-y-3 flex-1">
+      <nav className="px-3 py-5 space-y-2 flex-1">
         {menuItems.map((item, index) => {
           const Icon = item.icon;
           const active = pathname === item.href;

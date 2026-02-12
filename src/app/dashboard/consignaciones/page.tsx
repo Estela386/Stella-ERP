@@ -7,8 +7,6 @@ import InventoryToolbar from "./_components/InventoryToolbar";
 import ProductTable from "./_components/ProductTable";
 import SidebarMenu from "@/app/_components/SideBarMenu";
 
-/* ---------------- MOCK DATA ---------------- */
-
 const usuarioMock: Usuario = {
   id: 1,
   nombre: "Administrador",
@@ -48,8 +46,6 @@ const consignacionesMock: Consignacion[] = [
   },
 ];
 
-/* ---------------- PAGE ---------------- */
-
 export default function ConsignacionesPage() {
   const [search, setSearch] = useState("");
 
@@ -61,13 +57,10 @@ export default function ConsignacionesPage() {
 
   return (
     <div className="flex min-h-screen bg-[#F6F3EF]">
-      {/* Sidebar NO fijo */}
       <SidebarMenu />
 
-      {/* Contenido */}
       <main className="flex-1 px-4 py-8">
         <div className="mx-auto max-w-6xl space-y-6">
-          {/* Header */}
           <header className="space-y-1">
             <div className="flex items-center gap-4">
               <span className="h-px w-12 bg-[#B76E79]" />
@@ -76,13 +69,31 @@ export default function ConsignacionesPage() {
               </span>
             </div>
 
-            <h1 className="font-serif text-5xl md:text-6xl font-medium text-[#708090]">
+            <h1
+              className="
+                font-serif
+                text-5xl md:text-6xl
+                font-medium
+                leading-tight
+                text-[#708090]
+              "
+            >
               Control de productos entregados
             </h1>
           </header>
 
           {/* Card */}
-          <div className="bg-white rounded-2xl p-6 shadow border border-[#E2D6CC] space-y-6">
+          <div
+            className="
+              relative
+              rounded-3xl
+              bg-white
+              p-10
+              space-y-3
+              border border-black/10
+              shadow-[0_30px_70px_rgba(0,0,0,0.12)]
+            "
+          >
             {usuarioMock.rol === "admin" && (
               <InventoryStats consignaciones={filtradas} />
             )}
@@ -93,10 +104,7 @@ export default function ConsignacionesPage() {
               rol={usuarioMock.rol}
             />
 
-            <ProductTable
-              consignaciones={filtradas}
-              usuario={usuarioMock}
-            />
+            <ProductTable consignaciones={filtradas} usuario={usuarioMock} />
           </div>
         </div>
       </main>

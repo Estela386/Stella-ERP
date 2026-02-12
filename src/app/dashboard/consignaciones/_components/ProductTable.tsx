@@ -9,7 +9,7 @@ export default function ProductTable({
   usuario: Usuario;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" >
       {/* Desktop */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full rounded-xl overflow-hidden border border-[#8c9796]">

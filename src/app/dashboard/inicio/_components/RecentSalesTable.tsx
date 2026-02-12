@@ -22,13 +22,24 @@ const ventas: Venta[] = [
 
 export default function RecentSalesTable() {
   return (
-    <div className="bg-white rounded-xl border border-[#8C9796]/25">
-      <h2 className="text-lg font-medium p-5">
-        Ventas Recientes
-      </h2>
+    <div
+      className="
+        rounded-2xl
+        border border-black/10
+        shadow-md shadow-[#8C9796]/30
+        overflow-hidden
+      "
+    >
+      {/* Header */}
+      <div className="bg-[#708090] px-6 py-4">
+        <h2 className="text-lg font-medium text-[#F6F4EF]">
+          Ventas Recientes
+        </h2>
+      </div>
 
-      <table className="min-w-full text-sm">
-        <thead className="bg-[#F5F3EF]">
+      <table className="min-w-full text-sm bg-white">
+        {/* Head */}
+        <thead className="bg-[#F6F4EF] border-b border-black/5">
           <tr>
             {[
               "ID Venta",
@@ -42,7 +53,12 @@ export default function RecentSalesTable() {
             ].map(h => (
               <th
                 key={h}
-                className="px-4 py-3 text-left text-[#708090]"
+                className="
+                  px-6 py-3
+                  text-left
+                  text-[#708090]
+                  font-medium
+                "
               >
                 {h}
               </th>
@@ -50,18 +66,56 @@ export default function RecentSalesTable() {
           </tr>
         </thead>
 
+        {/* Body */}
         <tbody>
           {ventas.map(v => (
-            <tr key={v.id} className="border-t">
-              <td className="px-4 py-3">{v.id}</td>
-              <td className="px-4 py-3">{v.fecha}</td>
-              <td className="px-4 py-3">{v.cliente}</td>
-              <td className="px-4 py-3">{v.items}</td>
-              <td className="px-4 py-3 font-medium">{v.total}</td>
-              <td className="px-4 py-3">{v.pago}</td>
-              <td className="px-4 py-3">{v.vendedor}</td>
-              <td className="px-4 py-3 text-[#E28A2D] cursor-pointer">
-                Ver
+            <tr
+              key={v.id}
+              className="
+                border-t border-black/5
+                hover:bg-[#F6F4EF]
+                transition
+              "
+            >
+              <td className="px-6 py-4 font-medium text-[#708090]">
+                {v.id}
+              </td>
+
+              <td className="px-6 py-4 text-[#1C1C1C]">
+                {v.fecha}
+              </td>
+
+              <td className="px-6 py-4 text-[#1C1C1C]">
+                {v.cliente}
+              </td>
+
+              <td className="px-6 py-4 text-[#1C1C1C]">
+                {v.items}
+              </td>
+
+              <td className="px-6 py-4 font-semibold text-[#B76E79]">
+                {v.total}
+              </td>
+
+              <td className="px-6 py-4 text-[#1C1C1C]">
+                {v.pago}
+              </td>
+
+              <td className="px-6 py-4 text-[#1C1C1C]">
+                {v.vendedor}
+              </td>
+
+              <td className="px-6 py-4">
+                <span
+                  className="
+                    text-[#B76E79]
+                    font-medium
+                    cursor-pointer
+                    hover:underline
+                  "
+                >
+                  Ver
+                </span>
               </td>
             </tr>
           ))}

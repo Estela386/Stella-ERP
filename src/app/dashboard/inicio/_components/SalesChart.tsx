@@ -10,23 +10,48 @@ export default function SalesChart() {
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-[#8C9796]/25 p-6">
-      <h2 className="text-lg font-medium mb-6">
-        Ventas de la Semana
-      </h2>
+    <div
+      className="
+        rounded-2xl
+        border border-black/10
+        shadow-md shadow-[#8C9796]/30
+        overflow-hidden
+      "
+    >
+      {/* Header oscuro elegante */}
+      <div className="bg-[#708090] px-6 py-4">
+        <h2 className="text-lg font-medium text-[#F6F4EF]">
+          Ventas de la Semana
+        </h2>
+      </div>
 
-      <div className="flex items-end gap-4 h-64">
-        {data.map(d => (
-          <div key={d.day} className="flex flex-col items-center gap-2">
+      <div className="bg-white p-6">
+        <div className="flex items-end justify-between gap-4 h-64">
+          {data.map(d => (
             <div
-              className="w-8 rounded-xl bg-[#F2A23A]"
-              style={{ height: `${d.value}%` }}
-            />
-            <span className="text-xs text-[#708090]">
-              {d.day}
-            </span>
-          </div>
-        ))}
+              key={d.day}
+              className="flex flex-col items-center gap-3 flex-1"
+            >
+              {/* Barra */}
+              <div
+                className="
+                  w-10
+                  rounded-xl
+                  bg-[#B76E79]
+                  hover:bg-[#a45f69]
+                  transition-all duration-300
+                  shadow-md shadow-[#8C9796]/40
+                "
+                style={{ height: `${d.value}%` }}
+              />
+
+              {/* Día */}
+              <span className="text-xs font-medium text-[#708090] tracking-wide">
+                {d.day}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

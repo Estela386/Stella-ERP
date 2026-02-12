@@ -14,27 +14,30 @@ const stats: Stat[] = [
 export default function DashboardStats() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {stats.map(stat => (
-        <div
-          key={stat.label}
-          className="
-            bg-white
-            rounded-xl
-            p-5
-            border border-[#8C9796]/25
-          "
-        >
-          <p className="text-sm text-[#708090]">{stat.label}</p>
-          <p className="text-2xl font-semibold text-[#1C1C1C] mt-1">
-            {stat.value}
-          </p>
-          {stat.hint && (
-            <p className="text-xs text-[#8C9796] mt-1">
-              {stat.hint}
+      {stats.map((stat: Stat, index: number) => {
+        const bgColor = index === 1 ? "bg-[#B76E79]" : "bg-[#708090]";
+
+        return (
+          <div
+            key={stat.label}
+            className={`p-4 rounded-xl shadow-md shadow-[#8c8c76] ${bgColor}`}
+          >
+            <p className="text-sm text-[#f6f4ef]">
+              {stat.label}
             </p>
-          )}
-        </div>
-      ))}
+
+            <p className="text-2xl font-bold text-[#f6f4ef]">
+              {stat.value}
+            </p>
+
+            {stat.hint && (
+              <p className="text-xs text-[#f6f4ef]/80 mt-1">
+                {stat.hint}
+              </p>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

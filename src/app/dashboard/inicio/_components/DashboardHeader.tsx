@@ -1,29 +1,48 @@
-export default function DashboardHeader() {
-  return (
-    <div className="flex flex-col md:flex-row justify-between gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold text-[#1C1C1C]">
-          Gestión de Ventas
-        </h1>
-        <p className="text-sm text-[#8C9796]">
-          Registro y seguimiento de transacciones
-        </p>
-      </div>
+"use client";
 
-      <button
-        className="
-          bg-[#E28A2D]
-          text-white
-          px-6 py-3
-          rounded-full
-          text-sm font-medium
-          shadow
-          hover:bg-[#CF7C24]
-          transition
-        "
-      >
-        + Nueva Venta
-      </button>
-    </div>
+import { useRouter } from "next/navigation";
+
+export default function DashboardHeader() {
+  const router = useRouter();
+  return (
+    <header className="space-y-6">
+      {/* Línea decorativa */}
+      <div className="flex items-center justify-between gap-6 flex-col md:flex-row">
+        <div className="space-y-1">
+          <h1
+            className="
+              font-serif
+              text-5xl md:text-6xl
+              font-medium
+              leading-tight
+              text-[#708090]
+            "
+          >
+            Gestión de Ventas
+          </h1>
+
+          <p className="text-sm text-[#8C9796] mt-2">
+            Registro y seguimiento de transacciones
+          </p>
+        </div>
+
+        <button
+          onClick={() => router.push("/dashboard/inicio/nuevaVenta")}
+          className="
+        bg-[#B76E79]
+        text-white
+        px-6 py-3
+        rounded-full
+        text-sm font-medium
+        shadow-sm
+        hover:bg-[#A45F69]
+        hover:shadow-md
+        transition
+      "
+        >
+          + Nueva Venta
+        </button>
+      </div>
+    </header>
   );
 }

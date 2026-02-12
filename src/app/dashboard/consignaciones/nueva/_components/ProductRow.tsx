@@ -78,7 +78,6 @@ export default function ProductoRow({
                 bg-[#b76e79]
                 text-[#f6f4ef]
                 font-medium
-                shadow-[0_6px_18px_rgba(183,110,121,0.4)]
                 hover:translate-y-[-1px]
                 transition
               "

@@ -30,7 +30,6 @@ const productos: Producto[] = [
   },
 ];
 
-/* ---------------- PAGE ---------------- */
 
 export default function InventariosPage() {
   const [search, setSearch] = useState("");
@@ -45,7 +44,7 @@ export default function InventariosPage() {
         <div className="mx-auto max-w-7xl space-y-10">
           {/* Header */}
           <header className="space-y-6">
-            {/* Línea editorial */}
+            Línea editorial
             <div className="flex items-center gap-4">
               <span className="h-px w-12 bg-[#B76E79]" />
               <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
@@ -67,20 +66,17 @@ export default function InventariosPage() {
             </h1>
           </header>
 
-          {/* Card principal */}
           <div
             className="
               relative
               rounded-3xl
               bg-white
-              p-8
-              space-y-8
+              p-10
+              space-y-3
               border border-black/10
               shadow-[0_30px_70px_rgba(0,0,0,0.12)]
             "
           >
-            {/* Accent line */}
-            <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-[#B76E79]" />
 
             <InventoryStats productos={productos} />
 
