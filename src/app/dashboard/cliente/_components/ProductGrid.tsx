@@ -4,15 +4,7 @@ import { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 import { ProductoService } from "@lib/services";
 import { createClient } from "@utils/supabase/client";
-
-interface ProductoCard {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category?: string;
-  rating?: number;
-}
+import { ProductoCard } from "../types";
 
 export default function ProductGrid() {
   const [productos, setProductos] = useState<ProductoCard[]>([]);
