@@ -31,7 +31,7 @@ export default function ProductGrid() {
           id: p.id,
           name: p.nombre || "Producto",
           price: p.precio || 0,
-          image: p.url_imagen || p.nombre || "Producto",
+          image: p.url_imagen || undefined,
           category: p.nombre?.split(" ")[0] || undefined,
           rating: 5,
         }));

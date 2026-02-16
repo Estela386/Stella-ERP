@@ -8,7 +8,7 @@ import ProductTable from "./_components/ProductTable";
 import ProductModalForm from "./_components/ProductModalForm";
 import CategoryModal from "./_components/CategoryModal";
 import { Producto } from "./type";
-import { ProductoService } from "@lib/services";
+import { ProductoService, ImageUploadService } from "@lib/services";
 import { CategoriaService } from "@lib/services";
 import { createClient } from "@utils/supabase/client";
 import { useAuth } from "@lib/hooks/useAuth";
@@ -127,20 +127,46 @@ export default function InventariosPage() {
   };
 
   const handleSubmitForm = async (
-    data: CreateProductoDTO | UpdateProductoDTO
+    data: CreateProductoDTO | UpdateProductoDTO,
+    imagenFile?: File
   ) => {
     try {
       setFormLoading(true);
       const supabase = createClient();
       const productoService = new ProductoService(supabase);
       const categoriaService = new CategoriaService(supabase);
+      const imageUploadService = new ImageUploadService(supabase);
+
+      let urlImagen: string | undefined = undefined;
+
+      // Si hay una imagen nueva, subirla
+      console.log("Imagen recibida en submit:", imagenFile);
+      if (imagenFile) {
+        const { url, error: uploadError } =
+          await imageUploadService.uploadImage(
+            imagenFile,
+            selectedProducto?.id
+          );
+
+        if (uploadError) {
+          setError(uploadError);
+          return;
+        }
+
+        urlImagen = url || undefined;
+      }
+
+      // Preparar datos con la URL de imagen si existe
+      const dataConImagen = urlImagen
+        ? { ...data, url_imagen: urlImagen }
+        : data;
 
       if (selectedProducto) {
         // Actualizar producto existente
         const { producto: productoActualizado, error } =
           await productoService.actualizar(
             selectedProducto.id,
-            data as UpdateProductoDTO
+            dataConImagen as UpdateProductoDTO
           );
 
         if (error) {
@@ -177,7 +203,7 @@ export default function InventariosPage() {
       } else {
         // Crear nuevo producto
         const { producto: productoNuevo, error } = await productoService.crear(
-          data as CreateProductoDTO
+          dataConImagen as CreateProductoDTO
         );
 
         if (error) {
@@ -351,13 +377,13 @@ export default function InventariosPage() {
             <div className="flex gap-3">
               <button
                 onClick={handleOpenCategoryModal}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium transition"
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium transition cursor-pointer"
               >
                 + Categoría
               </button>
               <button
                 onClick={() => handleOpenModal()}
-                className="bg-[#B76E79] text-white px-6 py-2 rounded-lg hover:bg-[#a05a65] font-medium transition"
+                className="bg-[#B76E79] text-white px-6 py-2 rounded-lg hover:bg-[#a05a65] font-medium transition cursor-pointer"
               >
                 + Nuevo Producto
               </button>
