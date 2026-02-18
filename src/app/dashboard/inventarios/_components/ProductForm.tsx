@@ -147,7 +147,7 @@ export default function ProductForm({
           value={formData.nombre}
           onChange={handleChange}
           disabled={loading}
-          className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
+          className={`text-gray-700 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
             errors.nombre ? "border-red-500" : "border-gray-300"
           }`}
           placeholder="Ej: Anillo Solitario Diamante"
@@ -171,10 +171,10 @@ export default function ProductForm({
           value={formData.id_categoria}
           onChange={handleChange}
           disabled={loading}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
+          className="text-gray-700 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
         >
           {categorias.map(cat => (
-            <option key={cat.id} value={cat.id}>
+            <option key={cat.id} value={cat.id} className="text-gray-700">
               {cat.nombre}
             </option>
           ))}
@@ -198,7 +198,7 @@ export default function ProductForm({
             onChange={handleChange}
             disabled={loading}
             step="0.01"
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
+            className={`text-gray-700 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
               errors.costo ? "border-red-500" : "border-gray-300"
             }`}
             placeholder="0.00"
@@ -223,7 +223,7 @@ export default function ProductForm({
             onChange={handleChange}
             disabled={loading}
             step="0.01"
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
+            className={`text-gray-700 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
               errors.precio ? "border-red-500" : "border-gray-300"
             }`}
             placeholder="0.00"
@@ -250,7 +250,7 @@ export default function ProductForm({
             value={formData.stock_actual}
             onChange={handleChange}
             disabled={loading}
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
+            className={`text-gray-700 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
               errors.stock_actual ? "border-red-500" : "border-gray-300"
             }`}
             placeholder="0"
@@ -274,7 +274,7 @@ export default function ProductForm({
             value={formData.stock_min}
             onChange={handleChange}
             disabled={loading}
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
+            className={`text-gray-700 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
               errors.stock_min ? "border-red-500" : "border-gray-300"
             }`}
             placeholder="0"
@@ -323,7 +323,7 @@ export default function ProductForm({
           accept="image/*"
           onChange={handleImageChange}
           disabled={loading}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#B76E79] file:text-white hover:file:bg-[#a05a65]"
+          className="text-gray-700 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#B76E79] file:text-white hover:file:bg-[#a05a65]"
         />
         {errors.imagen && (
           <p className="mt-1 text-sm text-red-600">{errors.imagen}</p>
@@ -348,7 +348,7 @@ export default function ProductForm({
           value={formData.tiempo}
           onChange={handleChange}
           disabled={loading}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
+          className="text-gray-700 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
           placeholder="0"
         />
       </div>
@@ -358,7 +358,7 @@ export default function ProductForm({
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-[#B76E79] text-white py-2 rounded-lg hover:bg-[#a05a65] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
+          className="cursor-pointer flex-1 bg-[#B76E79] text-white py-2 rounded-lg hover:bg-[#a05a65] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
         >
           {loading
             ? "Guardando..."
@@ -370,7 +370,7 @@ export default function ProductForm({
           type="button"
           onClick={onCancel}
           disabled={loading}
-          className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
+          className="cursor-pointer flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
         >
           Cancelar
         </button>
