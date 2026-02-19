@@ -61,6 +61,7 @@ export default function NewProductModal({ onClose }: Props) {
             label="Precio"
             name="precio"
             type="number"
+            placeholder="$0.00"
             value={form.precio}
             onChange={handleChange}
           />
@@ -69,6 +70,7 @@ export default function NewProductModal({ onClose }: Props) {
             label="Costo"
             name="costo"
             type="number"
+            placeholder="$0.00"
             value={form.costo}
             onChange={handleChange}
           />
