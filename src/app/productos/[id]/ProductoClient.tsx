@@ -6,6 +6,7 @@ import Footer from "@auth/_components/Footer";
 import { ProductoService } from "@lib/services";
 import { createClient } from "@utils/supabase/client";
 import { useAuth } from "@lib/hooks/useAuth";
+import { useCart } from "@lib/hooks/useCart";
 import Image from "next/image";
 
 interface ProductoClientProps {
@@ -14,10 +15,12 @@ interface ProductoClientProps {
 
 export default function ProductoClient({ id }: ProductoClientProps) {
   const { usuario } = useAuth();
+  const { agregarAlCarrito } = useCart();
   console.log("usuario:", usuario);
   const [producto, setProducto] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [agregandoCarrito, setAgregandoCarrito] = useState(false);
 
   useEffect(() => {
     const cargarProducto = async () => {
@@ -133,10 +136,22 @@ export default function ProductoClient({ id }: ProductoClientProps) {
             </div>
 
             <button
-              disabled={producto.stock_actual === 0}
+              disabled={producto.stock_actual === 0 || agregandoCarrito}
               className="cursor-pointer w-full bg-[#7c5c4a] text-white py-3 rounded-lg hover:bg-[#5c4a37] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              onClick={() => {
+                setAgregandoCarrito(true);
+                agregarAlCarrito(producto, 1);
+                setTimeout(() => {
+                  setAgregandoCarrito(false);
+                  alert("¡Producto agregado al carrito!");
+                }, 500);
+              }}
             >
-              {producto.stock_actual > 0 ? "Agregar al Carrito" : "Sin stock"}
+              {agregandoCarrito
+                ? "Agregando..."
+                : producto.stock_actual > 0
+                  ? "Agregar al Carrito"
+                  : "Sin stock"}
             </button>
           </div>
         </div>

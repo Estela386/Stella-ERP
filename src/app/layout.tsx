@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { CartProvider } from "@lib/context/CartContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,15 +29,11 @@ export default function RootLayout({
         <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
         <link rel="manifest" href="/favicon/site.webmanifest" />
-        {/* Puedes agregar más tamaños si tienes PNGs, ej:
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
-        */}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#f8eedc]`}
       >
-        {children}
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 
 import { Producto } from "@/lib/models";
 import { useState } from "react";
+import Image from "next/image";
 
 interface CartItemProps {
   producto: Producto;
@@ -32,9 +33,13 @@ export default function CartItem({
     <div className="flex items-center gap-6 pb-6 border-b border-[#d6c1b1] last:border-b-0">
       {/* Product Image */}
       <div className="w-24 h-24 bg-[#e5d3c2] rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-[#7c5c4a] text-sm text-center px-2">
-          {producto.url_imagen || "Imagen"}
-        </span>
+        <Image
+          src={producto.url_imagen || "/placeholder.png"}
+          alt={producto.nombre || "Producto"}
+          width={96}
+          height={96}
+          className="object-cover rounded-lg"
+        />
       </div>
 
       {/* Product Info */}

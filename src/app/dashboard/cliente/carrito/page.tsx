@@ -1,12 +1,15 @@
-import React from "react";
-import Header from "@auth/_components/Header";
+"use client";
+import HeaderClient from "@auth/_components/HeaderClient";
 import Footer from "@auth/_components/Footer";
 import CartView from "../_components/CartView";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 export default function CartPage() {
+  const { usuario } = useAuth();
+  console.log("user:", usuario);
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+      <HeaderClient user={usuario} />
 
       <main className="flex-grow">
         <CartView />
