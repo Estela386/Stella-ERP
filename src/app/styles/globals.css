@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* =====================
+   KEYFRAMES
+===================== */
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* =====================
+   UTILIDADES CUSTOM
+===================== */
+
+@layer utilities {
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .rotate-x-6 {
+    transform: rotateX(6deg);
+  }
+
+  .shadow-soft {
+    box-shadow: 0 6px 16px rgba(140, 151, 102, 0.25);
+  }
+
+  .shadow-medium {
+    box-shadow: 0 14px 30px rgba(140, 151, 102, 0.35);
+  }
+
+  .shadow-accent {
+    box-shadow: 0 14px 30px rgba(183, 110, 121, 0.55);
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+}
