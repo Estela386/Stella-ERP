@@ -20,8 +20,8 @@ const menuItems = [
   { label: "Consignación", href: "/dashboard/consignaciones", icon: ShoppingCart },
   { label: "Pedidos", href: "/dashboard/pedidos", icon: PackageIcon },
   { label: "Materiales", href: "/dashboard/materiales", icon: LayoutListIcon },
-  { label: "Cuentas", href: "/dashboard/reportes", icon: BiMoney },
-  { label: "Reportes", href: "/dashboard/reportes", icon: BarChart3 },
+  { label: "Cuentas", href: "/dashboard/cuentas", icon: BiMoney },
+  { label: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
 ];
 
 export default function SidebarMenu() {
@@ -40,7 +40,6 @@ export default function SidebarMenu() {
         rounded-r-3xl
       "
     >
-      {/* LOGO — SOLO EN PANTALLAS GRANDES */}
       <div className="hidden md:flex p-6 border-b border-[#f6f4ef] flex-col items-center">
         <Image
           src="/logo.png"
@@ -51,8 +50,7 @@ export default function SidebarMenu() {
         />
       </div>
 
-      {/* MENÚ */}
-      <nav className="px-2 md:px-6 py-5 space-y-2 flex-1">
+      <nav className="px-2 md:px-2 py-5 space-y-2 flex-1">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href;
@@ -73,14 +71,12 @@ export default function SidebarMenu() {
                 }
               `}
             >
-              {/* INDICADOR ACTIVO */}
               {active && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-full bg-[#f6f4ef]" />
               )}
 
               <Icon size={20} />
 
-              {/* TEXTO — SOLO EN PANTALLAS GRANDES */}
               <span className="hidden md:block font-semibold">
                 {item.label}
               </span>
@@ -89,7 +85,6 @@ export default function SidebarMenu() {
         })}
       </nav>
 
-      {/* FOOTER */}
       <div className="p-3 md:p-4 border-t border-[#f6f4ef]/15">
         <div className="hidden md:block text-sm font-medium">
           Administrador
