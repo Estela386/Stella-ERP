@@ -5,9 +5,8 @@ import PrimaryButton from "@/_components/PrimaryButton";
 import SecondaryButton from "../../_components/SecondaryButton";
 import Image from "next/image";
 import { logout } from "@auth/actions";
-
 interface HeaderClientProps {
-  user: any;
+  user: any; // Cambia esto al tipo correcto de usuario si lo tienes definido
 }
 
 export default function HeaderClient({ user }: HeaderClientProps) {
@@ -15,7 +14,8 @@ export default function HeaderClient({ user }: HeaderClientProps) {
   const router = useRouter();
   const isLogin = pathname === "/login";
   const isRegister = pathname === "/register";
-  const isClientDashboard = pathname.startsWith("/dashboard/cliente");
+  const { id_rol } = user || 0;
+  const isClientDashboard = id_rol === 1 || id_rol === 2; // Mostrar nav solo para admin y cliente
 
   const navItems = [
     { label: "Inicio", href: "/dashboard/cliente" },

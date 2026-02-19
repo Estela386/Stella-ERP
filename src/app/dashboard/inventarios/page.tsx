@@ -19,7 +19,6 @@ import {
   CreateCategoriaDTO,
 } from "@lib/models";
 
-
 export default function InventariosPage() {
   const router = useRouter();
   const { usuario, loading: loadingUser } = useAuth();
@@ -328,7 +327,7 @@ export default function InventariosPage() {
         <div className="mx-auto max-w-7xl space-y-10">
           {/* Header */}
           <header className="space-y-6">
-            Línea editorial
+            {/* Línea editorial */}
             <div className="flex items-center gap-4">
               <span className="h-px w-12 bg-[#B76E79]" />
               <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
@@ -348,62 +347,62 @@ export default function InventariosPage() {
             >
               Consulta de Inventario
             </h1>
+
+            {/* Subtle divider */}
+            <div className="h-px w-full bg-black/5" />
           </header>
 
+          {/* Card principal */}
           <div
             className="
               relative
               rounded-3xl
               bg-white
-              p-10
-              space-y-3
+              p-8
+              space-y-8
               border border-black/10
               shadow-[0_30px_70px_rgba(0,0,0,0.12)]
             "
           >
+            {/* Accent line */}
+            <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-[#B76E79]" />
+
+            {/* Error message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
 
             <InventoryStats productos={productos} />
 
-            <InventoryToolbar
+            <div className="flex justify-between items-center gap-4">
+              <InventoryToolbar search={search} setSearch={setSearch} />
+              <div className="flex gap-3">
+                <button
+                  onClick={handleOpenCategoryModal}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium transition cursor-pointer"
+                >
+                  + Categoría
+                </button>
+                <button
+                  onClick={() => handleOpenModal()}
+                  className="bg-[#B76E79] text-white px-6 py-2 rounded-lg hover:bg-[#a05a65] font-medium transition cursor-pointer"
+                >
+                  + Nuevo Producto
+                </button>
+              </div>
+            </div>
+
+            <ProductTable
+              productos={productos}
               search={search}
-              setSearch={setSearch}
+              onEdit={handleOpenModal}
+              onDelete={handleDeleteProducto}
             />
-
-          {/* Error message */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {error}
-            </div>
-          )}
-
-          <InventoryStats productos={productos} />
-
-          <div className="flex justify-between items-center gap-4">
-            <InventoryToolbar search={search} setSearch={setSearch} />
-            <div className="flex gap-3">
-              <button
-                onClick={handleOpenCategoryModal}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium transition cursor-pointer"
-              >
-                + Categoría
-              </button>
-              <button
-                onClick={() => handleOpenModal()}
-                className="bg-[#B76E79] text-white px-6 py-2 rounded-lg hover:bg-[#a05a65] font-medium transition cursor-pointer"
-              >
-                + Nuevo Producto
-              </button>
-            </div>
           </div>
-
-          <ProductTable
-            productos={productos}
-            search={search}
-            onEdit={handleOpenModal}
-            onDelete={handleDeleteProducto}
-          />
         </div>
-      </div>
+      </main>
 
       {/* Modal de Producto */}
       <ProductModalForm
@@ -422,6 +421,6 @@ export default function InventariosPage() {
         onClose={handleCloseCategoryModal}
         loading={formLoading}
       />
-    </section>
+    </div>
   );
 }
