@@ -16,11 +16,13 @@ export default function ProductTable({
 }: Props) {
   const productosFiltrados = productos.filter(p => {
     const term = search.toLowerCase();
+    const nombre = p.nombre?.toLowerCase() || "";
+    const categoria = p.categoria.nombre.toLowerCase();
 
     return (
-      p.nombre.toLowerCase().includes(term) ||
+      nombre.includes(term) ||
       p.id.toString().includes(term) ||
-      p.categoria.nombre.toLowerCase().includes(term)
+      categoria.includes(term)
     );
   });
 

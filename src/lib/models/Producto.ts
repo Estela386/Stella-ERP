@@ -6,7 +6,7 @@ export interface IProducto {
   id: number;
   nombre: string | null;
   costo: number | null;
-  precio: number | null;
+  precio: number;
   tiempo: number | null;
   stock_actual: number | null;
   stock_min: number | null;
@@ -34,7 +34,7 @@ export class Producto implements IProducto {
   id: number;
   nombre: string | null;
   costo: number | null;
-  precio: number | null;
+  precio: number;
   tiempo: number | null;
   stock_actual: number | null;
   stock_min: number | null;

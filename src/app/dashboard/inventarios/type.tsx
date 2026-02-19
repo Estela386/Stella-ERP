@@ -7,9 +7,9 @@ export type Producto = {
   id: number;
   nombre: string | null;
   precio: number | null;
-  costo: number | null;
-  stock_actual: number | null;
-  stock_min: number | null;
+  costo: number;
+  stock_actual: number;
+  stock_min: number;
   tiempo?: number | null;
   url_imagen?: string | null;
   id_categoria?: number | null;

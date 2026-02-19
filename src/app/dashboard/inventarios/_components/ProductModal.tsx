@@ -49,7 +49,7 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
           <Input
             label="Nombre"
             name="nombre"
-            value={form.nombre}
+            value={form.nombre || ""}
             onChange={handleChange}
           />
 
@@ -63,7 +63,7 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
           <Input
             label="Precio"
             name="precio"
-            value={form.precio}
+            value={form.precio || ""}
             onChange={handleChange}
           />
 
@@ -131,9 +131,7 @@ function Input({
 
   return (
     <div className="space-y-1.5">
-      <label className="text-xs tracking-wide text-[#708090]">
-        {label}
-      </label>
+      <label className="text-xs tracking-wide text-[#708090]">{label}</label>
 
       <input
         className={`

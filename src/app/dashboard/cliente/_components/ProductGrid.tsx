@@ -5,6 +5,7 @@ import ProductCard from "./ProductCard";
 import { ProductoService } from "@lib/services";
 import { createClient } from "@utils/supabase/client";
 import { ProductoCard } from "../types";
+import Link from "next/link";
 
 export default function ProductGrid() {
   const [productos, setProductos] = useState<ProductoCard[]>([]);
@@ -83,7 +84,9 @@ export default function ProductGrid() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {productos.map(product => (
-              <ProductCard key={product.id} {...product} />
+              <Link key={product.id} href={`/productos/${product.id}`}>
+                <ProductCard key={product.id} {...product} />
+              </Link>
             ))}
           </div>
 
