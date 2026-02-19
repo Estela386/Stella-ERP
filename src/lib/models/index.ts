@@ -15,3 +15,4 @@ export {
   type CreateCategoriaDTO,
   type UpdateCategoriaDTO,
 } from "./Categoria";
+export { Usuario, type IUsuario, type UpdateUsuarioDTO } from "./Usuario";

@@ -4,9 +4,16 @@ import ProductRow from "./ProductRow";
 interface Props {
   productos: Producto[];
   search: string;
+  onEdit?: (producto: Producto) => void;
+  onDelete?: (id: number) => void;
 }
 
-export default function ProductTable({ productos, search }: Props) {
+export default function ProductTable({
+  productos,
+  search,
+  onEdit,
+  onDelete,
+}: Props) {
   const productosFiltrados = productos.filter(p => {
     const term = search.toLowerCase();
 
@@ -50,7 +57,12 @@ export default function ProductTable({ productos, search }: Props) {
         {/* BODY */}
         <tbody className="divide-y divide-[#8C9796]/20">
           {productosFiltrados.map(p => (
-            <ProductRow key={p.id} producto={p} />
+            <ProductRow
+              key={p.id}
+              producto={p}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
           ))}
 
           {productosFiltrados.length === 0 && (
