@@ -1,4 +1,16 @@
-export default function ProductosVenta() {
+import { Producto } from "../page";
+
+type Props = {
+  productos: Producto[];
+  onAgregar: () => void;
+  onEliminar: (id: number) => void;
+};
+
+export default function ProductosVenta({
+  productos,
+  onAgregar,
+  onEliminar,
+}: Props) {
   return (
     <div className="bg-white rounded-2xl shadow-md shadow-[#8C9796]/20 overflow-hidden">
       <div className="bg-[#F6F4EF] px-6 py-4 border-b">
@@ -7,37 +19,47 @@ export default function ProductosVenta() {
         </h2>
       </div>
 
-      <div className="p-6">
-        <p className="text-[#8C9796] text-sm">Aún no hay productos agregados</p>
+      <div className="p-6 space-y-4">
+        {productos.length === 0 ? (
+          <p className="text-[#8C9796] text-sm">
+            Aún no hay productos agregados
+          </p>
+        ) : (
+          productos.map(p => (
+            <div
+              key={p.id}
+              className="flex justify-between items-center border-b pb-2"
+            >
+              <div>
+                <p className="font-medium">{p.nombre}</p>
+                <p className="text-sm text-gray-500">
+                  ${p.precio} x {p.cantidad}
+                </p>
+              </div>
+
+              <button
+                onClick={() => onEliminar(p.id)}
+                className="text-red-500 text-sm"
+              >
+                Eliminar
+              </button>
+            </div>
+          ))
+        )}
       </div>
 
       <div className="flex gap-4 p-6 border-t bg-[#F6F4EF]">
         <button
-          className="
-            bg-[#708090]
-            text-[#F6F4EF]
-            px-5 py-3
-            rounded-xl
-            font-medium
-            hover:opacity-90
-            transition
-          "
+          className="bg-[#708090] text-white px-5 py-3 rounded-xl font-medium"
         >
-          Escanear 
+          Escanear
         </button>
 
         <button
-          className="
-            bg-[#B76E79]
-            text-white
-            px-5 py-3
-            rounded-xl
-            font-medium
-            hover:bg-[#a45f69]
-            transition
-          "
+          onClick={onAgregar}
+          className="bg-[#B76E79] text-white px-5 py-3 rounded-xl font-medium"
         >
-          + Agregar 
+          + Agregar
         </button>
       </div>
     </div>

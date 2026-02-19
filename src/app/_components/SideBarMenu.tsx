@@ -9,6 +9,7 @@ import {
   BarChart3,
   LogOut,
   LayoutListIcon,
+  PackageIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { BiMoney } from "react-icons/bi";
@@ -16,11 +17,8 @@ import { BiMoney } from "react-icons/bi";
 const menuItems = [
   { label: "Inicio", href: "/dashboard/inicio", icon: LayoutDashboard },
   { label: "Inventario", href: "/dashboard/inventarios", icon: Boxes },
-  {
-    label: "Consignaciones",
-    href: "/dashboard/consignaciones",
-    icon: ShoppingCart,
-  },
+  { label: "Consignación", href: "/dashboard/consignaciones", icon: ShoppingCart },
+  { label: "Pedidos", href: "/dashboard/pedidos", icon: PackageIcon },
   { label: "Materiales", href: "/dashboard/materiales", icon: LayoutListIcon },
   { label: "Cuentas", href: "/dashboard/reportes", icon: BiMoney },
   { label: "Reportes", href: "/dashboard/reportes", icon: BarChart3 },
@@ -32,33 +30,30 @@ export default function SidebarMenu() {
   return (
     <aside
       className="
-  w-20 sm:w-24 md:w-56 lg:w-64
-  min-h-screen
-  bg-[#D1BBAA]
-  text-[#f6f4ef]
-  flex flex-col
-  transition-all duration-300
-  shadow-[6px_0_30px_rgba(183,110,121,0.35)]
-  animate-[slideIn_0.6s_ease-out]
-  perspective-[1200px]
-  preserve-3d
-  rounded-r-3xl
-"
+        w-20 md:w-56 lg:w-64
+        min-h-screen
+        bg-[#D1BBAA]
+        text-[#f6f4ef]
+        flex flex-col
+        transition-all duration-300
+        shadow-[6px_0_30px_rgba(183,110,121,0.35)]
+        rounded-r-3xl
+      "
     >
-      {/* Logo */}
-      <div className="p-6 border-b border-[#f6f4ef] animate-float flex flex-col items-center">
+      {/* LOGO — SOLO EN PANTALLAS GRANDES */}
+      <div className="hidden md:flex p-6 border-b border-[#f6f4ef] flex-col items-center">
         <Image
           src="/logo.png"
           alt="Stella Logo"
           width={100}
           height={100}
-          className="h-40 w-40 mb-2"
+          className="mb-2"
         />
       </div>
 
-      {/* Menú */}
-      <nav className="px-3 py-5 space-y-2 flex-1">
-        {menuItems.map((item, index) => {
+      {/* MENÚ */}
+      <nav className="px-2 md:px-6 py-5 space-y-2 flex-1">
+        {menuItems.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href;
 
@@ -66,74 +61,52 @@ export default function SidebarMenu() {
             <Link
               key={item.href}
               href={item.href}
-              style={{ animationDelay: `${index * 80}ms` }}
               className={`
                 group relative
-                flex items-center gap-3 px-4 py-3 rounded-xl
-                transform-gpu
-                transition-all duration-300 ease-out
-                animate-[slideIn_0.5s_ease-out]
+                flex items-center justify-center md:justify-start
+                gap-3 px-2 md:px-4 py-3 rounded-xl
+                transition-all duration-300
                 ${
                   active
-                    ? `
-                      bg-[#B76E79]
-                      text-[#f6f4ef]
-                      shadow-accent
-                      translate-z-10
-                    `
-                    : `
-                      text-[#f6f4ef]/80
-                      hover:bg-[#f6f4ef]/10
-                      hover:-translate-y-1
-                      hover:rotate-x-6
-                      hover:shadow-medium
-                    `
+                    ? "bg-[#B76E79] text-[#f6f4ef]"
+                    : "text-[#f6f4ef]/80 hover:bg-[#f6f4ef]/10"
                 }
               `}
             >
-              {/* Indicador activo */}
+              {/* INDICADOR ACTIVO */}
               {active && (
-                <span
-                  className="
-                    absolute left-0 top-1/2 -translate-y-1/2
-                    h-8 w-1 rounded-full
-                    bg-[#f6f4ef]
-                  "
-                />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-full bg-[#f6f4ef]" />
               )}
 
-              {/* Brillo superior */}
-              <span
-                className="
-                  pointer-events-none absolute inset-x-2 top-0 h-px
-                  bg-white/40
-                  opacity-0 group-hover:opacity-100
-                  transition
-                "
-              />
+              <Icon size={20} />
 
-              <Icon size={18} />
-              <span className="text-sm font-medium">{item.label}</span>
+              {/* TEXTO — SOLO EN PANTALLAS GRANDES */}
+              <span className="hidden md:block font-semibold">
+                {item.label}
+              </span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-[#f6f4ef]/15">
-        <div className="text-sm font-medium">Administrador</div>
+      {/* FOOTER */}
+      <div className="p-3 md:p-4 border-t border-[#f6f4ef]/15">
+        <div className="hidden md:block text-sm font-medium">
+          Administrador
+        </div>
 
         <button
           className="
-            mt-4 flex items-center gap-2 text-sm
+            mt-2 md:mt-4
+            flex items-center justify-center md:justify-start
+            gap-2 text-sm
             text-[#f6f4ef]/70
             hover:text-[#B76E79]
-            hover:translate-x-1
             transition
           "
         >
-          <LogOut size={16} />
-          Cerrar sesión
+          <LogOut size={18} />
+          <span className="hidden md:block">Cerrar sesión</span>
         </button>
       </div>
     </aside>

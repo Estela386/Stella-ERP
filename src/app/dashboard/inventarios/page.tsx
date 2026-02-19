@@ -7,8 +7,6 @@ import InventoryToolbar from "./_components/InventoryToolbar";
 import ProductTable from "./_components/ProductTable";
 import { Producto } from "./type";
 
-/* ---------------- MOCK DATA ---------------- */
-
 const productos: Producto[] = [
   {
     id: 1,
@@ -35,12 +33,10 @@ export default function InventariosPage() {
   const [search, setSearch] = useState("");
 
   return (
-    <div className="flex min-h-screen bg-[#F8F6F2]">
-      {/* Sidebar NO fijo */}
+    <div className="flex h-screen overflow-hidden bg-[#F6F3EF]">
       <SidebarMenu />
 
-      {/* Contenido */}
-      <main className="flex-1 px-8 py-14">
+      <main className="flex-1 px-4 py-8 overflow-y-auto">
         <div className="mx-auto max-w-7xl space-y-10">
           {/* Header */}
           <header className="space-y-6">
