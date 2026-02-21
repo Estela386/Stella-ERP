@@ -15,8 +15,7 @@ export default function DashboardStats() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {stats.map((stat: Stat, index: number) => {
-        const bgColor =
-          index === 1 || index === 3 ? "bg-[#B76E79]" : "bg-[#708090]";
+        const bgColor = index % 2 !== 0 ? "bg-[#B76E79]" : "bg-[#708090]";
 
         return (
           <div
