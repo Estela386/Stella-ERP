@@ -19,7 +19,7 @@ const menuItems = [
   { label: "Inventario", href: "/dashboard/inventarios", icon: Boxes },
   { label: "Consignación", href: "/dashboard/consignaciones", icon: ShoppingCart },
   { label: "Pedidos", href: "/dashboard/pedidos", icon: PackageIcon },
-  { label: "Materiales", href: "/dashboard/materiales", icon: LayoutListIcon },
+  { label: "Materiales", href: "/materials", icon: LayoutListIcon },
   { label: "Cuentas", href: "/dashboard/cuentas", icon: BiMoney },
   { label: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
 ];
