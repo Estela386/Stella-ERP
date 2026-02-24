@@ -14,18 +14,25 @@ import {
 import Image from "next/image";
 import { BiMoney } from "react-icons/bi";
 
+/* 🔹 Menú con roles permitidos */
 const menuItems = [
-  { label: "Inicio", href: "/dashboard/inicio", icon: LayoutDashboard },
-  { label: "Inventario", href: "/dashboard/inventarios", icon: Boxes },
-  { label: "Consignación", href: "/dashboard/consignaciones", icon: ShoppingCart },
-  { label: "Pedidos", href: "/dashboard/pedidos", icon: PackageIcon },
-  { label: "Materiales", href: "/dashboard/materiales", icon: LayoutListIcon },
-  { label: "Cuentas", href: "/dashboard/cuentas", icon: BiMoney },
-  { label: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
+  { label: "Inicio", href: "/dashboard/inicio", icon: LayoutDashboard, roles: [1, 3] },
+  { label: "Inventario", href: "/dashboard/inventarios", icon: Boxes, roles: [1] },
+  { label: "Consignación", href: "/dashboard/consignaciones", icon: ShoppingCart, roles: [1, 3] },
+  { label: "Pedidos", href: "/dashboard/pedidos", icon: PackageIcon, roles: [1, 3] },
+  { label: "Materiales", href: "/materials", icon: LayoutListIcon, roles: [1] },
+  { label: "Cuentas", href: "/dashboard/cuentas", icon: BiMoney, roles: [1, 3] },
+  { label: "Reportes", href: "/dashboard/reports", icon: BarChart3, roles: [1, 3] },
 ];
 
 export default function SidebarMenu() {
   const pathname = usePathname();
+
+  const userType = 1; // 1 = Administrador | 3 = Mayorista ANAA
+
+  const filteredMenu = menuItems.filter(item =>
+    item.roles.includes(userType)
+  );
 
   return (
     <aside
@@ -40,6 +47,7 @@ export default function SidebarMenu() {
         rounded-r-3xl
       "
     >
+      {/* 🔹 Logo */}
       <div className="hidden md:flex p-6 border-b border-[#f6f4ef] flex-col items-center">
         <Image
           src="/logo.png"
@@ -50,8 +58,9 @@ export default function SidebarMenu() {
         />
       </div>
 
+      {/* 🔹 Navegación */}
       <nav className="px-2 md:px-2 py-5 space-y-2 flex-1">
-        {menuItems.map((item) => {
+        {filteredMenu.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href;
 
@@ -85,9 +94,10 @@ export default function SidebarMenu() {
         })}
       </nav>
 
+      {/* 🔹 Usuario */}
       <div className="p-3 md:p-4 border-t border-[#f6f4ef]/15">
         <div className="hidden md:block text-sm font-medium">
-          Administrador
+          {userType === 1 ? "Administrador" : "Mayorista"}
         </div>
 
         <button
