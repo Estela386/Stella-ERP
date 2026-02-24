@@ -16,21 +16,32 @@ export default function PedidosTable({ pedidos }: Props) {
       <div className="bg-white rounded-2xl border border-[#8C9796]/30 shadow-md shadow-[#8C9796]/20 overflow-hidden">
 
         {/* ================= DESKTOP TABLE ================= */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-sm text-left border-collapse">
+        <div className="hidden md:block">
+          <table className="w-full table-fixed text-sm text-left border-collapse">
+            
+            {/* HEADER */}
             <thead className="bg-[#F6F4EF] text-[#708090] border-b border-[#8C9796]/40">
               <tr>
-                <th className="py-4 px-4">ID</th>
-                <th>Cliente</th>
-                <th>Tipo</th>
-                <th>Descripción</th>
-                <th>Entrega</th>
-                <th>Estado</th>
-                <th>Prioridad</th>
-                <th className="pr-4">Acciones</th>
+                <th className="py-4 px-4 w-[70px]">ID</th>
+                <th className="w-[160px]">Cliente</th>
+
+                {/* Oculta en laptops pequeñas */}
+                <th className="hidden lg:table-cell w-[120px]">Tipo</th>
+
+                {/* Solo pantallas muy grandes */}
+                <th className="hidden xl:table-cell">Descripción</th>
+
+                <th className="w-[130px]">Entrega</th>
+                <th className="w-[130px]">Estado</th>
+
+                {/* Oculta en md */}
+                <th className="hidden lg:table-cell w-[120px]">Prioridad</th>
+
+                <th className="w-[150px] pr-4">Acciones</th>
               </tr>
             </thead>
 
+            {/* BODY */}
             <tbody>
               {pedidos.map((p) => (
                 <tr
@@ -38,9 +49,14 @@ export default function PedidosTable({ pedidos }: Props) {
                   className="border-b border-[#8C9796]/20 text-[#708090] hover:bg-[#F6F4EF] transition"
                 >
                   <td className="py-4 px-4 font-semibold">{p.id}</td>
-                  <td>{p.cliente}</td>
-                  <td>{p.tipo}</td>
-                  <td className="max-w-[220px] truncate">{p.descripcion}</td>
+                  <td className="truncate">{p.cliente}</td>
+
+                  <td className="hidden lg:table-cell">{p.tipo}</td>
+
+                  <td className="hidden xl:table-cell truncate">
+                    {p.descripcion}
+                  </td>
+
                   <td>{p.entrega}</td>
 
                   <td>
@@ -49,7 +65,7 @@ export default function PedidosTable({ pedidos }: Props) {
                     </span>
                   </td>
 
-                  <td>
+                  <td className="hidden lg:table-cell">
                     <span className="bg-[#B76E79] text-[#F6F4EF] px-3 py-1 rounded-lg text-xs font-medium">
                       {p.prioridad}
                     </span>

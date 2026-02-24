@@ -49,30 +49,49 @@ export default function NuevaConsignacionForm() {
     router.push("/dashboard/consignaciones");
   };
 
+  // 🎨 INPUT ESTILO PROFESIONAL
   const inputBase = `
     w-full
+    h-11
     rounded-xl
-    px-4 py-3
-    border border-black/10
+    px-4
+    bg-[#F8F6F2]
+
+    border border-[#8C9796]/25
+    text-[#1C1C1C]
+    placeholder:text-[#9A9A9A]
+
     focus:outline-none
+    focus:border-[#B76E79]
     focus:ring-2
-    focus:ring-[#B76E79]/40
+    focus:ring-[#B76E79]/30
+
     transition
   `;
 
-  return (
-    <form onSubmit={onSubmit} className="space-y-10">
+  const sectionCard = `
+    space-y-4
+    bg-white
+    p-6
+    rounded-2xl
+    border border-black/5
+    shadow-sm
+  `;
 
-      {/* Cliente */}
-      <section className="space-y-4">
+  return (
+    <form onSubmit={onSubmit} className="space-y-8 max-w-5xl">
+
+      {/* ================= CLIENTE ================= */}
+      <section className={sectionCard}>
         <h2 className="text-lg font-medium text-[#708090]">
           Información del cliente
         </h2>
 
         <div>
-          <label className="block text-sm font-medium text-[#708090] mb-2">
+          <label className="block text-sm font-medium text-[#708090] mb-1">
             Cliente / Mayorista
           </label>
+
           <input
             className={inputBase}
             placeholder="Seleccionar cliente"
@@ -83,17 +102,18 @@ export default function NuevaConsignacionForm() {
         </div>
       </section>
 
-      {/* Fechas */}
-      <section className="space-y-4">
+      {/* ================= FECHAS ================= */}
+      <section className={sectionCard}>
         <h2 className="text-lg font-medium text-[#708090]">
           Periodo de consignación
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-[#708090] mb-2">
+            <label className="block text-sm font-medium text-[#708090] mb-1">
               Fecha inicio
             </label>
+
             <input
               type="date"
               className={inputBase}
@@ -104,9 +124,10 @@ export default function NuevaConsignacionForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#708090] mb-2">
+            <label className="block text-sm font-medium text-[#708090] mb-1">
               Fecha fin
             </label>
+
             <input
               type="date"
               className={inputBase}
@@ -118,8 +139,8 @@ export default function NuevaConsignacionForm() {
         </div>
       </section>
 
-      {/* Productos */}
-      <section className="space-y-4">
+      {/* ================= PRODUCTOS ================= */}
+      <section className={sectionCard}>
         <h2 className="text-lg font-medium text-[#708090]">
           Productos en consignación
         </h2>
@@ -152,7 +173,7 @@ export default function NuevaConsignacionForm() {
         </button>
       </section>
 
-      {/* Acciones */}
+      {/* ================= BOTONES ================= */}
       <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-black/10">
         <button
           type="button"

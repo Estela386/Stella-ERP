@@ -381,14 +381,33 @@ export default function InventariosPage() {
               <div className="flex gap-3">
                 <button
                   onClick={handleOpenCategoryModal}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium transition cursor-pointer"
-                >
+                   className="
+            bg-[#B76E79]
+            text-white
+            px-5 py-2.5
+            rounded-full
+            text-sm font-medium
+            shadow-sm
+            hover:bg-[#A45F69]
+            hover:shadow-md
+            transition
+          "
+                  >
                   + Categoría
                 </button>
                 <button
                   onClick={() => handleOpenModal()}
-                  className="bg-[#B76E79] text-white px-6 py-2 rounded-lg hover:bg-[#a05a65] font-medium transition cursor-pointer"
-                >
+                   className="
+            bg-[#B76E79]
+            text-white
+            px-5 py-2.5
+            rounded-full
+            text-sm font-medium
+            shadow-sm
+            hover:bg-[#A45F69]
+            hover:shadow-md
+            transition
+          ">
                   + Nuevo Producto
                 </button>
               </div>

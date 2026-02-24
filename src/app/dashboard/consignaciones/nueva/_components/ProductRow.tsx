@@ -74,16 +74,19 @@ export default function ProductoRow({
         disabled={disableDelete}
         onClick={() => onDelete(data.id)}
         className="
-                px-6 py-2 rounded-lg
-                bg-[#b76e79]
-                text-[#f6f4ef]
-                font-medium
-                hover:translate-y-[-1px]
-                transition
-              "
+                    w-8 h-8
+                    rounded-full
+                    bg-[#B76E79]/15
+                    text-[#B76E79]
+                    flex items-center justify-center
+                    hover:bg-[#B76E79]
+                    hover:text-white
+                    transition
+                  "
       >
-        Eliminar
+        X
       </button>
+      
     </div>
   );
 }
