@@ -7,8 +7,19 @@ export default function RegisterForm() {
   return (
     <form
       action={register}
-      className="bg-white rounded-lg shadow p-8 w-full max-w-md flex flex-col gap-4"
+      className="bg-white rounded-lg shadow p-8 w-full max-w-md flex flex-col gap-2 mb-8"
     >
+      <div>
+        <label className="block text-[#7c5c4a] mb-1">Nombre</label>
+        <input
+          name="nombre"
+          type="text"
+          required
+          className="w-full border rounded px-3 py-2 text-[#3a2a1a] placeholder-[#a89b8a]"
+          placeholder="Juan Pérez"
+        />
+      </div>
+
       <div>
         <label className="block text-[#7c5c4a] mb-1">Correo</label>
         <input

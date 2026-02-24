@@ -27,6 +27,7 @@ export async function logout() {
 }
 
 export async function register(formData: FormData) {
+  const nombre = formData.get("nombre") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
@@ -37,14 +38,28 @@ export async function register(formData: FormData) {
 
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signUp({
+  const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
   });
 
-  if (error) {
-    console.log(error);
+  if (authError) {
+    console.log(authError);
     redirect("/register?error=signup_failed");
+  }
+
+  // Insertar/actualizar el usuario en la tabla "usuario"
+  if (authData.user) {
+    const { error: dbError } = await supabase
+      .from("usuario")
+      .update({
+        nombre: nombre,
+      })
+      .eq("id_auth", authData.user.id);
+
+    if (dbError) {
+      console.log("Error al actualizar usuario en tabla:", dbError);
+    }
   }
 
   // Si tienes email confirmation activado:
