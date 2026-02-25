@@ -14,4 +14,12 @@ export type Pedido = {
   entrega: string;
   estado: PedidoEstado;
   prioridad: Prioridad;
+
+  productos: ProductoPedido[];
+};
+
+export type ProductoPedido = {
+  codigo: string;
+  nombre: string;
+  cantidad: number;
 };

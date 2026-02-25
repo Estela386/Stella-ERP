@@ -4,6 +4,7 @@ import ProductRow from "./ProductRow";
 interface Props {
   productos: Producto[];
   search: string;
+  filtro: "todos" | "bajo" | "agotados";
   onEdit?: (producto: Producto) => void;
   onDelete?: (id: number) => void;
 }
@@ -11,10 +12,24 @@ interface Props {
 export default function ProductTable({
   productos,
   search,
+  filtro,
   onEdit,
   onDelete,
 }: Props) {
-  const productosFiltrados = productos.filter(p => {
+
+  // 🔎 FILTRO POR ESTADO
+  let productosFiltrados = productos.filter(p => {
+    if (filtro === "bajo")
+      return p.stock_actual <= p.stock_min && p.stock_actual > 0;
+
+    if (filtro === "agotados")
+      return p.stock_actual === 0;
+
+    return true;
+  });
+
+  // 🔎 FILTRO POR BÚSQUEDA
+  productosFiltrados = productosFiltrados.filter(p => {
     const term = search.toLowerCase();
     const nombre = p.nombre?.toLowerCase() || "";
     const categoria = p.categoria.nombre.toLowerCase();
@@ -27,36 +42,21 @@ export default function ProductTable({
   });
 
   return (
-    <div
-      className="
-        bg-white
-        rounded-xl
-        border border-[#8C9796]/30
-        overflow-x-auto
-      "
-    >
+    <div className="bg-white rounded-xl border border-[#8C9796]/30 overflow-x-auto">
       <table className="min-w-full text-sm text-[#111111]">
-        {/* HEADER */}
         <thead className="bg-[#D1BBAA]/35">
           <tr>
-            <th className="px-4 py-3 text-left font-medium text-[#708090]">
-              Código
-            </th>
-            <th className="px-4 py-3 text-left font-medium text-[#708090]">
-              Nombre
-            </th>
+            <th className="px-4 py-3 text-left font-medium text-[#708090]">Código</th>
+            <th className="px-4 py-3 text-left font-medium text-[#708090]">Nombre</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Categoría</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Stock</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Precio</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Estado</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Ubicación</th>
-            <th className="px-4 py-3 text-right font-medium text-[#708090]">
-              Acciones
-            </th>
+            <th className="px-4 py-3 text-right font-medium text-[#708090]">Acciones</th>
           </tr>
         </thead>
 
-        {/* BODY */}
         <tbody className="divide-y divide-[#8C9796]/20">
           {productosFiltrados.map(p => (
             <ProductRow

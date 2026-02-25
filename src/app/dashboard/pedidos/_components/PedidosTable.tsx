@@ -24,19 +24,10 @@ export default function PedidosTable({ pedidos }: Props) {
               <tr>
                 <th className="py-4 px-4 w-[70px]">ID</th>
                 <th className="w-[160px]">Cliente</th>
-
-                {/* Oculta en laptops pequeñas */}
                 <th className="hidden lg:table-cell w-[120px]">Tipo</th>
-
-                {/* Solo pantallas muy grandes */}
-                <th className="hidden xl:table-cell">Descripción</th>
-
                 <th className="w-[130px]">Entrega</th>
                 <th className="w-[130px]">Estado</th>
-
-                {/* Oculta en md */}
                 <th className="hidden lg:table-cell w-[120px]">Prioridad</th>
-
                 <th className="w-[150px] pr-4">Acciones</th>
               </tr>
             </thead>
@@ -50,13 +41,7 @@ export default function PedidosTable({ pedidos }: Props) {
                 >
                   <td className="py-4 px-4 font-semibold">{p.id}</td>
                   <td className="truncate">{p.cliente}</td>
-
                   <td className="hidden lg:table-cell">{p.tipo}</td>
-
-                  <td className="hidden xl:table-cell truncate">
-                    {p.descripcion}
-                  </td>
-
                   <td>{p.entrega}</td>
 
                   <td>
@@ -101,15 +86,11 @@ export default function PedidosTable({ pedidos }: Props) {
               </div>
 
               <p className="text-[#708090] text-sm">
-                <span className="font-medium">Cliente:</span> {p.cliente}
+                <b>Cliente:</b> {p.cliente}
               </p>
 
               <p className="text-[#708090] text-sm">
-                <span className="font-medium">Tipo:</span> {p.tipo}
-              </p>
-
-              <p className="text-[#708090] text-sm">
-                <span className="font-medium">Entrega:</span> {p.entrega}
+                <b>Entrega:</b> {p.entrega}
               </p>
 
               <div className="flex justify-between items-center pt-2">
@@ -131,43 +112,108 @@ export default function PedidosTable({ pedidos }: Props) {
 
       {/* ================= MODAL ================= */}
       {selected && (
-        <div className="fixed inset-0 z-[999] bg-black/40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-lg shadow-[0_30px_70px_rgba(0,0,0,0.15)] space-y-4">
-            
-            <div className="flex justify-between items-center border-b pb-3">
-              <h2 className="text-xl font-bold text-[#708090]">
-                Detalles del pedido
-              </h2>
+  <div className="fixed inset-0 z-[999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    
+    {/* CONTENEDOR */}
+    <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-[0_40px_90px_rgba(0,0,0,0.25)]">
 
-              <button
-                onClick={() => setSelected(null)}
-                className="text-[#708090] hover:text-[#B76E79] text-xl font-bold"
-              >
-                ✕
-              </button>
-            </div>
+      {/* ===== HEADER ELEGANTE ===== */}
+      <div className="bg-gradient-to-r from-[#708090] to-[#708090] text-[#F6F4EF] p-6 flex justify-between items-center">
+        <div>
+          <p className="text-xs uppercase tracking-widest opacity-80">
+            Pedido
+          </p>
+          <h2 className="text-2xl font-bold">{selected.id}</h2>
+        </div>
 
-            <div className="space-y-2 text-[#708090] text-sm">
-              <p><b>ID:</b> {selected.id}</p>
-              <p><b>Cliente:</b> {selected.cliente}</p>
-              <p><b>Tipo:</b> {selected.tipo}</p>
-              <p><b>Descripción:</b> {selected.descripcion}</p>
-              <p><b>Entrega:</b> {selected.entrega}</p>
-              <p><b>Estado:</b> {selected.estado.replace("_"," ")}</p>
-              <p><b>Prioridad:</b> {selected.prioridad}</p>
-            </div>
+        <button
+          onClick={() => setSelected(null)}
+          className="text-2xl font-light hover:opacity-70"
+        >
+          ✕
+        </button>
+      </div>
 
-            <div className="pt-4 flex justify-end">
-              <button
-                onClick={() => setSelected(null)}
-                className="px-5 py-2 rounded-full bg-[#708090] text-[#F6F4EF] shadow-md shadow-[#8C9796]/40 hover:bg-[#5F6F7F] transition"
-              >
-                Cerrar
-              </button>
-            </div>
+      {/* ===== CONTENIDO ===== */}
+      <div className="p-6 space-y-6 bg-[#F6F4EF]">
+
+        {/* BADGES */}
+        <div className="flex gap-3">
+          <span className="bg-[#708090] text-white px-5 py-1 rounded-full text-xs font-medium shadow">
+            {selected.estado.replace("_", " ")}
+          </span>
+
+          <span className="bg-[#B76E79] text-white px-4 py-1 rounded-full text-xs font-medium shadow">
+            Prioridad: {selected.prioridad}
+          </span>
+        </div>
+
+        {/* ===== TARJETA INFO ===== */}
+        <div className="bg-white rounded-2xl p-5 shadow border border-[#8C9796]/20 space-y-4">
+          
+          <div className="grid sm:grid-cols-2 gap-4 text-sm text-[#708090]">
+            <Input label="Cliente" value={selected.cliente} />
+            <Input label="Tipo" value={selected.tipo} />
+            <Input label="Entrega" value={selected.entrega} />
+          </div>
+
+        </div>
+
+        {/* ===== TABLA PRODUCTOS ===== */}
+        <div className="bg-white rounded-2xl shadow border border-[#8C9796]/20 overflow-hidden">
+          
+          <div className="px-5 py-3 border-b bg-[#F6F4EF]">
+            <p className="text-xs uppercase tracking-wide text-[#8C9796]">
+              Productos del pedido
+            </p>
+          </div>
+
+          <div className="max-h-60 overflow-y-auto">
+            <table className="w-full text-sm text-[#708090]">
+              
+              <thead className="bg-[#708090] text-[#F6F4EF] text-xs uppercase sticky top-0">
+                <tr>
+                  <th className="px-4 py-2 text-left">Código</th>
+                  <th className="px-4 py-2 text-left">Producto</th>
+                  <th className="px-4 py-2 text-center">Cantidad</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {selected.productos?.map((prod, i) => (
+                  <tr
+                    key={i}
+                    className="border-t border-[#8C9796]/20 hover:bg-[#F6F4EF]"
+                  >
+                    <td className="px-4 py-2 font-medium">
+                      {prod.codigo}
+                    </td>
+                    <td className="px-4 py-2">{prod.nombre}</td>
+                    <td className="px-4 py-2 text-center font-semibold">
+                      {prod.cantidad}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+
+            </table>
           </div>
         </div>
-      )}
+
+        {/* BOTÓN */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => setSelected(null)}
+            className="px-6 py-2 rounded-full bg-[#B76E79] text-[#F6F4EF] font-medium shadow-md shadow-[#8C9796]/40 hover:bg-[#A45F69] transition"
+          >
+            Cerrar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+)}
 
       {/* EMPTY STATE */}
       {pedidos.length === 0 && (
@@ -176,5 +222,19 @@ export default function PedidosTable({ pedidos }: Props) {
         </p>
       )}
     </>
+  );
+}
+
+/* INPUT COMPONENTE */
+function Input({ label, value }: { label: string; value: any }) {
+  return (
+    <div>
+      <p className="text-xs text-[#8C9796]">{label}</p>
+      <input
+        value={value}
+        readOnly
+        className="w-full bg-[#F6F4EF] border border-[#8C9796]/30 rounded-lg px-3 py-2 text-[#708090] font-medium"
+      />
+    </div>
   );
 }

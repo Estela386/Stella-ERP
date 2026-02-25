@@ -47,7 +47,7 @@ export default function SidebarMenu() {
         rounded-r-3xl
       "
     >
-      {/* 🔹 Logo */}
+      {/*  Logo */}
       <div className="hidden md:flex p-6 border-b border-[#f6f4ef] flex-col items-center">
         <Image
           src="/logo.png"
@@ -58,7 +58,7 @@ export default function SidebarMenu() {
         />
       </div>
 
-      {/* 🔹 Navegación */}
+      {/*  Navegación */}
       <nav className="px-2 md:px-2 py-5 space-y-2 flex-1">
         {filteredMenu.map((item) => {
           const Icon = item.icon;
