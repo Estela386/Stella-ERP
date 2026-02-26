@@ -21,7 +21,7 @@ const menuItems = [
   { label: "Consignación", href: "/dashboard/consignaciones", icon: ShoppingCart, roles: [1, 3] },
   { label: "Pedidos", href: "/dashboard/pedidos", icon: PackageIcon, roles: [1, 3] },
   { label: "Materiales", href: "/materials", icon: LayoutListIcon, roles: [1] },
-  { label: "Cuentas", href: "/dashboard/cuentas", icon: BiMoney, roles: [1, 3] },
+  { label: "Cuentas", href: "/accounts", icon: BiMoney, roles: [1, 3] },
   { label: "Reportes", href: "/dashboard/reports", icon: BarChart3, roles: [1, 3] },
 ];
 
@@ -47,7 +47,7 @@ export default function SidebarMenu() {
         rounded-r-3xl
       "
     >
-      {/*  Logo */}
+      {/* 🔹 Logo */}
       <div className="hidden md:flex p-6 border-b border-[#f6f4ef] flex-col items-center">
         <Image
           src="/logo.png"
@@ -117,3 +117,4 @@ export default function SidebarMenu() {
     </aside>
   );
 }
+
