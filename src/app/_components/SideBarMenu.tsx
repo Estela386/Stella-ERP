@@ -16,23 +16,46 @@ import { BiMoney } from "react-icons/bi";
 
 /* 🔹 Menú con roles permitidos */
 const menuItems = [
-  { label: "Inicio", href: "/dashboard/inicio", icon: LayoutDashboard, roles: [1, 3] },
-  { label: "Inventario", href: "/dashboard/inventarios", icon: Boxes, roles: [1] },
-  { label: "Consignación", href: "/dashboard/consignaciones", icon: ShoppingCart, roles: [1, 3] },
-  { label: "Pedidos", href: "/dashboard/pedidos", icon: PackageIcon, roles: [1, 3] },
+  {
+    label: "Inicio",
+    href: "/dashboard/inicio",
+    icon: LayoutDashboard,
+    roles: [1, 3],
+  },
+  {
+    label: "Inventario",
+    href: "/dashboard/inventarios",
+    icon: Boxes,
+    roles: [1],
+  },
+  {
+    label: "Consignación",
+    href: "/dashboard/consignaciones",
+    icon: ShoppingCart,
+    roles: [1, 3],
+  },
+  {
+    label: "Pedidos",
+    href: "/dashboard/pedidos",
+    icon: PackageIcon,
+    roles: [1, 3],
+  },
   { label: "Materiales", href: "/materials", icon: LayoutListIcon, roles: [1] },
   { label: "Cuentas", href: "/accounts", icon: BiMoney, roles: [1, 3] },
-  { label: "Reportes", href: "/dashboard/reports", icon: BarChart3, roles: [1, 3] },
+  {
+    label: "Reportes",
+    href: "/dashboard/reports",
+    icon: BarChart3,
+    roles: [1, 3],
+  },
 ];
 
 export default function SidebarMenu() {
   const pathname = usePathname();
 
-  const userType = 1; // 1 = Administrador | 3 = Mayorista ANAA
+  const userType = 3; // 1 = Administrador | 3 = Mayorista ANAA
 
-  const filteredMenu = menuItems.filter(item =>
-    item.roles.includes(userType)
-  );
+  const filteredMenu = menuItems.filter(item => item.roles.includes(userType));
 
   return (
     <aside
@@ -60,7 +83,7 @@ export default function SidebarMenu() {
 
       {/*  Navegación */}
       <nav className="px-2 md:px-2 py-5 space-y-2 flex-1">
-        {filteredMenu.map((item) => {
+        {filteredMenu.map(item => {
           const Icon = item.icon;
           const active = pathname === item.href;
 
@@ -117,4 +140,3 @@ export default function SidebarMenu() {
     </aside>
   );
 }
-
