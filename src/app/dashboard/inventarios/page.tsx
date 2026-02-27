@@ -33,6 +33,7 @@ export default function InventariosPage() {
     Producto | undefined
   >();
   const [formLoading, setFormLoading] = useState(false);
+  const [filtro, setFiltro] = useState<"todos" | "bajo" | "agotados">("todos");
 
   // Verificar rol en cliente
   useEffect(() => {
@@ -320,7 +321,7 @@ export default function InventariosPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F6F3EF]">
+    <div className="flex h-screen overflow-hidden ">
       <SidebarMenu />
 
       <main className="flex-1 px-4 py-8 overflow-y-auto">
@@ -374,7 +375,10 @@ export default function InventariosPage() {
               </div>
             )}
 
-            <InventoryStats productos={productos} />
+            <InventoryStats
+  productos={productos}
+  onFilterChange={setFiltro}
+/>
 
             <div className="flex justify-between items-center gap-4">
               <InventoryToolbar search={search} setSearch={setSearch} />
@@ -418,6 +422,7 @@ export default function InventariosPage() {
               search={search}
               onEdit={handleOpenModal}
               onDelete={handleDeleteProducto}
+              filtro={filtro}
             />
           </div>
         </div>

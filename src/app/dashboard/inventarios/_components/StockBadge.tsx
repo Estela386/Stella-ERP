@@ -5,9 +5,9 @@ export default function StockBadge({
   actual: number;
   minimo: number;
 }) {
-  if (actual === 0) return <Badge text="Agotado" color="red" />;
-  if (actual <= minimo) return <Badge text="Stock Bajo" color="orange" />;
-  return <Badge text="En Stock" color="green" />;
+  if (actual === 0) return <Badge text="Agotado" color="agotado" />;
+  if (actual <= minimo) return <Badge text="Stock Bajo" color="bajo" />;
+  return <Badge text="En Stock" color="stock" />;
 }
 
 function Badge({
@@ -15,16 +15,25 @@ function Badge({
   color,
 }: {
   text: string;
-  color: "red" | "orange" | "green";
+  color: "agotado" | "bajo" | "stock";
 }) {
   const styles = {
-    red: "bg-red-100 text-red-700",
-    orange: "bg-orange-100 text-orange-700",
-    green: "bg-green-100 text-green-700",
+    agotado: "bg-[#B76E79] text-white",
+    bajo: "bg-[#d1bbaa] text-[#FFFFFF]",
+    stock: "bg-[#708090] text-white",
   };
 
   return (
-    <span className={`px-2 py-1 rounded-full text-xs ${styles[color]}`}>
+    <span
+      className={`
+        inline-flex items-center justify-center
+        px-3 py-1
+        rounded-full
+        text-xs font-semibold
+        whitespace-nowrap
+        ${styles[color]}
+      `}
+    >
       {text}
     </span>
   );

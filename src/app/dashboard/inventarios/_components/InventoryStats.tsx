@@ -2,8 +2,10 @@ import { Producto } from "../type";
 
 export default function InventoryStats({
   productos,
+  onFilterChange,
 }: {
   productos: Producto[];
+  onFilterChange: (f: "todos" | "bajo" | "agotados") => void;
 }) {
   const totalPiezas = productos.reduce((acc, p) => acc + p.stock_actual, 0);
 
@@ -25,33 +27,34 @@ export default function InventoryStats({
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <Stat
-        label="Total de Piezas"
-        value={totalPiezas}
-        bgColor="bg-[#708090]"
-        textColor="text-[#F8F6F2]"
-      />
 
       <Stat
         label="Valor del Inventario"
         value={valorFormateado}
-        bgColor="bg-[#B76E79]"
-        textColor="text-[#F8F6F2]"
+        color="bg-[#708090]"   // ⭐ COLOR DIFERENTE
+      />
+
+      <Stat
+        label="Total de Piezas"
+        value={totalPiezas}
+        color="bg-[#B76E79]"
+        onClick={() => onFilterChange("todos")}
       />
 
       <Stat
         label="Stock Bajo"
         value={bajo}
-        bgColor="bg-[#708090]"
-        textColor="text-[#F8F6F2]"
+        color="bg-[#708090]"
+        onClick={() => onFilterChange("bajo")}
       />
 
       <Stat
         label="Agotados"
         value={agotados}
-        bgColor="bg-[#B76E79]"
-        textColor="text-[#F8F6F2]"
+        color="bg-[#B76E79]"   // ⭐ COLOR DIFERENTE
+        onClick={() => onFilterChange("agotados")}
       />
+
     </div>
   );
 }
@@ -59,49 +62,28 @@ export default function InventoryStats({
 function Stat({
   label,
   value,
-  bgColor,
-  textColor,
+  onClick,
+  color,
 }: {
   label: string;
   value: any;
-  bgColor: string;
-  textColor: string;
+  onClick?: () => void;
+  color: string;
 }) {
-  const isDark =
-    bgColor.includes("#708090") || bgColor.includes("#B76E79");
-
   return (
     <div
+      onClick={onClick}
       className={`
         rounded-xl
         p-4
-        transition-all
-        duration-200
-        ${isDark ? "border border-white/10" : "border border-black/10"}
-        ${bgColor}
+        text-white
+        ${color}
+        ${onClick ? "cursor-pointer hover:scale-[1.03]" : ""}
+        transition
       `}
     >
-      <p
-        className={`
-          text-xs
-          tracking-wide
-          ${isDark ? "text-white/70" : "text-[#111111]/70"}
-        `}
-      >
-        {label}
-      </p>
-
-      <p
-        className={`
-          mt-1
-          text-2xl
-          md:text-3xl
-          font-semibold
-          ${textColor}
-        `}
-      >
-        {value}
-      </p>
+      <p className="text-xs opacity-80">{label}</p>
+      <p className="text-2xl font-semibold">{value}</p>
     </div>
   );
 }

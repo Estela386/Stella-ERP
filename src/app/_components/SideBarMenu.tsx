@@ -126,7 +126,7 @@ export default function SidebarMenu() {
         />
       </div>
 
-      {/* 🔹 Navegación */}
+      {/*  Navegación */}
       <nav className="px-2 md:px-2 py-5 space-y-2 flex-1">
         {filteredMenu.map(item => {
           const Icon = item.icon;
