@@ -12,7 +12,15 @@ interface Cliente {
   telefono: string;
 }
 
-export default function VentaInfoForm() {
+interface VentaInfoFormProps {
+  onClienteChange?: (cliente: Cliente) => void;
+  onFechaChange?: (fecha: string) => void;
+}
+
+export default function VentaInfoForm({
+  onClienteChange,
+  onFechaChange,
+}: VentaInfoFormProps) {
   const hoy = new Date().toISOString().split("T")[0];
 
   const [clienteSeleccionado, setClienteSeleccionado] =
@@ -100,6 +108,25 @@ export default function VentaInfoForm() {
     setClientes([...clientes, cliente]);
     setClienteSeleccionado(cliente);
     setBusqueda("");
+    if (onClienteChange) {
+      onClienteChange(cliente);
+    }
+  };
+
+  const handleClienteSelect = (cliente: Cliente) => {
+    setClienteSeleccionado(cliente);
+    setShowDropdown(false);
+    setBusqueda("");
+    if (onClienteChange) {
+      onClienteChange(cliente);
+    }
+  };
+
+  const handleFechaChange = (nuevaFecha: string) => {
+    setFecha(nuevaFecha);
+    if (onFechaChange) {
+      onFechaChange(nuevaFecha);
+    }
   };
 
   const esValido = clienteSeleccionado !== null && fecha !== "";
@@ -191,9 +218,7 @@ export default function VentaInfoForm() {
                         <button
                           key={cliente.id}
                           onClick={() => {
-                            setClienteSeleccionado(cliente);
-                            setShowDropdown(false);
-                            setBusqueda("");
+                            handleClienteSelect(cliente);
                           }}
                           className="w-full text-left px-4 py-3 hover:bg-[#B76E79]/10 transition border-b border-[#8C9796]/10 last:border-b-0"
                         >
@@ -234,7 +259,7 @@ export default function VentaInfoForm() {
               required
               value={fecha}
               max={hoy}
-              onChange={e => setFecha(e.target.value)}
+              onChange={e => handleFechaChange(e.target.value)}
               className="w-full bg-[#F6F4EF] border border-[#8C9796]/40 rounded-xl px-4 py-3 text-[#708090] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
             />
           </div>
