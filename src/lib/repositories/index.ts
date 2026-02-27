@@ -6,3 +6,4 @@
 export { BaseRepository } from "./BaseRepository";
 export { ProductoRepository } from "./ProductoRepository";
 export { CategoriaRepository } from "./CategoriaRepository";
+export { ClienteRepository } from "./ClienteRepository";
