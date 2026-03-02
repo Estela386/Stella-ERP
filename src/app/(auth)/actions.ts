@@ -18,7 +18,29 @@ export async function login(formData: FormData) {
     redirect("/login?error=invalid_credentials");
   }
 
-  redirect("/dashboard/cliente");
+  // Obtener el id_rol del usuario
+  const { data: user, error: userError } = await supabase
+    .from("usuario")
+    .select("id_rol")
+    .eq("email", email)
+    .single();
+
+  if (userError || !user) {
+    console.log("Error al obtener usuario:", userError);
+    redirect("/dashboard/cliente"); // Redirección por defecto
+  }
+
+  // Redirigir según el id_rol
+  switch (user.id_rol) {
+    case 1: // Admin
+      redirect("/dashboard/inicio");
+    case 2: // Cliente
+      redirect("/dashboard/cliente");
+    case 3: // Mayorista
+      redirect("/dashboard/inicio");
+    default:
+      redirect("/dashboard/cliente");
+  }
 }
 export async function logout() {
   const supabase = await createClient();

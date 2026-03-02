@@ -7,7 +7,6 @@ import Footer from "@auth/_components/Footer";
 import { useAuth } from "@/lib/hooks/useAuth";
 export default function ClientDashboard() {
   const { usuario } = useAuth();
-  console.log("user:", usuario);
   return (
     <div className="min-h-screen bg-white">
       <HeaderClient user={usuario} />

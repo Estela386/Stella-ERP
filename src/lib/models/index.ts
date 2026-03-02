@@ -16,3 +16,21 @@ export {
   type UpdateCategoriaDTO,
 } from "./Categoria";
 export { Usuario, type IUsuario, type UpdateUsuarioDTO } from "./Usuario";
+export {
+  Cliente,
+  type ICliente,
+  type CreateClienteDTO,
+  type UpdateClienteDTO,
+} from "./Cliente";
+export {
+  Venta,
+  type IVenta,
+  type CreateVentaDTO,
+  type UpdateVentaDTO,
+} from "./Venta";
+export {
+  DetalleVenta,
+  type IDetalleVenta,
+  type CreateDetalleVentaDTO,
+  type UpdateDetalleVentaDTO,
+} from "./DetalleVenta";

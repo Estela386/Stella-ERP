@@ -6,3 +6,5 @@
 export { ProductoService } from "./ProductoService";
 export { CategoriaService } from "./CategoriaService";
 export { ImageUploadService } from "./ImageUploadService";
+export { ClienteService } from "./ClienteService";
+export { VentaService, type ProductoEnVenta } from "./VentaService";

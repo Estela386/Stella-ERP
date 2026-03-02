@@ -5,12 +5,14 @@ import PrimaryButton from "@/_components/PrimaryButton";
 import SecondaryButton from "../../_components/SecondaryButton";
 import Image from "next/image";
 import { logout } from "@auth/actions";
-import { ShoppingCart, User, LogOut } from "lucide-react";
+import { ShoppingCart, User, LogOut, LayoutDashboard } from "lucide-react";
+import { useAuth } from "@/lib/hooks/useAuth";
+
 interface HeaderClientProps {
-  user: any; // Cambia esto al tipo correcto de usuario si lo tienes definido
+  user?: any; // Opcional, usaremos useAuth directamente
 }
 
-export default function HeaderClient({ user }: HeaderClientProps) {
+export default function HeaderClient({ user: userProp }: HeaderClientProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,9 +20,18 @@ export default function HeaderClient({ user }: HeaderClientProps) {
   const userButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Obtener usuario desde el hook si no viene como prop
+  const { usuario: authUsuario, loading } = useAuth();
+  const user = userProp || authUsuario;
+
   const isLogin = pathname === "/login";
   const isRegister = pathname === "/register";
-  const { id_rol } = user || 0;
+  const id_rol = user?.id_rol || 0;
+
+  // No renderizar hasta que se obtenga un id_rol válido
+  const isUserLoaded =
+    id_rol !== 0 && id_rol !== undefined && id_rol !== null && !loading;
+
   const isClientDashboard = id_rol === 1 || id_rol === 2; // Mostrar nav solo para admin y cliente
 
   const navItems = [
@@ -62,6 +73,11 @@ export default function HeaderClient({ user }: HeaderClientProps) {
     await logout();
     router.refresh();
   };
+
+  // No renderizar nada hasta que se cargue el usuario con un id_rol válido
+  if (!isUserLoaded) {
+    return null;
+  }
 
   return (
     <header className="w-full px-6 pt-4">
@@ -126,8 +142,9 @@ export default function HeaderClient({ user }: HeaderClientProps) {
             <ShoppingCart size={20} />
           </button>
 
-          {/* USER MENU */}
-          <div className="relative">
+        {/* User Menu Dropdown - For Authenticated Users */}
+        {isClientDashboard && (
+          <div>
             <button
               ref={userButtonRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -165,27 +182,29 @@ export default function HeaderClient({ user }: HeaderClientProps) {
                     router.push("/dashboard/inicio");
                     setIsMenuOpen(false);
                   }}
-                  className="
-                    w-full text-left px-4 py-3 text-sm
-                    text-[#7c5c4a]
-                    hover:bg-[#f5e6db]
-                    flex items-center gap-2
-                  "
+                  className="cursor-pointer w-full text-left px-4 py-2 text-sm text-[#7c5c4a] hover:bg-[#f5e6db] flex items-center gap-2 transition-colors rounded-t-md"
                 >
                   <User size={16} />
                   ERP
                 </button>
+                {/* Si el id_rol es 1 o 3, renderizar un botón que redirija a /dashboard/inicio */}
+                {(id_rol === 1 || id_rol === 3) && (
+                  <button
+                    onClick={() => {
+                      router.push("/dashboard/inicio");
+                      setIsMenuOpen(false);
+                    }}
+                    className="cursor-pointer w-full text-left px-4 py-2 text-sm text-[#7c5c4a] hover:bg-[#f5e6db] flex items-center gap-2 transition-colors"
+                  >
+                    <LayoutDashboard size={16} />
+                    Dashboard Admin
+                  </button>
+                )}
 
-                <div className="border-t border-[#e0ccc0]" />
-
+                <div className="border-t border-[#e0ccc0]"></div>
                 <button
                   onClick={handleLogout}
-                  className="
-                    w-full text-left px-4 py-3 text-sm
-                    text-[#7c5c4a]
-                    hover:bg-[#f5e6db]
-                    flex items-center gap-2
-                  "
+                  className="cursor-pointer w-full text-left px-4 py-2 text-sm text-[#7c5c4a] hover:bg-[#f5e6db] flex items-center gap-2 transition-colors rounded-b-md"
                 >
                   <LogOut size={16} />
                   Cerrar sesión
@@ -196,26 +215,52 @@ export default function HeaderClient({ user }: HeaderClientProps) {
         </>
       )}
 
-      {!isClientDashboard && (
-        <>
-          <SecondaryButton
-            selected={isLogin}
-            disabled={isLogin}
-            onClick={() => router.push("/login")}
-          >
-            Iniciar sesión
-          </SecondaryButton>
+        {/* User Menu Dropdown - For Unauthenticated Users */}
+        {!isClientDashboard && (
+          <div>
+            <button
+              ref={userButtonRef}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-[#7c5c4a] hover:text-[#5c4a37] hover:bg-[#7c5c4a] hover:bg-opacity-10 transition-all px-3 py-2 rounded-md !cursor-pointer"
+            >
+              <User size={20} />
+            </button>
 
-          <PrimaryButton
-            disabled={isRegister}
-            onClick={() => router.push("/register")}
-          >
-            Registrarse
-          </PrimaryButton>
-        </>
-      )}
-    </div>
-  </div>
-</header>
+            {/* Dropdown Menu for Auth Buttons */}
+            {isMenuOpen && (
+              <div
+                ref={menuRef}
+                className="fixed w-48 bg-white rounded-md shadow-2xl border border-[#d6c1b1]"
+                style={{
+                  top: `${menuPosition.top}px`,
+                  right: `${menuPosition.right}px`,
+                  zIndex: 9999,
+                }}
+              >
+                <button
+                  onClick={() => {
+                    router.push("/login");
+                    setIsMenuOpen(false);
+                  }}
+                  className="cursor-pointer w-full text-left px-4 py-2 text-xs text-[#7c5c4a] hover:bg-[#f5e6db] transition-colors rounded-t-md font-medium"
+                >
+                  Iniciar sesión
+                </button>
+                <div className="border-t border-[#e0ccc0]"></div>
+                <button
+                  onClick={() => {
+                    router.push("/register");
+                    setIsMenuOpen(false);
+                  }}
+                  className="cursor-pointer w-full text-left px-4 py-2 text-xs text-[#7c5c4a] hover:bg-[#f5e6db] transition-colors rounded-b-md font-medium"
+                >
+                  Registrarse
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </header>
   );
 }
