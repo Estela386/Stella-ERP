@@ -2,7 +2,7 @@
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full h-96 md:h-[500px] bg-gradient-to-b from-[#e5d3c2] to-white overflow-hidden">
+    <section className="relative w-full h-96 md:h-[500px] bg-gradient-to-b from-[#F6F3EF] to-white overflow-hidden">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-10 right-10 w-64 h-64 bg-[#d6c1b1] rounded-full blur-3xl"></div>

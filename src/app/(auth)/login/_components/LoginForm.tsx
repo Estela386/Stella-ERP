@@ -1,6 +1,8 @@
 import React from "react";
 import PrimaryButton from "@components/PrimaryButton";
+import Link from "next/link";
 import { login } from "@auth/actions";
+
 interface LoginFormProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
   error?: string;
@@ -22,6 +24,7 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
           placeholder="estela@example.com"
         />
       </div>
+
       <div>
         <label className="block text-[#7c5c4a] mb-1">Contraseña</label>
         <input
@@ -31,15 +34,24 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
           placeholder="Escribe tu contraseña"
         />
       </div>
+
       {error && (
         <div className="flex items-center gap-2 text-[#b97a7a] text-sm">
           <span>❗</span>
           <span>{error}</span>
         </div>
       )}
+
       <PrimaryButton type="submit" className="w-full mt-2">
         Ingresar
       </PrimaryButton>
+
+       <Link
+        href="/resetPass"
+        className="text-sm text-[#7c5c4a] hover:underline mt-2 text-center"
+      >
+        ¿Olvidaste tu contraseña?
+      </Link>
     </form>
   );
 }
