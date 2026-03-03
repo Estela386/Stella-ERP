@@ -26,18 +26,24 @@ export default function ProductRow({
       {/* 🔹 Badge de stock */}
       <td className="px-4 py-3 items-cente">
         <div className="flex justify-center items-center">
-        <StockBadge
-          actual={producto.stock_actual}
-          minimo={producto.stock_min}
-        />
+          <StockBadge
+            actual={producto.stock_actual}
+            minimo={producto.stock_min}
+          />
         </div>
       </td>
 
-      {/* 🔹 Ver */}
+      {/* 🔹 Personalizable */}
       <td className="px-4 py-3 flex justify-center items-center">
-        <button className="text-[#708090] hover:text-[#B76E79] transition">
-          <Eye size={18} />
-        </button>
+        <div
+          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            producto.es_personalizable
+              ? "bg-[#B76E79]/15 text-[#B76E79]"
+              : "bg-gray-200 text-gray-600"
+          }`}
+        >
+          {producto.es_personalizable ? "Sí" : "No"}
+        </div>
       </td>
 
       {/* 🔹 Editar / Eliminar */}

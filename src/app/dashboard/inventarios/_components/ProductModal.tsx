@@ -17,11 +17,17 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
     stock_actual: producto.stock_actual,
     stock_min: producto.stock_min,
     categoria: producto.categoria.nombre,
+    es_personalizable: producto.es_personalizable || false,
   });
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
+  }
+
+  function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, checked } = e.target;
+    setForm(prev => ({ ...prev, [name]: checked }));
   }
 
   function handleSave() {
@@ -32,6 +38,7 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
       costo: Number(form.costo),
       stock_actual: Number(form.stock_actual),
       stock_min: Number(form.stock_min),
+      es_personalizable: form.es_personalizable,
     });
   }
 
@@ -88,6 +95,24 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
             value={form.stock_min}
             onChange={handleChange}
           />
+        </div>
+
+        {/* Checkbox para personalizable */}
+        <div className="flex items-center gap-3 pt-2">
+          <input
+            type="checkbox"
+            id="es_personalizable"
+            name="es_personalizable"
+            checked={form.es_personalizable}
+            onChange={handleCheckboxChange}
+            className="w-5 h-5 cursor-pointer accent-[#B76E79] rounded"
+          />
+          <label
+            htmlFor="es_personalizable"
+            className="text-sm text-[#708090] cursor-pointer font-medium"
+          >
+            Este producto es personalizable
+          </label>
         </div>
 
         <div className="flex justify-end gap-3 pt-6">

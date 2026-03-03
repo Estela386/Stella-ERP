@@ -82,11 +82,14 @@ export default function InventariosPage() {
               nombre: p.nombre || "",
               precio: p.precio || 0,
               costo: p.costo || 0,
+              costo_mayorista: p.costo_mayorista || 0,
               stock_actual: p.stock_actual || 0,
               stock_min: p.stock_min || 0,
               tiempo: p.tiempo || 0,
               url_imagen: p.url_imagen,
               id_categoria: p.id_categoria,
+              es_personalizable: p.es_personalizable,
+              descripcion: p.descripcion || "",
               categoria: cat
                 ? { id: cat.id, nombre: cat.nombre }
                 : { id: 0, nombre: "Sin categoría" },
@@ -187,11 +190,14 @@ export default function InventariosPage() {
           nombre: productoActualizado?.nombre || "",
           precio: productoActualizado?.precio || 0,
           costo: productoActualizado?.costo || 0,
+          costo_mayorista: productoActualizado?.costo_mayorista || 0,
           stock_actual: productoActualizado?.stock_actual || 0,
           stock_min: productoActualizado?.stock_min || 0,
           tiempo: productoActualizado?.tiempo,
           url_imagen: productoActualizado?.url_imagen,
           id_categoria: productoActualizado?.id_categoria,
+          es_personalizable: productoActualizado?.es_personalizable,
+          descripcion: productoActualizado?.descripcion || "",
           categoria: cat
             ? { id: cat.id, nombre: cat.nombre || "" }
             : { id: 0, nombre: "Sin categoría" },
@@ -224,11 +230,14 @@ export default function InventariosPage() {
           nombre: productoNuevo?.nombre || "",
           precio: productoNuevo?.precio || 0,
           costo: productoNuevo?.costo || 0,
+          costo_mayorista: productoNuevo?.costo_mayorista || 0,
           stock_actual: productoNuevo?.stock_actual || 0,
           stock_min: productoNuevo?.stock_min || 0,
           tiempo: productoNuevo?.tiempo,
           url_imagen: productoNuevo?.url_imagen,
           id_categoria: productoNuevo?.id_categoria,
+          es_personalizable: productoNuevo?.es_personalizable,
+          descripcion: productoNuevo?.descripcion || "",
           categoria: cat
             ? { id: cat.id, nombre: cat.nombre || "" }
             : { id: 0, nombre: "Sin categoría" },
@@ -375,17 +384,14 @@ export default function InventariosPage() {
               </div>
             )}
 
-            <InventoryStats
-  productos={productos}
-  onFilterChange={setFiltro}
-/>
+            <InventoryStats productos={productos} onFilterChange={setFiltro} />
 
             <div className="flex justify-between items-center gap-4">
               <InventoryToolbar search={search} setSearch={setSearch} />
               <div className="flex gap-3">
                 <button
                   onClick={handleOpenCategoryModal}
-                   className="
+                  className="
             bg-[#B76E79]
             text-white
             px-5 py-2.5
@@ -396,12 +402,12 @@ export default function InventariosPage() {
             hover:shadow-md
             transition
           "
-                  >
+                >
                   + Categoría
                 </button>
                 <button
                   onClick={() => handleOpenModal()}
-                   className="
+                  className="
             bg-[#B76E79]
             text-white
             px-5 py-2.5
@@ -411,7 +417,8 @@ export default function InventariosPage() {
             hover:bg-[#A45F69]
             hover:shadow-md
             transition
-          ">
+          "
+                >
                   + Nuevo Producto
                 </button>
               </div>

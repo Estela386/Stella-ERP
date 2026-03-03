@@ -16,14 +16,12 @@ export default function ProductTable({
   onEdit,
   onDelete,
 }: Props) {
-
   // 🔎 FILTRO POR ESTADO
   let productosFiltrados = productos.filter(p => {
     if (filtro === "bajo")
       return p.stock_actual <= p.stock_min && p.stock_actual > 0;
 
-    if (filtro === "agotados")
-      return p.stock_actual === 0;
+    if (filtro === "agotados") return p.stock_actual === 0;
 
     return true;
   });
@@ -46,14 +44,22 @@ export default function ProductTable({
       <table className="min-w-full text-sm text-[#111111]">
         <thead className="bg-[#D1BBAA]/35">
           <tr>
-            <th className="px-4 py-3 text-left font-medium text-[#708090]">Código</th>
-            <th className="px-4 py-3 text-left font-medium text-[#708090]">Nombre</th>
+            <th className="px-4 py-3 text-left font-medium text-[#708090]">
+              Código
+            </th>
+            <th className="px-4 py-3 text-left font-medium text-[#708090]">
+              Nombre
+            </th>
             <th className="px-4 py-3 font-medium text-[#708090]">Categoría</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Stock</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Precio</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Estado</th>
-            <th className="px-4 py-3 font-medium text-[#708090]">Ubicación</th>
-            <th className="px-4 py-3 text-right font-medium text-[#708090]">Acciones</th>
+            <th className="px-4 py-3 font-medium text-[#708090]">
+              Personalizable
+            </th>
+            <th className="px-4 py-3 text-right font-medium text-[#708090]">
+              Acciones
+            </th>
           </tr>
         </thead>
 

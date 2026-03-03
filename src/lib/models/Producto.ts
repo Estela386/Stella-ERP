@@ -6,12 +6,15 @@ export interface IProducto {
   id: number;
   nombre: string | null;
   costo: number | null;
+  costo_mayorista?: number | null;
   precio: number;
   tiempo: number | null;
   stock_actual: number | null;
   stock_min: number | null;
   url_imagen: string | null;
   id_categoria: number | null;
+  es_personalizable?: boolean | null;
+  descripcion?: string | null;
 }
 
 /**
@@ -34,23 +37,29 @@ export class Producto implements IProducto {
   id: number;
   nombre: string | null;
   costo: number | null;
+  costo_mayorista?: number | null;
   precio: number;
   tiempo: number | null;
   stock_actual: number | null;
   stock_min: number | null;
   url_imagen: string | null;
   id_categoria: number | null;
+  es_personalizable?: boolean | null;
+  descripcion?: string | null;
 
   constructor(data: IProducto) {
     this.id = data.id;
     this.nombre = data.nombre;
     this.costo = data.costo;
+    this.costo_mayorista = data.costo_mayorista;
     this.precio = data.precio;
     this.tiempo = data.tiempo;
     this.stock_actual = data.stock_actual;
     this.stock_min = data.stock_min;
     this.url_imagen = data.url_imagen;
     this.id_categoria = data.id_categoria;
+    this.es_personalizable = data.es_personalizable;
+    this.descripcion = data.descripcion;
   }
 
   /**
@@ -120,12 +129,15 @@ export class Producto implements IProducto {
       id: this.id,
       nombre: this.nombre,
       costo: this.costo,
+      costo_mayorista: this.costo_mayorista,
       precio: this.precio,
       tiempo: this.tiempo,
       stock_actual: this.stock_actual,
       stock_min: this.stock_min,
       url_imagen: this.url_imagen,
       id_categoria: this.id_categoria,
+      es_personalizable: this.es_personalizable,
+      descripcion: this.descripcion,
     };
   }
 }

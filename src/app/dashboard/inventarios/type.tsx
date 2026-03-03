@@ -8,12 +8,15 @@ export type Producto = {
   nombre: string | null;
   precio: number | null;
   costo: number;
+  costo_mayorista?: number | null;
   stock_actual: number;
   stock_min: number;
   tiempo?: number | null;
   url_imagen?: string | null;
   id_categoria?: number | null;
   categoria: Categoria;
+  es_personalizable?: boolean | null;
+  descripcion?: string | null;
 };
 
 export type HistorialProducto = {

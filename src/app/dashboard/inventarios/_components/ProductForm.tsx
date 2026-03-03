@@ -24,10 +24,13 @@ export default function ProductForm({
     nombre: producto?.nombre || "",
     precio: producto?.precio || 0,
     costo: producto?.costo || 0,
+    costo_mayorista: producto?.costo_mayorista || 0,
     stock_actual: producto?.stock_actual || 0,
     stock_min: producto?.stock_min || 0,
     tiempo: producto?.tiempo || 0,
     id_categoria: producto?.id_categoria || categorias[0]?.id || 0,
+    es_personalizable: producto?.es_personalizable || false,
+    descripcion: producto?.descripcion || "",
   });
 
   const [imagenFile, setImagenFile] = useState<File | null>(null);
@@ -40,14 +43,30 @@ export default function ProductForm({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    const numericFields = [
+      "precio",
+      "costo",
+      "costo_mayorista",
+      "stock_actual",
+      "stock_min",
+      "tiempo",
+    ];
     setFormData(prev => ({
       ...prev,
-      [name]: name === "nombre" ? value : parseFloat(value) || 0,
+      [name]: numericFields.includes(name) ? parseFloat(value) || 0 : value,
     }));
     // Limpiar error cuando el usuario empieza a editar
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked,
+    }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -234,6 +253,53 @@ export default function ProductForm({
         </div>
       </div>
 
+      {/* Costo Mayorista */}
+      <div>
+        <label
+          htmlFor="costo_mayorista"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Costo Mayorista
+        </label>
+        <input
+          type="number"
+          id="costo_mayorista"
+          name="costo_mayorista"
+          value={formData.costo_mayorista}
+          onChange={handleChange}
+          disabled={loading}
+          step="0.01"
+          className="text-gray-700 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
+          placeholder="0.00"
+        />
+      </div>
+
+      {/* Descripción */}
+      <div>
+        <label
+          htmlFor="descripcion"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Descripción
+        </label>
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          value={formData.descripcion}
+          onChange={e => {
+            const { name, value } = e.target;
+            setFormData(prev => ({
+              ...prev,
+              [name]: value,
+            }));
+          }}
+          disabled={loading}
+          rows={3}
+          className="text-gray-700 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] resize-none"
+          placeholder="Describe el producto..."
+        />
+      </div>
+
       {/* Stock Actual y Stock Mínimo - en una fila */}
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -351,6 +417,25 @@ export default function ProductForm({
           className="text-gray-700 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
           placeholder="0"
         />
+      </div>
+
+      {/* Checkbox para personalizable */}
+      <div className="flex items-center gap-3">
+        <input
+          type="checkbox"
+          id="es_personalizable"
+          name="es_personalizable"
+          checked={formData.es_personalizable}
+          onChange={handleCheckboxChange}
+          disabled={loading}
+          className="w-5 h-5 cursor-pointer accent-[#B76E79] rounded"
+        />
+        <label
+          htmlFor="es_personalizable"
+          className="text-sm font-medium text-gray-700 cursor-pointer"
+        >
+          Este producto es personalizable
+        </label>
       </div>
 
       {/* Botones de acción */}
