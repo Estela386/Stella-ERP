@@ -1,25 +1,27 @@
-import { Material } from "../type";
+import { Insumo } from "@lib/models/Insumo";
+
+type Filtro = "TODOS" | "BAJO" | "AGOTADO";
 
 type Props = {
-  materiales: Material[];
-  onFilter: (filtro: string) => void;
+  materiales: Insumo[];
+  onFilter: (filtro: Filtro) => void;
 };
 
 export default function MaterialsStats({ materiales, onFilter }: Props) {
   const total = materiales.length;
-  const stockBajo = materiales.filter(m => m.cantidad < 5).length;
+  const stockBajo = materiales.filter(
+    m => m.cantidad > 0 && m.cantidad < 5
+  ).length;
   const agotados = materiales.filter(m => m.cantidad === 0).length;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-      
       <StatCard
         title="Total de Materiales"
         value={total}
         onClick={() => onFilter("TODOS")}
       />
 
-      {/* 👇 ESTE ES EL DEL MEDIO */}
       <StatCard
         title="Stock Bajo"
         value={stockBajo}
@@ -32,12 +34,18 @@ export default function MaterialsStats({ materiales, onFilter }: Props) {
         value={agotados}
         onClick={() => onFilter("AGOTADO")}
       />
-
     </div>
   );
 }
 
-function StatCard({ title, value, onClick, middle = false }: any) {
+type StatCardProps = {
+  title: string;
+  value: number;
+  onClick: () => void;
+  middle?: boolean;
+};
+
+function StatCard({ title, value, onClick, middle = false }: StatCardProps) {
   return (
     <div
       onClick={onClick}
@@ -48,12 +56,10 @@ function StatCard({ title, value, onClick, middle = false }: any) {
         ${middle ? "bg-[#B76E79]" : "bg-[#708090]"}
         text-white
         p-5
-
         shadow-md
         hover:shadow-xl
         hover:-translate-y-1
         active:scale-95
-
         transition-all duration-200
       `}
     >
