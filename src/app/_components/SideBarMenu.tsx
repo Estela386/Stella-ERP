@@ -46,7 +46,7 @@ const menuItems = [
   { label: "Materiales", href: "/materials", icon: LayoutListIcon, roles: [1] },
   {
     label: "Cuentas",
-    href: "/dashboard/cuentas",
+    href: "/accounts",
     icon: BiMoney,
     roles: [1, 3],
   },

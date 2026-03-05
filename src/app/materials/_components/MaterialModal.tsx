@@ -1,39 +1,44 @@
-import { useState } from "react";
-import { Material } from "../type";
+"use client";
 
-type Uso = {
-  id: number;
-  producto: string;
-  cantidadUsada: number;
-};
+import { useState } from "react";
+import { Insumo } from "@lib/models/Insumo";
 
 type Props = {
-  material: Material;
+  material: Insumo;
   onClose: () => void;
+  onSave: (material: Insumo) => void;
 };
 
-export default function MaterialModal({ material, onClose }: Props) {
-  const [form, setForm] = useState(material);
+export default function MaterialModal({ material, onClose, onSave }: Props) {
+  const [form, setForm] = useState({
+    id: material.id,
+    nombre: material.nombre,
+    tipo: material.tipo,
+    precio: material.precio,
+    cantidad: material.cantidad,
+  });
 
-  const usosMock: Uso[] = [
-    { id: 1, producto: "Anillo Oro", cantidadUsada: 2 },
-    { id: 2, producto: "Pulsera Elegante", cantidadUsada: 1.5 },
-    { id: 3, producto: "Collar Perlas", cantidadUsada: 3 },
-  ];
+  const handleChange = (field: keyof typeof form, value: string | number) => {
+    setForm(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    const actualizado = new Insumo(form);
+    onSave(actualizado);
+    onClose();
+  };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-
-      <div className="bg-white rounded-3xl w-full max-w-3xl p-8 shadow-xl space-y-8">
-
-        {/* TITULO */}
+    <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl w-full max-w-3xl p-8 shadow-2xl space-y-8">
         <h2 className="text-3xl font-semibold text-[#708090]">
           Detalles del material
         </h2>
 
-        {/* 📦 DATOS DEL MATERIAL */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
           {/* Nombre */}
           <div className="space-y-1">
             <label className="text-sm font-semibold text-[#708090]">
@@ -41,30 +46,18 @@ export default function MaterialModal({ material, onClose }: Props) {
             </label>
             <input
               value={form.nombre}
-              onChange={e => setForm({ ...form, nombre: e.target.value })}
-              className="
-                w-full
-                rounded-xl
-                border border-[#8C9796]/40
-                bg-[#F8F6F2]
-                px-4 py-2.5
-                text-[#1C1C1C]
-                placeholder:text-[#8C9796]
-                focus:outline-none
-                focus:ring-2 focus:ring-[#B76E79]
-              "
+              onChange={e => handleChange("nombre", e.target.value)}
+              className="w-full rounded-xl border border-[#8C9796]/40 bg-white px-4 py-2.5 text-[#1C1C1C] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
             />
           </div>
 
           {/* Tipo */}
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-[#708090]">
-              Tipo
-            </label>
+            <label className="text-sm font-semibold text-[#708090]">Tipo</label>
             <input
               value={form.tipo}
-              onChange={e => setForm({ ...form, tipo: e.target.value })}
-              className="w-full rounded-xl border border-[#8C9796]/40 bg-[#F8F6F2] px-4 py-2.5 text-[#1C1C1C] focus:ring-2 focus:ring-[#B76E79]"
+              onChange={e => handleChange("tipo", e.target.value)}
+              className="w-full rounded-xl border border-[#8C9796]/40 bg-white px-4 py-2.5 text-[#1C1C1C] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
             />
           </div>
 
@@ -76,12 +69,12 @@ export default function MaterialModal({ material, onClose }: Props) {
             <input
               type="number"
               value={form.precio}
-              onChange={e => setForm({ ...form, precio: Number(e.target.value) })}
-              className="w-full rounded-xl border border-[#8C9796]/40 bg-[#F8F6F2] px-4 py-2.5 text-[#1C1C1C] focus:ring-2 focus:ring-[#B76E79]"
+              onChange={e => handleChange("precio", Number(e.target.value))}
+              className="w-full rounded-xl border border-[#8C9796]/40 bg-white px-4 py-2.5 text-[#1C1C1C] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
             />
           </div>
 
-          {/* Stock */}
+          {/* Cantidad */}
           <div className="space-y-1">
             <label className="text-sm font-semibold text-[#708090]">
               Stock disponible
@@ -89,91 +82,27 @@ export default function MaterialModal({ material, onClose }: Props) {
             <input
               type="number"
               value={form.cantidad}
-              onChange={e => setForm({ ...form, cantidad: Number(e.target.value) })}
-              className="w-full rounded-xl border border-[#8C9796]/40 bg-[#F8F6F2] px-4 py-2.5 text-[#1C1C1C] focus:ring-2 focus:ring-[#B76E79]"
+              onChange={e => handleChange("cantidad", Number(e.target.value))}
+              className="w-full rounded-xl border border-[#8C9796]/40 bg-white px-4 py-2.5 text-[#1C1C1C] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#B76E79]"
             />
           </div>
-
         </section>
 
-        {/* 📊 TABLA */}
-        <section className="space-y-3">
-
-          <h3 className="text-lg font-semibold text-[#708090]">
-            Artículos que utilizan este material
-          </h3>
-
-          <div className="overflow-hidden rounded-2xl border border-[#8C9796]/40">
-            <table className="w-full text-sm text-[#708090]">
-
-              <thead className="bg-[#708090] text-white">
-                <tr>
-                  <th className="text-left px-5 py-3">
-                    Artículo
-                  </th>
-                  <th className="text-center px-5 py-3">
-                    Cantidad por pieza
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {usosMock.map((u, i) => (
-                  <tr
-                    key={u.id}
-                    className={`
-                      border-t
-                      ${i % 2 === 0 ? "bg-[#F8F6F2]" : "bg-white"}
-                      hover:bg-[#F6F3EF]
-                    `}
-                  >
-                    <td className="px-5 py-3 font-medium">
-                      {u.producto}
-                    </td>
-
-                    <td className="px-5 py-3 text-center font-bold text-[#B76E79]">
-                      {u.cantidadUsada} g
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-
-            </table>
-          </div>
-
-        </section>
-
-        {/* BOTONES */}
-        <div className="flex justify-end gap-3">
-
+        <div className="flex justify-end gap-3 pt-4">
           <button
             onClick={onClose}
-            className="
-              px-6 py-2.5
-              rounded-full
-              border border-[#8C9796]/40
-              text-[#708090]
-              hover:bg-[#F6F3EF]
-            "
+            className="px-6 py-2.5 rounded-full border border-[#8C9796]/40 text-[#708090] hover:bg-[#F6F3EF] transition"
           >
             Cancelar
           </button>
 
           <button
-            className="
-              bg-[#B76E79]
-              text-white
-              px-6 py-2.5
-              rounded-full
-              font-medium
-              hover:bg-[#A45F69]
-            "
+            onClick={handleSave}
+            className="bg-[#B76E79] text-white px-6 py-2.5 rounded-full font-medium hover:bg-[#A45F69] transition"
           >
             Guardar cambios
           </button>
-
         </div>
-
       </div>
     </div>
   );

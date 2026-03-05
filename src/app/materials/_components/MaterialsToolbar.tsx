@@ -30,11 +30,11 @@ export default function MaterialsToolbar({
 
       {/* ➕ BOTONES */}
       <div className="flex gap-3">
-        <button
+        {/* <button
           className="bg-[#708090] text-white px-5 py-2.5 rounded-full text-sm"
         >
           + Categoría
-        </button>
+        </button> */}
 
         <button
           onClick={onNewMaterial} // 👈 abre modal

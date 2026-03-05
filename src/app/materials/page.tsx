@@ -5,10 +5,10 @@ import SidebarMenu from "@/app/_components/SideBarMenu";
 import MaterialsStats from "./_components/MaterialsStats";
 import MaterialsToolbar from "./_components/MaterialsToolbar";
 import MaterialsGrid from "./_components/MaterialsGrid";
-import NewMaterialModal from "./_components/NewMaterialModal"; // 👈 IMPORT NUEVO
+import NewMaterialModal from "./_components/NewMaterialModal";
 import { createClient } from "@utils/supabase/client";
 import { InsumoService } from "@/lib/services/InsumoService";
-import { Insumo } from "@lib/models/Insumo";
+import { Insumo, UpdateInsumoDTO } from "@lib/models/Insumo";
 import { useAuth } from "@lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -21,8 +21,7 @@ export default function MaterialsPage() {
   const [filtro, setFiltro] = useState<"TODOS" | "BAJO" | "AGOTADO">("TODOS");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [showModal, setShowModal] = useState(false); // 👈 NUEVO ESTADO
+  const [showModal, setShowModal] = useState(false);
 
   // 🔐 Validación admin
   useEffect(() => {
@@ -61,6 +60,34 @@ export default function MaterialsPage() {
       cargarInsumos();
     }
   }, [usuario, loadingUser]);
+
+  // 🔄 ACTUALIZAR MATERIAL (CORREGIDO)
+  const actualizarMaterial = async (materialActualizado: Insumo) => {
+    const supabase = createClient();
+    const insumoService = new InsumoService(supabase);
+
+    const { id, ...rest } = materialActualizado;
+
+    const data: UpdateInsumoDTO = {
+      nombre: rest.nombre,
+      tipo: rest.tipo,
+      precio: rest.precio,
+      cantidad: rest.cantidad,
+    };
+
+    const { insumo, error } = await insumoService.actualizar(id, data);
+
+    if (error || !insumo) {
+      alert("Error actualizando material");
+      return;
+    }
+
+    setInsumos(prev =>
+      prev.map(m =>
+        m.id === insumo.id ? insumo : m
+      )
+    );
+  };
 
   // 🔎 Filtros
   const filtrados = useMemo(() => {
@@ -121,16 +148,18 @@ export default function MaterialsPage() {
             <MaterialsToolbar
               search={search}
               setSearch={setSearch}
-              onNewMaterial={() => setShowModal(true)} // 👈 ABRE MODAL
+              onNewMaterial={() => setShowModal(true)}
             />
 
-            <MaterialsGrid materiales={filtrados} />
+            <MaterialsGrid
+              materiales={filtrados}
+              onUpdate={actualizarMaterial}
+            />
 
           </div>
         </div>
       </main>
 
-      {/* 👇 MODAL */}
       {showModal && (
         <NewMaterialModal
           onClose={() => setShowModal(false)}
