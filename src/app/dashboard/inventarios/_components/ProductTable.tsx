@@ -53,6 +53,10 @@ export default function ProductTable({
             <th className="px-4 py-3 font-medium text-[#708090]">Categoría</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Stock</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Precio</th>
+            <th className="px-4 py-3 font-medium text-[#708090]">Costo</th>
+            <th className="px-4 py-3 font-medium text-[#708090]">
+              Costo Mayorista
+            </th>
             <th className="px-4 py-3 font-medium text-[#708090]">Estado</th>
             <th className="px-4 py-3 font-medium text-[#708090]">
               Personalizable
@@ -75,7 +79,7 @@ export default function ProductTable({
 
           {productosFiltrados.length === 0 && (
             <tr>
-              <td colSpan={8} className="px-4 py-6 text-center text-[#708090]">
+              <td colSpan={10} className="px-4 py-6 text-center text-[#708090]">
                 No se encontraron productos
               </td>
             </tr>

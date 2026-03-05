@@ -122,6 +122,15 @@ export default function ProductoClient({ id }: ProductoClientProps) {
               </div>
             )}
 
+            {producto.descripcion && (
+              <div>
+                <p className="text-sm text-gray-600 mb-2">Descripción</p>
+                <p className="text-base text-[#7c5c4a] leading-relaxed">
+                  {producto.descripcion}
+                </p>
+              </div>
+            )}
+
             <div>
               <p className="text-sm text-gray-600 mb-2">Stock Disponible</p>
               <p

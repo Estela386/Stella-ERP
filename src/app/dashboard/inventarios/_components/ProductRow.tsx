@@ -22,6 +22,10 @@ export default function ProductRow({
       <td className="px-4 py-3">{producto.categoria.nombre}</td>
       <td className="px-4 py-3 text-center">{producto.stock_actual}</td>
       <td className="px-4 py-3 text-center">${producto.precio}</td>
+      <td className="px-4 py-3 text-center">${producto.costo}</td>
+      <td className="px-4 py-3 text-center">
+        ${producto.costo_mayorista || "N/A"}
+      </td>
 
       {/* 🔹 Badge de stock */}
       <td className="px-4 py-3 items-cente">
