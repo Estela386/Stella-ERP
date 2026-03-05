@@ -9,91 +9,80 @@ import PaymentModal from "./_components/PaymentModal";
 import ClientModal from "./_components/ClientModal";
 import SidebarMenu from "@/app/_components/SideBarMenu";
 
+export type Account = {
+  id: number;
+  cliente: string;
+  concepto: string;
+  monto: number;
+  pagado: number;
+  activo: boolean;
+};
+
 export default function AccountsPage() {
   const [openAccount, setOpenAccount] = useState(false);
   const [openPayment, setOpenPayment] = useState(false);
   const [openClient, setOpenClient] = useState(false);
+  const [search, setSearch] = useState("");
+
+  // 🔥 ESTADO GLOBAL
+  const [accounts, setAccounts] = useState<Account[]>([
+    {
+      id: 1,
+      cliente: "María López",
+      concepto: "Venta de productos",
+      monto: 3000,
+      pagado: 1000,
+      activo: true,
+    },
+    {
+      id: 2,
+      cliente: "Carlos Ramírez",
+      concepto: "Servicio mensual",
+      monto: 5000,
+      pagado: 5000,
+      activo: true,
+    },
+  ]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F6F3EF]">
-
-      {/* 🧭 SIDEBAR */}
+    <div className="flex min-h-screen bg-[#f6f4ef]">
       <SidebarMenu />
 
-      <main className="flex-1 px-4 py-8 overflow-y-auto">
+      <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto">
+        <div className="mx-auto max-w-7xl space-y-8">
 
-        <div className="mx-auto max-w-6xl space-y-6">
-
-          {/* ===== HEADER IGUAL ===== */}
-          <header className="space-y-1">
-
-            <div className="flex items-center gap-4">
-              <span className="h-px w-12 bg-[#B76E79]" />
-              <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
-                Finanzas
-              </span>
-            </div>
-
-            <h1
-              className="
-                font-serif
-                text-5xl md:text-6xl
-                font-medium
-                leading-tight
-                text-[#708090]
-              "
-            >
+          <header className="space-y-3">
+            <h1 className="text-5xl font-medium text-[#708090]">
               Cuentas por cobrar
             </h1>
-
           </header>
 
-          {/* ===== CARD BLANCA PRINCIPAL ===== */}
-          <div
-            className="
-              relative
-              rounded-3xl
-              bg-white
-              p-10
-              space-y-6
-              border border-black/10
-              shadow-[0_30px_70px_rgba(0,0,0,0.12)]
-            "
-          >
+          <div className="rounded-3xl bg-white p-10 space-y-8 border border-[#8c8976]/30 shadow-lg">
 
-            {/* 📊 STATS */}
-            <AccountsStats />
+            <AccountsStats accounts={accounts} />
 
-            {/* 🔎 TOOLBAR */}
             <AccountsToolbar
+              search={search}
+              onSearchChange={setSearch}
               onAddAccount={() => setOpenAccount(true)}
               onAddPayment={() => setOpenPayment(true)}
               onAddClient={() => setOpenClient(true)}
             />
 
-            {/* 📋 TABLA */}
-            <AccountsTable />
-
+            <AccountsTable search={search} accounts={accounts} />
           </div>
         </div>
       </main>
 
-      {/* 🪟 MODALES */}
-      <AccountModal
-        open={openAccount}
-        onClose={() => setOpenAccount(false)}
-      />
-
       <PaymentModal
         open={openPayment}
         onClose={() => setOpenPayment(false)}
+        accounts={accounts}
+        setAccounts={setAccounts}
       />
 
-      <ClientModal
-        open={openClient}
-        onClose={() => setOpenClient(false)}
-      />
-
+      <AccountModal open={openAccount} onClose={() => setOpenAccount(false)} />
+      <ClientModal open={openClient} onClose={() => setOpenClient(false)} />
     </div>
   );
 }
