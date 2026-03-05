@@ -1,30 +1,26 @@
 import RegisterForm from "./_components/RegisterForm";
-import Image from "next/image";
+import ResetLayout from "@/app/resetPass/_components/ResetLayout";
 
-export default async function RegisterPage({
+export default function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: { error?: string };
 }) {
-  const { error } = await searchParams;
+  const { error } = searchParams;
 
   return (
-    <>
-      <div className="flex flex-col items-center mb-2">
-        <Image
-          src="/logo.png"
-          alt="Stella Logo"
-          width={96}
-          height={96}
-          className="h-24 w-24 mb-2"
-        />
+    <ResetLayout>
+      <div className="w-full max-w-md space-y-4">
+
+        {error === "password_mismatch" && (
+          <p className="text-[#B76E79] text-center">
+            Las contraseñas no coinciden
+          </p>
+        )}
+
+        <RegisterForm />
+
       </div>
-
-      {error === "password_mismatch" && (
-        <p className="text-red-500">Las contraseñas no coinciden</p>
-      )}
-
-      <RegisterForm />
-    </>
+    </ResetLayout>
   );
 }

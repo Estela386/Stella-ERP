@@ -117,13 +117,16 @@ export default function SidebarMenu() {
     >
       {/* 🔹 Logo */}
       <div className="hidden md:flex p-6 border-b border-[#f6f4ef] flex-col items-center">
-        <Image
-          src="/logo.png"
-          alt="Stella Logo"
-          width={100}
-          height={100}
-          className="mb-2"
-        />
+       <Image
+  src="/logo.png"
+  alt="Stella Logo"
+  width={100}
+  height={100}
+  className="mb-2"
+  style={{
+    filter: "invert(33%) sepia(14%) saturate(403%) hue-rotate(185deg) brightness(92%) contrast(90%)",
+  }}
+/>
       </div>
 
       {/*  Navegación */}
