@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import HeaderClient from "@auth/_components/HeaderClient";
 import Footer from "@auth/_components/Footer";
 import { ProductoCard } from "../types";
@@ -113,11 +114,12 @@ export default function CatalogPage() {
                 <div key={product.id} className="group cursor-pointer">
                   {/* Product Card */}
                   <div className="relative w-full aspect-square bg-[#e5d3c2] rounded-lg overflow-hidden mb-3">
-                    <div className="w-full h-full bg-gradient-to-br from-[#e5d3c2] to-[#d6c1b1] flex items-center justify-center">
-                      <span className="text-[#7c5c4a] text-xs md:text-sm text-center px-2">
-                        {product.image}
-                      </span>
-                    </div>
+                    <Image
+                      src={product.image || "/placeholder.png"}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
                     <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
                   </div>
 
