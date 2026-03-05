@@ -3,6 +3,7 @@ import { Venta, IVenta, CreateVentaDTO, UpdateVentaDTO } from "../models/Venta";
 import { VentaRepository } from "../repositories/VentaRepository";
 import { DetalleVentaRepository } from "../repositories/DetalleVentaRepository";
 import { ProductoRepository } from "../repositories/ProductoRepository";
+import { CuentasPorCobrarService } from "./CuentasPorCobrarService";
 
 export interface ProductoEnVenta {
   id_producto: number;
@@ -18,12 +19,14 @@ export class VentaService {
   private ventaRepository: VentaRepository;
   private detalleRepository: DetalleVentaRepository;
   private productoRepository: ProductoRepository;
+  private cuentasPorCobrarService: CuentasPorCobrarService;
   private client: SupabaseClient;
 
   constructor(client: SupabaseClient) {
     this.ventaRepository = new VentaRepository(client);
     this.detalleRepository = new DetalleVentaRepository(client);
     this.productoRepository = new ProductoRepository(client);
+    this.cuentasPorCobrarService = new CuentasPorCobrarService(client);
     this.client = client;
   }
 
@@ -86,7 +89,8 @@ export class VentaService {
     idUsuario: string,
     productos: ProductoEnVenta[],
     fecha: string,
-    totalConIva?: number
+    totalConIva?: number,
+    montoPagado: number = 0
   ): Promise<{
     venta: Venta | null;
     ventaId?: number;
@@ -182,6 +186,20 @@ export class VentaService {
           venta: null,
           error: ventaErrorFinal || "Error al actualizar la venta",
         };
+      }
+
+      // 5. Crear un registro en cuentas por cobrar
+      try {
+        await this.cuentasPorCobrarService.crearParaVenta(
+          clienteId,
+          ventaId,
+          totalFinal,
+          montoPagado,
+          "Venta registrada"
+        );
+      } catch (cuentaError) {
+        console.error("Error al crear cuenta por cobrar:", cuentaError);
+        // No interrumpimos el flujo de la venta si hay error en cuentas
       }
 
       const venta = new Venta(ventaDataFinal as IVenta);

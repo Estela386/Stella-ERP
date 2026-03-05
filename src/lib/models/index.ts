@@ -34,3 +34,9 @@ export {
   type CreateDetalleVentaDTO,
   type UpdateDetalleVentaDTO,
 } from "./DetalleVenta";
+export {
+  CuentasPorCobrar,
+  type ICuentasPorCobrar,
+  type CreateCuentasPorCobrarDTO,
+  type UpdateCuentasPorCobrarDTO,
+} from "./CuentasPorCobrar";

@@ -137,7 +137,7 @@ export default function ProductosVenta({
                   <button
                     onClick={() => onDisminuir(p.id)}
                     disabled={p.cantidad <= 1}
-                    className="p-1 hover:bg-[#B76E79]/10 rounded disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    className="p-1 hover:bg-[#B76E79]/10 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
                     title="Disminuir cantidad"
                   >
                     <Minus size={14} className="text-[#B76E79]" />
@@ -148,7 +148,7 @@ export default function ProductosVenta({
                   <button
                     onClick={() => onAumentar(p.id)}
                     disabled={p.stock !== undefined && p.cantidad >= p.stock}
-                    className="p-1 hover:bg-[#B76E79]/10 rounded disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    className="p-1 hover:bg-[#B76E79]/10 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
                     title={
                       p.stock !== undefined && p.cantidad >= p.stock
                         ? "Stock máximo alcanzado"
@@ -175,6 +175,7 @@ export default function ProductosVenta({
                     flex items-center justify-center
                     hover:bg-[#B76E79]
                     hover:text-white
+                    cursor-pointer
                     transition
                   "
                   title="Eliminar producto"
@@ -196,7 +197,7 @@ export default function ProductosVenta({
               setShowDropdown(!showDropdown);
               if (!showDropdown) setBusqueda("");
             }}
-            className={`w-full text-left bg-white border-2 rounded-xl px-4 py-3 text-[#708090] shadow-sm focus:outline-none transition flex items-center justify-between ${
+            className={`w-full text-left bg-white border-2 rounded-xl px-4 py-3 text-[#708090] shadow-sm focus:outline-none transition flex items-center justify-between cursor-pointer ${
               showDropdown
                 ? "border-[#B76E79] ring-2 ring-[#B76E79]/20"
                 : "border-[#8C9796]/40 hover:border-[#8C9796]/60"
@@ -258,10 +259,10 @@ export default function ProductosVenta({
                           setShowDropdown(false);
                           setBusqueda("");
                         }}
-                        className={`w-full text-left px-4 py-3 transition border-b border-[#8C9796]/10 last:border-b-0 ${
+                        className={`w-full text-left px-4 py-3 transition border-b border-[#8C9796]/10 last:border-b-0 cursor-pointer ${
                           sinStock
                             ? "opacity-50 cursor-not-allowed bg-[#8C9796]/5"
-                            : "hover:bg-[#B76E79]/10 cursor-pointer"
+                            : "hover:bg-[#B76E79]/10"
                         }`}
                       >
                         <div className="flex justify-between items-start">

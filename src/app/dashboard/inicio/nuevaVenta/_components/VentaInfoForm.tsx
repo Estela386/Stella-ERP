@@ -148,7 +148,7 @@ export default function VentaInfoForm({
                   setShowDropdown(!showDropdown);
                   if (!showDropdown) setBusqueda("");
                 }}
-                className={`w-full text-left bg-[#F6F4EF] border-2 rounded-xl px-4 py-3 text-[#708090] shadow-sm focus:outline-none transition flex items-center justify-between ${
+                className={`w-full text-left bg-[#F6F4EF] border-2 rounded-xl px-4 py-3 text-[#708090] shadow-sm focus:outline-none transition flex items-center justify-between cursor-pointer ${
                   clienteSeleccionado
                     ? "border-[#B76E79]/50 bg-white"
                     : "border-[#8C9796]/40 hover:border-[#8C9796]/60"
@@ -220,7 +220,7 @@ export default function VentaInfoForm({
                           onClick={() => {
                             handleClienteSelect(cliente);
                           }}
-                          className="w-full text-left px-4 py-3 hover:bg-[#B76E79]/10 transition border-b border-[#8C9796]/10 last:border-b-0"
+                          className="w-full text-left px-4 py-3 hover:bg-[#B76E79]/10 transition border-b border-[#8C9796]/10 last:border-b-0 cursor-pointer"
                         >
                           <div className="font-medium text-[#708090]">
                             {cliente.nombre}
@@ -239,7 +239,7 @@ export default function VentaInfoForm({
                       setShowModal(true);
                       setShowDropdown(false);
                     }}
-                    className="w-full text-left px-4 py-3 text-[#B76E79] hover:bg-[#B76E79]/10 transition border-t border-[#8C9796]/20 flex items-center gap-2 font-medium"
+                    className="w-full text-left px-4 py-3 text-[#B76E79] hover:bg-[#B76E79]/10 transition border-t border-[#8C9796]/20 flex items-center gap-2 font-medium cursor-pointer"
                   >
                     <Plus size={16} />
                     Agregar nuevo cliente

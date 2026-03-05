@@ -12,12 +12,14 @@ interface ConfirmarVentaRequest {
   }>;
   fecha: string;
   totalConIva?: number;
+  montoPagado?: number;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as ConfirmarVentaRequest;
-    const { idUsuario, clienteId, productos, fecha, totalConIva } = body;
+    const { idUsuario, clienteId, productos, fecha, totalConIva, montoPagado } =
+      body;
 
     // Validaciones
     if (!idUsuario || !clienteId || !productos || !fecha) {
@@ -43,7 +45,8 @@ export async function POST(request: NextRequest) {
       idUsuario,
       productos,
       fecha,
-      totalConIva
+      totalConIva,
+      montoPagado || 0
     );
 
     if (error || !venta) {

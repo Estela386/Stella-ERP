@@ -29,6 +29,7 @@ export default function VentaResumen({
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [montoPagado, setMontoPagado] = useState<string>("");
 
   const subtotal = productos.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
   const iva = subtotal * 0.16;
@@ -38,6 +39,19 @@ export default function VentaResumen({
     if (productos.length === 0) return;
     if (!cliente) {
       setError("Selecciona un cliente");
+      return;
+    }
+
+    // Validar monto a pagar
+    const montoAlPagar = montoPagado ? parseFloat(montoPagado) : 0;
+    if (montoAlPagar < 0) {
+      setError("El monto a pagar no puede ser negativo");
+      return;
+    }
+    if (montoAlPagar > total) {
+      setError(
+        `El monto a pagar no puede ser mayor al total ($${total.toFixed(2)})`
+      );
       return;
     }
 
@@ -56,6 +70,7 @@ export default function VentaResumen({
         })),
         fecha,
         totalConIva: total,
+        montoPagado: montoAlPagar,
       };
 
       const response = await fetch("/api/ventas/confirmar", {
@@ -85,7 +100,7 @@ export default function VentaResumen({
       const folio = ventaId || Math.floor(Math.random() * 900000 + 100000);
 
       const continuar = () => {
-        y += 5;
+        y += 8;
 
         doc.setFontSize(13);
         doc.setFont("helvetica", "bold");
@@ -164,6 +179,31 @@ export default function VentaResumen({
 
         y += 8;
 
+        // SECCIÓN DE PAGOS
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.line(8, y, 72, y);
+        y += 4;
+
+        doc.setFont("helvetica", "bold");
+        doc.text("PAGO REALIZADO", 40, y, { align: "center" });
+        y += 5;
+
+        doc.setFont("helvetica", "normal");
+        const montoAlPagar = montoPagado ? parseFloat(montoPagado) : 0;
+        const deudaPendiente = total - montoAlPagar;
+
+        doc.text("Monto Pagado:", 8, y);
+        doc.text(`$${montoAlPagar.toFixed(2)}`, 72, y, { align: "right" });
+        y += 4;
+
+        doc.text("Deuda Pendiente:", 8, y);
+        doc.text(`$${deudaPendiente.toFixed(2)}`, 72, y, { align: "right" });
+        y += 6;
+
+        doc.line(8, y, 72, y);
+        y += 6;
+
         // METODO DE PAGO
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
@@ -196,7 +236,7 @@ export default function VentaResumen({
       img.src = "/logo.png";
 
       img.onload = () => {
-        doc.addImage(img, "PNG", 28, y, 36, 50);
+        doc.addImage(img, "PNG", 22, y, 36, 50);
         y += 50;
         continuar();
       };
@@ -213,9 +253,9 @@ export default function VentaResumen({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-md shadow-[#8C9796]/20 flex flex-col sm:flex-row justify-between items-center gap-6">
+    <div className="bg-white rounded-2xl p-6 shadow-md shadow-[#8C9796]/20 flex flex-col gap-6">
       {/* Info de total con desglose */}
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div>
           <p className="text-sm text-[#8C9796]">Subtotal</p>
           <p className="text-lg font-semibold text-[#708090]">
@@ -228,7 +268,7 @@ export default function VentaResumen({
             ${iva.toFixed(2)}
           </p>
         </div>
-        <div className="border-t-2 border-[#8C9796]/20 pt-3">
+        <div className="border-t-2 sm:border-t-0 border-[#8C9796]/20 pt-3 sm:pt-0">
           <p className="text-sm text-[#708090]">Total</p>
           <p className="text-3xl font-semibold text-[#B76E79]">
             ${total.toFixed(2)}
@@ -236,10 +276,45 @@ export default function VentaResumen({
         </div>
       </div>
 
+      {/* Input de monto a pagar */}
+      <div className="border-t-2 border-[#8C9796]/20 pt-4">
+        <label className="block text-sm font-medium text-[#708090] mb-2">
+          Monto a Pagar (Opcional)
+        </label>
+        <div className="relative">
+          <span className="absolute left-3 top-3 text-[#708090] font-semibold">
+            $
+          </span>
+          <input
+            type="number"
+            value={montoPagado}
+            onChange={e => {
+              const value = e.target.value;
+              const numValue = value ? parseFloat(value) : 0;
+              if (numValue <= total || value === "") {
+                setMontoPagado(value);
+              }
+            }}
+            placeholder="0.00"
+            max={total}
+            min="0"
+            step="0.01"
+            className="w-full pl-8 pr-4 py-2 border-2 border-[#8C9796]/30 rounded-lg focusing:border-[#B76E79] focus:outline-none text-[#708090] cursor-pointer"
+          />
+        </div>
+        {montoPagado && parseFloat(montoPagado) > 0 && (
+          <p className="text-sm text-[#8C9796] mt-2">
+            Saldo pendiente: ${(total - parseFloat(montoPagado)).toFixed(2)}
+          </p>
+        )}
+      </div>
+
       {/* Error */}
       {error && (
-        <div className="w-full text-center">
-          <p className="text-sm text-red-600 font-medium">{error}</p>
+        <div className="w-full">
+          <p className="text-sm text-red-600 font-medium text-center">
+            {error}
+          </p>
         </div>
       )}
 
@@ -256,7 +331,9 @@ export default function VentaResumen({
           disabled:opacity-50
           disabled:cursor-not-allowed
           hover:bg-[#A0626B]
+          cursor-pointer
           transition
+          w-full sm:w-auto
         "
       >
         {loading ? "Confirmando..." : "Confirmar Venta"}

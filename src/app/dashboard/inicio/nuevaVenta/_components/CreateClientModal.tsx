@@ -80,7 +80,7 @@ export default function CreateClientModal({
           <h2 className="text-lg font-bold text-[#708090]">Nuevo Cliente</h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-lg transition"
+            className="p-1 hover:bg-gray-100 rounded-lg transition cursor-pointer"
           >
             <X size={20} className="text-[#708090]" />
           </button>
@@ -139,14 +139,14 @@ export default function CreateClientModal({
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 text-[#708090] bg-gray-100 rounded-xl hover:bg-gray-200 transition disabled:opacity-50 font-medium"
+            className="px-4 py-2 text-[#708090] bg-gray-100 rounded-xl hover:bg-gray-200 transition disabled:opacity-50 cursor-pointer font-medium"
           >
             Cancelar
           </button>
           <button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="px-4 py-2 text-white bg-[#B76E79] rounded-xl hover:bg-[#A0626B] transition disabled:opacity-50 font-medium"
+            className="px-4 py-2 text-white bg-[#B76E79] rounded-xl hover:bg-[#A0626B] transition disabled:opacity-50 cursor-pointer font-medium"
           >
             {isLoading ? "Creando..." : "Crear Cliente"}
           </button>
