@@ -1,17 +1,16 @@
 import RegisterForm from "./_components/RegisterForm";
 import ResetLayout from "@/app/resetPass/_components/ResetLayout";
 
-export default function RegisterPage({
+export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
-  const { error } = searchParams;
+  const { error } = await searchParams;
 
   return (
     <ResetLayout>
       <div className="w-full max-w-md space-y-4">
-
         {error === "password_mismatch" && (
           <p className="text-[#B76E79] text-center">
             Las contraseñas no coinciden
@@ -19,7 +18,6 @@ export default function RegisterPage({
         )}
 
         <RegisterForm />
-
       </div>
     </ResetLayout>
   );
