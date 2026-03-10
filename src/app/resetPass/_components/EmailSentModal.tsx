@@ -65,8 +65,14 @@ export default function EmailSentModal({
 
         {/* TEXT */}
         <p className="text-sm text-[#708090]/90 text-center leading-relaxed">
-          Hemos enviado un el link a tu correo para restablecer tu contraseña.
-          Revisa tu bandeja de entrada o spam.
+          Hemos enviado un enlace a tu correo para restablecer tu contraseña.
+          <br />
+          <strong>Haz clic en el enlace del email</strong> para continuar con el
+          cambio de contraseña.
+          <br />
+          <span className="text-xs text-[#8C8976]">
+            Revisa tu bandeja de entrada o spam si no lo ves.
+          </span>
         </p>
 
         {/* BUTTON */}
