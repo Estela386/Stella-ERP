@@ -5,6 +5,7 @@ import { useCart } from "@lib/hooks/useCart";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 import EmptyCart from "./EmptyCart";
+import Swal from "sweetalert2";
 
 export default function CartView() {
   const {
@@ -38,7 +39,24 @@ export default function CartView() {
   };
 
   const handleRemove = (index: number) => {
-    eliminarDelCarrito(cartItems[index].producto.id);
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¡No podrás revertir esta acción!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, eliminar",
+    }).then(result => {
+      if (result.isConfirmed) {
+        eliminarDelCarrito(cartItems[index].producto.id);
+        Swal.fire(
+          "¡Eliminado!",
+          "El producto ha sido eliminado del carrito.",
+          "success"
+        );
+      }
+    });
   };
 
   const handleCheckout = () => {
