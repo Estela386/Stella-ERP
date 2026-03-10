@@ -8,6 +8,7 @@ import { createClient } from "@utils/supabase/client";
 import { useAuth } from "@lib/hooks/useAuth";
 import { useCart } from "@lib/hooks/useCart";
 import Image from "next/image";
+import { toast } from "sonner";
 
 interface ProductoClientProps {
   id: string;
@@ -152,7 +153,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                 agregarAlCarrito(producto, 1);
                 setTimeout(() => {
                   setAgregandoCarrito(false);
-                  alert("¡Producto agregado al carrito!");
+                  toast.success("Producto agregado al carrito");
                 }, 500);
               }}
             >
