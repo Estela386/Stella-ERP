@@ -12,6 +12,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ onSubmit, error }: LoginFormProps) {
   const [showPass, setShowPass] = useState(false);
+  const [email, setEmail] = useState("");
 
   return (
     <form
@@ -23,21 +24,18 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
       <div className="text-center space-y-2">
         <div className="w-10 h-10 border-4 border-[#B76E79] rounded-full mx-auto" />
 
-        <h2 className="text-xl font-semibold text-[#708090]">
-          Iniciar sesión
-        </h2>
+        <h2 className="text-xl font-semibold text-[#708090]">Iniciar sesión</h2>
       </div>
 
       {/* EMAIL */}
       <div className="space-y-1">
-        <label className="text-sm text-[#708090]">
-          Correo electrónico
-        </label>
+        <label className="text-sm text-[#708090]">Correo electrónico</label>
 
         <input
           type="email"
           name="email"
           placeholder="correo@ejemplo.com"
+          onChange={e => setEmail(e.target.value)}
           className="
             w-full
             border
@@ -53,12 +51,11 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
           "
         />
       </div>
+      <div className="text-sm text-[#B76E79] text-center">{error}</div>
 
       {/* PASSWORD */}
       <div className="space-y-1">
-        <label className="text-sm text-[#708090]">
-          Contraseña
-        </label>
+        <label className="text-sm text-[#708090]">Contraseña</label>
 
         <div className="relative">
           <input
@@ -106,9 +103,7 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
 
       {/* ERROR */}
       {error && (
-        <div className="text-sm text-[#B76E79] text-center">
-          {error}
-        </div>
+        <div className="text-sm text-[#B76E79] text-center">{error}</div>
       )}
 
       {/* LOGIN BUTTON */}
