@@ -6,7 +6,6 @@ import { useAuth } from "@/lib/hooks/useAuth";
 
 export default function CartPage() {
   const { usuario } = useAuth();
-  console.log("user:", usuario);
   return (
     <div className="flex flex-col min-h-screen">
       <HeaderClient user={usuario} />

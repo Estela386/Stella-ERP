@@ -5,6 +5,7 @@ import Image from "next/image";
 import { logout } from "@auth/actions";
 import { ShoppingCart, User, LogOut, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import CartIcon from "@auth/_components/CartIcon";
 
 interface HeaderClientProps {
   user?: any;
@@ -96,7 +97,6 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               px-4 py-2
               rounded-lg
             "
-
               >
                 {item.label}
               </button>
@@ -113,7 +113,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                 onClick={() => router.push("/dashboard/cliente/carrito")}
                 className="text-[#7c5c4a] hover:bg-white/30 hover:text-[#5c4a37] transition-all p-2 rounded-lg"
               >
-                <ShoppingCart size={20} />
+                <CartIcon />
               </button>
 
               {/* USER MENU */}
