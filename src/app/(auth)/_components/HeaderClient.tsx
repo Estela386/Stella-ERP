@@ -32,6 +32,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
   const navItems = [
     { label: "Inicio", href: "/dashboard/cliente" },
     { label: "Catálogo", href: "/dashboard/cliente/catalogo" },
+    { label: "Nosotros", href: "/nosotros" },
   ];
 
   useEffect(() => {

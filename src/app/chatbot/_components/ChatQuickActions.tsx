@@ -1,26 +1,36 @@
 "use client"
 
-import { Package, CreditCard, ShoppingBag, LifeBuoy } from "lucide-react"
+import { Package, CreditCard, ShoppingBag, LifeBuoy, Star } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface Props{
   onSend: (message: string) => void
 }
 
 const ACTIONS = [
-  { icon: Package,     label: "Pedidos",   message: "¿Cuáles son mis pedidos recientes?",              color: "from-[#b76e79]/15 to-[#b76e79]/5" },
-  { icon: ShoppingBag, label: "Productos", message: "¿Qué productos tienen disponibles en su catálogo?", color: "from-[#b76e79]/15 to-[#b76e79]/5" },
-  { icon: CreditCard,  label: "Pagos",     message: "¿Cuáles son los métodos de pago disponibles?",     color: "from-[#b76e79]/15 to-[#b76e79]/5" },
-  { icon: LifeBuoy,    label: "Soporte",   message: "Necesito ayuda con mi compra.",                     color: "from-[#b76e79]/15 to-[#b76e79]/5" },
+  { icon: Package,     label: "Pedidos",   message: "¿Cuáles son mis pedidos recientes?" },
+  { icon: ShoppingBag, label: "Productos", message: "¿Qué productos tienen disponibles en su catálogo?" },
+  { icon: CreditCard,  label: "Pagos",     message: "¿Cuáles son los métodos de pago disponibles?" },
+  { icon: LifeBuoy,    label: "Soporte",   message: "Necesito ayuda con mi compra." },
+  { icon: Star,        label: "Nosotros",  link: "/nosotros" },
 ]
 
 export default function ChatQuickActions({ onSend }: Props){
+  const router = useRouter()
+
   return(
     <div className="px-4 pb-4 pt-3 grid grid-cols-2 gap-2.5 border-t border-[#708090]/15">
-      {ACTIONS.map(({ icon: Icon, label, message }) => (
+      {ACTIONS.map(({ icon: Icon, label, message, link }) => (
         <button
           key={label}
-          onClick={() => onSend(message)}
-          className="
+          onClick={() => {
+            if (link) {
+              router.push(link)
+            } else if (message) {
+              onSend(message)
+            }
+          }}
+          className={`
           flex items-center justify-center gap-1.5
           w-full
           text-[12px] sm:text-[13px] font-medium px-2 py-2.5
@@ -37,9 +47,10 @@ export default function ChatQuickActions({ onSend }: Props){
           active:translate-y-0
           transition-all duration-300
           group
-          "
+          ${label === "Nosotros" ? "col-span-2" : ""}
+          `}
         >
-          <Icon size={14} className="text-[#708090] group-hover:text-[#f6f4ef] transition-colors duration-300"/>
+          <Icon size={14} className={`transition-colors duration-300 ${label === "Nosotros" ? "text-[#b76e79] group-hover:text-[#f6f4ef]" : "text-[#708090] group-hover:text-[#f6f4ef]"}`}/>
           {label}
         </button>
       ))}
