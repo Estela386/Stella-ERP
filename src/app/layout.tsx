@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "ERP orientado a venta de joyería",
 };
 
+import ChatbotPage from "./chatbot/page";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,7 +35,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#f8eedc]`}
       >
-        <CartProvider>{children}</CartProvider>
+        <CartProvider>
+          {children}
+          <ChatbotPage />
+        </CartProvider>
       </body>
     </html>
   );
