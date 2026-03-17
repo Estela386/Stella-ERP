@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { logout } from "@auth/actions";
 import {
@@ -23,25 +23,25 @@ import CartIcon from "@auth/_components/CartIcon";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ─── tokens ───────────────────────────────────────────────
-const ROSE = "#B76E79";
-const ROSE_BG = "#FFF0F2";
+const ROSE      = "#B76E79";
+const ROSE_BG   = "#FFF0F2";
 const ROSE_DARK = "#C0404F";
-const SLATE = "#708090";
-const MUTED = "#9E9A95";
-const BORDER = "#E4E1DB";
-const WHITE = "#FFFFFF";
-const DARK = "#1A1A1A";
+const SLATE     = "#708090";
+const MUTED     = "#9E9A95";
+const BORDER    = "#E4E1DB";
+const WHITE     = "#FFFFFF";
+const DARK      = "#1A1A1A";
 
 // ─── íconos por ruta ──────────────────────────────────────
 const NAV_ICONS: Record<string, React.ReactNode> = {
-  "/dashboard/cliente": <Home size={18} />,
-  "categoria=personalizada": <Sparkles size={18} />,
-  "categoria=nuevos": <Star size={18} />,
-  "categoria=accesorios": <Heart size={18} />,
-  "categoria=hombre": <User size={18} />,
-  "categoria=mayoreo": <ShoppingBag size={18} />,
-  "/faq": <HelpCircle size={18} />,
-  "/nosotros": <MessageCircle size={18} />,
+  "/dashboard/cliente":          <Home      size={18} />,
+  "categoria=personalizada":     <Sparkles  size={18} />,
+  "categoria=nuevos":            <Star      size={18} />,
+  "categoria=accesorios":        <Heart     size={18} />,
+  "categoria=hombre":            <User      size={18} />,
+  "categoria=mayoreo":           <ShoppingBag size={18} />,
+  "/faq":                        <HelpCircle  size={18} />,
+  "/nosotros":                   <MessageCircle size={18} />,
 };
 
 function getNavIcon(href: string): React.ReactNode {
@@ -99,8 +99,7 @@ function NavBtn({
       }}
       onMouseLeave={e => {
         if (!active && !danger)
-          (e.currentTarget as HTMLButtonElement).style.background =
-            "transparent";
+          (e.currentTarget as HTMLButtonElement).style.background = "transparent";
         if (danger)
           (e.currentTarget as HTMLButtonElement).style.background = ROSE_BG;
       }}
@@ -109,11 +108,7 @@ function NavBtn({
         <span
           className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{
-            background: active
-              ? "rgba(255,255,255,0.2)"
-              : danger
-                ? "#FFE0E5"
-                : "#F5F0F1",
+            background: active ? "rgba(255,255,255,0.2)" : danger ? "#FFE0E5" : "#F5F0F1",
             color: active ? WHITE : danger ? ROSE_DARK : ROSE,
           }}
         >
@@ -147,10 +142,21 @@ interface HeaderClientProps {
 
 // ─── main component ────────────────────────────────────────
 export default function HeaderClient({ user: userProp }: HeaderClientProps) {
-  const router = useRouter();
-  const pathname = usePathname();
+  const router       = useRouter();
+  const pathname     = usePathname();
+  const searchParams = useSearchParams();
 
-  // ── lógica de usuario (igual al código viejo) ──
+  // ── función activa: compara pathname + query params ──
+  const isActive = (href: string): boolean => {
+    const [hrefPath, hrefQuery] = href.split("?");
+    if (hrefQuery) {
+      const [key, value] = hrefQuery.split("=");
+      return pathname === hrefPath && searchParams.get(key) === value;
+    }
+    return pathname === hrefPath;
+  };
+
+  // ── lógica de usuario ──
   const { usuario: authUsuario, loading } = useAuth();
   const usuario = userProp || authUsuario;
 
@@ -163,28 +169,22 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
   // ── estados UI ──
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [userMenu, setUserMenu] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
+  const [userMenu,   setUserMenu]   = useState(false);
+  const [cartCount,  setCartCount]  = useState(0);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   if (pathname === "/login" || pathname === "/register") return null;
 
   const navItems = [
-    { label: "Inicio", href: "/dashboard/cliente" },
-    {
-      label: "Personalizados",
-      href: "/dashboard/cliente/catalogo?categoria=personalizada",
-    },
-    { label: "Nuevos", href: "/dashboard/cliente/catalogo?categoria=nuevos" },
-    {
-      label: "Accesorios",
-      href: "/dashboard/cliente/catalogo?categoria=accesorios",
-    },
-    { label: "Hombre", href: "/dashboard/cliente/catalogo?categoria=hombre" },
-    { label: "Mayoreo", href: "/dashboard/cliente/catalogo?categoria=mayoreo" },
+    { label: "Inicio",               href: "/dashboard/cliente" },
+    { label: "Personalizados",       href: "/dashboard/cliente/catalogo?categoria=personalizada" },
+    { label: "Nuevos",               href: "/dashboard/cliente/catalogo?categoria=nuevos" },
+    { label: "Accesorios",           href: "/dashboard/cliente/catalogo?categoria=accesorios" },
+    { label: "Hombre",               href: "/dashboard/cliente/catalogo?categoria=hombre" },
+    { label: "Mayoreo",              href: "/dashboard/cliente/catalogo?categoria=mayoreo" },
     { label: "Preguntas frecuentes", href: "/faq" },
-    { label: "Contacto", href: "/nosotros" },
+    { label: "Contacto",             href: "/nosotros" },
   ];
 
   // ── carrito ──
@@ -205,10 +205,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
   // ── cerrar menú usuario al hacer click fuera ──
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(e.target as Node)
-      )
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node))
         setUserMenu(false);
     };
     document.addEventListener("mousedown", handler);
@@ -218,9 +215,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
   // ── bloquear scroll con drawer abierto ──
   useEffect(() => {
     document.body.style.overflow = mobileMenu ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    return () => { document.body.style.overflow = ""; };
   }, [mobileMenu]);
 
   const handleLogout = async () => {
@@ -228,7 +223,6 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     router.refresh();
   };
 
-  // ── si el usuario no está cargado aún, no renderizar (igual al código viejo) ──
   if (!isUserLoaded) return null;
 
   return (
@@ -242,17 +236,12 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     >
       {/* ── TOP BAR ─────────────────────────────────── */}
       <div className="grid grid-cols-3 items-center px-5 md:px-8 py-3">
+
         {/* COL 1 — izquierda: hamburger (solo mobile) */}
         <div className="flex items-center">
           <button
             className="flex md:hidden items-center justify-center rounded-xl border cursor-pointer"
-            style={{
-              width: 40,
-              height: 40,
-              borderColor: BORDER,
-              background: WHITE,
-              color: SLATE,
-            }}
+            style={{ width: 40, height: 40, borderColor: BORDER, background: WHITE, color: SLATE }}
             onClick={() => setMobileMenu(true)}
           >
             <Menu size={20} />
@@ -275,27 +264,22 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
         {/* COL 3 — derecha: acciones */}
         <div className="flex items-center justify-end gap-3">
+
           {/* Botón ERP — solo para admins/empleados en desktop */}
           {(id_rol === 1 || id_rol === 3) && (
             <button
               className="hidden sm:flex items-center gap-2 rounded-full border cursor-pointer transition-all duration-200 font-medium"
-              style={{
-                padding: "8px 16px",
-                fontSize: 14,
-                borderColor: BORDER,
-                background: WHITE,
-                color: SLATE,
-              }}
+              style={{ padding: "8px 16px", fontSize: 14, borderColor: BORDER, background: WHITE, color: SLATE }}
               onMouseEnter={e => {
                 const b = e.currentTarget as HTMLButtonElement;
-                b.style.background = ROSE;
-                b.style.color = WHITE;
-                b.style.borderColor = ROSE;
+                b.style.background   = ROSE;
+                b.style.color        = WHITE;
+                b.style.borderColor  = ROSE;
               }}
               onMouseLeave={e => {
                 const b = e.currentTarget as HTMLButtonElement;
-                b.style.background = WHITE;
-                b.style.color = SLATE;
+                b.style.background  = WHITE;
+                b.style.color       = SLATE;
                 b.style.borderColor = BORDER;
               }}
               onClick={() => router.push("/dashboard/inicio")}
@@ -316,12 +300,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               {cartCount > 0 && (
                 <span
                   className="absolute -top-1.5 -right-1.5 text-[10px] font-bold rounded-full text-center"
-                  style={{
-                    background: ROSE,
-                    color: WHITE,
-                    padding: "1px 5px",
-                    minWidth: 18,
-                  }}
+                  style={{ background: ROSE, color: WHITE, padding: "1px 5px", minWidth: 18 }}
                 >
                   {cartCount}
                 </span>
@@ -333,13 +312,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
           <div ref={userMenuRef} className="relative">
             <button
               className="flex items-center justify-center rounded-full border-none cursor-pointer font-bold"
-              style={{
-                width: 40,
-                height: 40,
-                background: ROSE,
-                color: WHITE,
-                fontSize: 16,
-              }}
+              style={{ width: 40, height: 40, background: ROSE, color: WHITE, fontSize: 16 }}
               onClick={() => setUserMenu(v => !v)}
             >
               {initials}
@@ -369,27 +342,15 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                   >
                     <div
                       className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
-                      style={{
-                        width: 38,
-                        height: 38,
-                        background: ROSE,
-                        color: WHITE,
-                        fontSize: 15,
-                      }}
+                      style={{ width: 38, height: 38, background: ROSE, color: WHITE, fontSize: 15 }}
                     >
                       {initials}
                     </div>
                     <div className="overflow-hidden">
-                      <p
-                        className="m-0 font-semibold truncate"
-                        style={{ fontSize: 14, color: DARK }}
-                      >
+                      <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
                         {usuario?.nombre || "Mi cuenta"}
                       </p>
-                      <p
-                        className="m-0 truncate"
-                        style={{ fontSize: 12, color: MUTED }}
-                      >
+                      <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
                         {usuario?.email || ""}
                       </p>
                     </div>
@@ -399,12 +360,9 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                   <div className="p-2">
                     {isClientDashboard && (
                       <>
-                        <NavBtn icon={<User size={15} />} label="Mi perfil" />
-                        <NavBtn
-                          icon={<Package size={15} />}
-                          label="Mis pedidos"
-                        />
-                        <NavBtn icon={<Heart size={15} />} label="Favoritos" />
+                        <NavBtn icon={<User size={15} />}    label="Mi perfil" />
+                        <NavBtn icon={<Package size={15} />} label="Mis pedidos" />
+                        <NavBtn icon={<Heart size={15} />}   label="Favoritos" />
                       </>
                     )}
 
@@ -412,10 +370,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                       <NavBtn
                         icon={<LayoutDashboard size={15} />}
                         label="Dashboard ERP"
-                        onClick={() => {
-                          router.push("/dashboard/inicio");
-                          setUserMenu(false);
-                        }}
+                        onClick={() => { router.push("/dashboard/inicio"); setUserMenu(false); }}
                       />
                     )}
 
@@ -441,7 +396,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
           style={{ borderTop: `1px solid ${BORDER}` }}
         >
           {navItems.map(item => {
-            const active = pathname.includes(item.href);
+            const active = isActive(item.href);
             return (
               <motion.button
                 key={item.label}
@@ -452,25 +407,23 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                 style={{
                   padding: "8px 20px",
                   fontSize: 14,
-                  border: active
-                    ? `1.5px solid ${ROSE}`
-                    : "1.5px solid transparent",
+                  border: active ? `1.5px solid ${ROSE}` : "1.5px solid transparent",
                   background: active ? ROSE : "transparent",
                   color: active ? WHITE : SLATE,
                 }}
                 onMouseEnter={e => {
                   if (!active) {
                     const b = e.currentTarget as HTMLButtonElement;
-                    b.style.color = ROSE;
-                    b.style.background = "#FFF5F6";
+                    b.style.color       = ROSE;
+                    b.style.background  = "#FFF5F6";
                     b.style.borderColor = "#F0D8DB";
                   }
                 }}
                 onMouseLeave={e => {
                   if (!active) {
                     const b = e.currentTarget as HTMLButtonElement;
-                    b.style.color = SLATE;
-                    b.style.background = "transparent";
+                    b.style.color       = SLATE;
+                    b.style.background  = "transparent";
                     b.style.borderColor = "transparent";
                   }
                 }}
@@ -492,10 +445,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-40"
-              style={{
-                background: "rgba(30,20,20,0.6)",
-                backdropFilter: "blur(4px)",
-              }}
+              style={{ background: "rgba(30,20,20,0.6)", backdropFilter: "blur(4px)" }}
               onClick={() => setMobileMenu(false)}
             />
 
@@ -517,32 +467,27 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               {/* header drawer */}
               <div
                 className="flex items-center px-5 py-5 flex-shrink-0"
-                style={{
-                  borderBottom: `1.5px solid ${BORDER}`,
-                  background: WHITE,
-                }}
+                style={{ borderBottom: `1.5px solid ${BORDER}`, background: WHITE }}
               >
                 <Image src="/LogoM.svg" alt="logo" width={130} height={44} />
               </div>
 
               {/* contenido */}
               <div className="flex-1 overflow-y-auto px-3 py-2">
+
                 {/* Nav solo para clientes */}
                 {isClientDashboard && (
                   <>
                     <SectionLabel>Navegación</SectionLabel>
                     {navItems.map(item => {
-                      const active = pathname.includes(item.href);
+                      const active = isActive(item.href);
                       return (
                         <NavBtn
                           key={item.label}
                           icon={getNavIcon(item.href)}
                           label={item.label}
                           active={active}
-                          onClick={() => {
-                            router.push(item.href);
-                            setMobileMenu(false);
-                          }}
+                          onClick={() => { router.push(item.href); setMobileMenu(false); }}
                         />
                       );
                     })}
@@ -556,22 +501,15 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                   <NavBtn
                     icon={<LayoutDashboard size={18} />}
                     label="Dashboard ERP"
-                    onClick={() => {
-                      router.push("/dashboard/inicio");
-                      setMobileMenu(false);
-                    }}
+                    onClick={() => { router.push("/dashboard/inicio"); setMobileMenu(false); }}
                   />
                 )}
 
                 {isClientDashboard && (
                   <>
-                    <NavBtn icon={<User size={18} />} label="Mi perfil" />
-                    <NavBtn
-                      icon={<Package size={18} />}
-                      label="Mis pedidos"
-                      badge={cartCount}
-                    />
-                    <NavBtn icon={<Heart size={18} />} label="Favoritos" />
+                    <NavBtn icon={<User size={18} />}    label="Mi perfil" />
+                    <NavBtn icon={<Package size={18} />} label="Mis pedidos" badge={cartCount} />
+                    <NavBtn icon={<Heart size={18} />}   label="Favoritos" />
                   </>
                 )}
 
@@ -587,34 +525,19 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               {/* footer usuario */}
               <div
                 className="flex items-center gap-3 px-4 py-4 flex-shrink-0"
-                style={{
-                  borderTop: `1.5px solid ${BORDER}`,
-                  background: "#FAFAF8",
-                }}
+                style={{ borderTop: `1.5px solid ${BORDER}`, background: "#FAFAF8" }}
               >
                 <div
                   className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
-                  style={{
-                    width: 42,
-                    height: 42,
-                    background: ROSE,
-                    color: WHITE,
-                    fontSize: 17,
-                  }}
+                  style={{ width: 42, height: 42, background: ROSE, color: WHITE, fontSize: 17 }}
                 >
                   {initials}
                 </div>
                 <div className="overflow-hidden">
-                  <p
-                    className="m-0 font-semibold truncate"
-                    style={{ fontSize: 15, color: DARK }}
-                  >
+                  <p className="m-0 font-semibold truncate" style={{ fontSize: 15, color: DARK }}>
                     {usuario?.nombre || "Mi cuenta"}
                   </p>
-                  <p
-                    className="m-0 truncate"
-                    style={{ fontSize: 12, color: MUTED }}
-                  >
+                  <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
                     {usuario?.email || ""}
                   </p>
                 </div>

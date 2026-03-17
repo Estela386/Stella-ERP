@@ -18,18 +18,29 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
     <form
       action={login}
       onSubmit={onSubmit}
-      className="w-full max-w-md space-y-6"
+      className="
+        w-full
+        max-w-sm sm:max-w-md
+        mx-auto
+        px-4 sm:px-6
+        py-6 sm:py-8
+        space-y-5 sm:space-y-6
+      "
     >
       {/* HEADER */}
       <div className="text-center space-y-2">
-        <div className="w-10 h-10 border-4 border-[#B76E79] rounded-full mx-auto" />
+        <div className="w-8 h-8 sm:w-10 sm:h-10 border-4 border-[#B76E79] rounded-full mx-auto" />
 
-        <h2 className="text-xl font-semibold text-[#708090]">Iniciar sesión</h2>
+        <h2 className="text-lg sm:text-xl font-semibold text-[#708090]">
+          Iniciar sesión
+        </h2>
       </div>
 
       {/* EMAIL */}
       <div className="space-y-1">
-        <label className="text-sm text-[#708090]">Correo electrónico</label>
+        <label className="text-xs sm:text-sm text-[#708090]">
+          Correo electrónico
+        </label>
 
         <input
           type="email"
@@ -43,19 +54,25 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
             text-[#708090]
             placeholder-[#708090]/60
             rounded-full
-            px-6
-            py-2
+            px-4 sm:px-6
+            py-2 sm:py-2.5
+            text-sm sm:text-base
             focus:outline-none
             focus:ring-2
             focus:ring-[#B76E79]/40
           "
         />
       </div>
-      <div className="text-sm text-[#B76E79] text-center">{error}</div>
+
+      <div className="text-xs sm:text-sm text-[#B76E79] text-center">
+        {error}
+      </div>
 
       {/* PASSWORD */}
       <div className="space-y-1">
-        <label className="text-sm text-[#708090]">Contraseña</label>
+        <label className="text-xs sm:text-sm text-[#708090]">
+          Contraseña
+        </label>
 
         <div className="relative">
           <input
@@ -69,20 +86,25 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
               text-[#708090]
               placeholder-[#708090]/60
               rounded-full
-              px-6
-              py-2
-              pr-12
+              px-4 sm:px-6
+              py-2 sm:py-2.5
+              pr-10 sm:pr-12
+              text-sm sm:text-base
               focus:outline-none
               focus:ring-2
               focus:ring-[#B76E79]/40
             "
           />
 
-          {/* BOTON VER PASSWORD */}
           <button
             type="button"
             onClick={() => setShowPass(!showPass)}
-            className="absolute right-4 top-2.5 text-[#708090]"
+            className="
+              absolute
+              right-3 sm:right-4
+              top-2.5 sm:top-3
+              text-[#708090]
+            "
           >
             {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -90,20 +112,22 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
       </div>
 
       {/* OPTIONS */}
-      <div className="flex justify-between text-sm text-[#708090]">
+      <div className="flex justify-between items-center text-xs sm:text-sm text-[#708090]">
         <label className="flex items-center gap-2">
           <input type="checkbox" />
           Recordarme
         </label>
 
-        <Link href="/resetPass" className="hover:underline">
+        <Link href="/resetPass" className="hover:underline text-right">
           ¿Olvidaste tu contraseña?
         </Link>
       </div>
 
       {/* ERROR */}
       {error && (
-        <div className="text-sm text-[#B76E79] text-center">{error}</div>
+        <div className="text-xs sm:text-sm text-[#B76E79] text-center">
+          {error}
+        </div>
       )}
 
       {/* LOGIN BUTTON */}
@@ -111,9 +135,10 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
         type="submit"
         className="
           w-full
-          py-3
+          py-2.5 sm:py-3
           rounded-full
           text-white
+          text-sm sm:text-base
           font-medium
           bg-gradient-to-r
           from-[#B76E79]
@@ -126,23 +151,8 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
         Ingresar
       </button>
 
-      {/* SOCIAL
-      <div className="text-center text-sm text-[#708090]">
-        o continúa con
-      </div>
-
-      <div className="flex justify-center gap-4">
-        <button className="p-2 bg-white rounded-full shadow">
-          <Facebook size={18} />
-        </button>
-
-        <button className="p-2 bg-white rounded-full shadow">
-          <Mail size={18} />
-        </button>
-      </div> */}
-
       {/* SIGN UP */}
-      <p className="text-center text-sm text-[#708090]">
+      <p className="text-center text-xs sm:text-sm text-[#708090]">
         ¿No tienes una cuenta?{" "}
         <Link href="/register" className="text-[#B76E79] font-medium">
           Regístrate
