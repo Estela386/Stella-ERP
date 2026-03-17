@@ -8,61 +8,117 @@ export default function ResetLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="h-screen flex items-center justify-center overflow-hidden px-4">
-      {/* CONTENEDOR */}
+    /*
+      El wrapper ocupa exactamente la pantalla sin scroll.
+      En mobile: solo el form, centrado, con padding lateral.
+      En desktop: card dividida en dos mitades, todo dentro de la pantalla.
+    */
+    <div
+      className="h-dvh flex items-center justify-center px-4"
+      style={{ background: "", overflow: "hidden" }}
+    >
+      {/* ── CARD ── */}
       <div
         className="
-        relative
-        w-full
-        max-w-[1100px]
-        h-auto
-        md:h-[620px]
-        bg-white
-        rounded-3xl
-        shadow-[0_40px_120px_rgba(0,0,0,0.15)]
-        flex
-        flex-col md:flex-row
-        overflow-hidden
-      "
+          relative w-full max-w-[1100px]
+          bg-white rounded-3xl
+          shadow-[0_32px_80px_rgba(0,0,0,0.11)]
+          flex flex-col md:flex-row
+          overflow-hidden
+        "
+        /*
+          En mobile la altura se adapta al contenido del form.
+          En desktop usamos 88dvh para que quepa en cualquier pantalla
+          sin llegar a los bordes.
+        */
+        style={{ height: "auto", maxHeight: "88dvh" }}
       >
-        {/* IZQUIERDA (FORMULARIO) */}
-        <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12">
-          {children}
+        {/* ── IZQUIERDA: FORMULARIO ── */}
+        {/*
+          "flex-1 min-h-0" hace que este panel nunca empuje
+          al contenedor más allá de maxHeight.
+          "overflow-hidden" en el panel + el form usa
+          padding compacto para caber sin scroll.
+        */}
+        <div
+          className="
+            w-full md:w-1/2
+            flex items-center justify-center
+            overflow-hidden
+          "
+          style={{ padding: "clamp(16px, 3vw, 36px)" }}
+        >
+          {/*
+            scale-down: si el form es más alto que el espacio disponible,
+            el navegador lo escala hacia abajo automáticamente.
+            Se mantiene legible hasta pantallas muy pequeñas.
+          */}
+          <div
+            className="w-full"
+            style={{
+              maxWidth: 420,
+              transformOrigin: "top center",
+              /* Hace que el contenido se encoja si no cabe */
+              zoom: "min(1, calc((88dvh - 32px) / 640px))",
+            }}
+          >
+            {children}
+          </div>
         </div>
 
-        {/* DERECHA (CIRCULO GRADIENTE) */}
-        <div className="w-full md:w-1/2 relative flex items-center justify-center mt-6 md:mt-0">
-          {/* CIRCULO */}
+        {/* ── DERECHA: GRADIENTE + LOGO ── */}
+        {/* Oculto en mobile — el form ocupa todo el ancho */}
+        <div
+          className="hidden md:flex w-1/2 relative items-center justify-center"
+        >
+          {/* Gradiente de fondo */}
           <div
-            className="
-              absolute
-              w-[600px] sm:w-[700px] md:w-[800px]
-              h-[600px] sm:h-[700px] md:h-[800px]
-              rounded-full
-              inset-0
-              bg-gradient-to-br
-              from-[#B76E79]
-              via-[#D1BBAA]
-              to-[#708090]
-              top-[-80px] md:top-[-95px]
-              right-[-50px] md:right-[-0px]
-            "
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(135deg, #B76E79 0%, #C9A99A 40%, #708090 100%)",
+            }}
           />
 
-          {/* TEXTO */}
-          <div className="relative text-white max-w-sm text-center space-y-4 px-4">
+          {/* Círculo decorativo */}
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: "130%",
+              paddingBottom: "130%",
+              background:
+                "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18) 0%, transparent 65%)",
+              top: "-15%",
+              left: "-15%",
+            }}
+          />
+
+          {/* Logo + tagline */}
+          <div className="relative z-10 flex flex-col items-center gap-3 text-center px-10">
             <Image
               src="/logo.png"
               alt="Stella"
-              width={1500}
-              height={1500}
+              width={400}
+              height={400}
               priority
-              className="mx-auto mb-2 w-32 h-32 sm:w-36 sm:h-36"
               style={{
+                objectFit: "contain",
                 filter:
                   "invert(33%) sepia(14%) saturate(403%) hue-rotate(185deg) brightness(92%) contrast(90%)",
               }}
             />
+            <p
+              style={{
+                fontFamily: "'Nunito', sans-serif",
+                fontSize: "1rem",
+                fontWeight: 700,
+                color: "rgba(255,255,255,0.82)",
+                maxWidth: 240,
+                lineHeight: 1.55,
+                margin: 0,
+              }}
+            >
+            </p>
           </div>
         </div>
       </div>
