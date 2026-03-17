@@ -21,17 +21,12 @@ export default function CartView() {
       0
     );
 
-    const descuento = 0; // Por ahora sin descuento
+    const descuento = 0;
     const subtotalConDescuento = subtotal - descuento;
-    const iva = Math.round(subtotalConDescuento * 0.19 * 100) / 100; // 19% de IVA
+    const iva = Math.round(subtotalConDescuento * 0.19 * 100) / 100;
     const total = subtotalConDescuento + iva;
 
-    return {
-      subtotal,
-      descuento,
-      iva,
-      total,
-    };
+    return { subtotal, descuento, iva, total };
   }, [cartItems]);
 
   const handleCantidadChange = (index: number, newCantidad: number) => {
@@ -44,8 +39,8 @@ export default function CartView() {
       text: "¡No podrás revertir esta acción!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
+      confirmButtonColor: "#b76e79",
+      cancelButtonColor: "#708090",
       confirmButtonText: "Sí, eliminar",
     }).then(result => {
       if (result.isConfirmed) {
@@ -61,62 +56,185 @@ export default function CartView() {
 
   const handleCheckout = () => {
     alert(`Procesando compra por: $${calculos.total.toLocaleString()}`);
-    // Aquí irá la lógica de checkout
   };
 
   const isEmpty = cartItems.length === 0;
 
   return (
-    <div className="min-h-screen bg-[#f8eedc]">
-      {/* Header */}
-      <header className="bg-white border-b border-[#d6c1b1] sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
-          <h1 className="text-2xl font-semibold text-[#7c5c4a]">
-            Carrito de Compras
-          </h1>
-          <p className="text-sm text-[#a89080] mt-1">
-            {isEmpty ? "0" : cartItems.length} artículo
-            {cartItems.length !== 1 ? "s" : ""} en tu carrito
-          </p>
-        </div>
-      </header>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+        @keyframes fadeUp {
+          from { opacity:0; transform:translateY(16px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+        .cart-fade { animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both; }
+        .cart-fade-1 { animation-delay: 0.06s; }
+        .cart-fade-2 { animation-delay: 0.14s; }
+      `}</style>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-        {isEmpty ? (
-          <EmptyCart />
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg p-6">
-                {cartItems.map((item, index) => (
-                  <CartItem
-                    key={index}
-                    producto={item.producto}
-                    cantidad={item.cantidad}
-                    onCantidadChange={newCantidad =>
-                      handleCantidadChange(index, newCantidad)
-                    }
-                    onRemove={() => handleRemove(index)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Summary */}
-            <div className="lg:col-span-1">
-              <CartSummary
-                subtotal={calculos.subtotal}
-                descuento={calculos.descuento}
-                iva={calculos.iva}
-                total={calculos.total}
-                onCheckout={handleCheckout}
-              />
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#f6f4ef",
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
+        {/* ── Header ── */}
+        <header
+          style={{
+            background: "rgba(255,255,255,0.96)",
+            backdropFilter: "blur(12px)",
+            borderBottom: "1px solid rgba(112,128,144,0.18)",
+            boxShadow: "0 1px 12px rgba(140,151,104,0.08)",
+            position: "sticky",
+            top: 0,
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 1200,
+              margin: "0 auto",
+              padding: "18px clamp(16px,4vw,48px)",
+            }}
+          >
+            {/* Eyebrow */}
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "0.62rem",
+                fontWeight: 500,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "#8c9768",
+                margin: "0 0 4px",
+              }}
+            >
+              Stella Designs
+            </p>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                gap: 16,
+                flexWrap: "wrap",
+              }}
+            >
+              <h1
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: "clamp(1.6rem,3vw,2.4rem)",
+                  fontWeight: 400,
+                  color: "#4a5568",
+                  margin: 0,
+                }}
+              >
+                Carrito de{" "}
+                <em style={{ color: "#b76e79", fontStyle: "italic" }}>
+                  Compras
+                </em>
+              </h1>
+              {!isEmpty && (
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "0.78rem",
+                    color: "#708090",
+                    padding: "3px 12px",
+                    borderRadius: 20,
+                    background: "rgba(112,128,144,0.08)",
+                    border: "1px solid rgba(112,128,144,0.18)",
+                  }}
+                >
+                  {cartItems.length} artículo{cartItems.length !== 1 ? "s" : ""}
+                </span>
+              )}
             </div>
           </div>
-        )}
-      </main>
-    </div>
+        </header>
+
+        {/* ── Main ── */}
+        <main
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "clamp(24px,4vw,48px) clamp(16px,4vw,48px)",
+          }}
+        >
+          {isEmpty ? (
+            <EmptyCart />
+          ) : (
+            <div
+              className="grid grid-cols-1 lg:grid-cols-3"
+              style={{ gap: "clamp(16px,2vw,28px)" }}
+            >
+              {/* Items */}
+              <div className="lg:col-span-2 cart-fade">
+                <div
+                  style={{
+                    background: "white",
+                    borderRadius: 16,
+                    border: "1px solid rgba(112,128,144,0.18)",
+                    boxShadow: "0 2px 12px rgba(140,151,104,0.08)",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Card header */}
+                  <div
+                    style={{
+                      padding: "20px 28px 16px",
+                      borderBottom: "1px solid rgba(112,128,144,0.12)",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "0.68rem",
+                        fontWeight: 500,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.16em",
+                        color: "#8c9768",
+                        margin: 0,
+                      }}
+                    >
+                      Tus productos
+                    </p>
+                  </div>
+
+                  <div style={{ padding: "8px 28px 28px" }}>
+                    {cartItems.map((item, index) => (
+                      <CartItem
+                        key={index}
+                        producto={item.producto}
+                        cantidad={item.cantidad}
+                        onCantidadChange={newCantidad =>
+                          handleCantidadChange(index, newCantidad)
+                        }
+                        onRemove={() => handleRemove(index)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div
+                className="lg:col-span-1 cart-fade cart-fade-2"
+                style={{ position: "relative", zIndex: 1 }} // ← agrega este style
+              >
+                <CartSummary
+                  subtotal={calculos.subtotal}
+                  descuento={calculos.descuento}
+                  iva={calculos.iva}
+                  total={calculos.total}
+                  onCheckout={handleCheckout}
+                />
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    </>
   );
 }

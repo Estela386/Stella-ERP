@@ -13,7 +13,7 @@ interface ProductCardProps {
 }
 
 const PLACEHOLDER_IMAGE =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect fill='%23e5d3c2' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='24' fill='%237c5c4a' text-anchor='middle' dominant-baseline='middle'%3EImagen no disponible%3C/text%3E%3C/svg%3E";
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect fill='%23ede9e3' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' font-family='Cormorant Garamond,serif' font-size='20' fill='%23708090' text-anchor='middle' dominant-baseline='middle'%3ESin imagen%3C/text%3E%3C/svg%3E";
 
 export default function ProductCard({
   id,
@@ -24,56 +24,139 @@ export default function ProductCard({
   category,
 }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const imageUrl = !image || imageError ? PLACEHOLDER_IMAGE : image;
 
   return (
-    <div className="group cursor-pointer">
-      {/* Product Image */}
-      <div className="relative w-full aspect-square bg-[#e5d3c2] rounded-lg overflow-hidden mb-4">
-        <Image
-          src={imageUrl}
-          alt={name}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={() => setImageError(true)}
-          priority={false}
-        />
-        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
-      </div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+      `}</style>
 
-      {/* Product Info */}
-      <div>
-        {category && (
-          <p className="text-xs text-[#7c5c4a] uppercase tracking-wider mb-1">
-            {category}
+      <div
+        className="group cursor-pointer relative"
+        style={{ transition: "transform 0.22s cubic-bezier(.22,1,.36,1)" }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {/* Image container */}
+        <div
+          className="relative w-full overflow-hidden"
+          style={{
+            aspectRatio: "1/1",
+            borderRadius: 14,
+            background: "#ede9e3",
+            border: "1px solid rgba(112,128,144,0.12)",
+            marginBottom: 14,
+            boxShadow: hovered
+              ? "0 18px 40px rgba(140,151,104,0.22)"
+              : "0 2px 12px rgba(140,151,104,0.08)",
+            transform: hovered ? "translateY(-5px)" : "translateY(0)",
+            transition: "all 0.22s cubic-bezier(.22,1,.36,1)",
+          }}
+        >
+          {/* Sheen line */}
+          <div
+            style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: 1, zIndex: 2,
+              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent)",
+            }}
+          />
+
+          <Image
+            src={imageUrl}
+            alt={name}
+            fill
+            className="object-cover"
+            style={{
+              transform: hovered ? "scale(1.06)" : "scale(1)",
+              transition: "transform 0.5s cubic-bezier(.22,1,.36,1)",
+            }}
+            onError={() => setImageError(true)}
+            priority={false}
+          />
+
+          {/* Overlay */}
+          <div
+            style={{
+              position: "absolute", inset: 0,
+              background: "rgba(74,85,104,0.04)",
+              opacity: hovered ? 1 : 0,
+              transition: "opacity 0.22s ease",
+            }}
+          />
+        </div>
+
+        {/* Info */}
+        <div style={{ padding: "0 2px" }}>
+          {category && (
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "0.62rem",
+                fontWeight: 500,
+                textTransform: "uppercase",
+                letterSpacing: "0.16em",
+                color: "#8c9768",
+                marginBottom: 4,
+              }}
+            >
+              {category}
+            </p>
+          )}
+
+          <h3
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: "1.05rem",
+              fontWeight: 600,
+              color: hovered ? "#4a5568" : "#708090",
+              marginBottom: 6,
+              lineHeight: 1.2,
+              transition: "color 0.18s ease",
+            }}
+          >
+            {name}
+          </h3>
+
+          {/* Stars */}
+          {rating && (
+            <div
+              style={{
+                display: "flex",
+                gap: 2,
+                marginBottom: 8,
+              }}
+            >
+              {[...Array(5)].map((_, i) => (
+                <span
+                  key={i}
+                  style={{
+                    fontSize: "0.7rem",
+                    color: i < rating ? "#b76e79" : "rgba(112,128,144,0.25)",
+                  }}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Price */}
+          <p
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: "1.2rem",
+              fontWeight: 500,
+              color: "#4a5568",
+              fontStyle: "italic",
+            }}
+          >
+            ${price.toLocaleString()}
           </p>
-        )}
-        <h3 className="text-sm font-medium text-[#7c5c4a] mb-2 group-hover:text-[#5c4a37] transition-colors">
-          {name}
-        </h3>
-
-        {/* Rating */}
-        {rating && (
-          <div className="flex items-center gap-1 mb-3">
-            {[...Array(5)].map((_, i) => (
-              <span
-                key={i}
-                className={`text-xs ${
-                  i < rating ? "text-[#d4a574]" : "text-[#d6c1b1]"
-                }`}
-              >
-                ★
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Price */}
-        <p className="text-lg font-semibold text-[#7c5c4a]">
-          ${price.toLocaleString()}
-        </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

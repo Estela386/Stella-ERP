@@ -34,14 +34,14 @@ const DARK      = "#1A1A1A";
 
 // ─── íconos por ruta ──────────────────────────────────────
 const NAV_ICONS: Record<string, React.ReactNode> = {
-  "/dashboard/cliente":          <Home      size={18} />,
-  "categoria=personalizada":     <Sparkles  size={18} />,
-  "categoria=nuevos":            <Star      size={18} />,
-  "categoria=accesorios":        <Heart     size={18} />,
-  "categoria=hombre":            <User      size={18} />,
-  "categoria=mayoreo":           <ShoppingBag size={18} />,
-  "/faq":                        <HelpCircle  size={18} />,
-  "/nosotros":                   <MessageCircle size={18} />,
+  "/dashboard/cliente":       <Home        size={18} />,
+  "categoria=personalizada":  <Sparkles    size={18} />,
+  "categoria=nuevos":         <Star        size={18} />,
+  "categoria=accesorios":     <Heart       size={18} />,
+  "categoria=hombre":         <User        size={18} />,
+  "categoria=mayoreo":        <ShoppingBag size={18} />,
+  "/faq":                     <HelpCircle  size={18} />,
+  "/nosotros":                <MessageCircle size={18} />,
 };
 
 function getNavIcon(href: string): React.ReactNode {
@@ -135,18 +135,15 @@ function Divider() {
   return <div className="h-px my-1.5" style={{ background: "#EDE9E3" }} />;
 }
 
-// ─── props ─────────────────────────────────────────────────
 interface HeaderClientProps {
   user?: any;
 }
 
-// ─── main component ────────────────────────────────────────
 export default function HeaderClient({ user: userProp }: HeaderClientProps) {
   const router       = useRouter();
   const pathname     = usePathname();
   const searchParams = useSearchParams();
 
-  // ── función activa: compara pathname + query params ──
   const isActive = (href: string): boolean => {
     const [hrefPath, hrefQuery] = href.split("?");
     if (hrefQuery) {
@@ -156,7 +153,6 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     return pathname === hrefPath;
   };
 
-  // ── lógica de usuario ──
   const { usuario: authUsuario, loading } = useAuth();
   const usuario = userProp || authUsuario;
 
@@ -167,12 +163,13 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
   const initials = usuario?.nombre?.charAt(0)?.toUpperCase() || "U";
 
-  // ── estados UI ──
   const [mobileMenu, setMobileMenu] = useState(false);
   const [userMenu,   setUserMenu]   = useState(false);
   const [cartCount,  setCartCount]  = useState(0);
+  const [menuPos,    setMenuPos]    = useState({ top: 0, right: 0 });
 
-  const userMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuRef   = useRef<HTMLDivElement>(null);
+  const avatarBtnRef  = useRef<HTMLButtonElement>(null);
 
   if (pathname === "/login" || pathname === "/register") return null;
 
@@ -187,7 +184,6 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     { label: "Contacto",             href: "/nosotros" },
   ];
 
-  // ── carrito ──
   useEffect(() => {
     const update = () => {
       const cart = JSON.parse(localStorage.getItem("carrito") || "[]");
@@ -202,21 +198,38 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     };
   }, []);
 
-  // ── cerrar menú usuario al hacer click fuera ──
+  // Cierra el menú al hacer click fuera
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node))
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target as Node) &&
+        avatarBtnRef.current &&
+        !avatarBtnRef.current.contains(e.target as Node)
+      ) {
         setUserMenu(false);
+      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // ── bloquear scroll con drawer abierto ──
   useEffect(() => {
     document.body.style.overflow = mobileMenu ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileMenu]);
+
+  // Calcula posición del dropdown relativa al viewport para montarlo en portal
+  const handleToggleMenu = () => {
+    if (!userMenu && avatarBtnRef.current) {
+      const rect = avatarBtnRef.current.getBoundingClientRect();
+      setMenuPos({
+        top: rect.bottom + window.scrollY + 10,
+        right: window.innerWidth - rect.right,
+      });
+    }
+    setUserMenu(v => !v);
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -226,315 +239,320 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
   if (!isUserLoaded) return null;
 
   return (
-    <header
-      className="sticky top-0 z-50 border-b"
-      style={{
-        background: "rgba(250,250,248,0.95)",
-        backdropFilter: "blur(16px)",
-        borderColor: BORDER,
-      }}
-    >
-      {/* ── TOP BAR ─────────────────────────────────── */}
-      <div className="grid grid-cols-3 items-center px-5 md:px-8 py-3">
+    <>
+      {/* ════════════════════════════════════════════════════
+          HEADER — sin backdropFilter para evitar stacking context
+          El blur se simula con un pseudo-elemento via CSS
+      ════════════════════════════════════════════════════ */}
+      <style>{`
+        .header-blur-bg::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: rgba(250,250,248,0.95);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          z-index: -1;
+        }
+      `}</style>
 
-        {/* COL 1 — izquierda: hamburger (solo mobile) */}
-        <div className="flex items-center">
-          <button
-            className="flex md:hidden items-center justify-center rounded-xl border cursor-pointer"
-            style={{ width: 40, height: 40, borderColor: BORDER, background: WHITE, color: SLATE }}
-            onClick={() => setMobileMenu(true)}
-          >
-            <Menu size={20} />
-          </button>
-        </div>
+      <header
+        className="header-blur-bg sticky top-0 border-b"
+        style={{
+          /* ⚠️ SIN backdropFilter aquí — evita crear stacking context */
+          background: "transparent",
+          borderColor: BORDER,
+          zIndex: 50,
+          position: "sticky",
+          top: 0,
+          isolation: "auto", // NO crear stacking context
+        }}
+      >
+        {/* ── TOP BAR ── */}
+        <div className="grid grid-cols-3 items-center px-5 md:px-8 py-3">
 
-        {/* COL 2 — centro: logo */}
-        <div
-          className="flex justify-center items-center cursor-pointer"
-          onClick={() => router.push("/dashboard/cliente")}
-        >
-          <Image
-            src="/LogoM.svg"
-            alt="logo"
-            width={320}
-            height={90}
-            className="w-full max-w-[140px] sm:max-w-[180px] md:max-w-[220px] lg:max-w-[260px] h-auto object-contain"
-          />
-        </div>
-
-        {/* COL 3 — derecha: acciones */}
-        <div className="flex items-center justify-end gap-3">
-
-          {/* Botón ERP — solo para admins/empleados en desktop */}
-          {(id_rol === 1 || id_rol === 3) && (
+          {/* Hamburger mobile */}
+          <div className="flex items-center">
             <button
-              className="hidden sm:flex items-center gap-2 rounded-full border cursor-pointer transition-all duration-200 font-medium"
-              style={{ padding: "8px 16px", fontSize: 14, borderColor: BORDER, background: WHITE, color: SLATE }}
-              onMouseEnter={e => {
-                const b = e.currentTarget as HTMLButtonElement;
-                b.style.background   = ROSE;
-                b.style.color        = WHITE;
-                b.style.borderColor  = ROSE;
-              }}
-              onMouseLeave={e => {
-                const b = e.currentTarget as HTMLButtonElement;
-                b.style.background  = WHITE;
-                b.style.color       = SLATE;
-                b.style.borderColor = BORDER;
-              }}
-              onClick={() => router.push("/dashboard/inicio")}
+              className="flex md:hidden items-center justify-center rounded-xl border cursor-pointer"
+              style={{ width: 40, height: 40, borderColor: BORDER, background: WHITE, color: SLATE }}
+              onClick={() => setMobileMenu(true)}
             >
-              <LayoutDashboard size={16} />
-              ERP
+              <Menu size={20} />
             </button>
-          )}
-
-          {/* Carrito — solo para clientes */}
-          {isClientDashboard && (
-            <button
-              className="relative cursor-pointer border-none bg-transparent"
-              style={{ color: SLATE }}
-              onClick={() => router.push("/dashboard/cliente/carrito")}
-            >
-              <CartIcon />
-              {cartCount > 0 && (
-                <span
-                  className="absolute -top-1.5 -right-1.5 text-[10px] font-bold rounded-full text-center"
-                  style={{ background: ROSE, color: WHITE, padding: "1px 5px", minWidth: 18 }}
-                >
-                  {cartCount}
-                </span>
-              )}
-            </button>
-          )}
-
-          {/* Avatar con menú desplegable */}
-          <div ref={userMenuRef} className="relative">
-            <button
-              className="flex items-center justify-center rounded-full border-none cursor-pointer font-bold"
-              style={{ width: 40, height: 40, background: ROSE, color: WHITE, fontSize: 16 }}
-              onClick={() => setUserMenu(v => !v)}
-            >
-              {initials}
-            </button>
-
-            <AnimatePresence>
-              {userMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                  transition={{ type: "spring", damping: 24, stiffness: 300 }}
-                  className="absolute right-0 rounded-2xl overflow-hidden"
-                  style={{
-                    top: "calc(100% + 10px)",
-                    width: 240,
-                    background: WHITE,
-                    border: `1px solid ${BORDER}`,
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.10)",
-                    zIndex: 60,
-                  }}
-                >
-                  {/* Info usuario */}
-                  <div
-                    className="flex items-center gap-3 p-4"
-                    style={{ borderBottom: `1px solid ${BORDER}` }}
-                  >
-                    <div
-                      className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
-                      style={{ width: 38, height: 38, background: ROSE, color: WHITE, fontSize: 15 }}
-                    >
-                      {initials}
-                    </div>
-                    <div className="overflow-hidden">
-                      <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
-                        {usuario?.nombre || "Mi cuenta"}
-                      </p>
-                      <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                        {usuario?.email || ""}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Opciones */}
-                  <div className="p-2">
-                    {isClientDashboard && (
-                      <>
-                        <NavBtn icon={<User size={15} />}    label="Mi perfil" />
-                        <NavBtn icon={<Package size={15} />} label="Mis pedidos" />
-                        <NavBtn icon={<Heart size={15} />}   label="Favoritos" />
-                      </>
-                    )}
-
-                    {(id_rol === 1 || id_rol === 3) && (
-                      <NavBtn
-                        icon={<LayoutDashboard size={15} />}
-                        label="Dashboard ERP"
-                        onClick={() => { router.push("/dashboard/inicio"); setUserMenu(false); }}
-                      />
-                    )}
-
-                    <Divider />
-                    <NavBtn
-                      icon={<LogOut size={15} />}
-                      label="Cerrar sesión"
-                      danger
-                      onClick={handleLogout}
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
-        </div>
-      </div>
 
-      {/* ── NAV DESKTOP — solo clientes, solo md+ ────── */}
-      {isClientDashboard && (
-        <nav
-          className="hidden md:flex justify-center flex-wrap gap-1 px-8 py-3"
-          style={{ borderTop: `1px solid ${BORDER}` }}
-        >
-          {navItems.map(item => {
-            const active = isActive(item.href);
-            return (
-              <motion.button
-                key={item.label}
-                onClick={() => router.push(item.href)}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-                className="rounded-full cursor-pointer transition-colors duration-150 font-medium"
-                style={{
-                  padding: "8px 20px",
-                  fontSize: 14,
-                  border: active ? `1.5px solid ${ROSE}` : "1.5px solid transparent",
-                  background: active ? ROSE : "transparent",
-                  color: active ? WHITE : SLATE,
-                }}
+          {/* Logo */}
+          <div
+            className="flex justify-center items-center cursor-pointer"
+            onClick={() => router.push("/dashboard/cliente")}
+          >
+            <Image
+              src="/LogoM.svg"
+              alt="logo"
+              width={320}
+              height={90}
+              className="w-full max-w-[140px] sm:max-w-[180px] md:max-w-[220px] lg:max-w-[260px] h-auto object-contain"
+            />
+          </div>
+
+          {/* Acciones derecha */}
+          <div className="flex items-center justify-end gap-3">
+
+            {/* Botón ERP */}
+            {(id_rol === 1 || id_rol === 3) && (
+              <button
+                className="hidden sm:flex items-center gap-2 rounded-full border cursor-pointer transition-all duration-200 font-medium"
+                style={{ padding: "8px 16px", fontSize: 14, borderColor: BORDER, background: WHITE, color: SLATE }}
                 onMouseEnter={e => {
-                  if (!active) {
-                    const b = e.currentTarget as HTMLButtonElement;
-                    b.style.color       = ROSE;
-                    b.style.background  = "#FFF5F6";
-                    b.style.borderColor = "#F0D8DB";
-                  }
+                  const b = e.currentTarget as HTMLButtonElement;
+                  b.style.background  = ROSE;
+                  b.style.color       = WHITE;
+                  b.style.borderColor = ROSE;
                 }}
                 onMouseLeave={e => {
-                  if (!active) {
-                    const b = e.currentTarget as HTMLButtonElement;
-                    b.style.color       = SLATE;
-                    b.style.background  = "transparent";
-                    b.style.borderColor = "transparent";
-                  }
+                  const b = e.currentTarget as HTMLButtonElement;
+                  b.style.background  = WHITE;
+                  b.style.color       = SLATE;
+                  b.style.borderColor = BORDER;
+                }}
+                onClick={() => router.push("/dashboard/inicio")}
+              >
+                <LayoutDashboard size={16} />
+                ERP
+              </button>
+            )}
+
+            {/* Carrito */}
+            {isClientDashboard && (
+              <button
+                className="relative cursor-pointer border-none bg-transparent"
+                style={{ color: SLATE }}
+                onClick={() => router.push("/dashboard/cliente/carrito")}
+              >
+                <CartIcon />
+                {cartCount > 0 && (
+                  <span
+                    className="absolute -top-1.5 -right-1.5 text-[10px] font-bold rounded-full text-center"
+                    style={{ background: ROSE, color: WHITE, padding: "1px 5px", minWidth: 18 }}
+                  >
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            )}
+
+            {/* Avatar — el dropdown se monta fuera del header via portal */}
+            <div>
+              <button
+                ref={avatarBtnRef}
+                className="flex items-center justify-center rounded-full border-none cursor-pointer font-bold"
+                style={{ width: 40, height: 40, background: ROSE, color: WHITE, fontSize: 16 }}
+                onClick={handleToggleMenu}
+              >
+                {initials}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── NAV DESKTOP ── */}
+        {isClientDashboard && (
+          <nav
+            className="hidden md:flex justify-center flex-wrap gap-1 px-8 py-3"
+            style={{ borderTop: `1px solid ${BORDER}` }}
+          >
+            {navItems.map(item => {
+              const active = isActive(item.href);
+              return (
+                <motion.button
+                  key={item.label}
+                  onClick={() => router.push(item.href)}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="rounded-full cursor-pointer transition-colors duration-150 font-medium"
+                  style={{
+                    padding: "8px 20px",
+                    fontSize: 14,
+                    border: active ? `1.5px solid ${ROSE}` : "1.5px solid transparent",
+                    background: active ? ROSE : "transparent",
+                    color: active ? WHITE : SLATE,
+                  }}
+                  onMouseEnter={e => {
+                    if (!active) {
+                      const b = e.currentTarget as HTMLButtonElement;
+                      b.style.color       = ROSE;
+                      b.style.background  = "#FFF5F6";
+                      b.style.borderColor = "#F0D8DB";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!active) {
+                      const b = e.currentTarget as HTMLButtonElement;
+                      b.style.color       = SLATE;
+                      b.style.background  = "transparent";
+                      b.style.borderColor = "transparent";
+                    }
+                  }}
+                >
+                  {item.label}
+                </motion.button>
+              );
+            })}
+          </nav>
+        )}
+
+        {/* ── MOBILE MENU ── */}
+        <AnimatePresence>
+          {mobileMenu && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-40"
+                style={{ background: "rgba(30,20,20,0.6)", backdropFilter: "blur(4px)" }}
+                onClick={() => setMobileMenu(false)}
+              />
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", damping: 28, stiffness: 280 }}
+                className="fixed top-0 left-0 flex flex-col z-50"
+                style={{
+                  height: "100dvh",
+                  width: "min(85vw, 300px)",
+                  background: WHITE,
+                  borderRight: `1.5px solid ${BORDER}`,
+                  boxShadow: "8px 0 32px rgba(0,0,0,0.2)",
                 }}
               >
-                {item.label}
-              </motion.button>
-            );
-          })}
-        </nav>
-      )}
+                <div
+                  className="flex items-center px-5 py-5 flex-shrink-0"
+                  style={{ borderBottom: `1.5px solid ${BORDER}`, background: WHITE }}
+                >
+                  <Image src="/LogoM.svg" alt="logo" width={130} height={44} />
+                </div>
 
-      {/* ── MOBILE MENU ─────────────────────────────── */}
+                <div className="flex-1 overflow-y-auto px-3 py-2">
+                  {isClientDashboard && (
+                    <>
+                      <SectionLabel>Navegación</SectionLabel>
+                      {navItems.map(item => {
+                        const active = isActive(item.href);
+                        return (
+                          <NavBtn
+                            key={item.label}
+                            icon={getNavIcon(item.href)}
+                            label={item.label}
+                            active={active}
+                            onClick={() => { router.push(item.href); setMobileMenu(false); }}
+                          />
+                        );
+                      })}
+                      <Divider />
+                    </>
+                  )}
+
+                  <SectionLabel>Mi cuenta</SectionLabel>
+
+                  {(id_rol === 1 || id_rol === 3) && (
+                    <NavBtn
+                      icon={<LayoutDashboard size={18} />}
+                      label="Dashboard ERP"
+                      onClick={() => { router.push("/dashboard/inicio"); setMobileMenu(false); }}
+                    />
+                  )}
+
+                  {isClientDashboard && (
+                    <>
+                      <NavBtn icon={<User size={18} />}    label="Mi perfil" />
+                      <NavBtn icon={<Package size={18} />} label="Mis pedidos" badge={cartCount} />
+                      <NavBtn icon={<Heart size={18} />}   label="Favoritos" />
+                    </>
+                  )}
+
+                  <Divider />
+                  <NavBtn
+                    icon={<LogOut size={18} />}
+                    label="Cerrar sesión"
+                    danger
+                    onClick={handleLogout}
+                  />
+                </div>
+
+                <div
+                  className="flex items-center gap-3 px-4 py-4 flex-shrink-0"
+                  style={{ borderTop: `1.5px solid ${BORDER}`, background: "#FAFAF8" }}
+                >
+                  <div
+                    className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
+                    style={{ width: 42, height: 42, background: ROSE, color: WHITE, fontSize: 17 }}
+                  >
+                    {initials}
+                  </div>
+                  <div className="overflow-hidden">
+                    <p className="m-0 font-semibold truncate" style={{ fontSize: 15, color: DARK }}>
+                      {usuario?.nombre || "Mi cuenta"}
+                    </p>
+                    <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
+                      {usuario?.email || ""}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* ════════════════════════════════════════════════════
+          DROPDOWN PORTAL — montado directamente en el body
+          Así escapa de cualquier stacking context del header
+      ════════════════════════════════════════════════════ */}
       <AnimatePresence>
-        {mobileMenu && (
+        {userMenu && (
           <>
-            {/* overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40"
-              style={{ background: "rgba(30,20,20,0.6)", backdropFilter: "blur(4px)" }}
-              onClick={() => setMobileMenu(false)}
+            {/* Overlay invisible para cerrar al click fuera */}
+            <div
+              className="fixed inset-0"
+              style={{ zIndex: 9998 }}
+              onClick={() => setUserMenu(false)}
             />
 
-            {/* drawer */}
             <motion.div
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 280 }}
-              className="fixed top-0 left-0 flex flex-col z-50"
+              ref={userMenuRef}
+              initial={{ opacity: 0, y: -8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.96 }}
+              transition={{ type: "spring", damping: 24, stiffness: 300 }}
               style={{
-                height: "100dvh",
-                width: "min(85vw, 300px)",
+                position: "fixed",           // ← fixed escapa de cualquier stacking context
+                top: menuPos.top,
+                right: menuPos.right,
+                width: 240,
                 background: WHITE,
-                borderRight: `1.5px solid ${BORDER}`,
-                boxShadow: "8px 0 32px rgba(0,0,0,0.2)",
+                border: `1px solid ${BORDER}`,
+                boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                borderRadius: 16,
+                overflow: "hidden",
+                zIndex: 9999,               // ← siempre encima de todo
               }}
             >
-              {/* header drawer */}
+              {/* Info usuario */}
               <div
-                className="flex items-center px-5 py-5 flex-shrink-0"
-                style={{ borderBottom: `1.5px solid ${BORDER}`, background: WHITE }}
-              >
-                <Image src="/LogoM.svg" alt="logo" width={130} height={44} />
-              </div>
-
-              {/* contenido */}
-              <div className="flex-1 overflow-y-auto px-3 py-2">
-
-                {/* Nav solo para clientes */}
-                {isClientDashboard && (
-                  <>
-                    <SectionLabel>Navegación</SectionLabel>
-                    {navItems.map(item => {
-                      const active = isActive(item.href);
-                      return (
-                        <NavBtn
-                          key={item.label}
-                          icon={getNavIcon(item.href)}
-                          label={item.label}
-                          active={active}
-                          onClick={() => { router.push(item.href); setMobileMenu(false); }}
-                        />
-                      );
-                    })}
-                    <Divider />
-                  </>
-                )}
-
-                <SectionLabel>Mi cuenta</SectionLabel>
-
-                {(id_rol === 1 || id_rol === 3) && (
-                  <NavBtn
-                    icon={<LayoutDashboard size={18} />}
-                    label="Dashboard ERP"
-                    onClick={() => { router.push("/dashboard/inicio"); setMobileMenu(false); }}
-                  />
-                )}
-
-                {isClientDashboard && (
-                  <>
-                    <NavBtn icon={<User size={18} />}    label="Mi perfil" />
-                    <NavBtn icon={<Package size={18} />} label="Mis pedidos" badge={cartCount} />
-                    <NavBtn icon={<Heart size={18} />}   label="Favoritos" />
-                  </>
-                )}
-
-                <Divider />
-                <NavBtn
-                  icon={<LogOut size={18} />}
-                  label="Cerrar sesión"
-                  danger
-                  onClick={handleLogout}
-                />
-              </div>
-
-              {/* footer usuario */}
-              <div
-                className="flex items-center gap-3 px-4 py-4 flex-shrink-0"
-                style={{ borderTop: `1.5px solid ${BORDER}`, background: "#FAFAF8" }}
+                className="flex items-center gap-3 p-4"
+                style={{ borderBottom: `1px solid ${BORDER}` }}
               >
                 <div
                   className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
-                  style={{ width: 42, height: 42, background: ROSE, color: WHITE, fontSize: 17 }}
+                  style={{ width: 38, height: 38, background: ROSE, color: WHITE, fontSize: 15 }}
                 >
                   {initials}
                 </div>
                 <div className="overflow-hidden">
-                  <p className="m-0 font-semibold truncate" style={{ fontSize: 15, color: DARK }}>
+                  <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
                     {usuario?.nombre || "Mi cuenta"}
                   </p>
                   <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
@@ -542,10 +560,37 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                   </p>
                 </div>
               </div>
+
+              {/* Opciones */}
+              <div className="p-2">
+                {isClientDashboard && (
+                  <>
+                    <NavBtn icon={<User size={15} />}    label="Mi perfil" />
+                    <NavBtn icon={<Package size={15} />} label="Mis pedidos" />
+                    <NavBtn icon={<Heart size={15} />}   label="Favoritos" />
+                  </>
+                )}
+
+                {(id_rol === 1 || id_rol === 3) && (
+                  <NavBtn
+                    icon={<LayoutDashboard size={15} />}
+                    label="Dashboard ERP"
+                    onClick={() => { router.push("/dashboard/inicio"); setUserMenu(false); }}
+                  />
+                )}
+
+                <Divider />
+                <NavBtn
+                  icon={<LogOut size={15} />}
+                  label="Cerrar sesión"
+                  danger
+                  onClick={handleLogout}
+                />
+              </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
