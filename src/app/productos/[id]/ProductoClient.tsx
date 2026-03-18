@@ -1,9 +1,8 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import HeaderClient from "@auth/_components/HeaderClient";
 import Footer from "@auth/_components/Footer";
-import { ProductoService } from "@lib/services";
+import { ProductoService, ReviewService } from "@lib/services";
 import { createClient } from "@utils/supabase/client";
 import { useAuth } from "@lib/hooks/useAuth";
 import { useCart } from "@lib/hooks/useCart";
@@ -17,11 +16,16 @@ interface ProductoClientProps {
 export default function ProductoClient({ id }: ProductoClientProps) {
   const { usuario } = useAuth();
   const { agregarAlCarrito } = useCart();
-  console.log("usuario:", usuario);
   const [producto, setProducto] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [agregandoCarrito, setAgregandoCarrito] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [enviandoReview, setEnviandoReview] = useState(false);
+  const [yaComento, setYaComento] = useState(false);
 
   useEffect(() => {
     const cargarProducto = async () => {
@@ -54,7 +58,86 @@ export default function ProductoClient({ id }: ProductoClientProps) {
       setError("ID inválido");
       setLoading(false);
     }
-  }, [id]);
+    const cargarReviews = async () => {
+      try {
+        const supabase = createClient();
+        const reviewService = new ReviewService(supabase);
+
+        const { reviews, error } = await reviewService.obtenerPorProducto(id);
+
+        if (!error && reviews) {
+          setReviews(reviews);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+
+    if (id) cargarReviews();
+
+    const verificarYaComento = async () => {
+      console.log("Verificando si el usuario ya comentó:", { id, usuario });
+      if (usuario?.id_auth) {
+        const reviewService = new ReviewService(createClient());
+        const { yaComento, error } = await reviewService.yaComento(
+          id,
+          usuario.id_auth
+        );
+        console.log("Resultado de yaComento:", { yaComento, error });
+        if (!error) {
+          setYaComento(yaComento);
+        }
+      }
+    };
+
+    verificarYaComento();
+  }, [id, usuario]);
+  const handleSubmitReview = async () => {
+    if (!usuario) {
+      toast.error("Debes iniciar sesión");
+      return;
+    }
+
+    try {
+      setEnviandoReview(true);
+
+      const supabase = createClient();
+      const reviewService = new ReviewService(supabase);
+
+      if (usuario.uid === undefined) {
+        toast.error("Inicie sesión para enviar una reseña");
+        return;
+      }
+      const { review, error } = await reviewService.crear({
+        product_id: id,
+        user_id: usuario.uid,
+        rating,
+        comment,
+      });
+
+      if (error) {
+        toast.error(error);
+        return;
+      }
+
+      toast.success("Reseña publicada 💎");
+
+      setComment("");
+      setRating(5);
+
+      // recargar reviews
+      const { reviews: updated } = await reviewService.obtenerPorProducto(id);
+
+      if (updated) setReviews(updated);
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al enviar reseña");
+    } finally {
+      setEnviandoReview(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -81,7 +164,14 @@ export default function ProductoClient({ id }: ProductoClientProps) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f6f4ef", display: "flex", flexDirection: "column" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f6f4ef",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500&display=swap');
         @keyframes fadeIn {
@@ -89,34 +179,40 @@ export default function ProductoClient({ id }: ProductoClientProps) {
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
-      
+
       <HeaderClient user={usuario} />
 
-      <main style={{
-        flex: 1,
-        maxWidth: 1200,
-        width: "100%",
-        margin: "0 auto",
-        padding: "40px 20px",
-        animation: "fadeIn 0.8s ease-out"
-      }}>
-        <div style={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", 
-          gap: 60,
-          alignItems: "start" 
-        }}>
+      <main
+        style={{
+          flex: 1,
+          maxWidth: 1200,
+          width: "100%",
+          margin: "0 auto",
+          padding: "40px 20px",
+          animation: "fadeIn 0.8s ease-out",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+            gap: 60,
+            alignItems: "start",
+          }}
+        >
           {/* Columna Izquierda: Imagen */}
           <div style={{ position: "sticky", top: 100 }}>
-            <div style={{
-              position: "relative",
-              aspectRatio: "4/5",
-              background: "#ffffff",
-              borderRadius: 32,
-              overflow: "hidden",
-              boxShadow: "0 20px 40px rgba(112,128,144,0.08)",
-              border: "1px solid rgba(112,128,144,0.05)"
-            }}>
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "4/5",
+                background: "#ffffff",
+                borderRadius: 32,
+                overflow: "hidden",
+                boxShadow: "0 20px 40px rgba(112,128,144,0.08)",
+                border: "1px solid rgba(112,128,144,0.05)",
+              }}
+            >
               {producto.url_imagen ? (
                 <Image
                   src={producto.url_imagen}
@@ -126,38 +222,86 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   priority
                 />
               ) : (
-                <div style={{ 
-                  width: "100%", 
-                  height: "100%", 
-                  display: "flex", 
-                  alignItems: "center", 
-                  justifyContent: "center",
-                  background: "linear-gradient(135deg, #f6f4ef 0%, #ede9e3 100%)",
-                  color: "#b76e79"
-                }}>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background:
+                      "linear-gradient(135deg, #f6f4ef 0%, #ede9e3 100%)",
+                    color: "#b76e79",
+                  }}
+                >
                   <div style={{ textAlign: "center" }}>
-                    <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.2rem", fontStyle: "italic" }}>Stella Joyería</p>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.8rem", opacity: 0.6 }}>Imagen en proceso</p>
+                    <p
+                      style={{
+                        fontFamily: "'Cormorant Garamond', serif",
+                        fontSize: "1.2rem",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      Stella Joyería
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "0.8rem",
+                        opacity: 0.6,
+                      }}
+                    >
+                      Imagen en proceso
+                    </p>
                   </div>
                 </div>
               )}
             </div>
-            
+
             {/* Badges de Calidad */}
-            <div style={{ 
-              marginTop: 24, 
-              display: "flex", 
-              justifyContent: "center", 
-              gap: 20,
-              opacity: 0.8
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.75rem", color: "#708090", fontWeight: 500 }}>
+            <div
+              style={{
+                marginTop: 24,
+                display: "flex",
+                justifyContent: "center",
+                gap: 20,
+                opacity: 0.8,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: "0.75rem",
+                  color: "#708090",
+                  fontWeight: 500,
+                }}
+              >
                 <span style={{ color: "#b76e79" }}>◆</span> Arte Texturizado
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.75rem", color: "#708090", fontWeight: 500 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: "0.75rem",
+                  color: "#708090",
+                  fontWeight: 500,
+                }}
+              >
                 <span style={{ color: "#b76e79" }}>◆</span> Calidad Premium
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.75rem", color: "#708090", fontWeight: 500 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: "0.75rem",
+                  color: "#708090",
+                  fontWeight: 500,
+                }}
+              >
                 <span style={{ color: "#b76e79" }}>◆</span> Envío Seguro
               </div>
             </div>
@@ -167,79 +311,121 @@ export default function ProductoClient({ id }: ProductoClientProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
             <header>
               {producto.categoria && (
-                <span style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "0.8rem",
-                  color: "#b76e79",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.15em",
-                  display: "block",
-                  marginBottom: 12
-                }}>
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "0.8rem",
+                    color: "#b76e79",
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.15em",
+                    display: "block",
+                    marginBottom: 12,
+                  }}
+                >
                   {producto.categoria.nombre}
                 </span>
               )}
-              <h1 style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
-                fontWeight: 500,
-                color: "#4a5568",
-                lineHeight: 1.1,
-                margin: 0,
-                fontStyle: "italic"
-              }}>
+              <h1
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
+                  fontWeight: 500,
+                  color: "#4a5568",
+                  lineHeight: 1.1,
+                  margin: 0,
+                  fontStyle: "italic",
+                }}
+              >
                 {producto.nombre}
               </h1>
-              
-              <div style={{ marginTop: 24, display: "flex", alignItems: "baseline", gap: 12 }}>
-                <span style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: "2.2rem",
-                  fontWeight: 600,
-                  color: "#b76e79"
-                }}>
+
+              <div
+                style={{
+                  marginTop: 24,
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 12,
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: "2.2rem",
+                    fontWeight: 600,
+                    color: "#b76e79",
+                  }}
+                >
                   ${producto.precio.toLocaleString()}
                 </span>
-                <span style={{ fontSize: "0.85rem", color: "#708090", fontFamily: "'DM Sans', sans-serif" }}>MXN</span>
+                <span
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#708090",
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  MXN
+                </span>
               </div>
             </header>
 
-            <div style={{ height: "1px", background: "linear-gradient(90deg, rgba(112,128,144,0.15) 0%, rgba(112,128,144,0) 100%)" }} />
+            <div
+              style={{
+                height: "1px",
+                background:
+                  "linear-gradient(90deg, rgba(112,128,144,0.15) 0%, rgba(112,128,144,0) 100%)",
+              }}
+            />
 
             <section>
-              <h3 style={{ 
-                fontFamily: "'DM Sans', sans-serif", 
-                fontSize: "0.85rem", 
-                fontWeight: 600, 
-                color: "#4a5568", 
-                textTransform: "uppercase", 
-                marginBottom: 16 
-              }}>Descripción</h3>
-              <p style={{ 
-                fontFamily: "'DM Sans', sans-serif", 
-                fontSize: "1.05rem", 
-                color: "#708090", 
-                lineHeight: 1.7,
-                margin: 0,
-                whiteSpace: "pre-line"
-              }}>
-                {producto.descripcion || "Esta pieza artesanal ha sido diseñada con la elegancia y sutileza que caracteriza a Stella Joyería, utilizando materiales de la más alta calidad para resaltar tu brillo natural."}
+              <h3
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  color: "#4a5568",
+                  textTransform: "uppercase",
+                  marginBottom: 16,
+                }}
+              >
+                Descripción
+              </h3>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "1.05rem",
+                  color: "#708090",
+                  lineHeight: 1.7,
+                  margin: 0,
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {producto.descripcion ||
+                  "Esta pieza artesanal ha sido diseñada con la elegancia y sutileza que caracteriza a Stella Joyería, utilizando materiales de la más alta calidad para resaltar tu brillo natural."}
               </p>
             </section>
 
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ 
-                width: 8, height: 8, borderRadius: "50%", 
-                background: producto.stock_actual > 0 ? "#8c9768" : "#b76e79" 
-              }} />
-              <span style={{ 
-                fontFamily: "'DM Sans', sans-serif", 
-                fontSize: "0.9rem", 
-                fontWeight: 500,
-                color: producto.stock_actual > 0 ? "#8c9768" : "#b76e79"
-              }}>
-                {producto.stock_actual > 0 ? `${producto.stock_actual} Disponibles` : "Agotado temporalmente"}
+              <div
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: producto.stock_actual > 0 ? "#8c9768" : "#b76e79",
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
+                  color: producto.stock_actual > 0 ? "#8c9768" : "#b76e79",
+                }}
+              >
+                {producto.stock_actual > 0
+                  ? `${producto.stock_actual} Disponibles`
+                  : "Agotado temporalmente"}
               </span>
             </div>
 
@@ -269,84 +455,279 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 12
+                gap: 12,
               }}
-              onMouseOver={(e) => {
+              onMouseOver={e => {
                 if (!e.currentTarget.disabled) {
                   e.currentTarget.style.transform = "translateY(-4px)";
-                  e.currentTarget.style.boxShadow = "0 15px 25px rgba(183,110,121,0.3)";
+                  e.currentTarget.style.boxShadow =
+                    "0 15px 25px rgba(183,110,121,0.3)";
                   e.currentTarget.style.background = "#a65d68";
                 }
               }}
-              onMouseOut={(e) => {
+              onMouseOut={e => {
                 if (!e.currentTarget.disabled) {
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 10px 20px rgba(183,110,121,0.2)";
+                  e.currentTarget.style.boxShadow =
+                    "0 10px 20px rgba(183,110,121,0.2)";
                   e.currentTarget.style.background = "#b76e79";
                 }
               }}
             >
-              {agregandoCarrito ? "Asegurando pieza..." : producto.stock_actual > 0 ? "Añadir al carrito" : "Sin existencias"}
+              {agregandoCarrito
+                ? "Asegurando pieza..."
+                : producto.stock_actual > 0
+                  ? "Añadir al carrito"
+                  : "Sin existencias"}
             </button>
 
             {/* Cuidados de la Pieza */}
-            <section style={{
-              marginTop: 16,
-              padding: "24px",
-              background: "#ffffff",
-              borderRadius: 24,
-              border: "1px solid rgba(140,151,104,0.15)",
-              boxShadow: "0 8px 16px rgba(140,151,104,0.04)"
-            }}>
-              <h3 style={{ 
-                fontFamily: "'Cormorant Garamond', serif", 
-                fontSize: "1.4rem", 
-                fontWeight: 600, 
-                color: "#4a5568", 
-                fontStyle: "italic",
-                margin: "0 0 16px 0",
-                display: "flex",
-                alignItems: "center",
-                gap: 10
-              }}>
+            <section
+              style={{
+                marginTop: 16,
+                padding: "24px",
+                background: "#ffffff",
+                borderRadius: 24,
+                border: "1px solid rgba(140,151,104,0.15)",
+                boxShadow: "0 8px 16px rgba(140,151,104,0.04)",
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: "1.4rem",
+                  fontWeight: 600,
+                  color: "#4a5568",
+                  fontStyle: "italic",
+                  margin: "0 0 16px 0",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
                 <span style={{ color: "#8c9768" }}>✦</span> Cuidados Especiales
               </h3>
-              <ul style={{ 
-                listStyle: "none", 
-                padding: 0, 
-                margin: 0, 
-                display: "grid", 
-                gridTemplateColumns: "1fr 1fr",
-                gap: "12px 20px"
-              }}>
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "12px 20px",
+                }}
+              >
                 {[
                   { icon: "✧", text: "Evita perfumes" },
                   { icon: "✧", text: "Limpia con paño suave" },
                   { icon: "✧", text: "Guarda por separado" },
-                  { icon: "✧", text: "Evita químicos" }
+                  { icon: "✧", text: "Evita químicos" },
                 ].map((item, idx) => (
-                  <li key={idx} style={{ 
-                    fontFamily: "'DM Sans', sans-serif", 
-                    fontSize: "0.85rem", 
-                    color: "#708090",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8
-                  }}>
-                    <span style={{ color: "#b76e79" }}>{item.icon}</span> {item.text}
+                  <li
+                    key={idx}
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "0.85rem",
+                      color: "#708090",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <span style={{ color: "#b76e79" }}>{item.icon}</span>{" "}
+                    {item.text}
                   </li>
                 ))}
               </ul>
-              <p style={{
-                marginTop: 16,
-                fontSize: "0.75rem",
-                color: "#8c9768",
-                fontFamily: "'DM Sans', sans-serif",
-                lineHeight: 1.5,
-                opacity: 0.8
-              }}>
-                * Para piezas de chapa, retirar antes de nadar o ducharte. El acero inoxidable es resistente al agua.
+              <p
+                style={{
+                  marginTop: 16,
+                  fontSize: "0.75rem",
+                  color: "#8c9768",
+                  fontFamily: "'DM Sans', sans-serif",
+                  lineHeight: 1.5,
+                  opacity: 0.8,
+                }}
+              >
+                * Para piezas de chapa, retirar antes de nadar o ducharte. El
+                acero inoxidable es resistente al agua.
               </p>
+            </section>
+            {/* REVIEWS */}
+            <section
+              style={{
+                borderTop: "1px solid rgba(112,128,144,0.15)",
+              }}
+            >
+              <h2
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: "2rem",
+                  color: "#4a5568",
+                  marginBottom: 24,
+                  fontStyle: "italic",
+                }}
+              >
+                Opiniones
+              </h2>
+
+              {/* LISTA */}
+              {loadingReviews ? (
+                <p style={{ color: "#708090" }}>Cargando opiniones...</p>
+              ) : reviews.length === 0 ? (
+                <p style={{ color: "#708090", opacity: 0.7 }}>
+                  Aún no hay opiniones. Sé el primero 💎
+                </p>
+              ) : (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 16 }}
+                >
+                  {reviews.map(r => (
+                    <div
+                      key={r.id}
+                      style={{
+                        background: "#ffffff",
+                        padding: 20,
+                        borderRadius: 16,
+                        border: "1px solid rgba(112,128,144,0.15)",
+                      }}
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        {r.user_name ? (
+                          <span
+                            style={{ fontWeight: "bold", color: "#4a5568" }}
+                          >
+                            {r.user_name}
+                          </span>
+                        ) : (
+                          <span
+                            style={{ fontWeight: "bold", color: "#4a5568" }}
+                          >
+                            Anónimo
+                          </span>
+                        )}
+
+                        <span style={{ fontSize: 12, color: "#708090" }}>
+                          {new Date(r.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <div>
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <span key={star}>
+                              {star <= r.rating ? "⭐" : "☆"}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <p
+                        style={{
+                          marginTop: 8,
+                          color: "#708090",
+                          fontSize: "0.95rem",
+                        }}
+                      >
+                        {r.comment}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* FORM SOLO SI LOGUEADO */}
+              {usuario && !yaComento && (
+                <div
+                  style={{
+                    marginTop: 32,
+                    padding: 24,
+                    background: "#ffffff",
+                    borderRadius: 20,
+                    border: "1px solid rgba(183,110,121,0.2)",
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "0.9rem",
+                      textTransform: "uppercase",
+                      marginBottom: 12,
+                      color: "#4a5568",
+                    }}
+                  >
+                    Deja tu opinión
+                  </h3>
+
+                  {/* estrellas */}
+                  <div style={{ marginBottom: 12 }}>
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button
+                        key={star}
+                        onClick={() => setRating(star)}
+                        style={{
+                          fontSize: 22,
+                          marginRight: 4,
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {star <= rating ? "⭐" : "☆"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* textarea */}
+                  <textarea
+                    value={comment}
+                    onChange={e => setComment(e.target.value)}
+                    placeholder="Comparte tu experiencia..."
+                    style={{
+                      width: "100%",
+                      minHeight: 100,
+                      borderRadius: 12,
+                      padding: 12,
+                      border: "1px solid rgba(112,128,144,0.2)",
+                      fontFamily: "'DM Sans', sans-serif",
+                      marginBottom: 12,
+                      color: "#708090",
+                    }}
+                  />
+
+                  <button
+                    onClick={handleSubmitReview}
+                    disabled={enviandoReview}
+                    style={{
+                      background: "#b76e79",
+                      color: "#fff",
+                      padding: "12px 20px",
+                      borderRadius: 12,
+                      border: "none",
+                      cursor: "pointer",
+                      opacity: enviandoReview ? 0.6 : 1,
+                    }}
+                  >
+                    {enviandoReview ? "Publicando..." : "Publicar reseña"}
+                  </button>
+                </div>
+              )}
+
+              {!usuario && (
+                <p
+                  style={{
+                    marginTop: 20,
+                    fontSize: "0.9rem",
+                    color: "#708090",
+                  }}
+                >
+                  Inicia sesión para dejar una opinión
+                </p>
+              )}
             </section>
           </div>
         </div>

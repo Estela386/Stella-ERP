@@ -4,6 +4,7 @@
  */
 export interface IUsuario {
   id: string;
+  id_auth: string; // UID de Supabase
   correo: string;
   id_rol: number; // 1 = Admin, 2 = Cliente, etc.
   nombre?: string;
@@ -22,6 +23,7 @@ export type UpdateUsuarioDTO = Partial<Omit<IUsuario, "id" | "email">>;
  */
 export class Usuario implements IUsuario {
   id: string;
+  id_auth: string; // UID de Supabase
   correo: string;
   id_rol: number;
   nombre?: string;
@@ -30,6 +32,7 @@ export class Usuario implements IUsuario {
 
   constructor(data: IUsuario) {
     this.id = data.id;
+    this.id_auth = data.id_auth;
     this.correo = data.correo || (data as any).email;
     this.id_rol = data.id_rol;
     this.nombre = data.nombre;
@@ -50,6 +53,9 @@ export class Usuario implements IUsuario {
   tieneRol(id_rol: number): boolean {
     return this.id_rol === id_rol;
   }
+  get uid(): string {
+    return this.id_auth;
+  }
 
   /**
    * Convierte la instancia a JSON
@@ -57,6 +63,7 @@ export class Usuario implements IUsuario {
   toJSON(): IUsuario {
     return {
       id: this.id,
+      id_auth: this.id_auth,
       correo: this.correo,
       id_rol: this.id_rol,
       nombre: this.nombre,
