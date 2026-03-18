@@ -10,6 +10,8 @@ import { obtenerProductosCatalogo } from "../actions";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, X, Grid, List, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import { createClient } from "@utils/supabase/client";
+import ChatbotPage from "@/app/chatbot/page";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 // ─── Design tokens ────────────────────────────────────────
 const ROSE   = "#b76e79";
@@ -50,6 +52,7 @@ function PriceRangeSlider({
 
   return (
     <div style={{ padding: "8px 4px" }}>
+      
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
         <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.78rem", color: ROSE, fontWeight: 500 }}>
           ${value.min.toLocaleString()}
@@ -208,8 +211,9 @@ function FilterDropdown({
 }
 
 // ─── Tarjeta en vista lista ────────────────────────────────
-function ProductListCard({ product, onClick }: { product: ProductoCard; onClick: () => void }) {
+function ProductListCard({ product, onClick, esMayorista }: { product: ProductoCard; onClick: () => void; esMayorista?: boolean }) {
   const [hovered, setHovered] = useState(false);
+  const discountPrice = esMayorista ? (product.price || 0) * 0.7 : product.price;
 
   return (
     <motion.div
@@ -282,9 +286,14 @@ function ProductListCard({ product, onClick }: { product: ProductoCard; onClick:
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, flexWrap: "wrap", gap: 10 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", fontWeight: 500, color: DEEP, fontStyle: "italic" }}>
-              ${product.price?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+            <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", fontWeight: 500, color: esMayorista ? ROSE : DEEP, fontStyle: "italic" }}>
+              ${discountPrice?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
             </span>
+            {esMayorista && (
+              <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.6rem", fontWeight: 700, color: ROSE, background: "rgba(183,110,121,0.1)", padding: "2px 6px", borderRadius: 4 }}>
+                Socio Stella -30%
+              </span>
+            )}
           </div>
 
           {(product as any).stock_actual !== undefined && (
@@ -305,8 +314,9 @@ function ProductListCard({ product, onClick }: { product: ProductoCard; onClick:
 }
 
 // ─── Tarjeta en vista grid ─────────────────────────────────
-function ProductGridCard({ product, onClick }: { product: ProductoCard; onClick: () => void }) {
+function ProductGridCard({ product, onClick, esMayorista }: { product: ProductoCard; onClick: () => void; esMayorista?: boolean }) {
   const [hovered, setHovered] = useState(false);
+  const discountPrice = esMayorista ? (product.price || 0) * 0.7 : product.price;
 
   return (
     <motion.div
@@ -396,8 +406,9 @@ function ProductGridCard({ product, onClick }: { product: ProductoCard; onClick:
             <span key={i} style={{ color: ROSE, fontSize: "0.62rem" }}>★</span>
           ))}
         </div>
-        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.15rem", fontWeight: 500, color: DEEP, fontStyle: "italic", margin: "6px 0 0" }}>
-          ${product.price?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.15rem", fontWeight: 500, color: esMayorista ? ROSE : DEEP, fontStyle: "italic", margin: "6px 0 0" }}>
+          ${discountPrice?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+          {esMayorista && <span style={{ fontSize: '0.6rem', fontStyle: 'normal', opacity: 0.8, marginLeft: 4 }}>(-30%)</span>}
         </p>
       </div>
     </motion.div>
@@ -407,6 +418,8 @@ function ProductGridCard({ product, onClick }: { product: ProductoCard; onClick:
 // ─── Página principal ──────────────────────────────────────
 export default function CatalogPage() {
   const router = useRouter();
+  const { usuario } = useAuth();
+  const esMayorista = usuario?.id_rol === 3 || usuario?.id_rol === 1;
 
   const [productos, setProductos]       = useState<ProductoCard[]>([]);
   const [loading, setLoading]           = useState(true);
@@ -575,7 +588,7 @@ export default function CatalogPage() {
 
       <div style={{ minHeight: "100vh", background: BG, fontFamily: "'DM Sans',sans-serif" }}>
         <HeaderClient />
-
+        <ChatbotPage />
         <main style={{ maxWidth: 1280, margin: "0 auto", padding: "clamp(24px,4vw,48px) clamp(16px,4vw,40px)" }}>
 
           {/* ── Header de sección ── */}
@@ -889,7 +902,7 @@ export default function CatalogPage() {
                 <AnimatePresence mode="popLayout">
                   {filtered.map((p, i) => (
                     <div key={p.id} className="cat-fade" style={{ animationDelay: `${Math.min(i * 0.04, 0.3)}s` }}>
-                      <ProductListCard product={p} onClick={() => router.push(`/productos/${p.id}`)} />
+                      <ProductListCard product={p} esMayorista={esMayorista} onClick={() => router.push(`/productos/${p.id}`)} />
                     </div>
                   ))}
                 </AnimatePresence>

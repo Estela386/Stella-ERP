@@ -38,10 +38,10 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   "categoria=personalizada":  <Sparkles    size={18} />,
   "categoria=nuevos":         <Star        size={18} />,
   "categoria=accesorios":     <Heart       size={18} />,
-  "categoria=hombre":         <User        size={18} />,
-  "categoria=mayoreo":        <ShoppingBag size={18} />,
-  "/faq":                     <HelpCircle  size={18} />,
-  "/nosotros":                <MessageCircle size={18} />,
+  "categoria=mayoreo":        <ShoppingBag size={18} />, // This entry is for the old href, keeping it for now as the instruction is ambiguous
+  "/dashboard/cliente/mayoreo":       <ShoppingBag size={18} />,
+  "/dashboard/cliente/faq":           <HelpCircle  size={18} />,
+  "/dashboard/cliente/nosotros":                <MessageCircle size={18} />,
 };
 
 function getNavIcon(href: string): React.ReactNode {
@@ -178,10 +178,9 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     { label: "Personalizados",       href: "/dashboard/cliente/catalogo?categoria=personalizada" },
     { label: "Nuevos",               href: "/dashboard/cliente/catalogo?categoria=nuevos" },
     { label: "Accesorios",           href: "/dashboard/cliente/catalogo?categoria=accesorios" },
-    { label: "Hombre",               href: "/dashboard/cliente/catalogo?categoria=hombre" },
-    { label: "Mayoreo",              href: "/dashboard/cliente/catalogo?categoria=mayoreo" },
-    { label: "Preguntas frecuentes", href: "/faq" },
-    { label: "Contacto",             href: "/nosotros" },
+    { label: "Mayoreo",              href: "/dashboard/cliente/mayoreo" },
+    { label: "Preguntas frecuentes", href: "/dashboard/cliente/faq" },
+    { label: "Contacto",             href: "/dashboard/cliente/nosotros" },
   ];
 
   useEffect(() => {
@@ -467,8 +466,17 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
                   {isClientDashboard && (
                     <>
-                      <NavBtn icon={<User size={18} />}    label="Mi perfil" />
-                      <NavBtn icon={<Package size={18} />} label="Mis pedidos" badge={cartCount} />
+                      <NavBtn 
+                        icon={<User size={18} />} 
+                        label="Mi perfil" 
+                        onClick={() => { router.push("/dashboard/cliente/perfil"); setMobileMenu(false); }}
+                      />
+                      <NavBtn 
+                        icon={<Package size={18} />} 
+                        label="Mis pedidos" 
+                        badge={cartCount} 
+                        onClick={() => { router.push("/dashboard/cliente/pedidos"); setMobileMenu(false); }}
+                      />
                       <NavBtn icon={<Heart size={18} />}   label="Favoritos" />
                     </>
                   )}
@@ -497,7 +505,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                       {usuario?.nombre || "Mi cuenta"}
                     </p>
                     <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                      {usuario?.email || ""}
+                      {usuario?.correo || ""}
                     </p>
                   </div>
                 </div>
@@ -556,7 +564,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                     {usuario?.nombre || "Mi cuenta"}
                   </p>
                   <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                    {usuario?.email || ""}
+                    {usuario?.correo || ""}
                   </p>
                 </div>
               </div>
@@ -565,8 +573,16 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               <div className="p-2">
                 {isClientDashboard && (
                   <>
-                    <NavBtn icon={<User size={15} />}    label="Mi perfil" />
-                    <NavBtn icon={<Package size={15} />} label="Mis pedidos" />
+                    <NavBtn 
+                      icon={<User size={15} />} 
+                      label="Mi perfil" 
+                      onClick={() => { router.push("/dashboard/cliente/perfil"); setUserMenu(false); }}
+                    />
+                    <NavBtn 
+                      icon={<Package size={15} />} 
+                      label="Mis pedidos" 
+                      onClick={() => { router.push("/dashboard/cliente/pedidos"); setUserMenu(false); }}
+                    />
                     <NavBtn icon={<Heart size={15} />}   label="Favoritos" />
                   </>
                 )}

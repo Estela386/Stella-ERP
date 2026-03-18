@@ -46,7 +46,7 @@ export default function NuevaConsignacionForm() {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log({ cliente, fechaInicio, fechaFin, productos });
-    router.push("/dashboard/consignaciones");
+    router.push("/dashboard/inicio/consignaciones");
   };
 
   // 🎨 INPUT ESTILO PROFESIONAL
@@ -177,7 +177,7 @@ export default function NuevaConsignacionForm() {
       <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-black/10">
         <button
           type="button"
-          onClick={() => router.push("/dashboard/consignaciones")}
+          onClick={() => router.push("/dashboard/inicio/consignaciones")}
           className="
             px-6 py-3 rounded-xl
             bg-[#708090]

@@ -7,6 +7,8 @@ import HeaderClient from "@/app/(auth)/_components/HeaderClient"
 import { useAuth } from "@/lib/hooks/useAuth"
 import ReviewCard, { Review } from "./_components/ReviewCard"
 import WholesaleSection from "./_components/WholesaleSection"
+import ChatbotPage from "@/app/chatbot/page"
+import Footer from "@/app/(auth)/_components/Footer"
 
 const REVIEWS: Review[] = [
   {
@@ -45,7 +47,7 @@ export default function NosotrosPage() {
   return (
     <div className="min-h-screen bg-[#F8F6F3] flex flex-col">
       <HeaderClient user={usuario} />
-
+      <ChatbotPage />
       {/* ABOUT US CONTENT */}
       <div className="flex-1 max-w-6xl mx-auto px-4 py-8 md:py-16">
         
@@ -166,6 +168,7 @@ export default function NosotrosPage() {
         </div>
 
       </div>
+      <Footer />
     </div>
   )
 }

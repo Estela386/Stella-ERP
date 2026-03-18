@@ -4,7 +4,7 @@
  */
 export interface IUsuario {
   id: string;
-  email: string;
+  correo: string;
   id_rol: number; // 1 = Admin, 2 = Cliente, etc.
   nombre?: string;
   apellido?: string;
@@ -22,7 +22,7 @@ export type UpdateUsuarioDTO = Partial<Omit<IUsuario, "id" | "email">>;
  */
 export class Usuario implements IUsuario {
   id: string;
-  email: string;
+  correo: string;
   id_rol: number;
   nombre?: string;
   apellido?: string;
@@ -30,7 +30,7 @@ export class Usuario implements IUsuario {
 
   constructor(data: IUsuario) {
     this.id = data.id;
-    this.email = data.email;
+    this.correo = data.correo || (data as any).email;
     this.id_rol = data.id_rol;
     this.nombre = data.nombre;
     this.apellido = data.apellido;
@@ -57,7 +57,7 @@ export class Usuario implements IUsuario {
   toJSON(): IUsuario {
     return {
       id: this.id,
-      email: this.email,
+      correo: this.correo,
       id_rol: this.id_rol,
       nombre: this.nombre,
       apellido: this.apellido,

@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   const protectedRoutes = ["/dashboard"];
 
   // Rutas que requieren rol específico (rol 1 = admin)
-  const adminOnlyRoutes = ["/dashboard/inventarios"];
+  const adminOnlyRoutes = ["/dashboard/inicio/inventarios"];
 
   const isProtectedRoute = protectedRoutes.some(route =>
     pathname.startsWith(route)

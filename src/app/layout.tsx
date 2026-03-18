@@ -37,7 +37,6 @@ export default function RootLayout({
       >
         <CartProvider>
           {children}
-          <ChatbotPage />
         </CartProvider>
       </body>
     </html>

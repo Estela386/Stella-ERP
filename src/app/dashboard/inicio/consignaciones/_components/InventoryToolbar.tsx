@@ -57,7 +57,7 @@ export default function InventoryToolbar({
       {rol === "admin" && (
         <button
           onClick={() =>
-            router.push("/dashboard/consignaciones/nueva")
+            router.push("/dashboard/inicio/consignaciones/nueva")
           }
           className="
             bg-[#B76E79]

@@ -45,7 +45,7 @@ export function useAuth(): UseAuthResult {
           const { data: newUser, error: createError } = await supabase
             .from("usuario")
             .insert([
-              { id_auth: authUser.id, email: authUser.email, id_rol: 2 },
+              { id_auth: authUser.id, correo: authUser.email, id_rol: 2 },
             ])
             .select()
             .single();

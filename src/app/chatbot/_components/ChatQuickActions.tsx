@@ -12,7 +12,7 @@ const ACTIONS = [
   { icon: ShoppingBag, label: "Productos", message: "¿Qué productos tienen disponibles en su catálogo?" },
   { icon: CreditCard,  label: "Pagos",     message: "¿Cuáles son los métodos de pago disponibles?" },
   { icon: LifeBuoy,    label: "Soporte",   message: "Necesito ayuda con mi compra." },
-  { icon: Star,        label: "Nosotros",  link: "/nosotros" },
+  { icon: Star,        label: "Nosotros",  link: "/dashboard/cliente/nosotros" },
 ]
 
 export default function ChatQuickActions({ onSend }: Props){
