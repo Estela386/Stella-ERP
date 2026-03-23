@@ -6,9 +6,10 @@ import MaterialsStats from "./_components/MaterialsStats";
 import MaterialsToolbar from "./_components/MaterialsToolbar";
 import MaterialsGrid from "./_components/MaterialsGrid";
 import NewMaterialModal from "./_components/NewMaterialModal";
+import SuppliersModal from "./_components/SuppliersModal";
 import { createClient } from "@utils/supabase/client";
 import { InsumoService } from "@/lib/services/InsumoService";
-import { Insumo, UpdateInsumoDTO } from "@lib/models/Insumo";
+import { Insumo, UpdateInsumoDTO } from "@lib/models";
 import { useAuth } from "@lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -22,6 +23,7 @@ export default function MaterialsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showSuppliersModal, setShowSuppliersModal] = useState(false);
 
   // 🔐 Validación admin
   useEffect(() => {
@@ -61,7 +63,7 @@ export default function MaterialsPage() {
     }
   }, [usuario, loadingUser]);
 
-  // 🔄 ACTUALIZAR MATERIAL (CORREGIDO)
+  // 🔄 ACTUALIZAR MATERIAL
   const actualizarMaterial = async (materialActualizado: Insumo) => {
     const supabase = createClient();
     const insumoService = new InsumoService(supabase);
@@ -73,6 +75,10 @@ export default function MaterialsPage() {
       tipo: rest.tipo,
       precio: rest.precio,
       cantidad: rest.cantidad,
+      unidad_medida: rest.unidad_medida,
+      stock_minimo: rest.stock_minimo,
+      id_proveedor: rest.id_proveedor,
+      activo: rest.activo,
     };
 
     const { insumo, error } = await insumoService.actualizar(id, data);
@@ -96,7 +102,7 @@ export default function MaterialsPage() {
         m.nombre.toLowerCase().includes(search.toLowerCase())
       )
       .filter(m => {
-        if (filtro === "BAJO") return m.cantidad > 0 && m.cantidad < 5;
+        if (filtro === "BAJO") return m.cantidad > 0 && m.cantidad < (m.stock_minimo || 5);
         if (filtro === "AGOTADO") return m.cantidad === 0;
         return true;
       });
@@ -116,26 +122,25 @@ export default function MaterialsPage() {
     <div className="flex h-screen overflow-hidden bg-[#F6F3EF]">
       <SidebarMenu />
 
-      <main className="flex-1 px-4 py-8 overflow-y-auto">
-        <div className="mx-auto max-w-6xl space-y-6">
+      <main className="flex-1 px-8 py-10 overflow-y-auto">
+        <div className="mx-auto max-w-6xl space-y-10">
 
-          <header className="space-y-1">
+          <header className="space-y-4">
             <div className="flex items-center gap-4">
-              <span className="h-px w-12 bg-[#B76E79]" />
-              <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
-                Materiales
+              <span className="h-px w-12 bg-[#b76e79]" />
+              <span className="text-[0.65rem] tracking-[0.18em] uppercase text-[#8c9768] font-medium font-sans">
+                Inventario
               </span>
             </div>
 
-            <h1 className="font-serif text-5xl md:text-6xl font-medium leading-tight text-[#708090]">
-              Inventario de materia prima
+            <h1 className="font-sans text-5xl md:text-6xl font-bold tracking-tight leading-tight text-[#4a5568]">
+              Control de <em className="text-[#b76e79] translate-y-[-2px] inline-block not-italic px-1">Materiales</em>
             </h1>
           </header>
 
-          <div className="relative rounded-3xl bg-white p-10 space-y-6 border border-black/10 shadow-[0_30px_70px_rgba(0,0,0,0.12)]">
-
+          <div className="space-y-8">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg font-sans text-sm">
                 {error}
               </div>
             )}
@@ -149,6 +154,7 @@ export default function MaterialsPage() {
               search={search}
               setSearch={setSearch}
               onNewMaterial={() => setShowModal(true)}
+              onManageSuppliers={() => setShowSuppliersModal(true)}
             />
 
             <MaterialsGrid
@@ -166,6 +172,12 @@ export default function MaterialsPage() {
           onCreated={(nuevo) =>
             setInsumos(prev => [...prev, nuevo])
           }
+        />
+      )}
+
+      {showSuppliersModal && (
+        <SuppliersModal
+          onClose={() => setShowSuppliersModal(false)}
         />
       )}
     </div>

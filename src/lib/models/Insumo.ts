@@ -4,10 +4,15 @@ export interface IInsumo {
   tipo: string;
   cantidad: number; // 👈 stock actual
   precio: number;
+  unidad_medida?: string;
+  stock_minimo?: number;
+  id_proveedor?: number;
+  fecha_registro?: string;
+  activo: boolean;
 }
 
-export type CreateInsumoDTO = Omit<IInsumo, "id">;
-export type UpdateInsumoDTO = Partial<Omit<IInsumo, "id">>;
+export type CreateInsumoDTO = Omit<IInsumo, "id" | "fecha_registro">;
+export type UpdateInsumoDTO = Partial<Omit<IInsumo, "id" | "fecha_registro">>;
 
 export class Insumo implements IInsumo {
   id: number;
@@ -15,6 +20,11 @@ export class Insumo implements IInsumo {
   tipo: string;
   cantidad: number;
   precio: number;
+  unidad_medida?: string;
+  stock_minimo?: number;
+  id_proveedor?: number;
+  fecha_registro?: string;
+  activo: boolean;
 
   constructor(data: IInsumo) {
     this.id = data.id;
@@ -22,6 +32,11 @@ export class Insumo implements IInsumo {
     this.tipo = data.tipo;
     this.cantidad = data.cantidad;
     this.precio = data.precio;
+    this.unidad_medida = data.unidad_medida;
+    this.stock_minimo = data.stock_minimo;
+    this.id_proveedor = data.id_proveedor;
+    this.fecha_registro = data.fecha_registro;
+    this.activo = data.activo ?? true;
   }
 
   validar() {

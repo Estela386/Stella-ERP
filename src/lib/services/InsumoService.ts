@@ -27,7 +27,7 @@ export class InsumoService {
   }
 
   async crear(data: CreateInsumoDTO) {
-    const temp = new Insumo({ id: 0, ...data });
+    const temp = new Insumo({ id: 0, ...data, activo: data.activo ?? true });
     const validacion = temp.validar();
 
     if (!validacion.valid) {

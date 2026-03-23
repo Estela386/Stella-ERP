@@ -1,7 +1,7 @@
 import { useState } from "react";
 import MaterialCard from "./MaterialCard";
 import MaterialModal from "./MaterialModal";
-import { Insumo } from "@lib/models/Insumo";
+import { Insumo } from "@lib/models";
 
 type Props = {
   materiales: Insumo[];

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Producto } from "../type";
+import { FiX } from "react-icons/fi";
 
 type Props = {
   producto: Producto;
@@ -43,103 +44,106 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center z-50">
-      <div className="relative bg-white rounded-2xl w-full max-w-lg p-8 space-y-6 border border-black/10 shadow-[0_30px_70px_rgba(0,0,0,0.15)]">
-        {/* Accent line */}
-        <div className="absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-[#B76E79]" />
+    <div className="fixed inset-0 bg-[#4a5568]/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="relative bg-white rounded-3xl w-full max-w-xl p-10 overflow-hidden shadow-[0_30px_70px_rgba(140,151,104,0.3)] border border-[rgba(112,128,144,0.12)]">
+        
+        {/* Header Decor */}
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#b76e79] via-[#ede9e3] to-[#8c9768]/30" />
+        
+        <button 
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 text-[#708090] hover:bg-[#f6f4ef] rounded-full transition-all"
+        >
+          <FiX size={24} />
+        </button>
 
-        <h2 className="text-xl font-serif font-medium text-[#1C1C1C]">
-          Editar producto
-        </h2>
+        <header className="mb-8 space-y-1">
+          <p className="text-[#8c9768] text-[0.65rem] font-bold uppercase tracking-[0.2em] font-sans">
+            Catálogo de Inventario
+          </p>
+          <h2 className="text-4xl font-sans font-bold text-[#4a5568] tracking-tight">
+            Editar <em className="text-[#b76e79] not-italic">Producto</em>
+          </h2>
+        </header>
 
-        <div className="grid grid-cols-2 gap-5">
-          <Input
-            label="Nombre"
-            name="nombre"
-            value={form.nombre || ""}
-            onChange={handleChange}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <InputGroup label="Nombre del Producto" className="md:col-span-2">
+            <input
+              name="nombre"
+              value={form.nombre || ""}
+              onChange={handleChange}
+              className="w-full bg-[#f6f4ef]/50 border border-[rgba(112,128,144,0.15)] rounded-xl px-4 py-3 text-sm text-[#4a5568] focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all"
+            />
+          </InputGroup>
 
-          <Input
-            label="Categoría"
-            name="categoria"
-            value={form.categoria}
-            disabled
-          />
+          <InputGroup label="Categoría (Lectura)">
+            <input
+              value={form.categoria}
+              disabled
+              className="w-full bg-[#f6f4ef]/30 border border-transparent rounded-xl px-4 py-3 text-sm text-[#708090] font-medium cursor-not-allowed"
+            />
+          </InputGroup>
 
-          <Input
-            label="Precio"
-            name="precio"
-            value={form.precio || ""}
-            onChange={handleChange}
-          />
+          <InputGroup label="Precio de Venta">
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b76e79] font-bold">$</span>
+              <input
+                name="precio"
+                value={form.precio || ""}
+                onChange={handleChange}
+                className="w-full bg-[#f6f4ef]/50 border border-[rgba(112,128,144,0.15)] rounded-xl pl-8 pr-4 py-3 text-sm text-[#4a5568] font-bold focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all"
+              />
+            </div>
+          </InputGroup>
 
-          <Input
-            label="Costo"
-            name="costo"
-            placeholder="$0.00"
-            value={form.costo}
-            onChange={handleChange}
-          />
+          <InputGroup label="Costo de Producción">
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+              <input
+                name="costo"
+                value={form.costo}
+                onChange={handleChange}
+                className="w-full bg-[#f6f4ef]/50 border border-[rgba(112,128,144,0.15)] rounded-xl pl-8 pr-4 py-3 text-sm text-[#4a5568] focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all"
+              />
+            </div>
+          </InputGroup>
 
-          <Input
-            label="Stock actual"
-            name="stock_actual"
-            value={form.stock_actual}
-            onChange={handleChange}
-          />
-
-          <Input
-            label="Stock mínimo"
-            name="stock_min"
-            value={form.stock_min}
-            onChange={handleChange}
-          />
+          <InputGroup label="Stock Actual">
+            <input
+              name="stock_actual"
+              value={form.stock_actual}
+              onChange={handleChange}
+              className="w-full bg-[#f6f4ef]/50 border border-[rgba(112,128,144,0.15)] rounded-xl px-4 py-3 text-sm text-[#4a5568] focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all"
+            />
+          </InputGroup>
         </div>
 
-        {/* Checkbox para personalizable */}
-        <div className="flex items-center gap-3 pt-2">
+        <div className="mt-8 flex items-center gap-3">
           <input
             type="checkbox"
             id="es_personalizable"
             name="es_personalizable"
             checked={form.es_personalizable}
             onChange={handleCheckboxChange}
-            className="w-5 h-5 cursor-pointer accent-[#B76E79] rounded"
+            className="w-6 h-6 rounded-lg cursor-pointer accent-[#b76e79] border-[rgba(112,128,144,0.2)]"
           />
-          <label
-            htmlFor="es_personalizable"
-            className="text-sm text-[#708090] cursor-pointer font-medium"
-          >
-            Este producto es personalizable
+          <label htmlFor="es_personalizable" className="text-sm font-bold text-[#4a5568] cursor-pointer">
+            Producto Personalizable
           </label>
         </div>
 
-        <div className="flex justify-end gap-3 pt-6">
+        <div className="mt-10 flex gap-4">
           <button
-            className="
-              px-5 py-2 text-sm rounded-lg
-              border border-black/20
-              text-[#1C1C1C]
-              hover:bg-black/5
-              transition
-            "
             onClick={onClose}
+            className="flex-1 py-3 text-sm font-bold text-[#708090] rounded-xl border-2 border-[#708090]/10 hover:bg-[#708090]/5 transition-all"
           >
-            Cancelar
+            Cerrar
           </button>
-
           <button
-            className="
-              px-5 py-2 text-sm rounded-lg
-              bg-[#B76E79]
-              text-[#F8F6F2]
-              hover:bg-[#a95f6a]
-              transition
-            "
             onClick={handleSave}
+            className="flex-[2] py-3 text-sm font-bold text-white bg-[#b76e79] rounded-xl shadow-[0_10px_25px_rgba(183,110,121,0.3)] hover:shadow-[0_15px_30px_rgba(183,110,121,0.4)] hover:-translate-y-0.5 transition-all"
           >
-            Guardar cambios
+            Guardar Cambios
           </button>
         </div>
       </div>
@@ -147,34 +151,11 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
   );
 }
 
-function Input({
-  label,
-  ...props
-}: {
-  label: string;
-} & React.InputHTMLAttributes<HTMLInputElement>) {
-  const isDisabled = props.disabled;
-
+function InputGroup({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className="space-y-1.5">
-      <label className="text-xs tracking-wide text-[#708090]">{label}</label>
-
-      <input
-        className={`
-          w-full
-          rounded-lg
-          px-3 py-2
-          text-sm
-          text-[#1C1C1C]
-          border
-          ${isDisabled ? "bg-black/5 border-black/10" : "border-black/20"}
-          focus:outline-none
-          focus:ring-2
-          focus:ring-[#B76E79]/40
-          focus:border-[#B76E79]
-        `}
-        {...props}
-      />
+    <div className={`space-y-1.5 ${className}`}>
+      <label className="text-[0.65rem] font-bold text-[#708090] uppercase tracking-wider pl-1">{label}</label>
+      {children}
     </div>
   );
 }

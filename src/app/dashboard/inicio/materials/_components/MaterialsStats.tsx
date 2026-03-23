@@ -1,4 +1,4 @@
-import { Insumo } from "@lib/models/Insumo";
+import { Insumo } from "@lib/models";
 
 type Filtro = "TODOS" | "BAJO" | "AGOTADO";
 
@@ -10,7 +10,7 @@ type Props = {
 export default function MaterialsStats({ materiales, onFilter }: Props) {
   const total = materiales.length;
   const stockBajo = materiales.filter(
-    m => m.cantidad > 0 && m.cantidad < 5
+    m => m.cantidad > 0 && m.cantidad < (m.stock_minimo || 5)
   ).length;
   const agotados = materiales.filter(m => m.cantidad === 0).length;
 
@@ -20,19 +20,21 @@ export default function MaterialsStats({ materiales, onFilter }: Props) {
         title="Total de Materiales"
         value={total}
         onClick={() => onFilter("TODOS")}
+        color="slate"
       />
 
       <StatCard
         title="Stock Bajo"
         value={stockBajo}
         onClick={() => onFilter("BAJO")}
-        middle
+        color="slate"
       />
 
       <StatCard
         title="Agotados"
         value={agotados}
         onClick={() => onFilter("AGOTADO")}
+        color="rose"
       />
     </div>
   );
@@ -42,10 +44,12 @@ type StatCardProps = {
   title: string;
   value: number;
   onClick: () => void;
-  middle?: boolean;
+  color: "slate" | "rose";
 };
 
-function StatCard({ title, value, onClick, middle = false }: StatCardProps) {
+function StatCard({ title, value, onClick, color }: StatCardProps) {
+  const bgColor = color === "rose" ? "bg-[#B76E79]" : "bg-[#708090]";
+  
   return (
     <div
       onClick={onClick}
@@ -53,7 +57,7 @@ function StatCard({ title, value, onClick, middle = false }: StatCardProps) {
         w-full
         cursor-pointer
         rounded-2xl
-        ${middle ? "bg-[#B76E79]" : "bg-[#708090]"}
+        ${bgColor}
         text-white
         p-5
         shadow-md
@@ -63,8 +67,10 @@ function StatCard({ title, value, onClick, middle = false }: StatCardProps) {
         transition-all duration-200
       `}
     >
-      <p className="text-sm opacity-80">{title}</p>
-      <p className="text-3xl font-bold">{value}</p>
+      <p className="text-sm opacity-80 font-sans tracking-wide">{title}</p>
+      <p className="text-4xl font-sans font-bold tracking-tight">
+        {value}
+      </p>
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
   ShoppingBag,
   HelpCircle,
   MessageCircle,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import CartIcon from "@auth/_components/CartIcon";
@@ -42,6 +43,7 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   "/dashboard/cliente/mayoreo":       <ShoppingBag size={18} />,
   "/dashboard/cliente/faq":           <HelpCircle  size={18} />,
   "/dashboard/cliente/nosotros":                <MessageCircle size={18} />,
+  "/dashboard/cliente/contacto":                <MessageSquare size={18} />,
 };
 
 function getNavIcon(href: string): React.ReactNode {
@@ -180,7 +182,8 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     { label: "Accesorios",           href: "/dashboard/cliente/catalogo?categoria=accesorios" },
     { label: "Mayoreo",              href: "/dashboard/cliente/mayoreo" },
     { label: "Preguntas frecuentes", href: "/dashboard/cliente/faq" },
-    { label: "Contacto",             href: "/dashboard/cliente/nosotros" },
+    { label: "Nosotros",             href: "/dashboard/cliente/nosotros" },
+    { label: "Contacto",             href: "/dashboard/cliente/contacto" },
   ];
 
   useEffect(() => {

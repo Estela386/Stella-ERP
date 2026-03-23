@@ -51,7 +51,18 @@ export {
 } from "./Review";
 export { ProductoOpcion, type IProductoOpcion } from "./ProductoOpcion";
 
+export { ProductoOpcionValor, type IProductoOpcionValor } from "./ProductoOpcionValor";
+
 export {
-  ProductoOpcionValor,
-  type IProductoOpcionValor,
-} from "./ProductoOpcionValor";
+  Insumo,
+  type IInsumo,
+  type CreateInsumoDTO,
+  type UpdateInsumoDTO,
+} from "./Insumo";
+
+export {
+  Proveedor,
+  type IProveedor,
+  type CreateProveedorDTO,
+  type UpdateProveedorDTO,
+} from "./Proveedor";

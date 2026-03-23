@@ -1,26 +1,13 @@
 "use client";
 
+import { Account } from "../page";
+
 interface Props {
   search: string;
+  accounts: Account[];
 }
 
-export default function AccountsTable({ search }: Props) {
-  // 🔹 Datos simulados (luego pueden venir de Supabase)
-  const accounts = [
-    {
-      cliente: "María López",
-      concepto: "Venta de productos",
-      monto: 3000,
-      pagado: 1000,
-    },
-    {
-      cliente: "Carlos Ramírez",
-      concepto: "Servicio mensual",
-      monto: 5000,
-      pagado: 5000,
-    },
-  ];
-
+export default function AccountsTable({ search, accounts }: Props) {
   // 🔎 FILTRO
   const filteredAccounts = accounts.filter(
     account =>

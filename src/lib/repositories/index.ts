@@ -9,3 +9,5 @@ export { CategoriaRepository } from "./CategoriaRepository";
 export { ClienteRepository } from "./ClienteRepository";
 export { VentaRepository } from "./VentaRepository";
 export { DetalleVentaRepository } from "./DetalleVentaRepository";
+export { InsumoRepository } from "./InsumoRepository";
+export { ProveedorRepository } from "./ProveedorRepository";
