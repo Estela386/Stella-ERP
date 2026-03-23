@@ -2,9 +2,9 @@ import { ReactNode } from "react";
 
 export interface UserProfile {
   id: number;
+  clienteId: number;
   nombre: string;
   correo: string;
-  telefono?: string;
   rol: string;
   activo: boolean;
   avatarUrl?: string;
@@ -21,7 +21,6 @@ export interface ProfileStat {
 export interface ProfileFormData {
   nombre: string;
   correo: string;
-  telefono: string;
 }
 
 export interface UserStats {

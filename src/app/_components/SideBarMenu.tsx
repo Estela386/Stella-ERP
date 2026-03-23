@@ -96,6 +96,25 @@ export default function SidebarMenu() {
         .logout-btn:hover { color: ${ROSE} !important; background: rgba(183,110,121,0.08) !important; border-color: rgba(183,110,121,0.2) !important; }
         .logout-btn:hover .logout-icon { transform: translateX(2px); }
         .logout-icon { transition: transform 0.18s ease; }
+        
+        .sidebar-nav {
+          scrollbar-width: thin;
+          scrollbar-color: #708090 transparent;
+        }
+        .sidebar-nav::-webkit-scrollbar {
+          width: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+          background-color: #708090;
+          border-radius: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar-button {
+          display: none;
+        }
       `}</style>
 
       <aside
@@ -156,7 +175,18 @@ export default function SidebarMenu() {
         </div>
 
         {/* ── Navegación ── */}
-        <nav style={{ flex: 1, padding: "clamp(10px,1.5vw,16px) clamp(8px,1.2vw,14px)", display: "flex", flexDirection: "column", gap: 4 }}>
+        <nav 
+          style={{ 
+            flex: 1, 
+            padding: "clamp(10px,1.5vw,16px) clamp(8px,1.2vw,14px)", 
+            display: "flex", 
+            flexDirection: "column", 
+            gap: 4,
+            overflowY: "auto",
+            overflowX: "hidden"
+          }}
+          className="sidebar-nav"
+        >
           <p className="hidden md:block" style={{
             fontFamily: "'DM Sans',sans-serif",
             fontSize: "0.58rem", fontWeight: 500,

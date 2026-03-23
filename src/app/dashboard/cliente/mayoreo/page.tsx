@@ -18,7 +18,7 @@ import {
   MapPin,
   CheckCircle2
 } from "lucide-react";
-import { WholesaleRole } from "./type";
+import WholesaleCatalogModal from "./_components/WholesaleCatalogModal";
 
 // ── ESTILOS REUTILIZABLES (DESIGN TOKENS) ─────────────────────
 const STYLES = {
@@ -39,6 +39,7 @@ import { WholesaleRole } from "./type";
 export default function WholesalePage() {
   const { usuario, loading: authLoading } = useAuth();
   const [role, setRole] = useState<WholesaleRole | null>(null);
+  const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
 
   useEffect(() => {
     if (usuario) {
@@ -123,11 +124,17 @@ export default function WholesalePage() {
             <div style={{ ...adminSectionLabelStyle, borderTop: `1px dashed ${STYLES.rose}`, paddingTop: 100 }}>
               <span style={adminBadgeStyle}>VISTA DE SOCIO ACTIVO (MAYORISTA)</span>
             </div>
-            <WholesalerDashboard />
+            <WholesalerDashboard onDownloadClick={() => setIsCatalogModalOpen(true)} />
           </div>
         ) : (
-          role === "active" ? <WholesalerDashboard /> : <ProspectLanding />
+          role === "active" ? <WholesalerDashboard onDownloadClick={() => setIsCatalogModalOpen(true)} /> : <ProspectLanding />
         )}
+
+        <WholesaleCatalogModal 
+          isOpen={isCatalogModalOpen}
+          onClose={() => setIsCatalogModalOpen(false)}
+        />
+
 
       </main>
 
@@ -161,7 +168,7 @@ const adminBadgeStyle: React.CSSProperties = {
 };
 
 // ── COMPONENTE PARA MAYORISTA ACTIVO (ROL 3) ──────────────────
-function WholesalerDashboard() {
+function WholesalerDashboard({ onDownloadClick }: { onDownloadClick: () => void }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 30 }}>
       {/* CARD: CATALOGO PDF */}
@@ -170,7 +177,7 @@ function WholesalerDashboard() {
         <h3 style={cardTitleStyle}>Catálogo de <em style={{color: STYLES.rose}}>Precios</em></h3>
         <p style={cardDescStyle}>Descarga el catálogo PDF actualizado con tus descuentos exclusivos del 30% aplicados.</p>
         <button 
-          onClick={() => window.alert("Generando catálogo PDF con descuentos del 30%...")}
+          onClick={onDownloadClick}
           style={primaryButtonStyle}
         >
           <Download size={18} /> Descargar Catálogo

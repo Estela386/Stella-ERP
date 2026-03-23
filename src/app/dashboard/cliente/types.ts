@@ -6,7 +6,14 @@ export interface ProductoCard {
   id: number;
   name: string;
   price: number;
+  costo?: number;
+  costo_mayorista?: number;
+  descripcion?: string;
   image?: string;
   category?: string;
   rating?: number;
+  es_personalizable?: boolean;
+  stock_actual?: number;
+  stock_min?: number;
 }
+
