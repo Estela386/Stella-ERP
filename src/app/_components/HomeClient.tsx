@@ -14,6 +14,7 @@ import {
 import {
   ShieldCheck, Package, Sparkles, Bot,
   ArrowRight, Menu, X, ChevronRight,
+  LayoutGrid, Database, CircleDollarSign, ShoppingCart, TrendingUp, Handshake, Gem, Check,
 } from "lucide-react";
 
 // ─── Paleta exacta de la imagen ───────────────────────────────────────────────
@@ -93,7 +94,7 @@ function useSection() {
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface FeatureCardProps { icon: React.ReactNode; title: string; text: string; }
 interface RoleCardProps    { badge: string; title: string; desc: string; perks: string[]; }
-interface ModuleCardProps  { num: string; icon: string; name: string; desc: string; }
+interface ModuleCardProps  { num: string; icon: React.ReactNode; name: string; desc: string; }
 interface ReviewCardProps  { text: string; initials: string; name: string; role: string; }
 
 // ─── Feature Card — blanca limpia, icono slate, sin color extra ───────────────
@@ -287,12 +288,12 @@ const roles: RoleCardProps[] = [
 ];
 
 const modules: ModuleCardProps[] = [
-  { num: "01", icon: "🗂️", name: "Catálogo de Productos",  desc: "Artículos con imágenes optimizadas y categorías jerárquicas." },
-  { num: "02", icon: "📊", name: "Inventario Inteligente",  desc: "WebSockets + triggers SQL para actualización automática." },
-  { num: "03", icon: "💰", name: "Gestión de Precios",      desc: "Márgenes, descuentos por volumen y políticas de fidelización." },
-  { num: "04", icon: "🛒", name: "Pedidos y Ventas",        desc: "Trazabilidad ACID, devoluciones y panel interactivo." },
-  { num: "05", icon: "📈", name: "Reportes Estratégicos",   desc: "Dashboards con KPIs personalizables y analítica predictiva." },
-  { num: "06", icon: "🤝", name: "Módulo Mayoristas",       desc: "Consignaciones, créditos y paneles individualizados." },
+  { num: "01", icon: <LayoutGrid      size={18} color={C.slate} />, name: "Catálogo de Productos",  desc: "Artículos con imágenes optimizadas y categorías jerárquicas." },
+  { num: "02", icon: <Database        size={18} color={C.slate} />, name: "Inventario Inteligente",  desc: "WebSockets + triggers SQL para actualización automática." },
+  { num: "03", icon: <CircleDollarSign size={18} color={C.slate} />, name: "Gestión de Precios",      desc: "Márgenes, descuentos por volumen y políticas de fidelización." },
+  { num: "04", icon: <ShoppingCart    size={18} color={C.slate} />, name: "Pedidos y Ventas",        desc: "Trazabilidad ACID, devoluciones y panel interactivo." },
+  { num: "05", icon: <TrendingUp      size={18} color={C.slate} />, name: "Reportes Estratégicos",   desc: "Dashboards con KPIs personalizables y analítica predictiva." },
+  { num: "06", icon: <Handshake       size={18} color={C.slate} />, name: "Módulo Mayoristas",       desc: "Consignaciones, créditos y paneles individualizados." },
 ];
 
 const techStack = [
@@ -538,7 +539,9 @@ export default function HomeClient() {
                   style={{ position: "absolute", top: 40, left: 18, width: 292, height: 382, borderRadius: 16, background: C.white, border: `1px solid ${C.slateBorder}`, boxShadow: `0 20px 56px ${C.sageLg}, 0 4px 14px ${C.sageSm}, inset 0 1px 0 rgba(255,255,255,1)`, display: "flex", flexDirection: "column", overflow: "hidden" }}>
                   {/* product image */}
                   <div style={{ height: 196, position: "relative", background: "linear-gradient(135deg,#ede8e1 0%,#e2d9ce 50%,#d6cec2 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ fontSize: "3.8rem", filter: "drop-shadow(0 5px 12px rgba(112,128,144,0.22))" }}>💍</div>
+                    <div style={{ fontSize: "3.8rem", filter: "drop-shadow(0 5px 12px rgba(112,128,144,0.22))", color: C.slate }}>
+                      <Gem size={80} strokeWidth={1} />
+                    </div>
                     <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 40, background: "linear-gradient(to top,rgba(255,255,255,0.97),transparent)" }} />
                     <div style={{ position: "absolute", top: 12, right: 12, background: "rgba(255,255,255,0.88)", backdropFilter: "blur(6px)", borderRadius: 4, padding: "3px 9px", fontSize: "0.58rem", color: C.sage, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 500 }}>En stock</div>
                     <div style={{ position: "absolute", top: 12, left: 12, background: C.roseBg, border: `1px solid ${C.roseBorder}`, borderRadius: 4, padding: "3px 9px", fontSize: "0.58rem", color: C.rose, letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 500 }}>Nuevo</div>
@@ -568,7 +571,9 @@ export default function HomeClient() {
                 {/* Bottom-left: stock pill */}
                 <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1.1 }} whileHover={{ y: -8 }}
                   style={{ position: "absolute", bottom: 48, left: 0, width: 162, height: 66, borderRadius: 12, background: C.white, border: `1px solid ${C.slateBorder}`, transform: "rotate(-4deg)", boxShadow: `0 10px 28px ${C.sageLg}`, display: "flex", alignItems: "center", padding: "0 14px", gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: C.slateIcon, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.95rem", flexShrink: 0, border: `1px solid ${C.slateBorder}` }}>📦</div>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: C.slateIcon, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.95rem", flexShrink: 0, border: `1px solid ${C.slateBorder}` }}>
+                    <Package size={16} color={C.slate} />
+                  </div>
                   <div>
                     <div style={{ fontSize: "0.60rem", color: C.slate, textTransform: "uppercase", letterSpacing: "0.10em" }}>Inventario</div>
                     <div style={{ fontSize: "0.90rem", fontWeight: 600, color: C.slateDeep }}>48 piezas</div>
@@ -581,7 +586,9 @@ export default function HomeClient() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.8, duration: 0.4, ease: [0.22,1,0.36,1] }}
                   style={{ position: "absolute", bottom: 0, right: 0, width: 158, height: 60, borderRadius: 12, background: C.white, border: `1px solid ${C.slateBorder}`, boxShadow: `0 8px 22px ${C.sageLg}`, display: "flex", alignItems: "center", padding: "0 14px", gap: 10 }}>
-                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(140,151,104,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem", flexShrink: 0, border: `1px solid rgba(140,151,104,0.25)` }}>✓</div>
+                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(140,151,104,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem", flexShrink: 0, border: `1px solid rgba(140,151,104,0.25)` }}>
+                    <Check size={16} color={C.sage} />
+                  </div>
                   <div>
                     <div style={{ fontSize: "0.60rem", color: C.slate, textTransform: "uppercase", letterSpacing: "0.08em" }}>Pedido</div>
                     <div style={{ fontSize: "0.82rem", fontWeight: 600, color: C.slateDeep }}>Confirmado</div>

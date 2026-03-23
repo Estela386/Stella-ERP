@@ -1,6 +1,6 @@
 "use client"
 
-import { X } from "lucide-react"
+import { X, MessageCircle } from "lucide-react"
 
 interface Props{
   onClick:()=>void
@@ -37,13 +37,7 @@ export default function ChatBubble({ onClick, isOpen }:Props){
             ${isOpen ? "rotate-180 opacity-0 scale-50" : "rotate-0 opacity-100 scale-100"}
           `}
         >
-          <svg 
-            viewBox="0 0 24 24" 
-            fill="currentColor" 
-            className="w-6 h-6 text-[#f6f4ef] gem-float drop-shadow-sm"
-          >
-            <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8c1.86 0 3.55.63 4.93 1.69-4.22.42-7.55 3.99-7.55 8.31 0 4.32 3.33 7.89 7.55 8.31C15.55 19.37 13.86 20 12 20z" />
-          </svg>
+          <MessageCircle className="w-6 h-6 text-[#f6f4ef] gem-float drop-shadow-sm" />
         </div>
 
         <div 

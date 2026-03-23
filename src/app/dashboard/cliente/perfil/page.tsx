@@ -59,9 +59,9 @@ export default function ProfilePage() {
 
         setProfileData({
           id: Number(usuario.id),
+          clienteId: clienteData?.id || 0,
           nombre: finalNombre || "Usuario Stella",
           correo: finalCorreo,
-          telefono: clienteData?.telefono || "No registrado",
           rol: usuario.id_rol === 1 ? "Administrador" : "Cliente Stella",
           activo: (usuario as any).activo ?? true,
           fechaRegistro: usuario.created_at ? new Date(usuario.created_at).toLocaleDateString("es-MX", { month: "long", year: "numeric" }) : "Reciente"

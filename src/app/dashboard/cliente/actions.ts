@@ -132,3 +132,46 @@ export async function obtenerProductosPorCategoria(
     };
   }
 }
+
+/**
+ * Server Action para obtener productos con datos de mayoreo
+ */
+export async function obtenerProductosMayoreo(): Promise<{
+  productos: ProductoCard[] | null;
+  error: string | null;
+}> {
+  try {
+    const supabase = await createClient();
+    const productoService = new ProductoService(supabase);
+
+    const { productos: productosData, error: errorProductos } =
+      await productoService.obtenerTodos();
+
+    if (errorProductos || !productosData) {
+      return {
+        productos: null,
+        error: errorProductos || "No se pudieron cargar los productos",
+      };
+    }
+
+    const productosFormatted: ProductoCard[] = productosData.map(p => ({
+      id: p.id,
+      name: p.nombre || "Producto",
+      price: p.precio || 0,
+      costo: p.costo || 0,
+      costo_mayorista: p.costo_mayorista || (p.precio ? p.precio * 0.7 : 0),
+      descripcion: p.descripcion || "",
+      image: p.url_imagen || "",
+      category: p.nombre?.split(" ")[0] || undefined,
+    }));
+
+    return { productos: productosFormatted, error: null };
+  } catch (err) {
+    console.error("Error al cargar productos para mayoreo:", err);
+    return {
+      productos: null,
+      error: "Error al cargar productos",
+    };
+  }
+}
+

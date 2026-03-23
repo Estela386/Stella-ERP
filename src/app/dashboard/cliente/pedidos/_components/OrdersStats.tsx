@@ -49,46 +49,49 @@ export default function OrdersStats({ stats }: OrdersStatsProps) {
       {cards.map((card, idx) => (
         <div key={idx} style={{
           background: "#ffffff",
-          padding: "20px",
-          borderRadius: 16,
-          boxShadow: "0 4px 12px rgba(112,128,144,0.05)",
-          border: "1px solid rgba(112,128,144,0.1)",
+          padding: "clamp(18px, 2.2vw, 26px)",
+          borderRadius: 14,
+          boxShadow: "0 2px 12px rgba(140,151,104,0.08)",
+          border: "1px solid rgba(112,128,144,0.18)",
           display: "flex",
           flexDirection: "column",
           gap: 12,
-          transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          transition: "all 0.22s ease",
           cursor: "default"
-        }} onMouseOver={(e) => {
-          e.currentTarget.style.transform = "translateY(-4px)";
-          e.currentTarget.style.boxShadow = "0 8px 24px rgba(140,151,104,0.12)";
-        }} onMouseOut={(e) => {
+        }} onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "translateY(-5px)";
+          e.currentTarget.style.boxShadow = "0 18px 40px rgba(140,151,104,0.22)";
+        }} onMouseLeave={(e) => {
           e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(112,128,144,0.05)";
+          e.currentTarget.style.boxShadow = "0 2px 12px rgba(140,151,104,0.08)";
         }}>
           <div style={{
-            width: 40,
-            height: 40,
-            borderRadius: 10,
-            background: card.bg,
+            width: 48,
+            height: 48,
+            borderRadius: 12,
+            background: "rgba(112,128,144,0.12)",
+            border: "1px solid rgba(112,128,144,0.18)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: card.color
+            color: "#708090"
           }}>
             {card.icon}
           </div>
           <div>
             <div style={{
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: "0.75rem",
-              color: "#708090",
+              fontSize: "0.68rem",
+              color: "#4a5568",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
               fontWeight: 500
             }}>{card.label}</div>
             <div style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "1.4rem",
+              fontSize: "1.52rem",
               fontWeight: 600,
-              color: "#4a5568"
+              color: "#b76e79"
             }}>{card.value}</div>
           </div>
         </div>

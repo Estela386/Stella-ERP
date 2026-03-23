@@ -159,7 +159,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
   const id_rol = usuario?.id_rol || 0;
   const isUserLoaded =
     id_rol !== 0 && id_rol !== undefined && id_rol !== null && !loading;
-  const isClientDashboard = id_rol === 1 || id_rol === 2;
+  const isClientDashboard = id_rol === 1 || id_rol === 2 || id_rol === 3;
 
   const initials = usuario?.nombre?.charAt(0)?.toUpperCase() || "U";
 
@@ -218,15 +218,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     return () => { document.body.style.overflow = ""; };
   }, [mobileMenu]);
 
-  // Calcula posición del dropdown relativa al viewport para montarlo en portal
   const handleToggleMenu = () => {
-    if (!userMenu && avatarBtnRef.current) {
-      const rect = avatarBtnRef.current.getBoundingClientRect();
-      setMenuPos({
-        top: rect.bottom + window.scrollY + 10,
-        right: window.innerWidth - rect.right,
-      });
-    }
     setUserMenu(v => !v);
   };
 
@@ -235,7 +227,8 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     router.refresh();
   };
 
-  if (!isUserLoaded) return null;
+  // Si el rol es 0 o no ha cargado, permitimos que el esqueleto del header se vea
+  // para evitar que el header "parpadee" o desaparezca en algunas pantallas.
 
   return (
     <>
@@ -299,7 +292,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
           <div className="flex items-center justify-end gap-3">
 
             {/* Botón ERP */}
-            {(id_rol === 1 || id_rol === 3) && (
+            {id_rol === 1 && (
               <button
                 className="hidden sm:flex items-center gap-2 rounded-full border cursor-pointer transition-all duration-200 font-medium"
                 style={{ padding: "8px 16px", fontSize: 14, borderColor: BORDER, background: WHITE, color: SLATE }}
@@ -341,16 +334,109 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               </button>
             )}
 
-            {/* Avatar — el dropdown se monta fuera del header via portal */}
-            <div>
+            {/* Avatar */}
+            <div className="relative" ref={userMenuRef}>
               <button
                 ref={avatarBtnRef}
-                className="flex items-center justify-center rounded-full border-none cursor-pointer font-bold"
-                style={{ width: 40, height: 40, background: ROSE, color: WHITE, fontSize: 16 }}
+                className="flex items-center justify-center rounded-full border-none cursor-pointer font-bold transition-transform hover:scale-105 active:scale-95"
+                style={{ 
+                  width: 40, 
+                  height: 40, 
+                  background: isUserLoaded ? ROSE : "#E4E1DB", 
+                  color: WHITE, 
+                  fontSize: 16 
+                }}
                 onClick={handleToggleMenu}
+                disabled={loading}
               >
-                {initials}
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  initials
+                )}
               </button>
+
+              {/* DROPDOWN MENU */}
+              <AnimatePresence>
+                {userMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                    transition={{ type: "spring", damping: 24, stiffness: 300 }}
+                    style={{
+                      position: "absolute",
+                      top: "calc(100% + 10px)",
+                      right: 0,
+                      width: 240,
+                      background: WHITE,
+                      border: `1px solid ${BORDER}`,
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                      borderRadius: 16,
+                      overflow: "hidden",
+                      zIndex: 9999,
+                    }}
+                  >
+                    {/* Info usuario */}
+                    <div
+                      className="flex items-center gap-3 p-4"
+                      style={{ borderBottom: `1px solid ${BORDER}` }}
+                    >
+                      <div
+                        className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
+                        style={{ width: 38, height: 38, background: ROSE, color: WHITE, fontSize: 15 }}
+                      >
+                        {initials}
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
+                          {usuario?.nombre || "Mi cuenta"}
+                        </p>
+                        <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
+                          {usuario?.correo || ""}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Opciones */}
+                    <div className="p-2">
+                      {isUserLoaded && (
+                        <NavBtn 
+                          icon={<User size={15} />} 
+                          label="Mi perfil" 
+                          onClick={() => { router.push("/dashboard/cliente/perfil"); setUserMenu(false); }}
+                        />
+                      )}
+                      {isClientDashboard && (
+                        <>
+                          <NavBtn 
+                            icon={<Package size={15} />} 
+                            label="Mis pedidos" 
+                            onClick={() => { router.push("/dashboard/cliente/pedidos"); setUserMenu(false); }}
+                          />
+                          <NavBtn icon={<Heart size={15} />}   label="Favoritos" />
+                        </>
+                      )}
+
+                      {id_rol === 1 && (
+                        <NavBtn
+                          icon={<LayoutDashboard size={15} />}
+                          label="Dashboard ERP"
+                          onClick={() => { router.push("/dashboard/inicio"); setUserMenu(false); }}
+                        />
+                      )}
+
+                      <Divider />
+                      <NavBtn
+                        icon={<LogOut size={15} />}
+                        label="Cerrar sesión"
+                        danger
+                        onClick={handleLogout}
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -456,7 +542,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
                   <SectionLabel>Mi cuenta</SectionLabel>
 
-                  {(id_rol === 1 || id_rol === 3) && (
+                  {id_rol === 1 && (
                     <NavBtn
                       icon={<LayoutDashboard size={18} />}
                       label="Dashboard ERP"
@@ -464,13 +550,15 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                     />
                   )}
 
+                   {isUserLoaded && (
+                    <NavBtn 
+                      icon={<User size={18} />} 
+                      label="Mi perfil" 
+                      onClick={() => { router.push("/dashboard/cliente/perfil"); setMobileMenu(false); }}
+                    />
+                  )}
                   {isClientDashboard && (
                     <>
-                      <NavBtn 
-                        icon={<User size={18} />} 
-                        label="Mi perfil" 
-                        onClick={() => { router.push("/dashboard/cliente/perfil"); setMobileMenu(false); }}
-                      />
                       <NavBtn 
                         icon={<Package size={18} />} 
                         label="Mis pedidos" 
@@ -515,98 +603,6 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
         </AnimatePresence>
       </header>
 
-      {/* ════════════════════════════════════════════════════
-          DROPDOWN PORTAL — montado directamente en el body
-          Así escapa de cualquier stacking context del header
-      ════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {userMenu && (
-          <>
-            {/* Overlay invisible para cerrar al click fuera */}
-            <div
-              className="fixed inset-0"
-              style={{ zIndex: 9998 }}
-              onClick={() => setUserMenu(false)}
-            />
-
-            <motion.div
-              ref={userMenuRef}
-              initial={{ opacity: 0, y: -8, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.96 }}
-              transition={{ type: "spring", damping: 24, stiffness: 300 }}
-              style={{
-                position: "fixed",           // ← fixed escapa de cualquier stacking context
-                top: menuPos.top,
-                right: menuPos.right,
-                width: 240,
-                background: WHITE,
-                border: `1px solid ${BORDER}`,
-                boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-                borderRadius: 16,
-                overflow: "hidden",
-                zIndex: 9999,               // ← siempre encima de todo
-              }}
-            >
-              {/* Info usuario */}
-              <div
-                className="flex items-center gap-3 p-4"
-                style={{ borderBottom: `1px solid ${BORDER}` }}
-              >
-                <div
-                  className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
-                  style={{ width: 38, height: 38, background: ROSE, color: WHITE, fontSize: 15 }}
-                >
-                  {initials}
-                </div>
-                <div className="overflow-hidden">
-                  <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
-                    {usuario?.nombre || "Mi cuenta"}
-                  </p>
-                  <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                    {usuario?.correo || ""}
-                  </p>
-                </div>
-              </div>
-
-              {/* Opciones */}
-              <div className="p-2">
-                {isClientDashboard && (
-                  <>
-                    <NavBtn 
-                      icon={<User size={15} />} 
-                      label="Mi perfil" 
-                      onClick={() => { router.push("/dashboard/cliente/perfil"); setUserMenu(false); }}
-                    />
-                    <NavBtn 
-                      icon={<Package size={15} />} 
-                      label="Mis pedidos" 
-                      onClick={() => { router.push("/dashboard/cliente/pedidos"); setUserMenu(false); }}
-                    />
-                    <NavBtn icon={<Heart size={15} />}   label="Favoritos" />
-                  </>
-                )}
-
-                {(id_rol === 1 || id_rol === 3) && (
-                  <NavBtn
-                    icon={<LayoutDashboard size={15} />}
-                    label="Dashboard ERP"
-                    onClick={() => { router.push("/dashboard/inicio"); setUserMenu(false); }}
-                  />
-                )}
-
-                <Divider />
-                <NavBtn
-                  icon={<LogOut size={15} />}
-                  label="Cerrar sesión"
-                  danger
-                  onClick={handleLogout}
-                />
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </>
   );
 }
