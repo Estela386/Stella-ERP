@@ -10,6 +10,7 @@
     "format": "prettier \"**/*.{js,ts,jsx,tsx,css,scss,md}\" --write ."
   },
   "dependencies": {
+    "@stripe/stripe-js": "^8.11.0",
     "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.87.1",
@@ -23,6 +24,7 @@
     "recharts": "^3.7.0",
     "resend": "^6.9.4",
     "sonner": "^2.0.7",
+    "stripe": "^20.4.1",
     "sweetalert2": "^11.26.22"
   },
   "devDependencies": {
