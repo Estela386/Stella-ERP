@@ -161,7 +161,7 @@ export default function ProductGrid() {
                 marginBottom: 10,
               }}
             >
-              Shop Newest Collection
+              Colección Reciente
             </p>
             <div className="flex items-end justify-between flex-wrap gap-4">
               <h2
@@ -191,7 +191,7 @@ export default function ProductGrid() {
                   whiteSpace: "nowrap",
                 }}
               >
-                See all →
+                Ver todos →
               </Link>
             </div>
           </div>
