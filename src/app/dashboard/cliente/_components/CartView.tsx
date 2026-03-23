@@ -11,7 +11,6 @@ import EmptyCart from "./EmptyCart";
 import Swal from "sweetalert2";
 
 export default function CartView() {
-  const router = useRouter();
   const {
     items: cartItems,
     actualizarCantidad,
