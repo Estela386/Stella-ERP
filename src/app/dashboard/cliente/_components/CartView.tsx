@@ -2,6 +2,9 @@
 
 import { useMemo } from "react";
 import { useCart } from "@lib/hooks/useCart";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 import EmptyCart from "./EmptyCart";
@@ -13,6 +16,8 @@ export default function CartView() {
     actualizarCantidad,
     eliminarDelCarrito,
   } = useCart();
+  const { usuario } = useAuth();
+  const router = useRouter();
 
   // Calcular totales
   const calculos = useMemo(() => {
@@ -54,8 +59,45 @@ export default function CartView() {
     });
   };
 
-  const handleCheckout = () => {
-    alert(`Procesando compra por: $${calculos.total.toLocaleString()}`);
+  const handleCheckout = async () => {
+    if (!usuario) {
+      toast.error("Debes iniciar sesión para continuar");
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          idUsuario: usuario.id_auth,
+          clienteId: usuario.id,
+          email: usuario.correo,
+          nombre: usuario.nombre,
+          items: cartItems.map(item => ({
+            id_producto: item.producto.id,
+            nombre: item.producto.nombre,
+            precio: item.producto.precio,
+            cantidad: item.cantidad,
+            url_imagen: item.producto.url_imagen,
+            personalizacion: item.personalizacion ?? null,
+          })),
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.url) {
+        toast.error(data.error || "Error al iniciar el pago");
+        return;
+      }
+
+      // Redirigir a Stripe Checkout
+      window.location.href = data.url;
+    } catch (err) {
+      console.error("Error en checkout:", err);
+      toast.error("Error al procesar el pago");
+    }
   };
 
   const isEmpty = cartItems.length === 0;
@@ -208,6 +250,7 @@ export default function CartView() {
                         key={index}
                         producto={item.producto}
                         cantidad={item.cantidad}
+                        personalizacion={item.personalizacion}
                         onCantidadChange={newCantidad =>
                           handleCantidadChange(index, newCantidad)
                         }
@@ -221,7 +264,7 @@ export default function CartView() {
               {/* Summary */}
               <div
                 className="lg:col-span-1 cart-fade cart-fade-2"
-                style={{ position: "relative", zIndex: 1 }} // ← agrega este style
+                style={{ position: "relative", zIndex: 1 }}
               >
                 <CartSummary
                   subtotal={calculos.subtotal}

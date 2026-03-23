@@ -2,15 +2,19 @@
 
 import React, { createContext, useState, useCallback } from "react";
 import { Producto } from "@lib/models";
-
 export interface CartItemData {
-  producto: Producto & { personalizacion?: any };
+  producto: Producto;
   cantidad: number;
+  personalizacion?: Record<number, any>;
 }
 
 interface CartContextType {
   items: CartItemData[];
-  agregarAlCarrito: (producto: Producto, cantidad: number) => void;
+  agregarAlCarrito: (
+    producto: Producto,
+    cantidad: number,
+    personalizacion?: Record<number, any>
+  ) => void;
   actualizarCantidad: (productoId: number, cantidad: number) => void;
   eliminarDelCarrito: (productoId: number) => void;
   limpiarCarrito: () => void;
@@ -24,28 +28,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItemData[]>([]);
 
   const agregarAlCarrito = useCallback(
-    (producto: Producto, cantidad: number) => {
+    (
+      producto: Producto,
+      cantidad: number,
+      personalizacion?: Record<number, any>
+    ) => {
       setItems(prevItems => {
+        // Dos productos iguales con distinta personalización son items distintos
         const existingItem = prevItems.find(
-          item => item.producto.id === producto.id
+          item =>
+            item.producto.id === producto.id &&
+            JSON.stringify(item.personalizacion) ===
+              JSON.stringify(personalizacion)
         );
 
         if (existingItem) {
-          // Si el producto ya existe, aumentar la cantidad
           return prevItems.map(item =>
-            item.producto.id === producto.id
+            item.producto.id === producto.id &&
+            JSON.stringify(item.personalizacion) ===
+              JSON.stringify(personalizacion)
               ? { ...item, cantidad: item.cantidad + cantidad }
               : item
           );
         }
 
-        // Si no existe, agregar nuevo item
-        return [...prevItems, { producto, cantidad }];
+        return [...prevItems, { producto, cantidad, personalizacion }];
       });
     },
     []
   );
-
   const actualizarCantidad = useCallback(
     (productoId: number, cantidad: number) => {
       setItems(prevItems =>

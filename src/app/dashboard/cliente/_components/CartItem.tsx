@@ -7,6 +7,7 @@ import Image from "next/image";
 interface CartItemProps {
   producto: Producto;
   cantidad: number;
+  personalizacion?: Record<number, any>;
   onCantidadChange: (newCantidad: number) => void;
   onRemove: () => void;
 }
@@ -14,6 +15,7 @@ interface CartItemProps {
 export default function CartItem({
   producto,
   cantidad,
+  personalizacion,
   onCantidadChange,
   onRemove,
 }: CartItemProps) {
@@ -50,6 +52,29 @@ export default function CartItem({
         <p className="text-xs text-[#a89080] mb-3">
           ${(producto.precio || 0).toLocaleString()}
         </p>
+        {/* Personalización */}
+        {personalizacion && Object.keys(personalizacion).length > 0 && (
+          <div style={{ marginBottom: 8 }}>
+            {Object.entries(personalizacion).map(([key, value]) => (
+              <span
+                key={key}
+                style={{
+                  display: "inline-block",
+                  fontSize: "0.7rem",
+                  color: "#b76e79",
+                  background: "rgba(183,110,121,0.08)",
+                  border: "1px solid rgba(183,110,121,0.2)",
+                  borderRadius: 6,
+                  padding: "2px 8px",
+                  marginRight: 4,
+                  marginBottom: 4,
+                }}
+              >
+                {String(value)}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Quantity Controls */}
         <div className="flex items-center gap-2">

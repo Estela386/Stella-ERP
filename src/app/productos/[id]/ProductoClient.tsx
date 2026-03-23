@@ -29,6 +29,26 @@ export default function ProductoClient({ id }: ProductoClientProps) {
   const [opciones, setOpciones] = useState<any[]>([]);
   const [configuracion, setConfiguracion] = useState<Record<number, any>>({});
   const [loadingOpciones, setLoadingOpciones] = useState(true);
+  const [erroresPersonalizacion, setErroresPersonalizacion] = useState<
+    Record<number, string>
+  >({});
+  const validarPersonalizacion = (): boolean => {
+    if (!producto.es_personalizable || opciones.length === 0) return true;
+
+    const nuevosErrores: Record<number, string> = {};
+
+    opciones.forEach(op => {
+      if (op.obligatorio) {
+        const valor = configuracion[op.id];
+        if (!valor || String(valor).trim() === "") {
+          nuevosErrores[op.id] = "Este campo es obligatorio";
+        }
+      }
+    });
+
+    setErroresPersonalizacion(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
 
   useEffect(() => {
     const cargarProducto = async () => {
@@ -481,7 +501,15 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                 ) : (
                   opciones.map(op => (
                     <div key={op.id}>
-                      <label style={{ fontSize: "0.8rem", color: "#708090" }}>
+                      <label
+                        style={{
+                          fontSize: "0.8rem",
+                          color: erroresPersonalizacion[op.id]
+                            ? "#b76e79"
+                            : "#708090",
+                          fontWeight: erroresPersonalizacion[op.id] ? 600 : 400,
+                        }}
+                      >
                         {op.nombre}
                         {op.obligatorio && (
                           <span style={{ color: "#b76e79", marginLeft: 4 }}>
@@ -492,35 +520,36 @@ export default function ProductoClient({ id }: ProductoClientProps) {
 
                       {op.tipo === "select" && (
                         <select
-                          onChange={e =>
+                          onChange={e => {
                             setConfiguracion(prev => ({
                               ...prev,
                               [op.id]: e.target.value,
-                            }))
-                          }
+                            }));
+                            // Limpiar error al seleccionar
+                            if (erroresPersonalizacion[op.id]) {
+                              setErroresPersonalizacion(prev => {
+                                const next = { ...prev };
+                                delete next[op.id];
+                                return next;
+                              });
+                            }
+                          }}
                           style={{
                             width: "100%",
                             marginTop: 4,
                             padding: "10px 12px",
                             borderRadius: 10,
-                            border: "1px solid rgba(112,128,144,0.3)",
+                            border: `1px solid ${erroresPersonalizacion[op.id] ? "#b76e79" : "rgba(112,128,144,0.3)"}`,
                             fontFamily: "'DM Sans', sans-serif",
                             fontSize: "0.9rem",
                             color: "#4a5568",
                             background: "#ffffff",
-                            appearance: "auto",
                             cursor: "pointer",
                           }}
                         >
-                          <option value="" style={{ color: "#708090" }}>
-                            Selecciona...
-                          </option>
+                          <option value="">Selecciona...</option>
                           {op.valores?.map((v: any) => (
-                            <option
-                              key={v.id}
-                              value={v.valor}
-                              style={{ color: "#4a5568" }}
-                            >
+                            <option key={v.id} value={v.valor}>
                               {v.valor}
                             </option>
                           ))}
@@ -531,27 +560,75 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                         <input
                           type="text"
                           placeholder="Escribe aquí..."
-                          onChange={e =>
+                          onChange={e => {
                             setConfiguracion(prev => ({
                               ...prev,
                               [op.id]: e.target.value,
-                            }))
-                          }
-                          className="w-full mt-1 p-2 rounded-lg border"
+                            }));
+                            if (erroresPersonalizacion[op.id]) {
+                              setErroresPersonalizacion(prev => {
+                                const next = { ...prev };
+                                delete next[op.id];
+                                return next;
+                              });
+                            }
+                          }}
+                          style={{
+                            width: "100%",
+                            marginTop: 4,
+                            padding: "10px 12px",
+                            borderRadius: 10,
+                            border: `1px solid ${erroresPersonalizacion[op.id] ? "#b76e79" : "rgba(112,128,144,0.3)"}`,
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: "0.9rem",
+                            color: "#4a5568",
+                            background: "#ffffff",
+                          }}
                         />
                       )}
 
                       {op.tipo === "number" && (
                         <input
                           type="number"
-                          onChange={e =>
+                          onChange={e => {
                             setConfiguracion(prev => ({
                               ...prev,
                               [op.id]: e.target.value,
-                            }))
-                          }
-                          className="w-full mt-1 p-2 rounded-lg border"
+                            }));
+                            if (erroresPersonalizacion[op.id]) {
+                              setErroresPersonalizacion(prev => {
+                                const next = { ...prev };
+                                delete next[op.id];
+                                return next;
+                              });
+                            }
+                          }}
+                          style={{
+                            width: "100%",
+                            marginTop: 4,
+                            padding: "10px 12px",
+                            borderRadius: 10,
+                            border: `1px solid ${erroresPersonalizacion[op.id] ? "#b76e79" : "rgba(112,128,144,0.3)"}`,
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: "0.9rem",
+                            color: "#4a5568",
+                            background: "#ffffff",
+                          }}
                         />
+                      )}
+
+                      {/* Error message */}
+                      {erroresPersonalizacion[op.id] && (
+                        <p
+                          style={{
+                            marginTop: 4,
+                            fontSize: "0.75rem",
+                            color: "#b76e79",
+                            fontFamily: "'DM Sans', sans-serif",
+                          }}
+                        >
+                          {erroresPersonalizacion[op.id]}
+                        </p>
                       )}
                     </div>
                   ))
@@ -562,17 +639,22 @@ export default function ProductoClient({ id }: ProductoClientProps) {
             <button
               disabled={producto.stock_actual === 0 || agregandoCarrito}
               onClick={() => {
+                if (!validarPersonalizacion()) {
+                  toast.error(
+                    "Completa las opciones obligatorias antes de continuar"
+                  );
+                  return;
+                }
+
                 setAgregandoCarrito(true);
                 agregarAlCarrito(
-                  {
-                    ...producto,
-                    personalizacion: configuracion,
-                  },
-                  1
+                  producto,
+                  1,
+                  producto.es_personalizable ? configuracion : undefined // ← separado
                 );
                 setTimeout(() => {
                   setAgregandoCarrito(false);
-                  toast.success("Agregado a tu colección");
+                  toast.success("Agregado al carrito");
                 }, 800);
               }}
               style={{
