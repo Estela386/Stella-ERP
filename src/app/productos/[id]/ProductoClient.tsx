@@ -26,6 +26,9 @@ export default function ProductoClient({ id }: ProductoClientProps) {
   const [comment, setComment] = useState("");
   const [enviandoReview, setEnviandoReview] = useState(false);
   const [yaComento, setYaComento] = useState(false);
+  const [opciones, setOpciones] = useState<any[]>([]);
+  const [configuracion, setConfiguracion] = useState<Record<number, any>>({});
+  const [loadingOpciones, setLoadingOpciones] = useState(true);
 
   useEffect(() => {
     const cargarProducto = async () => {
@@ -93,6 +96,24 @@ export default function ProductoClient({ id }: ProductoClientProps) {
     };
 
     verificarYaComento();
+    const cargarOpciones = async () => {
+      try {
+        setLoadingOpciones(true);
+
+        const res = await fetch(`/api/productos/${id}/opciones`);
+        const data = await res.json();
+
+        if (!res.ok || !data.opciones) return;
+
+        setOpciones(data.opciones);
+      } catch (err) {
+        console.error("Error cargando opciones:", err);
+      } finally {
+        setLoadingOpciones(false);
+      }
+    };
+
+    if (id) cargarOpciones();
   }, [id, usuario]);
   const handleSubmitReview = async () => {
     if (!usuario) {
@@ -428,12 +449,127 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   : "Agotado temporalmente"}
               </span>
             </div>
+            {producto.es_personalizable && (
+              <section
+                style={{ display: "flex", flexDirection: "column", gap: 16 }}
+              >
+                <h3
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    color: "#4a5568",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Personaliza tu pieza
+                </h3>
+                {loadingOpciones ? (
+                  <p style={{ color: "#708090", fontSize: "0.9rem" }}>
+                    Cargando opciones...
+                  </p>
+                ) : opciones.length === 0 ? (
+                  <p
+                    style={{
+                      color: "#708090",
+                      fontSize: "0.9rem",
+                      opacity: 0.7,
+                    }}
+                  >
+                    No hay opciones disponibles.
+                  </p>
+                ) : (
+                  opciones.map(op => (
+                    <div key={op.id}>
+                      <label style={{ fontSize: "0.8rem", color: "#708090" }}>
+                        {op.nombre}
+                        {op.obligatorio && (
+                          <span style={{ color: "#b76e79", marginLeft: 4 }}>
+                            *
+                          </span>
+                        )}
+                      </label>
+
+                      {op.tipo === "select" && (
+                        <select
+                          onChange={e =>
+                            setConfiguracion(prev => ({
+                              ...prev,
+                              [op.id]: e.target.value,
+                            }))
+                          }
+                          style={{
+                            width: "100%",
+                            marginTop: 4,
+                            padding: "10px 12px",
+                            borderRadius: 10,
+                            border: "1px solid rgba(112,128,144,0.3)",
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: "0.9rem",
+                            color: "#4a5568",
+                            background: "#ffffff",
+                            appearance: "auto",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <option value="" style={{ color: "#708090" }}>
+                            Selecciona...
+                          </option>
+                          {op.valores?.map((v: any) => (
+                            <option
+                              key={v.id}
+                              value={v.valor}
+                              style={{ color: "#4a5568" }}
+                            >
+                              {v.valor}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+
+                      {op.tipo === "text" && (
+                        <input
+                          type="text"
+                          placeholder="Escribe aquí..."
+                          onChange={e =>
+                            setConfiguracion(prev => ({
+                              ...prev,
+                              [op.id]: e.target.value,
+                            }))
+                          }
+                          className="w-full mt-1 p-2 rounded-lg border"
+                        />
+                      )}
+
+                      {op.tipo === "number" && (
+                        <input
+                          type="number"
+                          onChange={e =>
+                            setConfiguracion(prev => ({
+                              ...prev,
+                              [op.id]: e.target.value,
+                            }))
+                          }
+                          className="w-full mt-1 p-2 rounded-lg border"
+                        />
+                      )}
+                    </div>
+                  ))
+                )}
+              </section>
+            )}
 
             <button
               disabled={producto.stock_actual === 0 || agregandoCarrito}
               onClick={() => {
                 setAgregandoCarrito(true);
-                agregarAlCarrito(producto, 1);
+                agregarAlCarrito(
+                  {
+                    ...producto,
+                    personalizacion: configuracion,
+                  },
+                  1
+                );
                 setTimeout(() => {
                   setAgregandoCarrito(false);
                   toast.success("Agregado a tu colección");

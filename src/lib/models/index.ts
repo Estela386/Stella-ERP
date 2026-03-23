@@ -3,6 +3,8 @@
  * Facilita las importaciones de modelos desde otros archivos
  */
 
+import { ProductoOpcion } from "./ProductoOpcion";
+
 export {
   Producto,
   type IProducto,
@@ -40,3 +42,16 @@ export {
   type CreateCuentasPorCobrarDTO,
   type UpdateCuentasPorCobrarDTO,
 } from "./CuentasPorCobrar";
+
+export {
+  Review,
+  type IReview,
+  type CreateReviewDTO,
+  type UpdateReviewDTO,
+} from "./Review";
+export { ProductoOpcion, type IProductoOpcion } from "./ProductoOpcion";
+
+export {
+  ProductoOpcionValor,
+  type IProductoOpcionValor,
+} from "./ProductoOpcionValor";

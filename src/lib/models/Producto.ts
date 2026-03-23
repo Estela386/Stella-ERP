@@ -21,7 +21,27 @@ export interface IProducto {
  * DTO para crear un nuevo producto
  * Excluye el id ya que es autogenerado
  */
-export type CreateProductoDTO = Omit<IProducto, "id">;
+export interface OpcionDTO {
+  nombre: string;
+  tipo: "select" | "multi" | "text";
+  obligatorio: boolean;
+  valores: { valor: string; precio_extra?: number }[];
+}
+
+export interface CreateProductoDTO {
+  nombre: string;
+  precio: number;
+  costo?: number;
+  costo_mayorista?: number;
+  tiempo?: number;
+  stock_actual?: number;
+  stock_min?: number;
+  url_imagen?: string;
+  id_categoria?: number;
+  descripcion?: string;
+  es_personalizable: boolean;
+  opciones?: OpcionDTO[];
+}
 
 /**
  * DTO para actualizar un producto

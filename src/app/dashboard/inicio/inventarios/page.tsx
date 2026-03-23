@@ -9,7 +9,13 @@ import ProductTable from "./_components/ProductTable";
 import ProductModalForm from "./_components/ProductModalForm";
 import CategoryModal from "./_components/CategoryModal";
 import { Producto } from "./type";
-import { ProductoService, ImageUploadService } from "@lib/services";
+import ProductForm, { type OpcionForm } from "./_components/ProductForm";
+
+import {
+  ProductoService,
+  ImageUploadService,
+  ProductoPersonalizacionService,
+} from "@lib/services";
 import { CategoriaService } from "@lib/services";
 import { createClient } from "@utils/supabase/client";
 import { useAuth } from "@lib/hooks/useAuth";
@@ -130,10 +136,17 @@ export default function InventariosPage() {
     setModalOpen(false);
     setSelectedProducto(undefined);
   };
-
+  // Helper para convertir OpcionForm al formato del servicio
+  const mapOpcionesParaServicio = (opciones: OpcionForm[]) =>
+    opciones.map(({ nombre, tipo, obligatorio, valores }) => ({
+      opcion: { nombre, tipo, obligatorio },
+      valores,
+    }));
+  // Actualiza la firma para recibir opciones
   const handleSubmitForm = async (
     data: CreateProductoDTO | UpdateProductoDTO,
-    imagenFile?: File
+    imagenFile?: File,
+    opciones?: OpcionForm[] // ← nuevo parámetro
   ) => {
     try {
       setFormLoading(true);
@@ -141,33 +154,31 @@ export default function InventariosPage() {
       const productoService = new ProductoService(supabase);
       const categoriaService = new CategoriaService(supabase);
       const imageUploadService = new ImageUploadService(supabase);
+      const personalizacionService = new ProductoPersonalizacionService(
+        supabase
+      );
 
       let urlImagen: string | undefined = undefined;
 
-      // Si hay una imagen nueva, subirla
-      console.log("Imagen recibida en submit:", imagenFile);
       if (imagenFile) {
         const { url, error: uploadError } =
           await imageUploadService.uploadImage(
             imagenFile,
             selectedProducto?.id
           );
-
         if (uploadError) {
           setError(uploadError);
           return;
         }
-
         urlImagen = url || undefined;
       }
 
-      // Preparar datos con la URL de imagen si existe
       const dataConImagen = urlImagen
         ? { ...data, url_imagen: urlImagen }
         : data;
 
       if (selectedProducto) {
-        // Actualizar producto existente
+        // ── Actualizar ──────────────────────────────────────────────
         const { producto: productoActualizado, error } =
           await productoService.actualizar(
             selectedProducto.id,
@@ -177,39 +188,47 @@ export default function InventariosPage() {
         if (error) {
           setError(error);
           return;
+        } // ← verificar error ANTES de guardar opciones
+
+        // Luego en ambos bloques (actualizar y crear):
+        if (data.es_personalizable && opciones?.length) {
+          await personalizacionService.guardarOpcionesProducto(
+            selectedProducto.id,
+            mapOpcionesParaServicio(opciones)
+          );
         }
 
-        // Actualizar en la lista local
         const { categorias: categoriasData } =
           await categoriaService.obtenerTodas();
         const cat = categoriasData?.find(
           c => c.id === productoActualizado?.id_categoria
         );
-        const productoConCategoria: Producto = {
-          id: productoActualizado?.id || 0,
-          nombre: productoActualizado?.nombre || "",
-          precio: productoActualizado?.precio || 0,
-          costo: productoActualizado?.costo || 0,
-          costo_mayorista: productoActualizado?.costo_mayorista || 0,
-          stock_actual: productoActualizado?.stock_actual || 0,
-          stock_min: productoActualizado?.stock_min || 0,
-          tiempo: productoActualizado?.tiempo,
-          url_imagen: productoActualizado?.url_imagen,
-          id_categoria: productoActualizado?.id_categoria,
-          es_personalizable: productoActualizado?.es_personalizable,
-          descripcion: productoActualizado?.descripcion || "",
-          categoria: cat
-            ? { id: cat.id, nombre: cat.nombre || "" }
-            : { id: 0, nombre: "Sin categoría" },
-        };
 
         setProductos(prev =>
           prev.map(p =>
-            p.id === selectedProducto.id ? productoConCategoria : p
+            p.id === selectedProducto.id
+              ? {
+                  id: productoActualizado?.id || 0,
+                  nombre: productoActualizado?.nombre || "",
+                  precio: productoActualizado?.precio || 0,
+                  costo: productoActualizado?.costo || 0,
+                  costo_mayorista: productoActualizado?.costo_mayorista || 0,
+                  stock_actual: productoActualizado?.stock_actual || 0,
+                  stock_min: productoActualizado?.stock_min || 0,
+                  tiempo: productoActualizado?.tiempo,
+                  url_imagen: productoActualizado?.url_imagen,
+                  id_categoria: productoActualizado?.id_categoria,
+                  es_personalizable: productoActualizado?.es_personalizable,
+                  descripcion: productoActualizado?.descripcion || "",
+                  categoria: cat
+                    ? { id: cat.id, nombre: cat.nombre || "" }
+                    : { id: 0, nombre: "Sin categoría" },
+                }
+              : p
           )
         );
       } else {
-        // Crear nuevo producto
+        // ── Crear ───────────────────────────────────────────────────
         const { producto: productoNuevo, error } = await productoService.crear(
           dataConImagen as CreateProductoDTO
         );
@@ -217,33 +236,42 @@ export default function InventariosPage() {
         if (error) {
           setError(error);
           return;
+        } // ← verificar error ANTES de guardar opciones
+
+        // Guardar opciones usando el id del producto recién creado
+        if (data.es_personalizable && opciones?.length && productoNuevo?.id) {
+          await personalizacionService.guardarOpcionesProducto(
+            productoNuevo.id, // ← ahora sí está en scope
+            mapOpcionesParaServicio(opciones)
+          );
         }
 
-        // Obtener la categoría
         const { categorias: categoriasData } =
           await categoriaService.obtenerTodas();
         const cat = categoriasData?.find(
           c => c.id === productoNuevo?.id_categoria
         );
-        const productoConCategoria: Producto = {
-          id: productoNuevo?.id || 0,
-          nombre: productoNuevo?.nombre || "",
-          precio: productoNuevo?.precio || 0,
-          costo: productoNuevo?.costo || 0,
-          costo_mayorista: productoNuevo?.costo_mayorista || 0,
-          stock_actual: productoNuevo?.stock_actual || 0,
-          stock_min: productoNuevo?.stock_min || 0,
-          tiempo: productoNuevo?.tiempo,
-          url_imagen: productoNuevo?.url_imagen,
-          id_categoria: productoNuevo?.id_categoria,
-          es_personalizable: productoNuevo?.es_personalizable,
-          descripcion: productoNuevo?.descripcion || "",
-          categoria: cat
-            ? { id: cat.id, nombre: cat.nombre || "" }
-            : { id: 0, nombre: "Sin categoría" },
-        };
 
-        setProductos(prev => [...prev, productoConCategoria]);
+        setProductos(prev => [
+          ...prev,
+          {
+            id: productoNuevo?.id || 0,
+            nombre: productoNuevo?.nombre || "",
+            precio: productoNuevo?.precio || 0,
+            costo: productoNuevo?.costo || 0,
+            costo_mayorista: productoNuevo?.costo_mayorista || 0,
+            stock_actual: productoNuevo?.stock_actual || 0,
+            stock_min: productoNuevo?.stock_min || 0,
+            tiempo: productoNuevo?.tiempo,
+            url_imagen: productoNuevo?.url_imagen,
+            id_categoria: productoNuevo?.id_categoria,
+            es_personalizable: productoNuevo?.es_personalizable,
+            descripcion: productoNuevo?.descripcion || "",
+            categoria: cat
+              ? { id: cat.id, nombre: cat.nombre || "" }
+              : { id: 0, nombre: "Sin categoría" },
+          },
+        ]);
       }
 
       handleCloseModal();
@@ -256,7 +284,6 @@ export default function InventariosPage() {
       setFormLoading(false);
     }
   };
-
   const handleDeleteProducto = async (id: number) => {
     if (!confirm("¿Estás seguro de que deseas eliminar este producto?")) {
       return;

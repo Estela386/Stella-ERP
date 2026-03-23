@@ -10,3 +10,4 @@ export { ClienteService } from "./ClienteService";
 export { VentaService, type ProductoEnVenta } from "./VentaService";
 export { CuentasPorCobrarService } from "./CuentasPorCobrarService";
 export { ReviewService } from "./ReviewService";
+export { ProductoPersonalizacionService } from "./ProductoPersonalizacionService";

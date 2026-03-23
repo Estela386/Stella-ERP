@@ -9,6 +9,7 @@ export interface ProductoEnVenta {
   id_producto: number;
   cantidad: number;
   descuento_aplicado?: number | null;
+  personalizacion?: any | null;
 }
 
 /**
@@ -125,7 +126,7 @@ export class VentaService {
         detallesData.push({
           cantidad: prod.cantidad,
           id_producto: prod.id_producto,
-          descuento_aplicado: prod.descuento_aplicado || null,
+          personalizacion: prod.personalizacion || null,
         });
       }
 

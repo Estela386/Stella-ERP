@@ -4,7 +4,7 @@ import React, { createContext, useState, useCallback } from "react";
 import { Producto } from "@lib/models";
 
 export interface CartItemData {
-  producto: Producto;
+  producto: Producto & { personalizacion?: any };
   cantidad: number;
 }
 
