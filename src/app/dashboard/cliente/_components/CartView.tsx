@@ -2,12 +2,14 @@
 
 import { useMemo } from "react";
 import { useCart } from "@lib/hooks/useCart";
+import { useRouter } from "next/navigation";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 import EmptyCart from "./EmptyCart";
 import Swal from "sweetalert2";
 
 export default function CartView() {
+  const router = useRouter();
   const {
     items: cartItems,
     actualizarCantidad,
@@ -55,7 +57,7 @@ export default function CartView() {
   };
 
   const handleCheckout = () => {
-    alert(`Procesando compra por: $${calculos.total.toLocaleString()}`);
+    router.push("/dashboard/cliente/checkout");
   };
 
   const isEmpty = cartItems.length === 0;
@@ -111,7 +113,7 @@ export default function CartView() {
                 margin: "0 0 4px",
               }}
             >
-              Stella Designs
+              Stella Joyería
             </p>
             <div
               style={{

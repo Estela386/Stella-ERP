@@ -199,7 +199,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
             className="hero-fade-0"
             style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.65rem", fontWeight: 500, letterSpacing: "0.22em", textTransform: "uppercase", color: "#8c9768", marginBottom: 12 }}
           >
-            Stella Designs
+            Stella Joyería
           </p>
 
           <h1
@@ -224,7 +224,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
               onMouseEnter={e => { const b = e.currentTarget; b.style.transform = "translateY(-2px)"; b.style.boxShadow = "0 10px 26px rgba(183,110,121,0.32)"; }}
               onMouseLeave={e => { const b = e.currentTarget; b.style.transform = "translateY(0)"; b.style.boxShadow = "0 3px 12px rgba(183,110,121,0.22)"; }}
             >
-              Shop New Drops
+              Ver Novedades
             </button>
             <button
               onClick={() => router.push("/dashboard/cliente/catalogo")}

@@ -281,7 +281,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
           >
             <Image
               src="/LogoM.svg"
-              alt="logo"
+              alt="Logotipo Stella Joyería"
               width={320}
               height={90}
               className="w-full max-w-[140px] sm:max-w-[180px] md:max-w-[220px] lg:max-w-[260px] h-auto object-contain"
