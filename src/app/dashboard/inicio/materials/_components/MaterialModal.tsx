@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { Insumo, Proveedor } from "@lib/models";
 import { createClient } from "@utils/supabase/client";
 import { ProveedorService } from "@lib/services/ProveedorService";
-import { FiX } from "react-icons/fi";
+import { ProductoInsumoService } from "@lib/services/ProductoInsumoService";
+import { FiX, FiPackage } from "react-icons/fi";
+
 
 const CATEGORIAS = [
   "hilo", "balín", "argolla", "broche", "arete", "cristal", 
@@ -35,16 +37,30 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
   });
 
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-
+  const [productosRelacionados, setProductosRelacionados] = useState<any[]>([]);
+  const [loadingProductos, setLoadingProductos] = useState(false);
   useEffect(() => {
-    const cargarProveedores = async () => {
+    const cargarDatos = async () => {
+
       const supabase = createClient();
-      const service = new ProveedorService(supabase);
-      const { proveedores: data } = await service.obtenerTodos();
-      if (data) setProveedores(data);
+      
+      // Cargar Proveedores
+      const provService = new ProveedorService(supabase);
+      const { proveedores: dataProv } = await provService.obtenerTodos();
+      if (dataProv) setProveedores(dataProv);
+
+      // Cargar Productos Relacionados
+      if (material.id) {
+        setLoadingProductos(true);
+        const relService = new ProductoInsumoService(supabase);
+        const { productos, error } = await relService.obtenerProductosPorInsumo(material.id);
+        if (productos) setProductosRelacionados(productos);
+        setLoadingProductos(false);
+      }
     };
-    cargarProveedores();
-  }, []);
+    cargarDatos();
+  }, [material.id]);
+
 
   const handleChange = (field: keyof typeof form, value: any) => {
     setForm(prev => ({
@@ -185,6 +201,54 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
             </select>
           </div>
         </section>
+
+        {/* 📋 Productos que usan este material */}
+        <section className="space-y-4 pt-4 border-t border-[rgba(112,128,144,0.12)]">
+          <div className="flex items-center gap-2">
+            <FiPackage className="text-[#b76e79]" />
+            <h3 className="text-sm font-bold text-[#4a5568] font-sans">Productos Vinculados</h3>
+            <span className="bg-[#f6f4ef] text-[#708090] text-[0.65rem] px-2 py-0.5 rounded-full font-bold">
+              {productosRelacionados.length}
+            </span>
+          </div>
+
+          <div className="bg-[#f6f4ef]/30 rounded-xl border border-[rgba(112,128,144,0.1)] overflow-hidden">
+            {loadingProductos ? (
+              <div className="p-8 text-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#b76e79] mx-auto" /></div>
+            ) : productosRelacionados.length === 0 ? (
+              <div className="p-8 text-center text-[0.7rem] text-[#708090] uppercase tracking-widest bg-white/50">
+                Ningún producto utiliza este material actualmente
+              </div>
+            ) : (
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="bg-[#f6f4ef]/50 border-b border-[rgba(112,128,144,0.05)]">
+                    <th className="px-4 py-2.5 font-bold text-[#708090] uppercase tracking-tighter">Producto</th>
+                    <th className="px-4 py-2.5 font-bold text-[#708090] uppercase tracking-tighter text-right">Cantidad</th>
+                    <th className="px-4 py-2.5 font-bold text-[#708090] uppercase tracking-tighter">Variante</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[rgba(112,128,144,0.05)] bg-white/30">
+                  {productosRelacionados.map((rel, idx) => (
+                    <tr key={idx} className="hover:bg-white/60 transition-colors">
+                      <td className="px-4 py-3 font-medium text-[#4a5568]">{rel.producto?.nombre}</td>
+                      <td className="px-4 py-3 text-right font-bold text-[#b76e79]">
+                        {rel.cantidad_necesaria} {material.unidad_medida}
+                      </td>
+                      <td className="px-4 py-3 text-[0.65rem] text-[#708090]">
+                        {rel.opcion_valor 
+                          ? `${rel.opcion_valor.opcion?.nombre}: ${rel.opcion_valor.valor}`
+                          : <span className="opacity-30">---</span>
+                        }
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </section>
+
 
         <div className="flex justify-end gap-4 pt-4 border-t border-[rgba(112,128,144,0.12)]">
           <button

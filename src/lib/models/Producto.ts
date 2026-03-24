@@ -15,7 +15,9 @@ export interface IProducto {
   id_categoria: number | null;
   es_personalizable?: boolean | null;
   descripcion?: string | null;
+  tipo: "fabricado" | "revendido";
 }
+
 
 /**
  * DTO para crear un nuevo producto
@@ -40,7 +42,9 @@ export interface CreateProductoDTO {
   id_categoria?: number;
   descripcion?: string;
   es_personalizable: boolean;
+  tipo: "fabricado" | "revendido";
   opciones?: OpcionDTO[];
+
 }
 
 /**
@@ -66,6 +70,8 @@ export class Producto implements IProducto {
   id_categoria: number | null;
   es_personalizable?: boolean | null;
   descripcion?: string | null;
+  tipo: "fabricado" | "revendido";
+
 
   constructor(data: IProducto) {
     this.id = data.id;
@@ -80,7 +86,9 @@ export class Producto implements IProducto {
     this.id_categoria = data.id_categoria;
     this.es_personalizable = data.es_personalizable;
     this.descripcion = data.descripcion;
+    this.tipo = data.tipo || "fabricado";
   }
+
 
   /**
    * Calcula el margen de ganancia del producto
@@ -119,15 +127,8 @@ export class Producto implements IProducto {
       errors.push("El precio no puede ser negativo");
     }
 
-    if (
-      this.costo !== null &&
-      this.precio !== null &&
-      this.precio < this.costo
-    ) {
-      errors.push("El precio no puede ser menor al costo");
-    }
-
     if (this.stock_actual !== null && this.stock_actual < 0) {
+
       errors.push("El stock actual no puede ser negativo");
     }
 
@@ -158,6 +159,8 @@ export class Producto implements IProducto {
       id_categoria: this.id_categoria,
       es_personalizable: this.es_personalizable,
       descripcion: this.descripcion,
+      tipo: this.tipo,
     };
   }
+
 }

@@ -66,3 +66,16 @@ export {
   type CreateProveedorDTO,
   type UpdateProveedorDTO,
 } from "./Proveedor";
+export {
+  ProductoInsumo,
+  type IProductoInsumo,
+  type CreateProductoInsumoDTO,
+} from "./ProductoInsumo";
+
+export {
+  ProductoProveedor,
+  type IProductoProveedor,
+  type CreateProductoProveedorDTO,
+} from "./ProductoProveedor";
+
+

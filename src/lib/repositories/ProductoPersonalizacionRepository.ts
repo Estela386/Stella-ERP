@@ -34,7 +34,8 @@ export class ProductoPersonalizacionRepository {
       extra?: JSON;
     }[]
   ) {
-    return await this.client.from("producto_opcion_valores").insert(valores);
+    return await this.client.from("producto_opcion_valores").insert(valores).select();
+
   }
 
   async eliminarPorProducto(productId: number) {

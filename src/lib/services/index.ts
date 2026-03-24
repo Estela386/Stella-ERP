@@ -11,3 +11,8 @@ export { VentaService, type ProductoEnVenta } from "./VentaService";
 export { CuentasPorCobrarService } from "./CuentasPorCobrarService";
 export { ReviewService } from "./ReviewService";
 export { ProductoPersonalizacionService } from "./ProductoPersonalizacionService";
+export { ProductoInsumoService } from "./ProductoInsumoService";
+export { InsumoService } from "./InsumoService";
+export { ProveedorService } from "./ProveedorService";
+export { ProductoProveedorService } from "./ProductoProveedorService";
+

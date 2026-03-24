@@ -36,6 +36,8 @@ export class ProductoPersonalizacionService {
   ) {
     await this.repo.eliminarPorProducto(productId);
 
+    const resultado = [];
+
     for (const op of opciones) {
       const { data: opcionCreada } = await this.repo.crearOpcion({
         ...op.opcion,
@@ -43,12 +45,27 @@ export class ProductoPersonalizacionService {
       });
 
       if (opcionCreada && op.valores?.length) {
-        const valores = op.valores.map(v => ({
+        const valoresParaInsertar = op.valores.map((v) => ({
           opcion_id: opcionCreada.id,
           valor: v,
         }));
-        await this.repo.crearValores(valores);
+
+        const { data: valoresCreados } = await this.repo.crearValores(
+          valoresParaInsertar
+        );
+
+        resultado.push({
+          nombre: op.opcion.nombre,
+          id: opcionCreada.id,
+          valores: (valoresCreados || []).map((v: any) => ({
+            valor: v.valor,
+            id: v.id,
+          })),
+        });
       }
     }
+
+    return resultado;
   }
+
 }
