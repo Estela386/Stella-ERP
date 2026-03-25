@@ -16,7 +16,7 @@ export default function ProductTable({
   onEdit,
   onDelete,
 }: Props) {
-  // 🔎 FILTRO POR ESTADO
+  // FILTRO POR ESTADO
   let productosFiltrados = productos.filter(p => {
     if (filtro === "bajo")
       return p.stock_actual <= p.stock_min && p.stock_actual > 0;
@@ -26,7 +26,7 @@ export default function ProductTable({
     return true;
   });
 
-  // 🔎 FILTRO POR BÚSQUEDA
+  // FILTRO POR BÚSQUEDA
   productosFiltrados = productosFiltrados.filter(p => {
     const term = search.toLowerCase();
     const nombre = p.nombre?.toLowerCase() || "";
@@ -51,6 +51,7 @@ export default function ProductTable({
               Nombre
             </th>
             <th className="px-4 py-3 font-medium text-[#708090]">Categoría</th>
+            <th className="px-4 py-3 font-medium text-[#708090]">Tipo</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Stock</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Precio</th>
             <th className="px-4 py-3 font-medium text-[#708090]">Costo</th>

@@ -31,8 +31,7 @@ export default function ProductCard({
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-      `}</style>
+              `}</style>
 
       <div
         className="group cursor-pointer relative"
@@ -93,7 +92,7 @@ export default function ProductCard({
           {category && (
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "0.62rem",
                 fontWeight: 500,
                 textTransform: "uppercase",
@@ -108,7 +107,7 @@ export default function ProductCard({
 
           <h3
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
               fontSize: "1.05rem",
               fontWeight: 600,
               color: hovered ? "#4a5568" : "#708090",
@@ -146,7 +145,7 @@ export default function ProductCard({
           {/* Price */}
           <p
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
               fontSize: "1.2rem",
               fontWeight: 500,
               color: "#4a5568",

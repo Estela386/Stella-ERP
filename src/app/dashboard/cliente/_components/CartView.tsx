@@ -105,8 +105,7 @@ export default function CartView() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        @keyframes fadeUp {
+                @keyframes fadeUp {
           from { opacity:0; transform:translateY(16px); }
           to   { opacity:1; transform:translateY(0); }
         }
@@ -119,7 +118,7 @@ export default function CartView() {
         style={{
           minHeight: "100vh",
           background: "#f6f4ef",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans, Inter, sans-serif)",
         }}
       >
         {/* ── Header ── */}
@@ -144,7 +143,7 @@ export default function CartView() {
             {/* Eyebrow */}
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "0.62rem",
                 fontWeight: 500,
                 letterSpacing: "0.2em",
@@ -165,7 +164,7 @@ export default function CartView() {
             >
               <h1
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                   fontSize: "clamp(1.6rem,3vw,2.4rem)",
                   fontWeight: 400,
                   color: "#4a5568",
@@ -180,7 +179,7 @@ export default function CartView() {
               {!isEmpty && (
                 <span
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                     fontSize: "0.78rem",
                     color: "#708090",
                     padding: "3px 12px",
@@ -231,7 +230,7 @@ export default function CartView() {
                   >
                     <p
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "var(--font-sans, Inter, sans-serif)",
                         fontSize: "0.68rem",
                         fontWeight: 500,
                         textTransform: "uppercase",

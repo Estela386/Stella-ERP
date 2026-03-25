@@ -38,7 +38,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
             <img src={profile.avatarUrl} alt={profile.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <span style={{ 
-              fontFamily: "'Cormorant Garamond', serif", 
+              fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", 
               fontSize: "3.5rem", 
               fontWeight: 600, 
               color: "#b76e79",
@@ -53,7 +53,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
       {/* Basic Info */}
       <div style={{ textAlign: "center" }}>
         <h1 style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
           fontSize: "2.4rem",
           fontWeight: 500,
           color: "#4a5568",
@@ -74,7 +74,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
         }}>
           <ShieldCheck size={14} color="#b76e79" />
           <span style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
             fontSize: "0.75rem",
             fontWeight: 600,
             color: "#b76e79",

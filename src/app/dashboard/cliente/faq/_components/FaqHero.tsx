@@ -36,7 +36,7 @@ export default function FaqHero() {
           <Sparkles size={12} style={{ color:"#b76e79" }} />
         </div>
         <span style={{
-          fontFamily:"'DM Sans',sans-serif",
+          fontFamily:"var(--font-sans, Inter, sans-serif)",
           fontSize:"0.62rem", fontWeight:500,
           textTransform:"uppercase", letterSpacing:"0.2em",
           color:"#b76e79",
@@ -61,7 +61,7 @@ export default function FaqHero() {
 
       {/* Subtítulo */}
       <p style={{
-        fontFamily:"'DM Sans',sans-serif",
+        fontFamily:"var(--font-sans, Inter, sans-serif)",
         fontSize:"clamp(0.9rem,1.5vw,1.05rem)",
         color:"#708090",
         maxWidth:520,
@@ -76,7 +76,7 @@ export default function FaqHero() {
       {/* Breadcrumb */}
       <div style={{
         display:"flex", alignItems:"center", justifyContent:"center", gap:6,
-        fontFamily:"'DM Sans',sans-serif", fontSize:"0.78rem", color:"#708090",
+        fontFamily:"var(--font-sans, Inter, sans-serif)", fontSize:"0.78rem", color:"#708090",
         animation:"fadeUp 0.55s cubic-bezier(.22,1,.36,1) 0.18s both",
       }}>
         <Link href="/dashboard/cliente" style={{ color:"#b76e79", textDecoration:"none" }}>Inicio</Link>

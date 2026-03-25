@@ -536,8 +536,7 @@ export default function FaqPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f6f4ef", display: "flex", flexDirection: "column" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500&display=swap');
-        @keyframes fadeUp {
+                @keyframes fadeUp {
           from { opacity:0; transform:translateY(18px); }
           to   { opacity:1; transform:translateY(0); }
         }
@@ -587,7 +586,7 @@ export default function FaqPage() {
             </div>
           </div>
           <span style={{
-            fontFamily: "'DM Sans',sans-serif",
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
             fontSize: "0.82rem", color: "#708090",
           }}>
             {currentSection.description}
@@ -603,7 +602,7 @@ export default function FaqPage() {
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:8 }}>
               <span style={{ height:1, width:36, background:"#b76e79" }} />
               <span style={{
-                fontFamily:"'DM Sans',sans-serif",
+                fontFamily:"var(--font-sans, Inter, sans-serif)",
                 fontSize:"0.62rem", fontWeight:500,
                 textTransform:"uppercase", letterSpacing:"0.2em",
                 color:"#b76e79",
@@ -611,7 +610,7 @@ export default function FaqPage() {
               <span style={{ height:1, width:36, background:"#b76e79" }} />
             </div>
             <h2 style={{
-              fontFamily:"'Cormorant Garamond',serif",
+              fontFamily:"var(--font-serif, 'Cormorant Garamond', serif)",
               fontSize:"clamp(1.8rem,3vw,2.6rem)",
               fontWeight:500, color:"#4a5568",
               margin:0,
@@ -629,7 +628,7 @@ export default function FaqPage() {
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:8 }}>
               <span style={{ height:1, width:36, background:"#b76e79" }} />
               <span style={{
-                fontFamily:"'DM Sans',sans-serif",
+                fontFamily:"var(--font-sans, Inter, sans-serif)",
                 fontSize:"0.62rem", fontWeight:500,
                 textTransform:"uppercase", letterSpacing:"0.2em",
                 color:"#b76e79",
@@ -637,7 +636,7 @@ export default function FaqPage() {
               <span style={{ height:1, width:36, background:"#b76e79" }} />
             </div>
             <h2 style={{
-              fontFamily:"'Cormorant Garamond',serif",
+              fontFamily:"var(--font-serif, 'Cormorant Garamond', serif)",
               fontSize:"clamp(1.8rem,3vw,2.6rem)",
               fontWeight:500, color:"#4a5568",
               margin:0,

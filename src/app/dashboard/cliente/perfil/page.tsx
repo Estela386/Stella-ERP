@@ -92,7 +92,7 @@ export default function ProfilePage() {
   if (authLoading || loading) {
     return (
       <div style={{ minHeight: "100vh", background: "#f6f4ef", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", color: "#708090" }}>Cargando perfil...</p>
+        <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", color: "#708090" }}>Cargando perfil...</p>
       </div>
     );
   }
@@ -100,7 +100,7 @@ export default function ProfilePage() {
   if (!usuario || !profileData) {
     return (
       <div style={{ minHeight: "100vh", background: "#f6f4ef", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 20 }}>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", color: "#708090" }}>No se pudo cargar la información del perfil.</p>
+        <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", color: "#708090" }}>No se pudo cargar la información del perfil.</p>
         <button onClick={() => window.location.href = "/dashboard/cliente"} style={{ padding: "10px 20px", background: "#b76e79", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer" }}>Volver al inicio</button>
       </div>
     );
@@ -109,8 +109,7 @@ export default function ProfilePage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f6f4ef", display: "flex", flexDirection: "column" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500&display=swap');
-        @keyframes fadeIn {
+                @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }

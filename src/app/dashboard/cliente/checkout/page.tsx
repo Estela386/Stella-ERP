@@ -86,7 +86,7 @@ export default function CheckoutPage() {
             <div style={{ width: "80px", height: "80px", background: "rgba(140, 151, 104, 0.1)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#8c9768", margin: "0 auto 24px" }}>
               <CheckCircle2 size={40} />
             </div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "2.5rem", color: "#4a5568", marginBottom: "12px" }}>¡Gracias por tu compra!</h1>
+            <h1 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "2.5rem", color: "#4a5568", marginBottom: "12px" }}>¡Gracias por tu compra!</h1>
             <p style={{ color: "#708090", marginBottom: "32px", fontSize: "1rem" }}>Tu pedido ha sido procesado con éxito. Recibirás un correo con los detalles en breve.</p>
             <button 
               onClick={() => router.push("/dashboard/cliente/pedidos")}
@@ -105,10 +105,9 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fdf8f4", display: "flex", flexDirection: "column", fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#fdf8f4", display: "flex", flexDirection: "column", fontFamily: "var(--font-sans, Inter, sans-serif)" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap');
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slideUp { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .input-stella:focus { border-bottom: 2px solid #b76e79 !important; outline: none; }
         .progress-line { height: 2px; background: #ede9e3; flex: 1; margin: 0 clamp(8px, 2vw, 16px); position: relative; overflow: hidden; }
@@ -200,7 +199,7 @@ export default function CheckoutPage() {
               {step === 1 ? (
                 <div className="animate-slideUp shipping-content" style={{ display: "flex", gap: "40px" }}>
                    <div style={{ flex: 1 }}>
-                     <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "2.2rem", color: COLORS.slateDeep, marginBottom: "32px" }}>
+                     <h2 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "2.2rem", color: COLORS.slateDeep, marginBottom: "32px" }}>
                        Detalles de <em style={{ color: COLORS.rose }}>Envío</em>
                      </h2>
                      
@@ -324,7 +323,7 @@ export default function CheckoutPage() {
                     <div style={{ display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
   
                       <div style={{ textAlign: "center" }}>
-                        <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "2.5rem", color: COLORS.slateDeep, marginBottom: "4px" }}>
+                        <h2 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "2.5rem", color: COLORS.slateDeep, marginBottom: "4px" }}>
                           Detalles de <em style={{ color: COLORS.rose }}>Pago</em>
                         </h2>
                         <p style={{ color: COLORS.slate, fontSize: "0.95rem", margin: 0 }}>Seguro y encriptado vía Stripe</p>
@@ -467,7 +466,7 @@ export default function CheckoutPage() {
           {/* ── Summary (Right) ── */}
           <aside className="summary-panel" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             <div style={{ background: "#ffffff", borderRadius: "24px", padding: "32px", boxShadow: "0 10px 40px rgba(112, 128, 144, 0.05)", border: "1px solid rgba(112, 128, 144, 0.1)" }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.5rem", color: "#4a5568", marginBottom: "24px" }}>Resumen de pedido</h3>
+              <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.5rem", color: "#4a5568", marginBottom: "24px" }}>Resumen de pedido</h3>
               
               <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "24px", maxHeight: "300px", overflowY: "auto", paddingRight: "8px" }}>
                 {cartItems.map((item, idx) => (

@@ -76,10 +76,10 @@ function Stat({
       className={`
         rounded-xl
         p-4
-        text-white
+        text-[#f6f4ef]
         ${color}
-        ${onClick ? "cursor-pointer hover:scale-[1.03]" : ""}
-        transition
+        ${onClick ? "cursor-pointer hover:shadow-lg shadow-[0_4px_12px_rgba(140,151,104,0.15)]" : ""}
+        transition-all duration-300
       `}
     >
       <p className="text-xs opacity-80">{label}</p>

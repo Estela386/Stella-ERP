@@ -37,17 +37,17 @@ export default function InventoryToolbar({ search, setSearch }: Props) {
             h-10
             rounded-full
             border border-[#E2E2E2]
-            bg-[#F8F6F2]
+            bg-[#f6f4ef]
             px-5
-            text-sm text-[#1C1C1C]
+            text-sm text-[#708090]
             placeholder:text-[#9A9A9A]
-            transition
-
+            transition-all duration-300
+ 
             focus:outline-none
             focus:border-[#B76E79]
             focus:ring-1 focus:ring-[#B76E79]
-
-            hover:border-[#C8B6B0]
+ 
+            hover:border-[#708090]/50
           "
         />
       </div>

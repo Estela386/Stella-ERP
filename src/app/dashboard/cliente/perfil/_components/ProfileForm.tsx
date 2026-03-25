@@ -58,7 +58,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2 style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
           fontSize: "1.5rem",
           fontWeight: 600,
           color: "#4a5568",
@@ -147,7 +147,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
         {/* Name Field */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <label style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
             fontSize: "0.75rem",
             color: "#708090",
             fontWeight: 500,
@@ -184,7 +184,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
         {/* Email Field */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <label style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
             fontSize: "0.75rem",
             color: "#708090",
             fontWeight: 500,
@@ -221,7 +221,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
         {/* Account Type Field */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <label style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
             fontSize: "0.75rem",
             color: "#708090",
             fontWeight: 500,

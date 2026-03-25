@@ -17,7 +17,7 @@ export default function FaqAccordion({ items }: Props) {
     return (
       <div style={{
         textAlign: "center", padding: "3rem 1rem",
-        color: "var(--slate,#708090)", fontFamily: "'DM Sans',sans-serif",
+        color: "var(--slate,#708090)", fontFamily: "var(--font-sans, Inter, sans-serif)",
         fontSize: "0.95rem",
       }}>
         No hay preguntas en esta categoría aún.
@@ -93,7 +93,7 @@ export default function FaqAccordion({ items }: Props) {
             {isOpen && (
               <div style={{
                 padding: "0 22px 22px",
-                fontFamily: "'DM Sans',sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "clamp(0.875rem,1.3vw,0.95rem)",
                 color: "#708090",
                 lineHeight: 1.75,

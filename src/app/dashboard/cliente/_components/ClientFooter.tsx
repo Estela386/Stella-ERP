@@ -38,8 +38,7 @@ export default function ClientFooter() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        .footer-link { transition: color 0.18s ease; }
+                .footer-link { transition: color 0.18s ease; }
         .footer-link:hover { color: rgba(246,244,239,0.92) !important; }
         .footer-social {
           width: 34px; height: 34px;
@@ -65,7 +64,7 @@ export default function ClientFooter() {
       <footer
         style={{
           background: "#3d4a5c",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans, Inter, sans-serif)",
         }}
       >
         <div
@@ -93,11 +92,11 @@ export default function ClientFooter() {
                     display: "flex", alignItems: "center", justifyContent: "center",
                   }}
                 >
-                  <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.1rem", fontWeight: 600, color: "#b76e79", fontStyle: "italic" }}>
+                  <span style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.1rem", fontWeight: 600, color: "#b76e79", fontStyle: "italic" }}>
                     S
                   </span>
                 </div>
-                <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.5rem", fontWeight: 400, color: "#f6f4ef", letterSpacing: "0.04em" }}>
+                <span style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.5rem", fontWeight: 400, color: "#f6f4ef", letterSpacing: "0.04em" }}>
                   Stella
                 </span>
               </div>
@@ -126,7 +125,7 @@ export default function ClientFooter() {
               <div key={section.title}>
                 <h4
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                     fontSize: "0.63rem",
                     fontWeight: 500,
                     letterSpacing: "0.2em",
@@ -149,7 +148,7 @@ export default function ClientFooter() {
                         className="footer-link"
                         style={{
                           background: "none", border: "none", cursor: "pointer", padding: 0,
-                          fontFamily: "'DM Sans', sans-serif",
+                          fontFamily: "var(--font-sans, Inter, sans-serif)",
                           fontSize: "0.84rem",
                           color: "rgba(246,244,239,0.4)",
                           textAlign: "left",
@@ -180,7 +179,7 @@ export default function ClientFooter() {
             className="flex flex-col md:flex-row justify-between items-center"
             style={{ padding: "20px 0", gap: 12 }}
           >
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.76rem", color: "rgba(246,244,239,0.28)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.76rem", color: "rgba(246,244,239,0.28)", margin: 0 }}>
               © {new Date().getFullYear()} Stella-Ayarela. Todos los derechos reservados.
             </p>
 
@@ -200,7 +199,7 @@ export default function ClientFooter() {
                   }
                   style={{
                     background: "none", border: "none", cursor: "pointer", padding: 0,
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                     fontSize: "0.74rem",
                     color: "rgba(246,244,239,0.28)",
                   }}

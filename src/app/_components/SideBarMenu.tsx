@@ -63,7 +63,6 @@ export default function SidebarMenu() {
     return (
       <>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
           @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
           .sk { animation: pulse 1.6s ease-in-out infinite; background: rgba(246,244,239,0.15); border-radius: 8px; }
         `}</style>
@@ -90,7 +89,6 @@ export default function SidebarMenu() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
         @keyframes fadeIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
         .sidebar-item { animation: fadeIn 0.4s cubic-bezier(.22,1,.36,1) both; }
         .logout-btn:hover { color: ${ROSE} !important; background: rgba(183,110,121,0.08) !important; border-color: rgba(183,110,121,0.2) !important; }
@@ -125,7 +123,7 @@ export default function SidebarMenu() {
           display: "flex", flexDirection: "column",
           borderRadius: "0 24px 24px 0",
           boxShadow: "6px 0 32px rgba(74,85,104,0.25), 2px 0 8px rgba(140,151,104,0.1)",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans, Inter, sans-serif)",
           position: "relative",
           overflow: "hidden",
         }}
@@ -151,7 +149,7 @@ export default function SidebarMenu() {
               style={{ filter: "brightness(0) invert(1)", opacity: 0.85 }}
             />
             <p style={{
-              fontFamily: "'DM Sans',sans-serif",
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
               fontSize: "0.58rem", fontWeight: 500,
               letterSpacing: "0.22em", textTransform: "uppercase",
               color: "rgba(246,244,239,0.45)",
@@ -168,7 +166,7 @@ export default function SidebarMenu() {
             border: "1px solid rgba(183,110,121,0.3)",
             alignItems: "center", justifyContent: "center",
           }}>
-            <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.3rem", fontWeight: 600, color: ROSE, fontStyle: "italic" }}>
+            <span style={{ fontFamily: "var(--font-serif)", fontSize: "1.3rem", fontWeight: 600, color: ROSE, fontStyle: "italic" }}>
               S
             </span>
           </div>
@@ -188,7 +186,7 @@ export default function SidebarMenu() {
           className="sidebar-nav"
         >
           <p className="hidden md:block" style={{
-            fontFamily: "'DM Sans',sans-serif",
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
             fontSize: "0.58rem", fontWeight: 500,
             letterSpacing: "0.18em", textTransform: "uppercase",
             color: "rgba(246,244,239,0.35)",
@@ -239,7 +237,7 @@ export default function SidebarMenu() {
                   {/* Label — solo md+ */}
                   <span className="hidden md:block" style={{
                     flex: 1,
-                    fontFamily: "'DM Sans',sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                     fontSize: "0.84rem",
                     fontWeight: active ? 600 : 400,
                     color: active ? BG : hovered ? "rgba(246,244,239,0.9)" : "rgba(246,244,239,0.6)",
@@ -298,7 +296,7 @@ export default function SidebarMenu() {
             {/* Label — solo md+ */}
             <span className="hidden md:block" style={{
               flex: 1,
-              fontFamily: "'DM Sans',sans-serif",
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
               fontSize: "0.84rem",
               fontWeight: 400,
               color: shopHovered ? ROSE : "rgba(246,244,239,0.45)",
@@ -336,7 +334,7 @@ export default function SidebarMenu() {
               border: "1px solid rgba(183,110,121,0.4)",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-              <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.05rem", fontWeight: 600, color: ROSE, fontStyle: "italic" }}>
+              <span style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.05rem", fontWeight: 600, color: ROSE, fontStyle: "italic" }}>
                 {usuario?.nombre?.charAt(0)?.toUpperCase() || "U"}
               </span>
             </div>
@@ -350,13 +348,13 @@ export default function SidebarMenu() {
               border: "1px solid rgba(183,110,121,0.35)",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-              <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1rem", fontWeight: 600, color: ROSE, fontStyle: "italic" }}>
+              <span style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1rem", fontWeight: 600, color: ROSE, fontStyle: "italic" }}>
                 {usuario?.nombre?.charAt(0)?.toUpperCase() || "U"}
               </span>
             </div>
             <div style={{ overflow: "hidden", flex: 1 }}>
               <p style={{
-                fontFamily: "'DM Sans',sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "0.82rem", fontWeight: 500,
                 color: "rgba(246,244,239,0.85)",
                 margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
@@ -364,7 +362,7 @@ export default function SidebarMenu() {
                 {usuario?.nombre || roleLabel}
               </p>
               <p style={{
-                fontFamily: "'DM Sans',sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "0.64rem",
                 color: "rgba(246,244,239,0.38)",
                 margin: 0,
@@ -386,7 +384,7 @@ export default function SidebarMenu() {
               border: "1px solid rgba(246,244,239,0.1)",
               background: "rgba(246,244,239,0.04)",
               color: "rgba(246,244,239,0.45)",
-              fontFamily: "'DM Sans',sans-serif",
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
               fontSize: "0.8rem", cursor: "pointer",
               transition: "all 0.18s ease",
             }}

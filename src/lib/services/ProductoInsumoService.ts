@@ -61,15 +61,13 @@ export class ProductoInsumoService {
       id_opcion_valor: item.id_opcion_valor || null,
     }));
 
-
-    const { data, error: errorInsert } = await this.repository.createMany(
-      dataToInsert
-    );
+    const { data, error: errorInsert } = await this.repository.createMany(dataToInsert);
 
     if (errorInsert) {
       return { success: false, error: errorInsert };
     }
 
+    return { success: true, error: null };
   }
 
   /**

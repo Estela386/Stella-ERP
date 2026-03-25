@@ -20,6 +20,15 @@ export default function ProductRow({
       <td className="px-4 py-3 text-center">JOY-{producto.id}</td>
       <td className="px-4 py-3">{producto.nombre}</td>
       <td className="px-4 py-3">{producto.categoria.nombre}</td>
+      <td className="px-4 py-3 text-center">
+        <span className={`px-2 py-0.5 rounded-full text-[0.65rem] font-bold uppercase tracking-wider ${
+          producto.tipo === "fabricado" 
+            ? "bg-[#8c9768]/15 text-[#8c9768]" 
+            : "bg-[#b76e79]/15 text-[#b76e79]"
+        }`}>
+          {producto.tipo === "fabricado" ? "Fabricado" : "Revendido"}
+        </span>
+      </td>
       <td className="px-4 py-3 text-center">{producto.stock_actual}</td>
       <td className="px-4 py-3 text-center">${producto.precio}</td>
       <td className="px-4 py-3 text-center">${producto.costo}</td>
@@ -27,7 +36,7 @@ export default function ProductRow({
         ${producto.costo_mayorista || "N/A"}
       </td>
 
-      {/* 🔹 Badge de stock */}
+      {/* Badge de stock */}
       <td className="px-4 py-3 items-cente">
         <div className="flex justify-center items-center">
           <StockBadge
@@ -37,20 +46,20 @@ export default function ProductRow({
         </div>
       </td>
 
-      {/* 🔹 Personalizable */}
+      {/* Personalizable */}
       <td className="px-4 py-3 flex justify-center items-center">
         <div
-          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+          className={`px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider ${
             producto.es_personalizable
-              ? "bg-[#B76E79]/15 text-[#B76E79]"
-              : "bg-gray-200 text-gray-600"
+              ? "bg-[#b76e79]/15 text-[#b76e79]"
+              : "bg-gray-100 text-[#708090]"
           }`}
         >
           {producto.es_personalizable ? "Sí" : "No"}
         </div>
       </td>
 
-      {/* 🔹 Editar / Eliminar */}
+      {/* Editar / Eliminar */}
       <td className="px-4 py-3 text-right space-x-3">
         <button
           className="text-[#708090] hover:text-[#B76E79] transition"

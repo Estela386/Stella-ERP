@@ -39,7 +39,7 @@ export default function FaqWholesale() {
       <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
         <span style={{ height:1, width:36, background:"#b76e79", flexShrink:0 }} />
         <span style={{
-          fontFamily:"'DM Sans',sans-serif",
+          fontFamily:"var(--font-sans, Inter, sans-serif)",
           fontSize:"0.62rem", fontWeight:500,
           textTransform:"uppercase", letterSpacing:"0.2em",
           color:"#b76e79",
@@ -61,7 +61,7 @@ export default function FaqWholesale() {
         <em style={{ color:"#b76e79" }}>Stella</em>
       </h2>
       <p style={{
-        fontFamily:"'DM Sans',sans-serif",
+        fontFamily:"var(--font-sans, Inter, sans-serif)",
         fontSize:"0.9rem",
         color:"rgba(246,244,239,0.55)",
         margin:"0 0 32px",
@@ -94,7 +94,7 @@ export default function FaqWholesale() {
               {/* Número */}
               <span style={{
                 position:"absolute", top:12, right:14,
-                fontFamily:"'Cormorant Garamond',serif",
+                fontFamily:"var(--font-serif, 'Cormorant Garamond', serif)",
                 fontSize:"2rem", fontWeight:400,
                 color:"rgba(246,244,239,0.08)",
                 lineHeight:1,
@@ -112,14 +112,14 @@ export default function FaqWholesale() {
               </div>
 
               <p style={{
-                fontFamily:"'Cormorant Garamond',serif",
+                fontFamily:"var(--font-serif, 'Cormorant Garamond', serif)",
                 fontSize:"1rem", fontWeight:600, fontStyle:"italic",
                 color:"rgba(246,244,239,0.82)", margin:"0 0 6px",
               }}>
                 {step.title}
               </p>
               <p style={{
-                fontFamily:"'DM Sans',sans-serif",
+                fontFamily:"var(--font-sans, Inter, sans-serif)",
                 fontSize:"0.8rem",
                 color:"rgba(246,244,239,0.45)",
                 margin:0, lineHeight:1.6,
@@ -148,7 +148,7 @@ export default function FaqWholesale() {
             padding:"5px 13px", borderRadius:99,
             background:"rgba(183,110,121,0.12)",
             border:"1px solid rgba(183,110,121,0.3)",
-            fontFamily:"'DM Sans',sans-serif",
+            fontFamily:"var(--font-sans, Inter, sans-serif)",
             fontSize:"0.75rem",
             color:"rgba(246,244,239,0.7)",
           }}>
@@ -165,7 +165,7 @@ export default function FaqWholesale() {
           display:"inline-flex", alignItems:"center", gap:8,
           padding:"11px 24px", borderRadius:99,
           background:"#b76e79", color:"#f6f4ef",
-          fontFamily:"'DM Sans',sans-serif",
+          fontFamily:"var(--font-sans, Inter, sans-serif)",
           fontSize:"0.84rem", fontWeight:500,
           textDecoration:"none",
           boxShadow:"0 4px 16px rgba(183,110,121,0.35)",

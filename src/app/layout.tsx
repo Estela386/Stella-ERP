@@ -1,16 +1,31 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, Inter, Manrope } from "next/font/google";
 import { CartProvider } from "@lib/context/CartContext";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// ── Serif elegante — Títulos, Branding, Logo ──────────────────
+const cormorant = Cormorant_Garamond({
+  variable: "--font-serif",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// ── Sans-serif primaria — UI, ERP, Formularios ─────────────────
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+// ── Sans-serif expresiva — Subtítulos, Botones, Badges ─────────
+const manrope = Manrope({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -33,11 +48,12 @@ export default function RootLayout({
         <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#f8eedc]`}
+        className={`${cormorant.variable} ${inter.variable} ${manrope.variable} antialiased bg-[#f6f4ef] text-[#708090]`}
       >
         <CartProvider>
           {children}
         </CartProvider>
+        <ChatbotPage />
       </body>
     </html>
   );

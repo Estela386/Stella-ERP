@@ -79,13 +79,13 @@ export default function ProfileStats({ stats }: ProfileStatsProps) {
           </div>
           <div>
             <div style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
               fontSize: "0.75rem",
               color: "#708090",
               fontWeight: 500
             }}>{card.label}</div>
             <div style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
               fontSize: "1.4rem",
               fontWeight: 600,
               color: "#4a5568"

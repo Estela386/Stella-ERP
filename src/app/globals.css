@@ -1,39 +1,137 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════
+   SISTEMA TIPOGRÁFICO — Stella ERP
+   ─────────────────────────────────────────────────────────────
+   --font-serif    → Cormorant Garamond  (Títulos, Logo, Branding)
+   --font-sans     → Inter               (UI, Tablas, Inputs ERP)
+   --font-display  → Manrope             (Botones, Badges, Subtítulos)
+   ═══════════════════════════════════════════════════════════════ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f4ef;
+  --foreground: #1a1a2e;
+
+  /* Escala tipográfica */
+  --text-xs:   0.72rem;
+  --text-sm:   0.85rem;
+  --text-base: 1rem;
+  --text-lg:   1.15rem;
+  --text-xl:   1.35rem;
+  --text-2xl:  1.65rem;
+  --text-3xl:  2.1rem;
+  --text-4xl:  2.8rem;
+  --text-5xl:  3.6rem;
+
+  /* Tracking */
+  --tracking-tight:  -0.02em;
+  --tracking-normal:  0em;
+  --tracking-wide:    0.05em;
+  --tracking-widest:  0.18em;
 }
 
-@theme inline {
+:root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #f8eedc;
-    --foreground: #ededed;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #ffffff;
-    --foreground: #f8eedc;
-  }
-}
-
+/* ── Reset base ─────────────────────────────────────────────── */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Clases de fuente semántica — úsalas en componentes ─────── */
+
+/* Serif: Cormorant Garamond — Branding, títulos editoriales */
+.font-serif,
+.font-brand {
+  font-family: var(--font-serif), "Cormorant Garamond", Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+/* Sans primaria: Inter — Texto UI, tablas, formularios */
+.font-sans,
+.font-ui {
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+}
+
+/* Manrope: etiquetas, botones, subtítulos de sección */
+.font-display {
+  font-family: var(--font-display), Manrope, system-ui, sans-serif;
+}
+
+/* ── Estilos semánticos de encabezados ──────────────────────── */
+h1, h2 {
+  font-family: var(--font-serif), "Cormorant Garamond", Georgia, serif;
+  font-weight: 500;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.1;
+}
+
+h3, h4 {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.25;
+}
+
+h5, h6, label, small,
+.label, .caption {
+  font-family: var(--font-sans), Inter, sans-serif;
+  font-weight: 500;
+}
+
+/* Inputs, selects, textareas — siempre Inter */
+input, select, textarea, button {
+  font-family: var(--font-sans), Inter, sans-serif;
+}
+
+/* Tablas — siempre Inter */
+table, th, td {
+  font-family: var(--font-sans), Inter, sans-serif;
+}
+
+/* Badges, pills, etiquetas de estado — Manrope */
+.badge, .pill, .tag {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+/* ── Utility classes extra ──────────────────────────────────── */
+.tracking-editorial {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.text-serif-hero {
+  font-family: var(--font-serif), "Cormorant Garamond", Georgia, serif;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+.text-erp-label {
+  font-family: var(--font-sans), Inter, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.text-erp-value {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-weight: 800;
 }
 
 /* ── Chatbot animations ─────────────────────────── */
-
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(10px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -77,4 +175,25 @@ body {
 }
 .gem-float {
   animation: floatUp 3s ease-in-out infinite;
+}
+
+/* ── Keyframes UI ───────────────────────────────────────────── */
+@keyframes slideIn {
+  from { transform: translateX(-40px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes float {
+  0%   { transform: translateY(0px);  }
+  50%  { transform: translateY(-2px); }
+  100% { transform: translateY(0px);  }
+}
+
+@layer utilities {
+  .preserve-3d  { transform-style: preserve-3d; }
+  .rotate-x-6   { transform: rotateX(6deg); }
+  .shadow-soft   { box-shadow: 0 6px 16px rgba(140,151,102,0.25); }
+  .shadow-medium { box-shadow: 0 14px 30px rgba(140,151,102,0.35); }
+  .shadow-accent { box-shadow: 0 14px 30px rgba(183,110,121,0.55); }
+  .animate-float { animation: float 3s ease-in-out infinite; }
 }

@@ -42,8 +42,8 @@ function ProductPill({ product }: { product: ProductoBasic }) {
         </div>
       )}
       <div>
-        <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "0.82rem", fontWeight: 600, color: "#4a5568", margin: 0, lineHeight: 1.2 }}>{product.nombre}</p>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: "#b76e79", margin: 0 }}>${product.precio?.toLocaleString()}</p>
+        <p style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "0.82rem", fontWeight: 600, color: "#4a5568", margin: 0, lineHeight: 1.2 }}>{product.nombre}</p>
+        <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.72rem", color: "#b76e79", margin: 0 }}>${product.precio?.toLocaleString()}</p>
       </div>
     </div>
   );
@@ -124,7 +124,6 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap');
         @keyframes heroFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
         @keyframes blobFloat { 0%,100%{transform:scale(1) translate(0,0)} 33%{transform:scale(1.04) translate(12px,-8px)} 66%{transform:scale(0.97) translate(-8px,6px)} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
@@ -161,7 +160,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
               color: "#b76e79", cursor: "pointer",
               backdropFilter: "blur(8px)",
               boxShadow: "0 2px 12px rgba(183,110,121,0.15)",
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
               fontSize: "0.78rem", fontWeight: 500,
               transition: "all 0.2s ease",
             }}
@@ -197,14 +196,14 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
         >
           <p
             className="hero-fade-0"
-            style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.65rem", fontWeight: 500, letterSpacing: "0.22em", textTransform: "uppercase", color: "#8c9768", marginBottom: 12 }}
+            style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", fontWeight: 500, letterSpacing: "0.22em", textTransform: "uppercase", color: "#8c9768", marginBottom: 12 }}
           >
             Stella Joyería
           </p>
 
           <h1
             className="hero-fade-1"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2.4rem,5vw,4.8rem)", fontWeight: 400, lineHeight: 1.08, color: "#4a5568", maxWidth: 540, margin: 0 }}
+            style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(2.4rem,5vw,4.8rem)", fontWeight: 400, lineHeight: 1.08, color: "#4a5568", maxWidth: 540, margin: 0 }}
           >
             {config.headline}<br />
             <em style={{ color: "#b76e79", fontStyle: "italic" }}>{config.accentWord}</em>
@@ -212,7 +211,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
 
           <p
             className="hero-fade-2"
-            style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "clamp(0.88rem,1.4vw,1rem)", color: "#708090", maxWidth: 400, lineHeight: 1.65, marginTop: 16 }}
+            style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "clamp(0.88rem,1.4vw,1rem)", color: "#708090", maxWidth: 400, lineHeight: 1.65, marginTop: 16 }}
           >
             {config.subheadline}
           </p>
@@ -220,7 +219,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
           <div className="hero-fade-3" style={{ display: "flex", gap: 12, marginTop: 32, flexWrap: "wrap" }}>
             <button
               onClick={() => router.push("/dashboard/cliente/catalogo")}
-              style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem", letterSpacing: "0.04em", fontWeight: 500, background: "#b76e79", color: "#f6f4ef", border: "none", borderRadius: 6, padding: "12px 28px", cursor: "pointer", boxShadow: "0 3px 12px rgba(183,110,121,0.22)", transition: "all 0.22s ease" }}
+              style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", letterSpacing: "0.04em", fontWeight: 500, background: "#b76e79", color: "#f6f4ef", border: "none", borderRadius: 6, padding: "12px 28px", cursor: "pointer", boxShadow: "0 3px 12px rgba(183,110,121,0.22)", transition: "all 0.22s ease" }}
               onMouseEnter={e => { const b = e.currentTarget; b.style.transform = "translateY(-2px)"; b.style.boxShadow = "0 10px 26px rgba(183,110,121,0.32)"; }}
               onMouseLeave={e => { const b = e.currentTarget; b.style.transform = "translateY(0)"; b.style.boxShadow = "0 3px 12px rgba(183,110,121,0.22)"; }}
             >
@@ -228,7 +227,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
             </button>
             <button
               onClick={() => router.push("/dashboard/cliente/catalogo")}
-              style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem", letterSpacing: "0.04em", fontWeight: 400, background: "transparent", color: "#708090", border: "1.5px solid rgba(112,128,144,0.35)", borderRadius: 6, padding: "12px 24px", cursor: "pointer", transition: "all 0.22s ease" }}
+              style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", letterSpacing: "0.04em", fontWeight: 400, background: "transparent", color: "#708090", border: "1.5px solid rgba(112,128,144,0.35)", borderRadius: 6, padding: "12px 24px", cursor: "pointer", transition: "all 0.22s ease" }}
               onMouseEnter={e => { const b = e.currentTarget; b.style.borderColor = "#708090"; b.style.color = "#4a5568"; b.style.background = "rgba(112,128,144,0.06)"; }}
               onMouseLeave={e => { const b = e.currentTarget; b.style.borderColor = "rgba(112,128,144,0.35)"; b.style.color = "#708090"; b.style.background = "transparent"; }}
             >
@@ -275,7 +274,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
 
             {/* Título */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", fontWeight: 500, color: "#4a5568", margin: 0 }}>
+              <h2 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.8rem", fontWeight: 500, color: "#4a5568", margin: 0 }}>
                 Editar <em style={{ color: "#b76e79" }}>Hero</em>
               </h2>
               <button
@@ -290,7 +289,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
 
               {/* ── Columna izquierda: imagen + textos ── */}
               <div>
-                <label style={{ display: "block", fontFamily: "'DM Sans',sans-serif", fontSize: "0.65rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.18em", color: "#708090", marginBottom: 10 }}>
+                <label style={{ display: "block", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.18em", color: "#708090", marginBottom: 10 }}>
                   Imagen principal
                 </label>
 
@@ -317,7 +316,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
                           <polyline points="17 8 12 3 7 8"/>
                           <line x1="12" y1="3" x2="12" y2="15"/>
                         </svg>
-                        <span style={{ fontFamily: "'DM Sans'", fontSize: "0.82rem", color: "#b76e79" }}>Cambiar imagen</span>
+                        <span style={{ fontFamily: "var(--font-sans)", fontSize: "0.82rem", color: "#b76e79" }}>Cambiar imagen</span>
                       </div>
                     </>
                   ) : (
@@ -329,8 +328,8 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
                           <polyline points="21 15 16 10 5 21"/>
                         </svg>
                       </div>
-                      <p style={{ fontFamily: "'DM Sans'", fontSize: "0.82rem", color: "#708090" }}>Haz clic para subir imagen</p>
-                      <p style={{ fontFamily: "'DM Sans'", fontSize: "0.72rem", color: "rgba(112,128,144,0.5)" }}>PNG, JPG, WEBP</p>
+                      <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.82rem", color: "#708090" }}>Haz clic para subir imagen</p>
+                      <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.72rem", color: "rgba(112,128,144,0.5)" }}>PNG, JPG, WEBP</p>
                     </div>
                   )}
                 </div>
@@ -342,7 +341,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
                   onChange={handleImageFile}
                 />
 
-                <p style={{ fontFamily: "'DM Sans'", fontSize: "0.72rem", color: "rgba(112,128,144,0.55)", marginTop: 8 }}>
+                <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.72rem", color: "rgba(112,128,144,0.55)", marginTop: 8 }}>
                   La imagen se aplica solo en esta sesión. Para que persista, coloca el archivo en{" "}
                   <code style={{ background: "rgba(112,128,144,0.08)", padding: "1px 5px", borderRadius: 4 }}>public/</code>{" "}
                   y actualiza <code style={{ background: "rgba(112,128,144,0.08)", padding: "1px 5px", borderRadius: 4 }}>imageUrl</code> en el código.
@@ -356,14 +355,14 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
                     { label: "Subtítulo", key: "subheadline" },
                   ] as { label: string; key: keyof HeroConfig }[]).map(field => (
                     <div key={field.key}>
-                      <label style={{ display: "block", fontFamily: "'DM Sans',sans-serif", fontSize: "0.63rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: "#708090", marginBottom: 6 }}>
+                      <label style={{ display: "block", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.63rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: "#708090", marginBottom: 6 }}>
                         {field.label}
                       </label>
                       <input
                         type="text"
                         value={draft[field.key] as string}
                         onChange={e => setDraft(d => ({ ...d, [field.key]: e.target.value }))}
-                        style={{ width: "100%", padding: "10px 14px", fontFamily: "'DM Sans',sans-serif", fontSize: "0.88rem", color: "#4a5568", background: "white", border: "1px solid rgba(112,128,144,0.22)", borderRadius: 8, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                        style={{ width: "100%", padding: "10px 14px", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", color: "#4a5568", background: "white", border: "1px solid rgba(112,128,144,0.22)", borderRadius: 8, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
                         onFocus={e => (e.currentTarget.style.borderColor = "rgba(183,110,121,0.5)")}
                         onBlur={e => (e.currentTarget.style.borderColor = "rgba(112,128,144,0.22)")}
                       />
@@ -375,14 +374,14 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
               {/* ── Columna derecha: selector de productos ── */}
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                  <label style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.65rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.18em", color: "#708090" }}>
+                  <label style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.18em", color: "#708090" }}>
                     Artículos destacados
                   </label>
                   <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(183,110,121,0.08)", border: "1px solid rgba(183,110,121,0.22)", color: "#b76e79", fontSize: "0.6rem", fontWeight: 500 }}>
                     máx. 3
                   </span>
                 </div>
-                <p style={{ fontFamily: "'DM Sans'", fontSize: "0.8rem", color: "rgba(112,128,144,0.65)", marginBottom: 14 }}>
+                <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.8rem", color: "rgba(112,128,144,0.65)", marginBottom: 14 }}>
                   Selecciona los productos del catálogo que aparecen en la imagen
                 </p>
 
@@ -408,10 +407,10 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
                             )}
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontFamily: "'DM Sans'", fontSize: "0.78rem", fontWeight: 500, color: selected ? "#4a5568" : "#708090", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>
+                            <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.78rem", fontWeight: 500, color: selected ? "#4a5568" : "#708090", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>
                               {product.nombre}
                             </p>
-                            <p style={{ fontFamily: "'DM Sans'", fontSize: "0.72rem", color: "#b76e79", margin: 0 }}>
+                            <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.72rem", color: "#b76e79", margin: 0 }}>
                               ${product.precio?.toLocaleString()}
                             </p>
                           </div>
@@ -426,7 +425,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
                       );
                     })}
                     {allProducts.length === 0 && (
-                      <div className="col-span-2" style={{ textAlign: "center", padding: "32px 0", fontFamily: "'DM Sans'", fontSize: "0.84rem", color: "rgba(112,128,144,0.5)" }}>
+                      <div className="col-span-2" style={{ textAlign: "center", padding: "32px 0", fontFamily: "var(--font-sans)", fontSize: "0.84rem", color: "rgba(112,128,144,0.5)" }}>
                         No hay productos en el catálogo
                       </div>
                     )}
@@ -439,14 +438,14 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 32, paddingTop: 24, borderTop: "1px solid rgba(112,128,144,0.12)" }}>
               <button
                 onClick={handleCancel}
-                style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem", padding: "10px 24px", borderRadius: 6, border: "1.5px solid rgba(112,128,144,0.25)", background: "transparent", color: "#708090", cursor: "pointer", transition: "all 0.18s" }}
+                style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", padding: "10px 24px", borderRadius: 6, border: "1.5px solid rgba(112,128,144,0.25)", background: "transparent", color: "#708090", cursor: "pointer", transition: "all 0.18s" }}
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem", letterSpacing: "0.04em", padding: "10px 28px", borderRadius: 6, border: "none", background: saving ? "rgba(183,110,121,0.5)" : "#b76e79", color: "#f6f4ef", cursor: saving ? "not-allowed" : "pointer", boxShadow: "0 3px 12px rgba(183,110,121,0.22)", display: "flex", alignItems: "center", gap: 8, transition: "all 0.22s" }}
+                style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", letterSpacing: "0.04em", padding: "10px 28px", borderRadius: 6, border: "none", background: saving ? "rgba(183,110,121,0.5)" : "#b76e79", color: "#f6f4ef", cursor: saving ? "not-allowed" : "pointer", boxShadow: "0 3px 12px rgba(183,110,121,0.22)", display: "flex", alignItems: "center", gap: 8, transition: "all 0.22s" }}
               >
                 {saving ? (
                   <>

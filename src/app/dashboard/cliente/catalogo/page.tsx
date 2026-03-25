@@ -54,10 +54,10 @@ function PriceRangeSlider({
     <div style={{ padding: "8px 4px" }}>
       
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-        <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.78rem", color: ROSE, fontWeight: 500 }}>
+        <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: ROSE, fontWeight: 500 }}>
           ${value.min.toLocaleString()}
         </span>
-        <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.78rem", color: ROSE, fontWeight: 500 }}>
+        <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: ROSE, fontWeight: 500 }}>
           ${value.max.toLocaleString()}
         </span>
       </div>
@@ -130,7 +130,7 @@ function PriceRangeSlider({
               background: value.min === preset.range.min && value.max === preset.range.max
                 ? "rgba(183,110,121,0.1)" : "transparent",
               color: ROSE,
-              fontFamily: "'DM Sans',sans-serif",
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
               fontSize: "0.66rem",
               cursor: "pointer",
               transition: "all 0.15s",
@@ -162,7 +162,7 @@ function FilterDropdown({
           border: activeCount ? `1.5px solid ${ROSE}` : "1.5px solid rgba(112,128,144,0.22)",
           background: activeCount ? "rgba(183,110,121,0.06)" : "white",
           color: activeCount ? ROSE : SLATE,
-          fontFamily: "'DM Sans',sans-serif",
+          fontFamily: "var(--font-sans, Inter, sans-serif)",
           fontSize: "0.8rem", fontWeight: 500,
           cursor: "pointer",
           transition: "all 0.18s ease",
@@ -258,7 +258,7 @@ function ProductListCard({ product, onClick, esMayorista }: { product: ProductoC
             padding: "3px 8px", borderRadius: 20,
             background: "rgba(183,110,121,0.9)",
             color: "white", fontSize: "0.6rem", fontWeight: 600,
-            fontFamily: "'DM Sans',sans-serif",
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
             display: "flex", alignItems: "center", gap: 3,
           }}>
             <Sparkles size={9} /> Personalizable
@@ -270,15 +270,15 @@ function ProductListCard({ product, onClick, esMayorista }: { product: ProductoC
       <div style={{ flex: 1, padding: "clamp(16px,2.5vw,24px)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div>
           {(product as any).category && (
-            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.62rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 6px" }}>
+            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.62rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 6px" }}>
               {(product as any).category}
             </p>
           )}
-          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.1rem,2vw,1.4rem)", fontWeight: 600, color: DEEP, margin: "0 0 8px", lineHeight: 1.2 }}>
+          <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(1.1rem,2vw,1.4rem)", fontWeight: 600, color: DEEP, margin: "0 0 8px", lineHeight: 1.2 }}>
             {product.name}
           </h3>
           {(product as any).descripcion && (
-            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem", color: SLATE, lineHeight: 1.6, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", color: SLATE, lineHeight: 1.6, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
               {(product as any).descripcion}
             </p>
           )}
@@ -286,11 +286,11 @@ function ProductListCard({ product, onClick, esMayorista }: { product: ProductoC
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, flexWrap: "wrap", gap: 10 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", fontWeight: 500, color: esMayorista ? ROSE : DEEP, fontStyle: "italic" }}>
+            <span style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.5rem", fontWeight: 500, color: esMayorista ? ROSE : DEEP, fontStyle: "italic" }}>
               ${discountPrice?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
             </span>
             {esMayorista && (
-              <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.6rem", fontWeight: 700, color: ROSE, background: "rgba(183,110,121,0.1)", padding: "2px 6px", borderRadius: 4 }}>
+              <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.6rem", fontWeight: 700, color: ROSE, background: "rgba(183,110,121,0.1)", padding: "2px 6px", borderRadius: 4 }}>
                 Socio Stella -30%
               </span>
             )}
@@ -298,7 +298,7 @@ function ProductListCard({ product, onClick, esMayorista }: { product: ProductoC
 
           {(product as any).stock_actual !== undefined && (
             <span style={{
-              fontFamily: "'DM Sans',sans-serif", fontSize: "0.72rem", fontWeight: 500,
+              fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.72rem", fontWeight: 500,
               padding: "4px 10px", borderRadius: 20,
               background: (product as any).stock_actual > 0 ? "rgba(140,151,104,0.1)" : "rgba(183,110,121,0.08)",
               color: (product as any).stock_actual > 0 ? SAGE : ROSE,
@@ -364,7 +364,7 @@ function ProductGridCard({ product, onClick, esMayorista }: { product: ProductoC
             background: "rgba(183,110,121,0.88)",
             backdropFilter: "blur(4px)",
             color: "white", fontSize: "0.58rem", fontWeight: 600,
-            fontFamily: "'DM Sans',sans-serif",
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
             display: "flex", alignItems: "center", gap: 3,
           }}>
             <Sparkles size={8} /> Personalizable
@@ -378,7 +378,7 @@ function ProductGridCard({ product, onClick, esMayorista }: { product: ProductoC
             background: "rgba(246,244,239,0.6)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.72rem", fontWeight: 600, color: SLATE, background: "white", padding: "4px 12px", borderRadius: 20, border: "1px solid rgba(112,128,144,0.2)" }}>
+            <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.72rem", fontWeight: 600, color: SLATE, background: "white", padding: "4px 12px", borderRadius: 20, border: "1px solid rgba(112,128,144,0.2)" }}>
               Sin stock
             </span>
           </div>
@@ -388,12 +388,12 @@ function ProductGridCard({ product, onClick, esMayorista }: { product: ProductoC
       {/* Info */}
       <div style={{ padding: "0 2px" }}>
         {(product as any).category && (
-          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.6rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 4px" }}>
+          <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.6rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 4px" }}>
             {(product as any).category}
           </p>
         )}
         <h3 style={{
-          fontFamily: "'Cormorant Garamond',serif",
+          fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
           fontSize: "1.05rem", fontWeight: 600,
           color: hovered ? DEEP : SLATE,
           margin: "0 0 6px", lineHeight: 1.2,
@@ -406,7 +406,7 @@ function ProductGridCard({ product, onClick, esMayorista }: { product: ProductoC
             <span key={i} style={{ color: ROSE, fontSize: "0.62rem" }}>★</span>
           ))}
         </div>
-        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.15rem", fontWeight: 500, color: esMayorista ? ROSE : DEEP, fontStyle: "italic", margin: "6px 0 0" }}>
+        <p style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.15rem", fontWeight: 500, color: esMayorista ? ROSE : DEEP, fontStyle: "italic", margin: "6px 0 0" }}>
           ${discountPrice?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
           {esMayorista && <span style={{ fontSize: '0.6rem', fontStyle: 'normal', opacity: 0.8, marginLeft: 4 }}>(-30%)</span>}
         </p>
@@ -576,8 +576,7 @@ export default function CatalogPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+                @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
         .cat-fade { animation: fadeUp 0.45s cubic-bezier(.22,1,.36,1) both; }
         select { -webkit-appearance:none; appearance:none; }
         input[type=range] { -webkit-appearance:none; appearance:none; height:4px; background:transparent; }
@@ -586,22 +585,22 @@ export default function CatalogPage() {
         .product-link { text-decoration: none; }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: BG, fontFamily: "'DM Sans',sans-serif" }}>
+      <div style={{ minHeight: "100vh", background: BG, fontFamily: "var(--font-sans, Inter, sans-serif)" }}>
         <HeaderClient />
         <ChatbotPage />
         <main style={{ maxWidth: 1280, margin: "0 auto", padding: "clamp(24px,4vw,48px) clamp(16px,4vw,40px)" }}>
 
           {/* ── Header de sección ── */}
           <div style={{ marginBottom: 32 }}>
-            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.63rem", fontWeight: 500, letterSpacing: "0.2em", textTransform: "uppercase", color: SAGE, margin: "0 0 8px" }}>
+            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.63rem", fontWeight: 500, letterSpacing: "0.2em", textTransform: "uppercase", color: SAGE, margin: "0 0 8px" }}>
               Stella Designs
             </p>
             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-              <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 400, color: DEEP, margin: 0, lineHeight: 1.1 }}>
+              <h1 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 400, color: DEEP, margin: 0, lineHeight: 1.1 }}>
                 Nuestro <em style={{ color: ROSE, fontStyle: "italic" }}>Catálogo</em>
               </h1>
               {!loading && (
-                <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.78rem", color: SLATE, padding: "3px 12px", borderRadius: 20, background: "rgba(112,128,144,0.08)", border: "1px solid rgba(112,128,144,0.15)" }}>
+                <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: SLATE, padding: "3px 12px", borderRadius: 20, background: "rgba(112,128,144,0.08)", border: "1px solid rgba(112,128,144,0.15)" }}>
                   {filtered.length} {filtered.length === 1 ? "producto" : "productos"}
                 </span>
               )}
@@ -632,7 +631,7 @@ export default function CatalogPage() {
                     borderRadius: 20,
                     border: "1.5px solid rgba(112,128,144,0.2)",
                     background: BG,
-                    fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem", color: DEEP,
+                    fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", color: DEEP,
                     outline: "none", boxSizing: "border-box",
                     transition: "border-color 0.2s",
                   }}
@@ -686,14 +685,14 @@ export default function CatalogPage() {
                               {sel && <svg width="9" height="9" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>}
                             </div>
                             <input type="checkbox" checked={sel} onChange={() => toggleFilter(cat, opt)} style={{ display: "none" }} />
-                            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem", color: sel ? DEEP : SLATE, fontWeight: sel ? 500 : 400 }}>
+                            <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", color: sel ? DEEP : SLATE, fontWeight: sel ? 500 : 400 }}>
                               {opt}
                             </span>
                           </label>
                         );
                       })}
                       {opts.length === 0 && (
-                        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.78rem", color: "rgba(112,128,144,0.5)", textAlign: "center", padding: "12px 0", margin: 0 }}>
+                        <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: "rgba(112,128,144,0.5)", textAlign: "center", padding: "12px 0", margin: 0 }}>
                           Sin opciones
                         </p>
                       )}
@@ -730,7 +729,7 @@ export default function CatalogPage() {
                   padding: "8px 14px", borderRadius: 20,
                   border: "1.5px solid rgba(112,128,144,0.22)",
                   background: "transparent", color: SLATE,
-                  fontFamily: "'DM Sans',sans-serif", fontSize: "0.8rem",
+                  fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.8rem",
                   cursor: "pointer",
                 }}
                 className="flex md:hidden"
@@ -745,7 +744,7 @@ export default function CatalogPage() {
 
               {/* Ordenar */}
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.68rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(112,128,144,0.6)" }}>
+                <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.68rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(112,128,144,0.6)" }}>
                   Ordenar
                 </span>
                 <div style={{ position: "relative" }}>
@@ -757,7 +756,7 @@ export default function CatalogPage() {
                       borderRadius: 20,
                       border: "1.5px solid rgba(112,128,144,0.2)",
                       background: BG,
-                      fontFamily: "'DM Sans',sans-serif", fontSize: "0.8rem",
+                      fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.8rem",
                       color: DEEP, cursor: "pointer", outline: "none",
                       backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23708090' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
                       backgroundRepeat: "no-repeat",
@@ -816,7 +815,7 @@ export default function CatalogPage() {
                       border: `1px solid rgba(183,110,121,0.3)`,
                       background: "rgba(183,110,121,0.06)",
                       color: ROSE,
-                      fontFamily: "'DM Sans',sans-serif", fontSize: "0.78rem",
+                      fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem",
                       cursor: "pointer", transition: "all 0.15s",
                     }}
                   >
@@ -829,7 +828,7 @@ export default function CatalogPage() {
                   <button
                     className="filter-chip"
                     onClick={() => setPriceFilter(priceRange)}
-                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, border: `1px solid rgba(183,110,121,0.3)`, background: "rgba(183,110,121,0.06)", color: ROSE, fontFamily: "'DM Sans',sans-serif", fontSize: "0.78rem", cursor: "pointer", transition: "all 0.15s" }}
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, border: `1px solid rgba(183,110,121,0.3)`, background: "rgba(183,110,121,0.06)", color: ROSE, fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", cursor: "pointer", transition: "all 0.15s" }}
                   >
                     <span style={{ fontSize: "0.62rem", color: "rgba(183,110,121,0.6)" }}>Precio</span>
                     ${priceFilter.min.toLocaleString()} – ${priceFilter.max.toLocaleString()}
@@ -838,7 +837,7 @@ export default function CatalogPage() {
                 )}
                 <button
                   onClick={clearAll}
-                  style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.76rem", color: SLATE, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}
+                  style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.76rem", color: SLATE, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}
                 >
                   Limpiar todo
                 </button>
@@ -855,13 +854,13 @@ export default function CatalogPage() {
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   style={{ width: 40, height: 40, borderRadius: "50%", border: `3px solid rgba(183,110,121,0.15)`, borderTopColor: ROSE }}
                 />
-                <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.84rem", color: SLATE }}>
+                <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.84rem", color: SLATE }}>
                   Preparando tu colección…
                 </p>
               </div>
             ) : error ? (
               <div style={{ textAlign: "center", padding: "60px 0" }}>
-                <div style={{ display: "inline-block", padding: "12px 24px", borderRadius: 12, background: "rgba(183,110,121,0.08)", border: "1px solid rgba(183,110,121,0.2)", color: ROSE, fontFamily: "'DM Sans',sans-serif", fontSize: "0.88rem" }}>
+                <div style={{ display: "inline-block", padding: "12px 24px", borderRadius: 12, background: "rgba(183,110,121,0.08)", border: "1px solid rgba(183,110,121,0.2)", color: ROSE, fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem" }}>
                   {error}
                 </div>
               </div>
@@ -870,15 +869,15 @@ export default function CatalogPage() {
                 <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(112,128,144,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
                   <Search size={24} style={{ color: "rgba(112,128,144,0.4)" }} />
                 </div>
-                <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: DEEP, margin: "0 0 8px" }}>
+                <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.5rem", color: DEEP, margin: "0 0 8px" }}>
                   Sin <em style={{ color: ROSE }}>resultados</em>
                 </h3>
-                <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.84rem", color: SLATE, marginBottom: 20 }}>
+                <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.84rem", color: SLATE, marginBottom: 20 }}>
                   No encontramos productos con esos filtros
                 </p>
                 <button
                   onClick={clearAll}
-                  style={{ padding: "10px 24px", borderRadius: 6, border: "none", background: ROSE, color: "white", fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem", cursor: "pointer" }}
+                  style={{ padding: "10px 24px", borderRadius: 6, border: "none", background: ROSE, color: "white", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", cursor: "pointer" }}
                 >
                   Limpiar filtros
                 </button>
@@ -940,7 +939,7 @@ export default function CatalogPage() {
                 <div style={{ width: 44, height: 4, borderRadius: 4, background: "rgba(112,128,144,0.2)" }} />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", fontWeight: 500, color: DEEP, margin: 0 }}>
+                <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.5rem", fontWeight: 500, color: DEEP, margin: 0 }}>
                   Filtros
                 </h3>
                 <button onClick={() => setShowMobileFilters(false)} style={{ background: "none", border: "none", cursor: "pointer", color: SLATE }}>
@@ -950,7 +949,7 @@ export default function CatalogPage() {
 
               {filterConfigs.map(({ cat, opts }) => (
                 <div key={cat} style={{ marginBottom: 24 }}>
-                  <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.65rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 12px" }}>
+                  <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 12px" }}>
                     {cat}
                   </p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -965,7 +964,7 @@ export default function CatalogPage() {
                             border: sel ? `1.5px solid ${ROSE}` : "1.5px solid rgba(112,128,144,0.22)",
                             background: sel ? "rgba(183,110,121,0.08)" : "white",
                             color: sel ? ROSE : SLATE,
-                            fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem",
+                            fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem",
                             cursor: "pointer", transition: "all 0.15s",
                           }}
                         >
@@ -978,7 +977,7 @@ export default function CatalogPage() {
               ))}
 
               <div style={{ marginBottom: 24 }}>
-                <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.65rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 12px" }}>
+                <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 12px" }}>
                   Precio
                 </p>
                 <PriceRangeSlider
@@ -989,10 +988,10 @@ export default function CatalogPage() {
               </div>
 
               <div style={{ display: "flex", gap: 10 }}>
-                <button onClick={clearAll} style={{ flex: 1, padding: "12px", borderRadius: 8, border: "1.5px solid rgba(112,128,144,0.25)", background: "transparent", color: SLATE, fontFamily: "'DM Sans',sans-serif", fontSize: "0.84rem", cursor: "pointer" }}>
+                <button onClick={clearAll} style={{ flex: 1, padding: "12px", borderRadius: 8, border: "1.5px solid rgba(112,128,144,0.25)", background: "transparent", color: SLATE, fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.84rem", cursor: "pointer" }}>
                   Limpiar
                 </button>
-                <button onClick={() => setShowMobileFilters(false)} style={{ flex: 2, padding: "12px", borderRadius: 8, border: "none", background: ROSE, color: "white", fontFamily: "'DM Sans',sans-serif", fontSize: "0.84rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(183,110,121,0.22)" }}>
+                <button onClick={() => setShowMobileFilters(false)} style={{ flex: 2, padding: "12px", borderRadius: 8, border: "none", background: ROSE, color: "white", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.84rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(183,110,121,0.22)" }}>
                   Ver {filtered.length} productos
                 </button>
               </div>

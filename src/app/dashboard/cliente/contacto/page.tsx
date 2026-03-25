@@ -61,8 +61,7 @@ export default function ContactoPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f6f4ef", display: "flex", flexDirection: "column" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500&display=swap');
-        
+                
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
@@ -94,7 +93,7 @@ export default function ContactoPage() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 12 }}>
               <span style={{ width: 40, height: 1.5, background: "#b76e79" }} />
               <span style={{ 
-                fontFamily: "'DM Sans', sans-serif", 
+                fontFamily: "var(--font-sans, Inter, sans-serif)", 
                 fontSize: "0.75rem", 
                 fontWeight: 500, 
                 textTransform: "uppercase", 
@@ -106,7 +105,7 @@ export default function ContactoPage() {
               <span style={{ width: 40, height: 1.5, background: "#b76e79" }} />
             </div>
             <h1 style={{ 
-              fontFamily: "'Cormorant Garamond', serif", 
+              fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", 
               fontSize: "clamp(2.5rem, 5vw, 4rem)", 
               fontWeight: 500, 
               color: "#4a5568",
@@ -128,7 +127,7 @@ export default function ContactoPage() {
               border: "1px solid rgba(112, 128, 144, 0.08)"
             }}>
               <h2 style={{ 
-                fontFamily: "'Cormorant Garamond', serif", 
+                fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", 
                 fontSize: "1.8rem", 
                 fontWeight: 600, 
                 color: "#4a5568",
@@ -151,7 +150,7 @@ export default function ContactoPage() {
                   </div>
                   <div>
                     <p style={{ 
-                      fontFamily: "'DM Sans', sans-serif", 
+                      fontFamily: "var(--font-sans, Inter, sans-serif)", 
                       fontSize: "0.8rem", 
                       fontWeight: 500, 
                       color: "#b76e79",
@@ -162,7 +161,7 @@ export default function ContactoPage() {
                       Ubicación
                     </p>
                     <p style={{ 
-                      fontFamily: "'DM Sans', sans-serif", 
+                      fontFamily: "var(--font-sans, Inter, sans-serif)", 
                       fontSize: "0.95rem", 
                       color: "#708090",
                       lineHeight: 1.6,
@@ -185,7 +184,7 @@ export default function ContactoPage() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <p style={{ 
-                      fontFamily: "'DM Sans', sans-serif", 
+                      fontFamily: "var(--font-sans, Inter, sans-serif)", 
                       fontSize: "0.8rem", 
                       fontWeight: 500, 
                       color: "#8c9768",
@@ -224,7 +223,7 @@ export default function ContactoPage() {
                   </div>
                   <div>
                     <p style={{ 
-                      fontFamily: "'DM Sans', sans-serif", 
+                      fontFamily: "var(--font-sans, Inter, sans-serif)", 
                       fontSize: "0.8rem", 
                       fontWeight: 500, 
                       color: "#708090",
@@ -235,7 +234,7 @@ export default function ContactoPage() {
                       Correo Electrónico
                     </p>
                     <p style={{ 
-                      fontFamily: "'DM Sans', sans-serif", 
+                      fontFamily: "var(--font-sans, Inter, sans-serif)", 
                       fontSize: "0.95rem", 
                       color: "#4a5568",
                       textDecoration: "none",
@@ -262,7 +261,7 @@ export default function ContactoPage() {
                     borderRadius: 16,
                     background: "#b76e79",
                     color: "#fff",
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                     fontWeight: 500,
                     textDecoration: "none",
                     boxShadow: "0 8px 20px rgba(183, 110, 121, 0.25)",
@@ -320,7 +319,7 @@ export default function ContactoPage() {
           <div className="animate-fade-up" style={{ marginTop: 80, animationDelay: "0.2s" }}>
             <div style={{ textAlign: "center", marginBottom: 40 }}>
               <h2 style={{ 
-                fontFamily: "'Cormorant Garamond', serif", 
+                fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", 
                 fontSize: "2.2rem", 
                 fontWeight: 600, 
                 color: "#4a5568",
@@ -329,7 +328,7 @@ export default function ContactoPage() {
                 Síguenos en Redes
               </h2>
               <p style={{ 
-                fontFamily: "'DM Sans', sans-serif", 
+                fontFamily: "var(--font-sans, Inter, sans-serif)", 
                 color: "#708090",
                 fontSize: "0.95rem"
               }}>
@@ -368,7 +367,7 @@ export default function ContactoPage() {
                     {social.icon}
                   </div>
                   <span style={{ 
-                    fontFamily: "'DM Sans', sans-serif", 
+                    fontFamily: "var(--font-sans, Inter, sans-serif)", 
                     fontSize: "0.85rem", 
                     fontWeight: 500, 
                     color: "#4a5568",
@@ -377,7 +376,7 @@ export default function ContactoPage() {
                     {social.name}
                   </span>
                   <span style={{ 
-                    fontFamily: "'DM Sans', sans-serif", 
+                    fontFamily: "var(--font-sans, Inter, sans-serif)", 
                     fontSize: "0.75rem", 
                     color: "#708090"
                   }}>

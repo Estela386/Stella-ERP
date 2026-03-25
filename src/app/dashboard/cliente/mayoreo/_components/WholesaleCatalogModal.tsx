@@ -356,7 +356,7 @@ export default function WholesaleCatalogModal({ isOpen, onClose }: Props) {
         }}>
           <div>
             <h2 style={{ 
-              fontFamily: "'Cormorant Garamond', serif", 
+              fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", 
               fontSize: "2rem", 
               color: STYLES.slateDeep,
               margin: 0
@@ -422,7 +422,7 @@ export default function WholesaleCatalogModal({ isOpen, onClose }: Props) {
                       width: "100%",
                       outline: "none",
                       color: STYLES.slateDeep,
-                      fontFamily: "'DM Sans', sans-serif"
+                      fontFamily: "var(--font-sans, Inter, sans-serif)"
                     }}
                   />
                 </div>
@@ -468,7 +468,7 @@ export default function WholesaleCatalogModal({ isOpen, onClose }: Props) {
                 border: "none",
                 borderRadius: 12,
                 padding: "12px 32px",
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontWeight: 600,
                 display: "flex",
                 alignItems: "center",
@@ -597,5 +597,5 @@ const tdStyle: React.CSSProperties = {
   padding: "16px 20px",
   fontSize: "0.85rem",
   color: STYLES.slateDeep,
-  fontFamily: "'DM Sans', sans-serif"
+  fontFamily: "var(--font-sans, Inter, sans-serif)"
 };

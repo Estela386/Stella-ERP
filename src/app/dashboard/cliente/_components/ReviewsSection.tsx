@@ -45,8 +45,7 @@ export default function ReviewsSection() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        @keyframes fadeUp {
+                @keyframes fadeUp {
           from { opacity:0; transform:translateY(18px); }
           to   { opacity:1; transform:translateY(0); }
         }
@@ -83,7 +82,7 @@ export default function ReviewsSection() {
             <div>
               <p
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
                   fontSize: "0.65rem",
                   fontWeight: 500,
                   letterSpacing: "0.18em",
@@ -96,7 +95,7 @@ export default function ReviewsSection() {
               </p>
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                   fontSize: "clamp(2.1rem, 4vw, 3.2rem)",
                   fontWeight: 500,
                   lineHeight: 1.1,
@@ -109,7 +108,7 @@ export default function ReviewsSection() {
               </h2>
               <p
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
                   fontSize: "0.94rem",
                   color: "#708090",
                   marginTop: 8,
@@ -136,7 +135,7 @@ export default function ReviewsSection() {
               <div>
                 <p
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                     fontSize: "2rem",
                     fontWeight: 500,
                     color: "#4a5568",
@@ -161,7 +160,7 @@ export default function ReviewsSection() {
               <div>
                 <p
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                     fontSize: "0.72rem",
                     color: "rgba(112,128,144,0.7)",
                     margin: 0,
@@ -171,7 +170,7 @@ export default function ReviewsSection() {
                 </p>
                 <p
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                     fontSize: "0.78rem",
                     fontWeight: 500,
                     color: "#4a5568",
@@ -236,7 +235,7 @@ export default function ReviewsSection() {
                   {/* Title */}
                   <h3
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                       fontSize: "1.18rem",
                       fontWeight: 600,
                       color: "#4a5568",
@@ -250,7 +249,7 @@ export default function ReviewsSection() {
                   {/* Comment */}
                   <p
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "var(--font-sans, Inter, sans-serif)",
                       fontSize: "0.84rem",
                       color: "#708090",
                       lineHeight: 1.65,
@@ -283,7 +282,7 @@ export default function ReviewsSection() {
                     >
                       <span
                         style={{
-                          fontFamily: "'Cormorant Garamond', serif",
+                          fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                           fontSize: "1rem",
                           fontWeight: 600,
                           color: "#b76e79",
@@ -294,7 +293,7 @@ export default function ReviewsSection() {
                     </div>
                     <span
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "var(--font-sans, Inter, sans-serif)",
                         fontSize: "0.82rem",
                         fontWeight: 500,
                         color: "#4a5568",
@@ -313,7 +312,7 @@ export default function ReviewsSection() {
             <button
               className="see-all-btn"
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "0.82rem",
                 letterSpacing: "0.04em",
                 fontWeight: 400,

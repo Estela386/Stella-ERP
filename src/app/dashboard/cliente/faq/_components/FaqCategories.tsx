@@ -32,7 +32,7 @@ export default function FaqCategories({ sections, active, onChange }: Props) {
                 ? "rgba(183,110,121,0.1)"
                 : "rgba(255,255,255,0.7)",
               color: isActive ? "#b76e79" : "#708090",
-              fontFamily: "'DM Sans',sans-serif",
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
               fontSize: "0.82rem",
               fontWeight: isActive ? 500 : 400,
               cursor: "pointer",

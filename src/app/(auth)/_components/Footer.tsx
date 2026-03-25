@@ -65,9 +65,8 @@ export default function Footer() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@400;500&display=swap');
-
-        .stella-footer { background: #3d4a5c; font-family: 'DM Sans', sans-serif; }
+        
+        .stella-footer { background: #3d4a5c; font-family: var(--font-sans), sans-serif; }
 
         .footer-link {
           color: rgba(246,244,239,0.52);
@@ -113,7 +112,7 @@ export default function Footer() {
         }
 
         .footer-brand-name {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--font-serif, 'Cormorant Garamond', serif);
           font-size: 1.08rem;
           font-weight: 500;
           font-style: italic;
@@ -121,7 +120,7 @@ export default function Footer() {
           letter-spacing: 0.06em;
         }
         .footer-copy {
-          font-family: 'DM Sans', sans-serif;
+          font-family: var(--font-sans), sans-serif;
           font-size: 0.72rem;
           color: rgba(246,244,239,0.28);
         }
@@ -181,7 +180,7 @@ export default function Footer() {
               </Link>
 
               <p style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "0.78rem",
                 color: "rgba(246,244,239,0.38)",
                 lineHeight: 1.6,

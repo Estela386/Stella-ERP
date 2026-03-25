@@ -71,7 +71,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
           background: "#ffffff"
         }}>
           <h3 style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
             fontSize: "1.25rem",
             fontWeight: 600,
             color: "#4a5568",

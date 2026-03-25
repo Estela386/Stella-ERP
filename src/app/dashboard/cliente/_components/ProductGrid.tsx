@@ -58,8 +58,7 @@ export default function ProductGrid() {
         }}
       >
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-          @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+                    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
           .skeleton { animation: pulse 1.6s ease-in-out infinite; }
         `}</style>
         <div className="mx-auto" style={{ maxWidth: 1200 }}>
@@ -122,7 +121,7 @@ export default function ProductGrid() {
               <line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
           </div>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.88rem", color: "#708090" }}>
+          <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", color: "#708090" }}>
             {error}
           </p>
         </div>
@@ -133,8 +132,7 @@ export default function ProductGrid() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        @keyframes fadeUp {
+                @keyframes fadeUp {
           from { opacity:0; transform:translateY(18px); }
           to   { opacity:1; transform:translateY(0); }
         }
@@ -152,7 +150,7 @@ export default function ProductGrid() {
           <div style={{ marginBottom: 36 }}>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "0.65rem",
                 fontWeight: 500,
                 letterSpacing: "0.18em",
@@ -166,7 +164,7 @@ export default function ProductGrid() {
             <div className="flex items-end justify-between flex-wrap gap-4">
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                   fontSize: "clamp(2.1rem, 4vw, 3.2rem)",
                   fontWeight: 500,
                   lineHeight: 1.1,
@@ -180,7 +178,7 @@ export default function ProductGrid() {
               <Link
                 href="/dashboard/cliente/catalogo"
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
                   fontSize: "0.78rem",
                   letterSpacing: "0.04em",
                   color: "#b76e79",
@@ -233,7 +231,7 @@ export default function ProductGrid() {
                 <Link href="/dashboard/cliente/catalogo">
                   <button
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "var(--font-sans, Inter, sans-serif)",
                       fontSize: "0.82rem",
                       letterSpacing: "0.04em",
                       fontWeight: 400,
@@ -268,7 +266,7 @@ export default function ProductGrid() {
               style={{
                 textAlign: "center",
                 padding: "48px 24px",
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "0.88rem",
                 color: "rgba(112,128,144,0.6)",
               }}

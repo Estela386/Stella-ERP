@@ -54,7 +54,7 @@ export default function OrderCard({ order, activeTab }: OrderCardProps) {
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans, Inter, sans-serif)",
           boxShadow: isHovered ? `0 18px 40px ${COLORS.sageLg}` : `0 2px 12px ${COLORS.sageSm}`,
           transform: isHovered ? "translateY(-5px)" : "translateY(0)",
           transition: "all 0.22s ease",
@@ -125,7 +125,7 @@ export default function OrderCard({ order, activeTab }: OrderCardProps) {
         <div style={{ padding: "clamp(18px, 2.2vw, 26px)", display: "flex", flexDirection: "column", gap: 24 }}>
           
           <h3 style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
             fontSize: "1.35rem",
             fontWeight: 600,
             color: status.text,

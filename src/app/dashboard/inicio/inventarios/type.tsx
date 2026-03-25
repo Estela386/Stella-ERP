@@ -17,6 +17,7 @@ export type Producto = {
   categoria: Categoria;
   es_personalizable?: boolean | null;
   descripcion?: string | null;
+  tipo: "fabricado" | "revendido";
 };
 
 export type HistorialProducto = {

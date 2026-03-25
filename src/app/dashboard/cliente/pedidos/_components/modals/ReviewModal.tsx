@@ -158,7 +158,7 @@ export default function ReviewModal({ isOpen, onClose, order }: ReviewModalProps
                 borderRadius: "12px",
                 border: "1.5px solid rgba(112, 128, 144, 0.25)",
                 outline: "none",
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "0.9rem",
                 color: "#4a5568",
                 resize: "none",

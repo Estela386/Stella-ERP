@@ -58,7 +58,7 @@ export default function CategoryForm({
           value={nombre}
           onChange={handleChange}
           disabled={loading}
-          className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B76E79] ${
+          className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#b76e79] ${
             error ? "border-red-500" : "border-gray-300"
           }`}
           placeholder="Ej: Anillos, Pulseras, Collares"
@@ -70,7 +70,7 @@ export default function CategoryForm({
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-[#B76E79] text-white py-2 rounded-lg hover:bg-[#a05a65] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
+          className="flex-1 bg-[#b76e79] text-[#f6f4ef] py-2 rounded-lg hover:bg-[#a05a65] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition shadow-sm hover:shadow-md"
         >
           {loading ? "Guardando..." : "Crear Categoría"}
         </button>

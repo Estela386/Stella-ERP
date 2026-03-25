@@ -21,7 +21,7 @@ export default function ExitoPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-sans, Inter, sans-serif)",
       }}
     >
       <div
@@ -39,7 +39,7 @@ export default function ExitoPage() {
         <div style={{ fontSize: "3rem", marginBottom: 16 }}>💎</div>
         <h1
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
             fontSize: "2rem",
             fontWeight: 500,
             color: "#4a5568",

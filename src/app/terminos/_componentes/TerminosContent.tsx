@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -231,8 +231,7 @@ export default function TerminosContent({ data }: { data: TerminosPageData }) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap');
-        * { box-sizing: border-box; }
+                * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
       `}</style>
 

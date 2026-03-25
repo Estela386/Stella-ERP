@@ -15,6 +15,10 @@ import {
   ProductoService,
   ImageUploadService,
   ProductoPersonalizacionService,
+  ProductoProveedorService,
+  ProveedorService,
+  InsumoService,
+  ProductoInsumoService,
 } from "@lib/services";
 import { CategoriaService } from "@lib/services";
 import { createClient } from "@utils/supabase/client";
@@ -31,6 +35,8 @@ export default function InventariosPage() {
   const [search, setSearch] = useState("");
   const [productos, setProductos] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<any[]>([]);
+  const [proveedores, setProveedores] = useState<any[]>([]);
+  const [insumos, setInsumos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -79,6 +85,25 @@ export default function InventariosPage() {
           return;
         }
 
+        // Cargar proveedores
+        const proveedorService = new ProveedorService(supabase);
+        const { proveedores: proveedoresData, error: errorProveedores } =
+          await proveedorService.obtenerTodos();
+        
+        if (errorProveedores) {
+          setError(errorProveedores);
+          return;
+        }
+        
+        // Cargar insumos
+        const insumoService = new InsumoService(supabase);
+        const { insumos: insumosData, error: errorInsumos } = await insumoService.obtenerTodos();
+
+        if (errorInsumos) {
+          setError(errorInsumos);
+          return;
+        }
+
         // Transformar productos a incluir la categoría
         if (productosData && categoriasData) {
           const productosConCategoria = productosData.map(p => {
@@ -96,6 +121,7 @@ export default function InventariosPage() {
               id_categoria: p.id_categoria,
               es_personalizable: p.es_personalizable,
               descripcion: p.descripcion || "",
+              tipo: p.tipo,
               categoria: cat
                 ? { id: cat.id, nombre: cat.nombre }
                 : { id: 0, nombre: "Sin categoría" },
@@ -105,6 +131,8 @@ export default function InventariosPage() {
         }
 
         setCategorias(categoriasData || []);
+        setProveedores(proveedoresData || []);
+        setInsumos(insumosData || []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -146,7 +174,9 @@ export default function InventariosPage() {
   const handleSubmitForm = async (
     data: CreateProductoDTO | UpdateProductoDTO,
     imagenFile?: File,
-    opciones?: OpcionForm[] // ← nuevo parámetro
+    opciones?: OpcionForm[],
+    relacionProveedor?: { id_proveedor: number; precio_compra: number; tiempo_entrega: number },
+    insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[]
   ) => {
     try {
       setFormLoading(true);
@@ -157,6 +187,8 @@ export default function InventariosPage() {
       const personalizacionService = new ProductoPersonalizacionService(
         supabase
       );
+      const productoProveedorService = new ProductoProveedorService(supabase);
+      const productoInsumoService = new ProductoInsumoService(supabase);
 
       let urlImagen: string | undefined = undefined;
 
@@ -198,6 +230,25 @@ export default function InventariosPage() {
           );
         }
 
+        // Guardar relación proveedor si es revendido
+        if (data.tipo === "revendido" && relacionProveedor) {
+          const provResult = await productoProveedorService.guardarRelacion({
+            id_producto: selectedProducto.id,
+            id_proveedor: relacionProveedor.id_proveedor,
+            precio_compra: relacionProveedor.precio_compra,
+            tiempo_entrega: relacionProveedor.tiempo_entrega,
+          });
+          if (provResult?.error) console.error("Error guardando proveedor:", provResult.error);
+        } else if (data.tipo === "fabricado") {
+          // Si cambia de revendido a fabricado, eliminar relación proveedor
+          await productoProveedorService.eliminarPorProducto(selectedProducto.id);
+        }
+
+        // Guardar insumos: siempre, ya sea lista llena o vacía (para borrar al cambiar tipo)
+        const insumosParaGuardar = data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
+        const insumoResult = await productoInsumoService.guardarInsumosProducto(selectedProducto.id, insumosParaGuardar);
+        if (insumoResult && !insumoResult.success) console.error("Error guardando insumos:", insumoResult.error);
+
         const { categorias: categoriasData } =
           await categoriaService.obtenerTodas();
         const cat = categoriasData?.find(
@@ -220,6 +271,7 @@ export default function InventariosPage() {
                   id_categoria: productoActualizado?.id_categoria,
                   es_personalizable: productoActualizado?.es_personalizable,
                   descripcion: productoActualizado?.descripcion || "",
+                  tipo: productoActualizado?.tipo || "fabricado",
                   categoria: cat
                     ? { id: cat.id, nombre: cat.nombre || "" }
                     : { id: 0, nombre: "Sin categoría" },
@@ -241,9 +293,27 @@ export default function InventariosPage() {
         // Guardar opciones usando el id del producto recién creado
         if (data.es_personalizable && opciones?.length && productoNuevo?.id) {
           await personalizacionService.guardarOpcionesProducto(
-            productoNuevo.id, // ← ahora sí está en scope
+            productoNuevo.id,
             mapOpcionesParaServicio(opciones)
           );
+        }
+
+        // Guardar relación proveedor si es revendido
+        if (data.tipo === "revendido" && relacionProveedor && productoNuevo?.id) {
+          const provResult = await productoProveedorService.guardarRelacion({
+            id_producto: productoNuevo.id,
+            id_proveedor: relacionProveedor.id_proveedor,
+            precio_compra: relacionProveedor.precio_compra,
+            tiempo_entrega: relacionProveedor.tiempo_entrega,
+          });
+          if (provResult?.error) console.error("Error guardando proveedor:", provResult.error);
+        }
+
+        // Guardar insumos siempre (lista vacía si es revendido, para limpiar)
+        if (productoNuevo?.id) {
+          const insumosParaGuardar = data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
+          const insumoResult = await productoInsumoService.guardarInsumosProducto(productoNuevo.id, insumosParaGuardar);
+          if (insumoResult && !insumoResult.success) console.error("Error guardando insumos:", insumoResult.error);
         }
 
         const { categorias: categoriasData } =
@@ -267,6 +337,7 @@ export default function InventariosPage() {
             id_categoria: productoNuevo?.id_categoria,
             es_personalizable: productoNuevo?.es_personalizable,
             descripcion: productoNuevo?.descripcion || "",
+            tipo: productoNuevo?.tipo || "fabricado",
             categoria: cat
               ? { id: cat.id, nombre: cat.nombre || "" }
               : { id: 0, nombre: "Sin categoría" },
@@ -357,7 +428,7 @@ export default function InventariosPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden ">
+    <div className="flex h-screen overflow-hidden bg-[#F6F3EF]">
       <SidebarMenu />
 
       <main className="flex-1 px-4 py-8 overflow-y-auto">
@@ -402,7 +473,7 @@ export default function InventariosPage() {
             "
           >
             {/* Accent line */}
-            <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-[#B76E79]" />
+            <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-[#b76e79]" />
 
             {/* Error message */}
             {error && (
@@ -467,6 +538,8 @@ export default function InventariosPage() {
         isOpen={modalOpen}
         producto={selectedProducto}
         categorias={categorias}
+        proveedores={proveedores}
+        insumos={insumos}
         onSubmit={handleSubmitForm}
         onClose={handleCloseModal}
         loading={formLoading}

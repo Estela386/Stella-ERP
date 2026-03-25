@@ -80,7 +80,7 @@ export default function OrdersStats({ stats }: OrdersStatsProps) {
           </div>
           <div>
             <div style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
               fontSize: "0.68rem",
               color: "#4a5568",
               textTransform: "uppercase",
@@ -88,7 +88,7 @@ export default function OrdersStats({ stats }: OrdersStatsProps) {
               fontWeight: 500
             }}>{card.label}</div>
             <div style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
               fontSize: "1.52rem",
               fontWeight: 600,
               color: "#b76e79"

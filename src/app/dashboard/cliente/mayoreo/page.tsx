@@ -57,7 +57,7 @@ export default function WholesalePage() {
   if (authLoading) {
     return (
       <div style={{ minHeight: "100vh", background: STYLES.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", color: STYLES.slateDeep }}>Cargando portal mayorista...</p>
+        <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", color: STYLES.slateDeep }}>Cargando portal mayorista...</p>
       </div>
     );
   }
@@ -71,7 +71,7 @@ export default function WholesalePage() {
         {/* HERO SECTION */}
         <section style={{ textAlign: "center", marginBottom: 60 }}>
           <span style={{ 
-            fontFamily: "'DM Sans', sans-serif", 
+            fontFamily: "var(--font-sans, Inter, sans-serif)", 
             fontSize: "0.68rem", 
             fontWeight: 600, 
             color: STYLES.rose, 
@@ -83,7 +83,7 @@ export default function WholesalePage() {
             {role === "admin" ? "Panel de Control Stella (Admin)" : role === "active" ? "Portal de Socio Exclusivo" : "Oportunidades de Negocio"}
           </span>
           <h1 style={{ 
-            fontFamily: "'Cormorant Garamond', serif", 
+            fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", 
             fontSize: "clamp(2.5rem, 6vw, 4.5rem)", 
             color: STYLES.slateDeep,
             margin: "0 0 20px 0",
@@ -99,7 +99,7 @@ export default function WholesalePage() {
             )}
           </h1>
           <p style={{ 
-            fontFamily: "'DM Sans', sans-serif", 
+            fontFamily: "var(--font-sans, Inter, sans-serif)", 
             fontSize: "1.1rem", 
             color: STYLES.slate, 
             maxWidth: 600, 
@@ -141,8 +141,7 @@ export default function WholesalePage() {
       <Footer />
       
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap');
-      `}</style>
+              `}</style>
     </div>
   );
 }
@@ -160,7 +159,7 @@ const adminBadgeStyle: React.CSSProperties = {
   color: "#f6f4ef",
   padding: "8px 20px",
   borderRadius: 99,
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "var(--font-sans, Inter, sans-serif)",
   fontSize: "0.7rem",
   fontWeight: 700,
   letterSpacing: "0.1em",
@@ -239,13 +238,13 @@ function ProspectLanding() {
         textAlign: "center"
       }}>
         <h2 style={{ 
-          fontFamily: "'Cormorant Garamond', serif", 
+          fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", 
           fontSize: "2.5rem", 
           color: STYLES.slateDeep,
           marginBottom: 20
         }}>¿Listo para <em style={{ color: STYLES.rose, fontStyle: "italic" }}>crecer</em> con nosotros?</h2>
         <p style={{ 
-          fontFamily: "'DM Sans', sans-serif", 
+          fontFamily: "var(--font-sans, Inter, sans-serif)", 
           color: STYLES.slate, 
           maxWidth: 500, 
           margin: "0 auto 40px",
@@ -301,7 +300,7 @@ const iconBoxStyle: React.CSSProperties = {
 };
 
 const cardTitleStyle: React.CSSProperties = {
-  fontFamily: "'Cormorant Garamond', serif",
+  fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
   fontSize: "1.6rem",
   color: STYLES.slateDeep,
   fontWeight: 600,
@@ -309,7 +308,7 @@ const cardTitleStyle: React.CSSProperties = {
 };
 
 const cardDescStyle: React.CSSProperties = {
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "var(--font-sans, Inter, sans-serif)",
   fontSize: "0.9rem",
   color: STYLES.slate,
   lineHeight: 1.5,
@@ -322,7 +321,7 @@ const primaryButtonStyle: React.CSSProperties = {
   border: "none",
   borderRadius: 8,
   padding: "14px 24px",
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "var(--font-sans, Inter, sans-serif)",
   fontSize: "0.82rem",
   fontWeight: 500,
   cursor: "pointer",
@@ -341,7 +340,7 @@ const secondaryButtonStyle: React.CSSProperties = {
   border: `1.5px solid rgba(112, 128, 144, 0.2)`,
   borderRadius: 8,
   padding: "14px 24px",
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "var(--font-sans, Inter, sans-serif)",
   fontSize: "0.82rem",
   fontWeight: 500,
   cursor: "pointer",
@@ -359,7 +358,7 @@ function BenefitCard({ icon, title, desc }: { icon: React.ReactNode, title: stri
       e.currentTarget.style.boxShadow = STYLES.shadowBase;
     }}>
       <div style={{ color: STYLES.rose }}>{icon}</div>
-      <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.3rem", color: STYLES.slateDeep, margin: 0 }}>{title}</h4>
+      <h4 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.3rem", color: STYLES.slateDeep, margin: 0 }}>{title}</h4>
       <p style={{ ...cardDescStyle, fontSize: "0.85rem" }}>{desc}</p>
     </div>
   );
@@ -367,7 +366,7 @@ function BenefitCard({ icon, title, desc }: { icon: React.ReactNode, title: stri
 
 function BenefitItem({ text }: { text: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.85rem", color: STYLES.slateDeep, fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.85rem", color: STYLES.slateDeep, fontFamily: "var(--font-sans, Inter, sans-serif)" }}>
       <CheckCircle2 size={16} color={STYLES.rose} />
       <span>{text}</span>
     </div>

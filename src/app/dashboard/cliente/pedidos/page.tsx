@@ -215,7 +215,7 @@ export default function OrdersPage() {
   if (authLoading || loading) {
     return (
       <div style={{ minHeight: "100vh", background: "#f6f4ef", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", color: "#708090" }}>Cargando tus pedidos...</p>
+        <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", color: "#708090" }}>Cargando tus pedidos...</p>
       </div>
     );
   }
@@ -223,8 +223,7 @@ export default function OrdersPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f6f4ef", display: "flex", flexDirection: "column" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600;700&display=swap');
-        @keyframes fadeIn {
+                @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
@@ -243,7 +242,7 @@ export default function OrdersPage() {
         {/* Page Title & Breadcrumb style */}
         <div style={{ marginBottom: 36 }}>
           <h1 style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
             fontSize: "clamp(2.8rem, 5.2vw, 5.2rem)",
             fontWeight: 400,
             color: "#4a5568",
@@ -264,7 +263,7 @@ export default function OrdersPage() {
                 background: "none", border: "none", borderBottom: activeTab === "pedidos" ? "3px solid #b76e79" : "3px solid transparent",
                 padding: "8px 4px", fontSize: "0.95rem", fontWeight: activeTab === "pedidos" ? 600 : 500,
                 color: activeTab === "pedidos" ? "#b76e79" : "#4a5568", cursor: "pointer", transition: "all 0.2s ease",
-                fontFamily: "'DM Sans', sans-serif"
+                fontFamily: "var(--font-sans, Inter, sans-serif)"
               }}>
               Pedidos
             </button>
@@ -274,7 +273,7 @@ export default function OrdersPage() {
                 background: "none", border: "none", borderBottom: activeTab === "comprar_nuevo" ? "3px solid #b76e79" : "3px solid transparent",
                 padding: "8px 4px", fontSize: "0.95rem", fontWeight: activeTab === "comprar_nuevo" ? 600 : 500,
                 color: activeTab === "comprar_nuevo" ? "#b76e79" : "#4a5568", cursor: "pointer", transition: "all 0.2s ease",
-                fontFamily: "'DM Sans', sans-serif"
+                fontFamily: "var(--font-sans, Inter, sans-serif)"
               }}>
               Comprar de nuevo
             </button>
@@ -284,7 +283,7 @@ export default function OrdersPage() {
                 background: "none", border: "none", borderBottom: activeTab === "cancelados" ? "3px solid #b76e79" : "3px solid transparent",
                 padding: "8px 4px", fontSize: "0.95rem", fontWeight: activeTab === "cancelados" ? 600 : 500,
                 color: activeTab === "cancelados" ? "#b76e79" : "#4a5568", cursor: "pointer", transition: "all 0.2s ease",
-                fontFamily: "'DM Sans', sans-serif"
+                fontFamily: "var(--font-sans, Inter, sans-serif)"
               }}>
               Pedidos cancelados
             </button>
@@ -299,13 +298,13 @@ export default function OrdersPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
                   padding: "8px 14px 8px 34px", fontSize: "0.85rem", border: "1px solid rgba(112,128,144,0.25)", borderRadius: 6,
-                  outline: "none", background: "#ffffff", color: "#4a5568", minWidth: 240, fontFamily: "'DM Sans', sans-serif"
+                  outline: "none", background: "#ffffff", color: "#4a5568", minWidth: 240, fontFamily: "var(--font-sans, Inter, sans-serif)"
                 }}
               />
               <button style={{
                   background: "#4a5568", color: "#fff", border: "none", padding: "9px 16px",
                   borderRadius: "0 6px 6px 0", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer",
-                  fontFamily: "'DM Sans', sans-serif", marginLeft: "-2px" // overlap border
+                  fontFamily: "var(--font-sans, Inter, sans-serif)", marginLeft: "-2px" // overlap border
               }}>
                 Buscar
               </button>
@@ -339,10 +338,10 @@ export default function OrdersPage() {
               marginTop: 20
             }}>
               <ShoppingBag size={48} color="#b76e79" style={{ marginBottom: 16, opacity: 0.5 }} />
-              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.5rem", color: "#4a5568", margin: "0 0 8px 0" }}>
+              <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.5rem", color: "#4a5568", margin: "0 0 8px 0" }}>
                 No encontramos pedidos
               </h3>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", color: "#708090", marginBottom: 24 }}>
+              <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", color: "#708090", marginBottom: 24 }}>
                 {searchTerm ? `No hay resultados para "${searchTerm}"` : "Te invitamos a realizar tu primera compra en nuestra tienda."}
               </p>
               {!searchTerm && (
@@ -350,7 +349,7 @@ export default function OrdersPage() {
                   onClick={() => window.location.href = "/dashboard/cliente/catalogo"}
                   style={{
                     padding: "10px 24px", background: "#b76e79", color: "#fff", border: "none",
-                    borderRadius: 8, fontFamily: "'DM Sans', sans-serif", fontWeight: 500, cursor: "pointer",
+                    borderRadius: 8, fontFamily: "var(--font-sans, Inter, sans-serif)", fontWeight: 500, cursor: "pointer",
                     boxShadow: "0 4px 12px rgba(183,110,121,0.2)"
                   }}
                 >

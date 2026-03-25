@@ -115,7 +115,7 @@ function FeatureCard({ icon, title, text }: FeatureCardProps) {
       <div style={{ width: 48, height: 48, borderRadius: 12, margin: "0 auto 16px", background: C.slateIcon, border: `1px solid ${C.slateBorder}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
         {icon}
       </div>
-      <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.18rem", fontWeight: 600, color: C.slateDeep, marginBottom: 8, letterSpacing: "-0.01em" }}>
+      <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.18rem", fontWeight: 600, color: C.slateDeep, marginBottom: 8, letterSpacing: "-0.01em" }}>
         {title}
       </h3>
       <p style={{ fontSize: "0.86rem", lineHeight: 1.68, color: C.slate, fontWeight: 400, margin: 0 }}>
@@ -143,7 +143,7 @@ function RoleCard({ badge, title, desc, perks }: RoleCardProps) {
         <span style={{ width: 10, height: 1, background: C.rose, display: "inline-block" }} />
         {badge}
       </div>
-      <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.25rem,1.9vw,1.52rem)", fontWeight: 600, color: C.slateDeep, marginBottom: 10, letterSpacing: "-0.01em" }}>
+      <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(1.25rem,1.9vw,1.52rem)", fontWeight: 600, color: C.slateDeep, marginBottom: 10, letterSpacing: "-0.01em" }}>
         {title}
       </h3>
       <p style={{ fontSize: "0.86rem", lineHeight: 1.70, color: C.slate, fontWeight: 400, marginBottom: 18 }}>
@@ -178,7 +178,7 @@ function ModuleCard({ num, icon, name, desc }: ModuleCardProps) {
       }}
     >
       {/* number watermark */}
-      <span style={{ position: "absolute", top: -8, right: 10, lineHeight: 1, fontFamily: "'Cormorant Garamond',serif", fontSize: "4.5rem", fontWeight: 600, color: "rgba(112,128,144,0.06)", pointerEvents: "none", userSelect: "none" }}>
+      <span style={{ position: "absolute", top: -8, right: 10, lineHeight: 1, fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "4.5rem", fontWeight: 600, color: "rgba(112,128,144,0.06)", pointerEvents: "none", userSelect: "none" }}>
         {num}
       </span>
       {/* left accent */}
@@ -219,7 +219,7 @@ function ReviewCard({ text, initials, name, role }: ReviewCardProps) {
         <div style={{ marginLeft: "auto", color: C.rose, fontSize: "0.82rem", letterSpacing: 1 }}>★★★★★</div>
       </div>
       <div style={{ height: 1, background: C.slateBorder, marginBottom: 14 }} />
-      <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.08rem", fontStyle: "italic", color: C.slateDeep, lineHeight: 1.67, fontWeight: 400, margin: 0 }}>
+      <p style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.08rem", fontStyle: "italic", color: C.slateDeep, lineHeight: 1.67, fontWeight: 400, margin: 0 }}>
         &ldquo;{text}&rdquo;
       </p>
     </motion.div>
@@ -244,7 +244,7 @@ function SectionHeader({
           {eyebrow}
         </motion.p>
       )}
-      <motion.h2 variants={d(0.06)} style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.1rem,4vw,3.2rem)", fontWeight: 500, lineHeight: 1.18, letterSpacing: "-0.01em", margin: "0 0 0" }}>
+      <motion.h2 variants={d(0.06)} style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(2.1rem,4vw,3.2rem)", fontWeight: 500, lineHeight: 1.18, letterSpacing: "-0.01em", margin: "0 0 0" }}>
         <span style={{ color: C.slateDeep }}>{before} </span>
         <span style={{ color: C.rose }}>{accent}</span>
         {after && <span style={{ color: C.slateDeep }}> {after}</span>}
@@ -347,8 +347,7 @@ export default function HomeClient() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
-        *,*::before,*::after{box-sizing:border-box;}
+                *,*::before,*::after{box-sizing:border-box;}
         html{scroll-behavior:smooth;}
         body{margin:0;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
         .cta-input:focus{outline:none;border-color:rgba(183,110,121,0.45)!important;box-shadow:0 0 0 3px rgba(183,110,121,0.09)!important;}
@@ -379,7 +378,7 @@ export default function HomeClient() {
         }
       `}</style>
 
-      <main style={{ background: C.bg, color: C.slate, fontFamily: "'DM Sans',sans-serif", overflowX: "hidden" }}>
+      <main style={{ background: C.bg, color: C.slate, fontFamily: "var(--font-sans, Inter, sans-serif)", overflowX: "hidden" }}>
 
         {/* ══════════ NAV ══════════ */}
         {/* Estilo igual a la imagen: fondo blanco, links slate, CTA rose */}
@@ -415,7 +414,7 @@ export default function HomeClient() {
           {/* Actions */}
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <motion.button className="nav-login-desk" whileHover={{ color: C.rose }} onClick={() => router.push("/login")}
-              style={{ display: "flex", background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: "0.78rem", color: C.slate, padding: "8px 2px", transition: "color 0.2s" }}>
+              style={{ display: "flex", background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: C.slate, padding: "8px 2px", transition: "color 0.2s" }}>
               Iniciar sesión
             </motion.button>
             {/* CTA principal: rose como en la imagen */}
@@ -423,7 +422,7 @@ export default function HomeClient() {
               whileHover={{ y: -2, boxShadow: `0 8px 22px ${C.roseMid}` }}
               whileTap={{ scale: 0.96 }}
               onClick={() => router.push("/register")}
-              style={{ background: C.rose, color: "#f6f4ef", border: "none", cursor: "pointer", padding: "9px 20px", borderRadius: 6, fontSize: "0.78rem", letterSpacing: "0.04em", fontFamily: "'DM Sans',sans-serif", boxShadow: `0 3px 10px ${C.roseBorder}`, transition: "box-shadow 0.2s" }}
+              style={{ background: C.rose, color: "#f6f4ef", border: "none", cursor: "pointer", padding: "9px 20px", borderRadius: 6, fontSize: "0.78rem", letterSpacing: "0.04em", fontFamily: "var(--font-sans, Inter, sans-serif)", boxShadow: `0 3px 10px ${C.roseBorder}`, transition: "box-shadow 0.2s" }}
             >
               Crear cuenta
             </motion.button>
@@ -446,14 +445,14 @@ export default function HomeClient() {
               <div style={{ flex: 1, paddingTop: 24 }}>
                 {navLinks.map(({ label, href }) => (
                   <a key={label} href={href} onClick={() => setMobileOpen(false)}
-                    style={{ display: "block", textDecoration: "none", color: C.slateDeep, fontSize: "1.4rem", fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, padding: "13px 0", borderBottom: `1px solid ${C.slateBorder}` }}>
+                    style={{ display: "block", textDecoration: "none", color: C.slateDeep, fontSize: "1.4rem", fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontWeight: 300, padding: "13px 0", borderBottom: `1px solid ${C.slateBorder}` }}>
                     {label}
                   </a>
                 ))}
               </div>
               <div style={{ paddingBottom: 40, display: "flex", flexDirection: "column", gap: 10 }}>
-                <button onClick={() => { router.push("/login"); setMobileOpen(false); }} style={{ background: "none", border: `1.5px solid ${C.slateMid}`, borderRadius: 6, padding: "12px 0", fontFamily: "'DM Sans',sans-serif", fontSize: "0.88rem", color: C.slate, cursor: "pointer" }}>Iniciar sesión</button>
-                <button onClick={() => { router.push("/register"); setMobileOpen(false); }} style={{ background: C.rose, color: "#f6f4ef", border: "none", borderRadius: 6, padding: "12px 0", fontFamily: "'DM Sans',sans-serif", fontSize: "0.88rem", cursor: "pointer" }}>Crear cuenta</button>
+                <button onClick={() => { router.push("/login"); setMobileOpen(false); }} style={{ background: "none", border: `1.5px solid ${C.slateMid}`, borderRadius: 6, padding: "12px 0", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", color: C.slate, cursor: "pointer" }}>Iniciar sesión</button>
+                <button onClick={() => { router.push("/register"); setMobileOpen(false); }} style={{ background: C.rose, color: "#f6f4ef", border: "none", borderRadius: 6, padding: "12px 0", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", cursor: "pointer" }}>Crear cuenta</button>
               </div>
             </motion.div>
           )}
@@ -481,7 +480,7 @@ export default function HomeClient() {
               </motion.div>
 
               {/* h1: palabra clave en rose */}
-              <motion.h1 variants={d(0.07)} style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.8rem,5.2vw,5.2rem)", fontWeight: 400, lineHeight: 1.10, marginBottom: 20, letterSpacing: "-0.02em" }}>
+              <motion.h1 variants={d(0.07)} style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(2.8rem,5.2vw,5.2rem)", fontWeight: 400, lineHeight: 1.10, marginBottom: 20, letterSpacing: "-0.02em" }}>
                 <span style={{ color: C.slateDeep }}>Gestión inteligente<br />para </span>
                 <em style={{ fontStyle: "italic", color: C.rose }}>joyería</em>
                 <span style={{ color: C.slateDeep }}><br />de alto valor</span>
@@ -493,11 +492,11 @@ export default function HomeClient() {
 
               <motion.div variants={d(0.20)} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <motion.button whileHover={{ y: -2, boxShadow: `0 10px 26px ${C.roseMid}` }} whileTap={{ scale: 0.96 }} onClick={() => router.push("/register")}
-                  style={{ background: C.rose, color: "#f6f4ef", border: "none", cursor: "pointer", padding: "13px 26px", borderRadius: 6, fontSize: "0.83rem", letterSpacing: "0.04em", fontFamily: "'DM Sans',sans-serif", boxShadow: `0 3px 12px ${C.roseBorder}`, display: "flex", alignItems: "center", gap: 7, transition: "box-shadow 0.2s" }}>
+                  style={{ background: C.rose, color: "#f6f4ef", border: "none", cursor: "pointer", padding: "13px 26px", borderRadius: 6, fontSize: "0.83rem", letterSpacing: "0.04em", fontFamily: "var(--font-sans, Inter, sans-serif)", boxShadow: `0 3px 12px ${C.roseBorder}`, display: "flex", alignItems: "center", gap: 7, transition: "box-shadow 0.2s" }}>
                   Crear cuenta <ArrowRight size={13} />
                 </motion.button>
                 <motion.button whileHover={{ borderColor: C.slate, color: C.slateDeep }} whileTap={{ scale: 0.96 }} onClick={() => router.push("/login")}
-                  style={{ background: "transparent", color: C.slate, border: `1.5px solid ${C.slateMid}`, cursor: "pointer", padding: "13px 26px", borderRadius: 6, fontSize: "0.83rem", letterSpacing: "0.04em", fontFamily: "'DM Sans',sans-serif", transition: "border-color 0.2s, color 0.2s" }}>
+                  style={{ background: "transparent", color: C.slate, border: `1.5px solid ${C.slateMid}`, cursor: "pointer", padding: "13px 26px", borderRadius: 6, fontSize: "0.83rem", letterSpacing: "0.04em", fontFamily: "var(--font-sans, Inter, sans-serif)", transition: "border-color 0.2s, color 0.2s" }}>
                   Iniciar sesión
                 </motion.button>
               </motion.div>
@@ -506,7 +505,7 @@ export default function HomeClient() {
               <motion.div variants={d(0.26)} className="hero-stats" style={{ display: "flex", gap: "clamp(16px,3.5vw,34px)", marginTop: 40 }}>
                 {[{ num: "50%", label: "Menos errores" }, { num: "3", label: "Roles de usuario" }, { num: "10+", label: "Módulos ERP" }].map((s, i) => (
                   <div key={s.label} style={{ display: "flex", flexDirection: "column", gap: 2, paddingRight: i < 2 ? "clamp(12px,3vw,30px)" : 0, borderRight: i < 2 ? `1px solid ${C.slateBorder}` : "none" }}>
-                    <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2.1rem", fontWeight: 600, color: C.rose, lineHeight: 1 }}>{s.num}</span>
+                    <span style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "2.1rem", fontWeight: 600, color: C.rose, lineHeight: 1 }}>{s.num}</span>
                     <span style={{ fontSize: "0.74rem", color: C.slate, letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 400 }}>{s.label}</span>
                   </div>
                 ))}
@@ -530,7 +529,7 @@ export default function HomeClient() {
                     ))}
                   </div>
                   <div style={{ fontSize: "0.60rem", letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.6, marginBottom: 5 }}>Ventas del mes</div>
-                  <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.6rem", fontWeight: 600, color: "#f6f4ef", lineHeight: 1 }}>$284,500</div>
+                  <div style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.6rem", fontWeight: 600, color: "#f6f4ef", lineHeight: 1 }}>$284,500</div>
                   <div style={{ fontSize: "0.64rem", opacity: 0.55, marginTop: 4 }}>MXN · ↑ 18% este mes</div>
                 </motion.div>
 
@@ -548,7 +547,7 @@ export default function HomeClient() {
                   </div>
                   {/* card body */}
                   <div style={{ padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column" }}>
-                    <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.28rem", fontWeight: 600, color: C.slateDeep, marginBottom: 2, letterSpacing: "-0.01em" }}>Anillo Stella</div>
+                    <div style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.28rem", fontWeight: 600, color: C.slateDeep, marginBottom: 2, letterSpacing: "-0.01em" }}>Anillo Stella</div>
                     <div style={{ fontSize: "0.72rem", color: C.slate, marginBottom: 8 }}>Colección Primavera 2025 · Talla 7</div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                       <div style={{ fontSize: "0.96rem", color: C.rose, fontWeight: 600 }}>$12,500 MXN</div>
@@ -653,7 +652,7 @@ export default function HomeClient() {
             style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "clamp(16px,4vw,40px)", maxWidth: 1000, margin: "0 auto", position: "relative", zIndex: 1 }}>
             {statsData.map((st) => (
               <motion.div key={st.label} variants={scaleV} style={{ textAlign: "center" }}>
-                <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.2rem,4.2vw,3.2rem)", fontWeight: 600, color: "#f6f4ef", lineHeight: 1, marginBottom: 6, letterSpacing: "-0.02em" }}>{st.num}</div>
+                <div style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(2.2rem,4.2vw,3.2rem)", fontWeight: 600, color: "#f6f4ef", lineHeight: 1, marginBottom: 6, letterSpacing: "-0.02em" }}>{st.num}</div>
                 <div style={{ width: 24, height: 2, background: C.rose, margin: "0 auto 8px", borderRadius: 1 }} />
                 <div style={{ fontSize: "0.67rem", color: "rgba(246,244,239,0.60)", letterSpacing: "0.12em", textTransform: "uppercase" }}>{st.label}</div>
               </motion.div>
@@ -704,7 +703,7 @@ export default function HomeClient() {
                 <motion.p variants={d(0)} style={{ fontSize: "0.65rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(246,244,239,0.45)", marginBottom: 8 }}>
                   Únete al proyecto
                 </motion.p>
-                <motion.h2 variants={d(0.06)} style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.7rem,3.4vw,2.8rem)", fontWeight: 500, color: "#f6f4ef", lineHeight: 1.18, letterSpacing: "-0.01em", margin: 0 }}>
+                <motion.h2 variants={d(0.06)} style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(1.7rem,3.4vw,2.8rem)", fontWeight: 500, color: "#f6f4ef", lineHeight: 1.18, letterSpacing: "-0.01em", margin: 0 }}>
                   Descubre tu{" "}
                   <em style={{ fontStyle: "italic", color: C.rose }}>brillo interior</em>
                 </motion.h2>
@@ -720,15 +719,15 @@ export default function HomeClient() {
                   </p>
                   <div className="cta-row" style={{ display: "flex", gap: 9 }}>
                     <input type="email" placeholder="tu@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} className="cta-input"
-                      style={{ flex: 1, minWidth: 0, padding: "10px 14px", borderRadius: 5, border: `1.5px solid ${C.slateBorder}`, background: C.bg, color: C.slateDeep, fontFamily: "'DM Sans',sans-serif", fontSize: "0.82rem", transition: "border-color 0.2s, box-shadow 0.2s" }} />
+                      style={{ flex: 1, minWidth: 0, padding: "10px 14px", borderRadius: 5, border: `1.5px solid ${C.slateBorder}`, background: C.bg, color: C.slateDeep, fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", transition: "border-color 0.2s, box-shadow 0.2s" }} />
                     <motion.button whileHover={{ y: -2, boxShadow: `0 8px 20px ${C.roseMid}` }} whileTap={{ scale: 0.96 }} onClick={() => router.push("/register")}
-                      style={{ background: C.rose, color: "#f6f4ef", border: "none", cursor: "pointer", padding: "10px 20px", borderRadius: 5, fontSize: "0.80rem", letterSpacing: "0.04em", fontFamily: "'DM Sans',sans-serif", boxShadow: `0 3px 10px ${C.roseBorder}`, whiteSpace: "nowrap", flexShrink: 0, transition: "box-shadow 0.2s" }}>
+                      style={{ background: C.rose, color: "#f6f4ef", border: "none", cursor: "pointer", padding: "10px 20px", borderRadius: 5, fontSize: "0.80rem", letterSpacing: "0.04em", fontFamily: "var(--font-sans, Inter, sans-serif)", boxShadow: `0 3px 10px ${C.roseBorder}`, whiteSpace: "nowrap", flexShrink: 0, transition: "box-shadow 0.2s" }}>
                       Solicitar acceso
                     </motion.button>
                   </div>
                   <p style={{ marginTop: 12, fontSize: "0.76rem", color: C.slate, textAlign: "center" }}>
                     ¿Ya tienes cuenta?{" "}
-                    <button onClick={() => router.push("/login")} style={{ background: "none", border: "none", cursor: "pointer", color: C.rose, fontFamily: "'DM Sans',sans-serif", fontSize: "0.76rem", padding: 0, textDecoration: "underline" }}>
+                    <button onClick={() => router.push("/login")} style={{ background: "none", border: "none", cursor: "pointer", color: C.rose, fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.76rem", padding: 0, textDecoration: "underline" }}>
                       Iniciar sesión
                     </button>
                   </p>

@@ -214,8 +214,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500&display=swap');
-        @keyframes fadeIn {
+                @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
@@ -278,7 +277,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   <div style={{ textAlign: "center" }}>
                     <p
                       style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                         fontSize: "1.2rem",
                         fontStyle: "italic",
                       }}
@@ -287,7 +286,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                     </p>
                     <p
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "var(--font-sans, Inter, sans-serif)",
                         fontSize: "0.8rem",
                         opacity: 0.6,
                       }}
@@ -354,7 +353,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
               {producto.categoria && (
                 <span
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                     fontSize: "0.8rem",
                     color: "#b76e79",
                     fontWeight: 600,
@@ -369,7 +368,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
               )}
               <h1
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                   fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
                   fontWeight: 500,
                   color: "#4a5568",
@@ -391,7 +390,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
               >
                 <span
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                     fontSize: "2.2rem",
                     fontWeight: 600,
                     color: "#b76e79",
@@ -403,7 +402,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   style={{
                     fontSize: "0.85rem",
                     color: "#708090",
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                   }}
                 >
                   MXN
@@ -422,7 +421,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
             <section>
               <h3
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
                   fontSize: "0.85rem",
                   fontWeight: 600,
                   color: "#4a5568",
@@ -434,7 +433,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
               </h3>
               <p
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
                   fontSize: "1.05rem",
                   color: "#708090",
                   lineHeight: 1.7,
@@ -458,7 +457,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
               />
               <span
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
                   fontSize: "0.9rem",
                   fontWeight: 500,
                   color: producto.stock_actual > 0 ? "#8c9768" : "#b76e79",
@@ -475,7 +474,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
               >
                 <h3
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
                     fontSize: "0.85rem",
                     fontWeight: 600,
                     color: "#4a5568",
@@ -540,7 +539,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                             padding: "10px 12px",
                             borderRadius: 10,
                             border: `1px solid ${erroresPersonalizacion[op.id] ? "#b76e79" : "rgba(112,128,144,0.3)"}`,
-                            fontFamily: "'DM Sans', sans-serif",
+                            fontFamily: "var(--font-sans, Inter, sans-serif)",
                             fontSize: "0.9rem",
                             color: "#4a5568",
                             background: "#ffffff",
@@ -579,7 +578,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                             padding: "10px 12px",
                             borderRadius: 10,
                             border: `1px solid ${erroresPersonalizacion[op.id] ? "#b76e79" : "rgba(112,128,144,0.3)"}`,
-                            fontFamily: "'DM Sans', sans-serif",
+                            fontFamily: "var(--font-sans, Inter, sans-serif)",
                             fontSize: "0.9rem",
                             color: "#4a5568",
                             background: "#ffffff",
@@ -609,7 +608,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                             padding: "10px 12px",
                             borderRadius: 10,
                             border: `1px solid ${erroresPersonalizacion[op.id] ? "#b76e79" : "rgba(112,128,144,0.3)"}`,
-                            fontFamily: "'DM Sans', sans-serif",
+                            fontFamily: "var(--font-sans, Inter, sans-serif)",
                             fontSize: "0.9rem",
                             color: "#4a5568",
                             background: "#ffffff",
@@ -624,7 +623,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                             marginTop: 4,
                             fontSize: "0.75rem",
                             color: "#b76e79",
-                            fontFamily: "'DM Sans', sans-serif",
+                            fontFamily: "var(--font-sans, Inter, sans-serif)",
                           }}
                         >
                           {erroresPersonalizacion[op.id]}
@@ -664,7 +663,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                 color: "#ffffff",
                 border: "none",
                 borderRadius: 16,
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
                 fontSize: "1rem",
                 fontWeight: 600,
                 cursor: "pointer",
@@ -712,7 +711,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
             >
               <h3
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                   fontSize: "1.4rem",
                   fontWeight: 600,
                   color: "#4a5568",
@@ -744,7 +743,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   <li
                     key={idx}
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "var(--font-sans, Inter, sans-serif)",
                       fontSize: "0.85rem",
                       color: "#708090",
                       display: "flex",
@@ -762,7 +761,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   marginTop: 16,
                   fontSize: "0.75rem",
                   color: "#8c9768",
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
                   lineHeight: 1.5,
                   opacity: 0.8,
                 }}
@@ -779,7 +778,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
             >
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
                   fontSize: "2rem",
                   color: "#4a5568",
                   marginBottom: 24,
@@ -871,7 +870,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                 >
                   <h3
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "var(--font-sans, Inter, sans-serif)",
                       fontSize: "0.9rem",
                       textTransform: "uppercase",
                       marginBottom: 12,
@@ -911,7 +910,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                       borderRadius: 12,
                       padding: 12,
                       border: "1px solid rgba(112,128,144,0.2)",
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "var(--font-sans, Inter, sans-serif)",
                       marginBottom: 12,
                       color: "#708090",
                     }}
