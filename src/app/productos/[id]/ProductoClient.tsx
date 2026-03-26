@@ -8,6 +8,7 @@ import { useAuth } from "@lib/hooks/useAuth";
 import { useCart } from "@lib/hooks/useCart";
 import Image from "next/image";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 
 interface ProductoClientProps {
   id: string;
@@ -203,6 +204,50 @@ export default function ProductoClient({ id }: ProductoClientProps) {
       </div>
     );
   }
+
+  // --- Parse materiales ---
+  const materialesArray: string[] = producto?.producto_material
+    ?.map((pm: any) => pm.materiales?.nombre)
+    .filter(Boolean) || [];
+
+  // --- Lógica de cuidados dinámicos ---
+  const sugerenciasCuidado = new Set<string>();
+  materialesArray.forEach((m) => {
+    const mat = m.toLowerCase();
+    
+    if (mat.includes("chapa")) {
+      sugerenciasCuidado.add("Evita perfumes y cremas");
+      sugerenciasCuidado.add("Retirar antes de bañarte o nadar");
+      sugerenciasCuidado.add("Guarda por separado en su bolsita");
+    } else if (mat.includes("acero")) {
+      sugerenciasCuidado.add("Altamente resistente, puedes humedecerla");
+      sugerenciasCuidado.add("Limpia con agua y jabón neutro ocasionalmente");
+    } else if (mat.includes("plata")) {
+      sugerenciasCuidado.add("Limpia con paño reparador especial");
+      sugerenciasCuidado.add("Evita aguas termales o químicos");
+      sugerenciasCuidado.add("Uso continuo previene la oxidación");
+    } else if (mat.includes("oro") && !mat.includes("chapa")) {
+      sugerenciasCuidado.add("Limpia con agua tibia y jabón suave");
+      sugerenciasCuidado.add("Evita el cloro intenso");
+    }
+
+    if (mat.includes("hilo")) {
+      sugerenciasCuidado.add("Evita la humedad constante");
+      sugerenciasCuidado.add("Solo lavado superficial suave a mano");
+    }
+    if (mat.includes("cristal") || mat.includes("piedra") || mat.includes("perla")) {
+      sugerenciasCuidado.add("Evita caídas y golpes bruscos");
+      sugerenciasCuidado.add("Limpia con paño de microfibra en seco");
+    }
+  });
+
+  if (sugerenciasCuidado.size === 0) {
+    sugerenciasCuidado.add("Limpia con paño suave");
+    sugerenciasCuidado.add("Guárdala en un lugar seco");
+    sugerenciasCuidado.add("Evita líquidos corrosivos");
+  }
+
+  const cuidadosFinales = Array.from(sugerenciasCuidado);
 
   return (
     <div
@@ -408,6 +453,32 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   MXN
                 </span>
               </div>
+
+              {/* Badges de Materiales */}
+              {materialesArray.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
+                  {materialesArray.map((mat, idx) => (
+                    <span 
+                      key={idx}
+                      style={{
+                        padding: "5px 12px",
+                        background: "rgba(183,110,121,0.06)",
+                        border: "1px solid rgba(183,110,121,0.2)",
+                        borderRadius: 20,
+                        fontFamily: "var(--font-sans, Inter, sans-serif)",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        color: "#b76e79",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4
+                      }}
+                    >
+                      <Sparkles size={11} /> {mat}
+                    </span>
+                  ))}
+                </div>
+              )}
             </header>
 
             <div
@@ -734,12 +805,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   gap: "12px 20px",
                 }}
               >
-                {[
-                  { icon: "✧", text: "Evita perfumes" },
-                  { icon: "✧", text: "Limpia con paño suave" },
-                  { icon: "✧", text: "Guarda por separado" },
-                  { icon: "✧", text: "Evita químicos" },
-                ].map((item, idx) => (
+                {cuidadosFinales.map((texto, idx) => (
                   <li
                     key={idx}
                     style={{
@@ -747,28 +813,34 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                       fontSize: "0.85rem",
                       color: "#708090",
                       display: "flex",
-                      alignItems: "center",
+                      alignItems: "start",
                       gap: 8,
+                      lineHeight: 1.4
                     }}
                   >
-                    <span style={{ color: "#b76e79" }}>{item.icon}</span>{" "}
-                    {item.text}
+                    <span style={{ color: "#b76e79", marginTop: 2 }}>✧</span>{" "}
+                    {texto}
                   </li>
                 ))}
               </ul>
-              <p
-                style={{
-                  marginTop: 16,
-                  fontSize: "0.75rem",
-                  color: "#8c9768",
-                  fontFamily: "var(--font-sans, Inter, sans-serif)",
-                  lineHeight: 1.5,
-                  opacity: 0.8,
-                }}
-              >
-                * Para piezas de chapa, retirar antes de nadar o ducharte. El
-                acero inoxidable es resistente al agua.
-              </p>
+              {materialesArray.some(m => m.toLowerCase().includes("chapa")) && (
+                <p
+                  style={{
+                    marginTop: 18,
+                    fontSize: "0.75rem",
+                    color: "#8c9768",
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
+                    lineHeight: 1.5,
+                    opacity: 0.9,
+                    fontWeight: 500,
+                    background: "rgba(140,151,104,0.08)",
+                    padding: "8px 12px",
+                    borderRadius: 8
+                  }}
+                >
+                  * <strong>Nota para chapa de oro:</strong> El ph de tu piel y la exposición a humedad pueden afectar la duración del baño. Sigue estos cuidados para prolongar su vida útil.
+                </p>
+              )}
             </section>
             {/* REVIEWS */}
             <section

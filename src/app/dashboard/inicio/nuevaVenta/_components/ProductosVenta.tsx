@@ -2,7 +2,8 @@
 
 import { Producto } from "../page";
 import { useState, useEffect, useRef } from "react";
-import { Search, X, ChevronDown, Plus, Minus } from "lucide-react";
+import { Search, X, ChevronDown, Plus, Minus, QrCode } from "lucide-react";
+import QrScannerModal from "./QrScannerModal";
 
 interface ProductoDisponible {
   id: number;
@@ -33,6 +34,8 @@ export default function ProductosVenta({
     ProductoDisponible[]
   >([]);
   const [busqueda, setBusqueda] = useState("");
+  const [qrInput, setQrInput] = useState("");
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -86,6 +89,52 @@ export default function ProductosVenta({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Manejar el escaneo de QR ya sea por texto manual o por la cámara
+  const processQrString = (val: string) => {
+    if (!val) return;
+    
+    let idStr = "";
+    
+    // Intentar extraer de una URL como xxx/productos/9
+    const match = val.match(/\/productos\/(\d+)/);
+    if (match && match[1]) {
+      idStr = match[1];
+    } else if (/^\d+$/.test(val)) {
+      // Fallback: si solo se escanea un número
+      idStr = val;
+    }
+    
+    if (idStr) {
+      const prodId = parseInt(idStr, 10);
+      const productoFound = productosDisponibles.find(p => p.id === prodId);
+      
+      if (productoFound) {
+        if (!productoFound.stock || productoFound.stock === 0) {
+          alert("El producto escaneado no tiene stock disponible.");
+        } else {
+          onAgregar(productoFound);
+        }
+      } else {
+        alert("Producto no encontrado en inventario.");
+      }
+    } else {
+      alert("Código QR inválido. No se pudo obtener el ID del producto.");
+    }
+  };
+
+  const handleQrScan = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      processQrString(qrInput.trim());
+      setQrInput("");
+    }
+  };
+
+  const handleCameraScan = (decodedText: string) => {
+    setIsScannerOpen(false);
+    processQrString(decodedText.trim());
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-md shadow-[#8C9796]/20 overflow-visible border border-[#8C9796]/20">
@@ -188,8 +237,33 @@ export default function ProductosVenta({
         )}
       </div>
 
-      {/* SELECTOR DE PRODUCTOS */}
-      <div className="flex gap-4 p-6 border-t bg-[#F6F4EF] relative z-20">
+      {/* SELECTOR DE PRODUCTOS Y ESCÁNER */}
+      <div className="flex flex-col sm:flex-row gap-4 p-6 border-t bg-[#F6F4EF] relative z-20">
+        
+        {/* Acciones de Escáner QR */}
+        <div className="w-full sm:w-[50%] md:w-1/3 flex gap-2">
+          {/* Cámara / Subir Imagen */}
+          <button
+            onClick={() => setIsScannerOpen(true)}
+            className="flex items-center justify-center bg-[#b76e79] text-white px-4 py-3 rounded-xl shadow-sm hover:bg-[#a45f69] transition"
+            title="Abrir cámara o imagen"
+          >
+            <QrCode className="w-5 h-5 mx-auto" />
+          </button>
+          
+          {/* Input para pistola láser física o pegado manual */}
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Pistola láser / Pega URL aquí y presiona Enter..."
+              value={qrInput}
+              onChange={(e) => setQrInput(e.target.value)}
+              onKeyDown={handleQrScan}
+              className="w-full px-3 py-3 bg-white border-2 border-[#8C9796]/40 rounded-xl text-xs text-[#708090] shadow-sm focus:outline-none focus:border-[#B76E79] focus:ring-1 focus:ring-[#B76E79]/20 transition"
+            />
+          </div>
+        </div>
+
         {/* Dropdown para buscar productos */}
         <div ref={dropdownRef} className="flex-1 relative">
           <button
@@ -300,6 +374,12 @@ export default function ProductosVenta({
           )}
         </div>
       </div>
+
+      <QrScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={handleCameraScan}
+      />
     </div>
   );
 }

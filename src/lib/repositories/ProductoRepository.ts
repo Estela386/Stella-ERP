@@ -28,7 +28,8 @@ export class ProductoRepository extends BaseRepository<IProducto> {
       const { data, error } = await this.client.from(this.tableName).select(
         `
           *,
-          categoria:id_categoria(id, nombre)
+          categoria:id_categoria(id, nombre),
+          producto_material(materiales(nombre))
         `
       );
 
@@ -59,7 +60,8 @@ export class ProductoRepository extends BaseRepository<IProducto> {
         .select(
           `
           *,
-          categoria:id_categoria(id, nombre)
+          categoria:id_categoria(id, nombre),
+          producto_material(materiales(nombre))
         `
         )
         .eq("id", id)
@@ -87,7 +89,11 @@ export class ProductoRepository extends BaseRepository<IProducto> {
     try {
       const { data, error } = await this.client
         .from(this.tableName)
-        .select("*")
+        .select(`
+          *,
+          categoria:id_categoria(id, nombre),
+          producto_material(materiales(nombre))
+        `)
         .eq("id_categoria", idCategoria);
 
       if (error) {
@@ -112,7 +118,11 @@ export class ProductoRepository extends BaseRepository<IProducto> {
     try {
       const { data, error } = await this.client
         .from(this.tableName)
-        .select("*")
+        .select(`
+          *,
+          categoria:id_categoria(id, nombre),
+          producto_material(materiales(nombre))
+        `)
         .lt("stock_actual", "stock_min");
 
       if (error) {
@@ -137,7 +147,11 @@ export class ProductoRepository extends BaseRepository<IProducto> {
     try {
       const { data, error } = await this.client
         .from(this.tableName)
-        .select("*")
+        .select(`
+          *,
+          categoria:id_categoria(id, nombre),
+          producto_material(materiales(nombre))
+        `)
         .ilike("nombre", `%${nombre}%`);
 
       if (error) {
@@ -155,11 +169,11 @@ export class ProductoRepository extends BaseRepository<IProducto> {
   /**
    * Crea un nuevo producto
    */
-  async create(data: CreateProductoDTO): Promise<{
+  async create(data: CreateProductoDTO | Omit<IProducto, "id">): Promise<{
     data: IProducto | null;
     error: string | null;
   }> {
-    return super.create(data as Omit<IProducto, "id">);
+    return super.create(data as unknown as Omit<IProducto, "id">);
   }
 
   /**

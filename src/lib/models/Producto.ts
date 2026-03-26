@@ -16,6 +16,7 @@ export interface IProducto {
   es_personalizable?: boolean | null;
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
+  producto_material?: any[];
 }
 
 
@@ -71,6 +72,7 @@ export class Producto implements IProducto {
   es_personalizable?: boolean | null;
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
+  producto_material?: any[];
 
 
   constructor(data: IProducto) {
@@ -87,6 +89,7 @@ export class Producto implements IProducto {
     this.es_personalizable = data.es_personalizable;
     this.descripcion = data.descripcion;
     this.tipo = data.tipo || "fabricado";
+    this.producto_material = data.producto_material;
   }
 
 

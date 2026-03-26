@@ -8,8 +8,10 @@ import InventoryToolbar from "./_components/InventoryToolbar";
 import ProductTable from "./_components/ProductTable";
 import ProductModalForm from "./_components/ProductModalForm";
 import CategoryModal from "./_components/CategoryModal";
+import LabelPrintModal from "./_components/LabelPrintModal";
 import { Producto } from "./type";
 import ProductForm, { type OpcionForm } from "./_components/ProductForm";
+import { FileText } from "lucide-react";
 
 import {
   ProductoService,
@@ -19,6 +21,8 @@ import {
   ProveedorService,
   InsumoService,
   ProductoInsumoService,
+  MaterialService,
+  ProductoMaterialService,
 } from "@lib/services";
 import { CategoriaService } from "@lib/services";
 import { createClient } from "@utils/supabase/client";
@@ -37,10 +41,12 @@ export default function InventariosPage() {
   const [categorias, setCategorias] = useState<any[]>([]);
   const [proveedores, setProveedores] = useState<any[]>([]);
   const [insumos, setInsumos] = useState<any[]>([]);
+  const [materiales, setMateriales] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [labelModalOpen, setLabelModalOpen] = useState(false);
   const [selectedProducto, setSelectedProducto] = useState<
     Producto | undefined
   >();
@@ -104,6 +110,15 @@ export default function InventariosPage() {
           return;
         }
 
+        // Cargar materiales
+        const materialService = new MaterialService(supabase);
+        const { materiales: materialesData, error: errorMateriales } = await materialService.obtenerTodos();
+
+        if (errorMateriales) {
+          setError(errorMateriales);
+          return;
+        }
+
         // Transformar productos a incluir la categoría
         if (productosData && categoriasData) {
           const productosConCategoria = productosData.map(p => {
@@ -133,6 +148,7 @@ export default function InventariosPage() {
         setCategorias(categoriasData || []);
         setProveedores(proveedoresData || []);
         setInsumos(insumosData || []);
+        setMateriales(materialesData || []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -170,13 +186,13 @@ export default function InventariosPage() {
       opcion: { nombre, tipo, obligatorio },
       valores,
     }));
-  // Actualiza la firma para recibir opciones
   const handleSubmitForm = async (
     data: CreateProductoDTO | UpdateProductoDTO,
     imagenFile?: File,
     opciones?: OpcionForm[],
     relacionProveedor?: { id_proveedor: number; precio_compra: number; tiempo_entrega: number },
-    insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[]
+    insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[],
+    materialesSeleccionados?: number[]
   ) => {
     try {
       setFormLoading(true);
@@ -184,11 +200,10 @@ export default function InventariosPage() {
       const productoService = new ProductoService(supabase);
       const categoriaService = new CategoriaService(supabase);
       const imageUploadService = new ImageUploadService(supabase);
-      const personalizacionService = new ProductoPersonalizacionService(
-        supabase
-      );
+      const personalizacionService = new ProductoPersonalizacionService(supabase);
       const productoProveedorService = new ProductoProveedorService(supabase);
       const productoInsumoService = new ProductoInsumoService(supabase);
+      const productoMaterialService = new ProductoMaterialService(supabase);
 
       let urlImagen: string | undefined = undefined;
 
@@ -248,6 +263,12 @@ export default function InventariosPage() {
         const insumosParaGuardar = data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
         const insumoResult = await productoInsumoService.guardarInsumosProducto(selectedProducto.id, insumosParaGuardar);
         if (insumoResult && !insumoResult.success) console.error("Error guardando insumos:", insumoResult.error);
+
+        // Guardar materiales
+        if (materialesSeleccionados) {
+          const materialResult = await productoMaterialService.guardarRelaciones(selectedProducto.id, materialesSeleccionados);
+          if (!materialResult.success) console.error("Error guardando materiales:", materialResult.error);
+        }
 
         const { categorias: categoriasData } =
           await categoriaService.obtenerTodas();
@@ -314,6 +335,11 @@ export default function InventariosPage() {
           const insumosParaGuardar = data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
           const insumoResult = await productoInsumoService.guardarInsumosProducto(productoNuevo.id, insumosParaGuardar);
           if (insumoResult && !insumoResult.success) console.error("Error guardando insumos:", insumoResult.error);
+          
+          if (materialesSeleccionados) {
+            const materialResult = await productoMaterialService.guardarRelaciones(productoNuevo.id, materialesSeleccionados);
+            if (!materialResult.success) console.error("Error guardando materiales:", materialResult.error);
+          }
         }
 
         const { categorias: categoriasData } =
@@ -504,6 +530,24 @@ export default function InventariosPage() {
                   + Categoría
                 </button>
                 <button
+                  onClick={() => setLabelModalOpen(true)}
+                  className="
+            bg-[#B76E79]
+            text-white
+            px-5 py-2.5
+            rounded-full
+            text-sm font-medium
+            shadow-sm
+            hover:bg-[#A45F69]
+            hover:shadow-md
+            transition
+            flex items-center gap-2
+          "
+                >
+                  <FileText className="w-4 h-4" />
+                  Imprimir Etiquetas
+                </button>
+                <button
                   onClick={() => handleOpenModal()}
                   className="
             bg-[#B76E79]
@@ -540,17 +584,24 @@ export default function InventariosPage() {
         categorias={categorias}
         proveedores={proveedores}
         insumos={insumos}
+        materiales={materiales}
         onSubmit={handleSubmitForm}
         onClose={handleCloseModal}
         loading={formLoading}
       />
 
-      {/* Modal de Categoría */}
       <CategoryModal
         isOpen={categoryModalOpen}
         onSubmit={handleCreateCategory}
         onClose={handleCloseCategoryModal}
         loading={formLoading}
+      />
+
+      {/* Modal de Etiquetas */}
+      <LabelPrintModal
+        isOpen={labelModalOpen}
+        onClose={() => setLabelModalOpen(false)}
+        productos={productos}
       />
     </div>
   );

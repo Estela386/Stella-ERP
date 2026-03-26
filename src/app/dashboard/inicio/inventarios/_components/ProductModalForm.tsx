@@ -9,12 +9,14 @@ interface ProductModalProps {
   categorias: any[];
   proveedores?: any[];
   insumos?: any[];
+  materiales?: any[];
   onSubmit: (
     data: CreateProductoDTO | UpdateProductoDTO,
     imagenFile?: File,
     opciones?: OpcionForm[],
     relacionProveedor?: { id_proveedor: number; precio_compra: number; tiempo_entrega: number },
-    insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[]
+    insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[],
+    materialesSeleccionados?: number[]
   ) => Promise<void>;
   onClose: () => void;
   loading?: boolean;
@@ -26,6 +28,7 @@ export default function ProductModal({
   categorias,
   proveedores = [],
   insumos = [],
+  materiales = [],
   onSubmit,
   onClose,
   loading = false,
@@ -73,6 +76,7 @@ export default function ProductModal({
             categorias={categorias}
             proveedores={proveedores}
             insumosDisponibles={insumos}
+            materialesDisponibles={materiales}
             onSubmit={onSubmit}
             onCancel={onClose}
             loading={loading}

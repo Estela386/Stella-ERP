@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from "react";
 import { Producto } from "../type";
 import { CreateProductoDTO, UpdateProductoDTO } from "@lib/models";
 import { IProductoOpcion } from "@lib/models";
+import { createClient } from "@utils/supabase/client";
+import { ProductoMaterialService } from "@lib/services";
 import { 
   Plus, 
   Trash2, 
@@ -34,12 +36,14 @@ interface ProductFormProps {
   categorias: any[];
   proveedores?: any[];
   insumosDisponibles?: any[];
+  materialesDisponibles?: any[];
   onSubmit: (
     data: CreateProductoDTO | UpdateProductoDTO,
     imagenFile?: File,
     opciones?: OpcionForm[],
     relacionProveedor?: { id_proveedor: number; precio_compra: number; tiempo_entrega: number },
-    insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[]
+    insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[],
+    materialesSeleccionados?: number[]
   ) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
@@ -50,6 +54,7 @@ export default function ProductForm({
   categorias,
   proveedores = [],
   insumosDisponibles = [],
+  materialesDisponibles = [],
   onSubmit,
   onCancel,
   loading = false,
@@ -86,6 +91,7 @@ export default function ProductForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loadingOpciones, setLoadingOpciones] = useState(false);
   const [insumosSeleccionados, setInsumosSeleccionados] = useState<{ id_insumo: number, cantidad_necesaria: number }[]>([]);
+  const [materialesSeleccionados, setMaterialesSeleccionados] = useState<number[]>([]);
   const [debugLog, setDebugLog] = useState<string[]>([]);
   
   const COSTO_MINUTO = 1.0; 
@@ -136,6 +142,12 @@ export default function ProductForm({
           ? { ...op, valores: op.valores.filter((_, vi) => vi !== valIdx) }
           : op
       )
+    );
+  };
+
+  const toggleMaterial = (id: number) => {
+    setMaterialesSeleccionados(prev =>
+      prev.includes(id) ? prev.filter(mId => mId !== id) : [...prev, id]
     );
   };
 
@@ -290,7 +302,8 @@ export default function ProductForm({
         imagenFile || undefined,
         opciones,
         formData.tipo === "revendido" ? proveedorRelacion : undefined,
-        formData.tipo === "fabricado" ? insumosSeleccionados : undefined
+        formData.tipo === "fabricado" ? insumosSeleccionados : undefined,
+        materialesSeleccionados
       );
     } catch (error) {
       console.error("Error al guardar producto:", error);
@@ -344,6 +357,15 @@ export default function ProductForm({
             console.warn("No se pudieron cargar insumos o están vacíos", dataIns);
           }
         }
+
+        // Cargar Materiales seleccionados (siempre, para ambos tipos de producto)
+        const supabase = createClient();
+        const materialSvc = new ProductoMaterialService(supabase);
+        const { materialesIds } = await materialSvc.obtenerPorProducto(producto.id);
+        if (materialesIds && materialesIds.length > 0) {
+          setMaterialesSeleccionados(materialesIds);
+        }
+
       } catch (err: any) {
         if (err.name !== 'AbortError') {
           console.error("Error cargando datos del producto:", err);
@@ -586,17 +608,52 @@ export default function ProductForm({
         </div>      )}
 
       {/* SECCIÓN 3: INSUMOS / MATERIALES */}
-      {formData.tipo === "fabricado" && (
-        <div className="p-5 bg-[#ffffff] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#f6f4ef] flex items-center justify-center text-[#708090]"><Layers size={14} strokeWidth={1.5} /></div>
-              <span className="text-sm font-bold text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>Insumos <span className="text-[#b76e79]">/</span> Materiales</span>
+      <div className="p-5 bg-[#ffffff] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] shadow-sm">
+        
+        {/* BLOQUE MATERIALES (Aplica a ambos tipos) */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-lg bg-[#f6f4ef] flex items-center justify-center text-[#708090]">
+              <Layers size={14} strokeWidth={1.5} />
             </div>
-            <button type="button" onClick={agregarInsumo} className="bg-[#2d3748] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black flex items-center gap-2">
-              <PlusCircle size={13} /> Agregar
-            </button>
+            <span className="text-sm font-bold text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
+              Materiales <span className="text-[#b76e79]">de Fabricación</span>
+            </span>
           </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {materialesDisponibles.map((mat) => (
+              <button
+                key={mat.id}
+                type="button"
+                onClick={() => toggleMaterial(mat.id)}
+                className={`
+                  px-4 py-1.5 rounded-full border-2 text-xs font-bold transition-all
+                  ${materialesSeleccionados.includes(mat.id)
+                    ? 'bg-[#2d3748] text-white border-[#2d3748] shadow-md'
+                    : 'bg-white text-[#708090] border-[rgba(112,128,144,0.15)] hover:border-[#b76e79]/40'}
+                `}
+              >
+                {mat.nombre}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Separador */}
+        {formData.tipo === "fabricado" && <div className="h-px w-full bg-[rgba(112,128,144,0.1)] mb-6" />}
+
+        {/* BLOQUE INSUMOS (Solo Fabricado) */}
+        {formData.tipo === "fabricado" && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-[#f6f4ef] flex items-center justify-center text-[#708090]"><Package size={14} strokeWidth={1.5} /></div>
+                <span className="text-sm font-bold text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>Insumos <span className="text-[#b76e79]">Configuración</span></span>
+              </div>
+              <button type="button" onClick={agregarInsumo} className="bg-[#2d3748] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black flex items-center gap-2">
+                <PlusCircle size={13} /> Agregar
+              </button>
+            </div>
 
           {loadingOpciones ? (
             <div className="py-5 flex items-center justify-center gap-3 text-[#708090]/50">
@@ -652,8 +709,9 @@ export default function ProductForm({
               </div>
             </div>
           )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
       {/* SECCIÓN 4: PRECIOS Y RENTABILIDAD */}
       <div className="p-5 bg-[#ffffff] rounded-[20px] border-2 border-[rgba(243, 239, 239, 0.12)] shadow-sm">

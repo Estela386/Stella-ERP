@@ -15,4 +15,5 @@ export { ProductoInsumoService } from "./ProductoInsumoService";
 export { InsumoService } from "./InsumoService";
 export { ProveedorService } from "./ProveedorService";
 export { ProductoProveedorService } from "./ProductoProveedorService";
-
+export { MaterialService } from "./MaterialService";
+export { ProductoMaterialService } from "./ProductoMaterialService";

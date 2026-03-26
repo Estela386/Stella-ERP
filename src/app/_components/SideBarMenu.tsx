@@ -144,19 +144,10 @@ export default function SidebarMenu() {
             <Image
               src="/logo.png"
               alt="Stella Logo"
-              width={160}
-              height={160}
+              width={120}
+              height={120}
               style={{ filter: "brightness(0) invert(1)", opacity: 0.85 }}
             />
-            <p style={{
-              fontFamily: "var(--font-sans, Inter, sans-serif)",
-              fontSize: "0.58rem", fontWeight: 500,
-              letterSpacing: "0.22em", textTransform: "uppercase",
-              color: "rgba(246,244,239,0.45)",
-              marginTop: 4,
-            }}>
-              Panel ERP
-            </p>
           </div>
 
           {/* Ícono S — solo mobile */}

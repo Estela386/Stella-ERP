@@ -13,7 +13,7 @@ export interface ProductoCard {
   category?: string;
   rating?: number;
   es_personalizable?: boolean;
+  materiales?: string[];
   stock_actual?: number;
   stock_min?: number;
 }
-

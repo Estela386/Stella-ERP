@@ -479,15 +479,12 @@ export default function CatalogPage() {
           .order("nombre");
         if (cats) setCategorias(cats.map(c => c.nombre).filter(Boolean) as string[]);
 
-        // Materiales: tipos de insumos usados en productos
-        const { data: ins } = await supabase
-          .from("insumos")
-          .select("tipo")
-          .not("tipo", "is", null);
-        if (ins) {
-          const tipos = [...new Set(ins.map(i => i.tipo).filter(Boolean))] as string[];
-          setMateriales(tipos);
-        }
+        // Materiales
+        const { data: mats } = await supabase
+          .from("materiales")
+          .select("nombre")
+          .order("nombre");
+        if (mats) setMateriales(mats.map(m => m.nombre).filter(Boolean) as string[]);
       } catch (e) {
         console.error(e);
       }
@@ -515,10 +512,7 @@ export default function CatalogPage() {
       if (f.category === "Categoría") {
         r = r.filter(p => (p as any).category?.toLowerCase() === v);
       } else if (f.category === "Material") {
-        r = r.filter(p =>
-          p.name?.toLowerCase().includes(v) ||
-          (p as any).descripcion?.toLowerCase().includes(v)
-        );
+        r = r.filter(p => p.materiales?.some(m => m.toLowerCase() === v));
       } else if (f.category === "Color") {
         r = r.filter(p =>
           p.name?.toLowerCase().includes(v) ||
