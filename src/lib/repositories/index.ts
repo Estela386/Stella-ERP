@@ -12,4 +12,6 @@ export { DetalleVentaRepository } from "./DetalleVentaRepository";
 export { InsumoRepository } from "./InsumoRepository";
 export { ProveedorRepository } from "./ProveedorRepository";
 export { ProductoInsumoRepository } from "./ProductoInsumoRepository";
-
+export { ConsignacionRepository } from "./ConsignacionRepository";
+export { SolicitudMayoristaRepository } from "./SolicitudMayoristaRepository";
+export { UsuarioRepository } from "./UsuarioRepository";

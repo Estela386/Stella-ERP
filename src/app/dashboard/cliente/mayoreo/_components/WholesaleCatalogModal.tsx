@@ -552,7 +552,7 @@ export default function WholesaleCatalogModal({ isOpen, onClose }: Props) {
                           </div>
                         </td>
                         <td style={tdStyle}>${wholesale.toLocaleString()}</td>
-                        <td style={{ ...tdStyle, color: STYLES.rose, fontWeight: 600 }}>+ ${profit.toLocaleString()}</td>
+                        <td style={{ ...tdStyle, color: STYLES.slate, fontWeight: 600 }}>+ ${profit.toLocaleString()}</td>
                         <td style={{ ...tdStyle, fontWeight: 700, color: STYLES.slateDeep }}>${final.toLocaleString()}</td>
                       </tr>
                     );

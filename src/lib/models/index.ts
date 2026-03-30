@@ -78,4 +78,16 @@ export {
   type CreateProductoProveedorDTO,
 } from "./ProductoProveedor";
 
-
+export {
+  type IConsignacion,
+  type CreateConsignacionDTO,
+  type UpdateConsignacionDTO,
+  type EstadoConsignacion,
+  type ISolicitudMayorista,
+  type CreateSolicitudDTO,
+  type UpdateSolicitudDTO,
+  type EstadoSolicitud,
+  type IMovimientoProducto,
+  type CreateMovimientoDTO,
+  type IUsuarioMayorista,
+} from "./Consignacion";

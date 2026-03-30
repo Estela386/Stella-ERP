@@ -132,10 +132,6 @@ export default function MaterialsPage() {
                 Inventario
               </span>
             </div>
-
-            <h1 className="font-sans text-5xl md:text-6xl font-bold tracking-tight leading-tight text-[#4a5568]">
-              Control de <em className="text-[#b76e79] translate-y-[-2px] inline-block not-italic px-1">Materiales</em>
-            </h1>
           </header>
 
           <div className="space-y-8">

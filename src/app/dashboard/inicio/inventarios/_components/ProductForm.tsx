@@ -383,7 +383,7 @@ export default function ProductForm({
     <div className="flex items-center justify-between mb-12 group/header">
       <div className="flex items-center gap-6">
         <div 
-          className="w-16 h-16 rounded-2xl bg-[#ffffff] flex items-center justify-center text-[#708090] border-2 border-[rgba(112,128,144,0.12)] transition-all group-hover/header:border-[#b76e79]/40 shadow-xl"
+          className="w-16 h-16 rounded-2xl bg-[#ffffff] flex items-center justify-center text-[#708090] border-2 border-[rgba(112,128,144,0.12)] transition-all group-hover/header:border-[#b76e79] shadow-xl"
           style={{ boxShadow: "0 8px 30px rgba(140,151,104,0.12)" }}
         >
           <Icon size={28} strokeWidth={1.2} />
@@ -409,7 +409,7 @@ export default function ProductForm({
       <div className="p-5 bg-[#ffffff] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] shadow-sm">
         {/* Tipo — toggles compactos en una sola fila */}
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest flex-shrink-0">Tipo</span>
+          <span className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest flex-shrink-0">Tipo</span>
           <div className="flex gap-2">
             <button
               type="button"
@@ -438,7 +438,7 @@ export default function ProductForm({
         {/* Nombre + Categoría en la misma fila */}
         <div className="flex gap-3">
           <div className="flex-1 flex flex-col gap-1">
-            <label className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest px-1">Nombre</label>
+            <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest px-1">Nombre</label>
             <input
               name="nombre"
               value={formData.nombre}
@@ -449,7 +449,7 @@ export default function ProductForm({
             />
           </div>
           <div className="flex flex-col gap-1" style={{ minWidth: '160px' }}>
-            <label className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest px-1">Categoría</label>
+            <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest px-1">Categoría</label>
             <div className="relative">
               <select
                 name="id_categoria"
@@ -502,11 +502,11 @@ export default function ProductForm({
                 </button>
                 <div className="grid grid-cols-3 gap-3 mb-3">
                   <div>
-                    <label className="text-[0.55rem] font-bold text-[#b76e79] uppercase tracking-widest block mb-1">Atributo</label>
+                    <label className="text-[0.7rem] font-bold text-[#b76e79] uppercase tracking-widest block mb-1">Atributo</label>
                     <input value={opcion.nombre} onChange={(e) => updateOpcion(index, "nombre", e.target.value)} placeholder="Metal, Talla..." className="w-full bg-[#f6f4ef]/70 border border-transparent rounded-[10px] px-3 py-2 text-sm text-[#4a5568] font-bold focus:border-[#b76e79] focus:bg-white outline-none transition-all" />
                   </div>
                   <div>
-                    <label className="text-[0.55rem] font-bold text-[#708090] uppercase tracking-widest block mb-1">Tipo</label>
+                    <label className="text-[0.7rem] font-bold text-[#708090] uppercase tracking-widest block mb-1">Tipo</label>
                     <select value={opcion.tipo} onChange={(e) => updateOpcion(index, "tipo", e.target.value as any)} className="w-full bg-[#f6f4ef]/70 border border-transparent rounded-[10px] px-3 py-2 text-sm text-[#4a5568] font-bold focus:border-[#b76e79] focus:bg-white outline-none cursor-pointer appearance-none">
                       <option value="select">Lista</option>
                       <option value="color">Color</option>
@@ -520,7 +520,7 @@ export default function ProductForm({
                         <input type="checkbox" checked={opcion.obligatorio} onChange={(e) => updateOpcion(index, "obligatorio", e.target.checked)} className="peer sr-only" />
                         <div className="w-8 h-4 bg-[rgba(112,128,144,0.18)] rounded-full peer peer-checked:bg-[#8c9768] transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4" />
                       </div>
-                      <span className="text-[0.6rem] font-bold text-[#708090] uppercase">Requerido</span>
+                      <span className="text-[0.75rem] font-bold text-[#708090] uppercase">Requerido</span>
                     </label>
                   </div>
                 </div>
@@ -555,7 +555,7 @@ export default function ProductForm({
            
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col gap-3 md:col-span-1">
-                <label className="text-[0.7rem] font-bold text-[#708090] uppercase tracking-[0.15em] px-1" style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}>Proveedor</label>
+                <label className="text-[0.8rem] font-bold text-[#708090] uppercase tracking-[0.15em] px-1" style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}>Proveedor</label>
                 <div className="relative group">
                   <select
                     name="id_proveedor"
@@ -576,7 +576,7 @@ export default function ProductForm({
               </div>
 
               <div className="flex flex-col gap-3">
-                 <label className="text-[0.7rem] font-bold text-[#708090] uppercase tracking-[0.15em] px-1" style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}>Costo de compra</label>
+                 <label className="text-[0.8rem] font-bold text-[#708090] uppercase tracking-[0.15em] px-1" style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}>Costo de compra</label>
                  <div className="relative">
                     <span className="absolute left-6 top-1/2 -translate-y-1/2 text-[#b76e79] font-bold">$</span>
                     <input
@@ -591,9 +591,9 @@ export default function ProductForm({
               </div>
 
               <div className="flex flex-col gap-3">
-                 <label className="text-[0.7rem] font-bold text-[#708090] uppercase tracking-[0.15em] px-1" style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}>Días de entrega</label>
+                 <label className="text-[0.8rem] font-bold text-[#708090] uppercase tracking-[0.15em] px-1" style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}>Días de entrega</label>
                  <div className="relative">
-                    <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[#708090]/40 font-bold uppercase text-[0.6rem]">Días</span>
+                    <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[#708090] font-bold uppercase text-[0.6rem]">Días</span>
                     <input
                       type="number"
                       name="tiempo_entrega"
@@ -698,7 +698,7 @@ export default function ProductForm({
               })}
               <div className="flex justify-end pt-2">
                 <div className="bg-[#2d3748] px-5 py-2.5 rounded-xl flex items-center gap-3">
-                  <p className="text-[0.6rem] font-bold text-[#b76e79] uppercase tracking-widest">Total</p>
+                  <p className="text-[0.75rem] font-bold text-[#b76e79] uppercase tracking-widest">Total</p>
                   <p className="text-lg font-black text-white" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
                     ${insumosSeleccionados.reduce((acc, sel) => {
                       const info = insumosDisponibles.find(i => i.id === sel.id_insumo);
@@ -730,25 +730,25 @@ export default function ProductForm({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {/* Costo */}
             <div className="flex flex-col gap-1">
-              <label className="text-[0.55rem] font-bold text-white/40 uppercase tracking-widest">Costo</label>
+              <label className="text-[0.7rem] font-bold text-white uppercase tracking-widest">Costo</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b76e79] font-bold text-xs">$</span>
                 <input
                   type="number" name="costo" value={formData.costo} onChange={handleChange}
                   readOnly={formData.tipo === "revendido"}
-                  className={`w-full bg-white/10 border border-white/10 rounded-lg py-2 pl-6 pr-2 text-sm font-black text-white focus:outline-none focus:border-[#b76e79] transition-all ${
+                  className={`w-full bg-white/10 border border-white rounded-lg py-2 pl-6 pr-2 text-sm font-black text-white focus:outline-none focus:border-[#b76e79] transition-all ${
                     formData.tipo === "revendido" ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                   style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
                 />
               </div>
-              <p className="text-[0.5rem] text-white/25 italic">{formData.tipo === "revendido" ? "Del proveedor" : "(min × $1) + mat."}</p>
+              <p className="text-[0.65rem] text-white italic">{formData.tipo === "revendido" ? "Del proveedor" : "(min × $1) + mat."}</p>
             </div>
 
             {/* Tiempo — solo fabricado */}
             {formData.tipo === "fabricado" ? (
               <div className="flex flex-col gap-1">
-                <label className="text-[0.55rem] font-bold text-white/40 uppercase tracking-widest">Minutos</label>
+                <label className="text-[0.7rem] font-bold text-white uppercase tracking-widest">Minutos</label>
                 <div className="relative">
                   <Clock size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
                   <input
@@ -757,13 +757,13 @@ export default function ProductForm({
                     style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
                   />
                 </div>
-                <p className="text-[0.5rem] text-white/25 italic">min fabricación</p>
+                <p className="text-[0.65rem] text-white italic">min fabricación</p>
               </div>
             ) : <div />}
 
             {/* Precio público */}
             <div className="flex flex-col gap-1">
-              <label className="text-[0.55rem] font-bold text-white/40 uppercase tracking-widest">Precio público</label>
+              <label className="text-[0.7rem] font-bold text-white uppercase tracking-widest">Precio público</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b76e79] font-bold text-xs">$</span>
                 <input
@@ -772,24 +772,24 @@ export default function ProductForm({
                   style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
                 />
                 {!formData.isManualPrecio && formData.costo > 0 && (
-                  <span className="absolute -top-2 right-1 bg-[#8c9768] text-white text-[0.45rem] px-1.5 py-0.5 rounded-full font-bold">Auto 60%</span>
+                  <span className="absolute -top-2 right-1 bg-[#8c9768] text-white text-[0.6rem] px-1.5 py-0.5 rounded-full font-bold">Auto 60%</span>
                 )}
               </div>
-              <p className="text-[0.5rem] text-white/25 italic">60% margen</p>
+              <p className="text-[0.65rem] text-white italic">60% margen</p>
             </div>
 
             {/* Precio mayoreo */}
             <div className="flex flex-col gap-1 opacity-60">
-              <label className="text-[0.55rem] font-bold text-white/40 uppercase tracking-widest">Mayoreo</label>
+              <label className="text-[0.7rem] font-bold text-white uppercase tracking-widest">Mayoreo</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 font-bold text-xs">$</span>
                 <input
                   type="number" readOnly value={formData.costo_mayorista}
-                  className="w-full bg-white/5 border border-transparent rounded-lg py-2 pl-6 pr-2 text-sm font-bold text-white/50 cursor-not-allowed"
+                  className="w-full bg-white/5 border border-transparent rounded-lg py-2 pl-6 pr-2 text-sm font-bold text-white cursor-not-allowed"
                   style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
                 />
               </div>
-              <p className="text-[0.5rem] text-white/25 italic">−30% del público</p>
+              <p className="text-[0.65rem] text-white italic">−30% del público</p>
             </div>
           </div>
         </div>
@@ -797,27 +797,27 @@ export default function ProductForm({
         {/* Métricas: fila de 4 pills delgadas */}
         <div className="grid grid-cols-4 gap-2">
           <div className="bg-[#f6f4ef] rounded-[12px] px-3 py-2 text-center">
-            <p className="text-[0.5rem] text-[#708090] font-bold uppercase mb-0.5">Costo</p>
+            <p className="text-[0.65rem] text-[#708090] font-bold uppercase mb-0.5">Costo</p>
             <p className="text-sm font-black text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
-              <span className="text-[0.6rem] text-[#b76e79]">$</span>{formData.costo}
+              <span className="text-[0.75rem] text-[#b76e79]">$</span>{formData.costo}
             </p>
           </div>
           <div className="bg-[#f6f4ef] rounded-[12px] px-3 py-2 text-center">
-            <p className="text-[0.5rem] text-[#708090] font-bold uppercase mb-0.5">Ganancia</p>
+            <p className="text-[0.65rem] text-[#708090] font-bold uppercase mb-0.5">Ganancia</p>
             <p className={`text-sm font-black ${formData.ganancia >= 0 ? 'text-[#8c9768]' : 'text-rose-500'}`} style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
-              <span className="text-[0.6rem] opacity-40">$</span>{formData.ganancia}
+              <span className="text-[0.75rem] opacity-40">$</span>{formData.ganancia}
             </p>
           </div>
           <div className="bg-[#f6f4ef] rounded-[12px] px-3 py-2 text-center">
-            <p className="text-[0.5rem] text-[#708090] font-bold uppercase mb-0.5">ROI</p>
+            <p className="text-[0.65rem] text-[#708090] font-bold uppercase mb-0.5">ROI</p>
             <p className={`text-sm font-black ${formData.roi_porcentaje >= 60 ? 'text-[#8c9768]' : 'text-amber-500'}`} style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
-              {formData.roi_porcentaje}<span className="text-[0.6rem] opacity-40">%</span>
+              {formData.roi_porcentaje}<span className="text-[0.75rem] opacity-40">%</span>
             </p>
           </div>
           <div className="bg-[#f6f4ef] rounded-[12px] px-3 py-2 text-center">
-            <p className="text-[0.5rem] text-[#708090] font-bold uppercase mb-0.5">Precio</p>
+            <p className="text-[0.65rem] text-[#708090] font-bold uppercase mb-0.5">Precio</p>
             <p className="text-sm font-black text-[#b76e79]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
-              <span className="text-[0.6rem] opacity-40">$</span>{formData.precio}
+              <span className="text-[0.75rem] opacity-40">$</span>{formData.precio}
             </p>
           </div>
         </div>
@@ -834,7 +834,7 @@ export default function ProductForm({
           </div>
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end gap-1">
-              <label className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest">Stock actual</label>
+              <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">Stock actual</label>
               <input
                 type="number"
                 name="stock_actual"
@@ -846,7 +846,7 @@ export default function ProductForm({
             </div>
             <div className="w-px h-10 bg-[rgba(112,128,144,0.2)]" />
             <div className="flex flex-col items-end gap-1">
-              <label className="text-[0.6rem] font-bold text-[#b76e79] uppercase tracking-widest">Stock mínimo</label>
+              <label className="text-[0.75rem] font-bold text-[#b76e79] uppercase tracking-widest">Stock mínimo</label>
               <input
                 type="number"
                 name="stock_min"
@@ -873,7 +873,7 @@ export default function ProductForm({
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#708090]/30">
                   <ImageIcon size={28} strokeWidth={1} />
-                  <p className="text-[0.55rem] font-bold uppercase tracking-widest">Sin imagen</p>
+                  <p className="text-[0.7rem] font-bold uppercase tracking-widest">Sin imagen</p>
                 </div>
               )}
               {previewUrl && (
@@ -889,15 +889,15 @@ export default function ProductForm({
             <label className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-dashed border-[rgba(112,128,144,0.2)] rounded-[14px] cursor-pointer hover:bg-[#b76e79]/5 hover:border-[#b76e79]/30 transition-all">
               <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
               <Plus size={14} className="text-[#b76e79]" />
-              <span className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest">Subir</span>
+              <span className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">Subir</span>
             </label>
           </div>
 
           {/* Descripción — columna derecha */}
           <div className="flex-1 flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <p className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest">Descripción</p>
-              <span className="text-[0.55rem] text-[#708090]/50">Opcional</span>
+              <p className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">Descripción</p>
+              <span className="text-[0.7rem] text-[#708090]/50">Opcional</span>
             </div>
             <textarea
               name="descripcion"

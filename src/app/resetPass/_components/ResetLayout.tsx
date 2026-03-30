@@ -76,7 +76,7 @@ export default function ResetLayout({
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(135deg, #B76E79 0%, #C9A99A 40%, #708090 100%)",
+                "linear-gradient(135deg, #B76E79 0%, #C9A99A 40%, #B76E79 170%)",
             }}
           />
 

@@ -55,13 +55,9 @@ export default function AccountsPage() {
             <div className="flex items-center gap-4">
               <span className="h-px w-12 bg-[#B76E79]" />
               <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
-                Inventario de Materia Prima
+                Cuentas por Cobrar
               </span>
             </div>
-
-            <h1 className="font-serif text-5xl md:text-6xl font-medium leading-tight text-[#708090]">
-              Inventario de materia prima
-            </h1>
           </header>
           <div className="rounded-3xl bg-white p-10 space-y-8 border border-[#8c8976]/30 shadow-lg">
 

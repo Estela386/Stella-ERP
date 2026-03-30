@@ -468,20 +468,6 @@ export default function InventariosPage() {
                 Inventarios
               </span>
             </div>
-
-            {/* Título principal */}
-            <h1
-              className="
-                font-serif
-                text-5xl md:text-6xl
-                font-medium
-                leading-tight
-                text-[#708090]
-              "
-            >
-              Consulta de Inventario
-            </h1>
-
             {/* Subtle divider */}
             <div className="h-px w-full bg-black/5" />
           </header>

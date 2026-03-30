@@ -14,7 +14,7 @@ las operaciones administrativas, comerciales y de atención al cliente de Stella
 
 - **Frontend:** Next.js 14, React 18, Tailwind CSS
 - **Backend:** Supabase, PostgreSQL, Node.js
-- **IA/ML:** Python, TensorFlow, Gemini API
+- **IA/ML:** Python, Gemini API
 - **DevOps:** Docker, GitHub Actions, Vercel
 
 ## Instrucciones para Ejecutar

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import ChatBubble from "./_components/ChatBubble";
 import ChatWindow from "./_components/ChatWindow";
 
 export default function ChatbotPage() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [render, setRender] = useState(false);
 
@@ -12,6 +14,11 @@ export default function ChatbotPage() {
   useEffect(() => {
     if (open) setRender(true);
   }, [open]);
+
+  // Si no estamos en la ruta de cliente, no renderizar el chatbot
+  if (!pathname || !pathname.startsWith("/dashboard/cliente")) {
+    return null;
+  }
 
   function handleAnimationEnd() {
     if (!open) setRender(false);

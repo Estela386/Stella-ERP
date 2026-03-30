@@ -56,7 +56,7 @@ export default function ProductModal({
         {/* Header compacto pegado arriba */}
         <div className="flex items-center justify-between px-5 py-4 bg-white border-b border-[rgba(112,128,144,0.12)] flex-shrink-0">
           <div>
-            <p className="text-[0.55rem] text-[#8c9768] font-bold uppercase tracking-widest">Stella ERP — Inventario</p>
+            <p className="text-[0.7rem] text-[#8c9768] font-bold uppercase tracking-widest">Stella ERP — Inventario</p>
             <h2 className="text-base font-black text-[#4a5568] leading-tight" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
               {producto ? "Editar" : "Nuevo"} <span className="text-[#b76e79]">Producto</span>
             </h2>

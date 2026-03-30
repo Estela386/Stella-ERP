@@ -2,7 +2,7 @@
 
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
+  Tooltip, ResponsiveContainer
 } from "recharts";
 
 const SEMANA_DATA = [
@@ -33,7 +33,8 @@ const HOY_DATA = [
   { dia: "16h", ventas: 3400  },
 ];
 
-function fmt(v: number) {
+function fmt(v: any) {
+  if (typeof v !== 'number') return v;
   return `$${(v / 1000).toFixed(0)}k`;
 }
 
@@ -81,7 +82,7 @@ export default function SalesLineChart({ periodo }: Props) {
             axisLine={false} tickLine={false} width={42}
           />
           <Tooltip
-            formatter={(v: number) => [`$${v.toLocaleString("es-MX")}`, "Ventas"]}
+            formatter={(v: any) => [`$${Number(v).toLocaleString("es-MX")}`, "Ventas"]}
             contentStyle={{
               background: "#fff", borderRadius: 10,
               border: "1px solid #F0EDE8",

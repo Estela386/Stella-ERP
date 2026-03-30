@@ -298,7 +298,7 @@ const modules: ModuleCardProps[] = [
 
 const techStack = [
   "Next.js","React","Tailwind CSS","Supabase","PostgreSQL",
-  "Node.js / Express","TensorFlow","Gemini API",
+  "Node.js / Express","Gemini API",
   "Stripe / PayPal","JWT / OAuth 2.0","Vercel","CI/CD Pipeline",
 ];
 

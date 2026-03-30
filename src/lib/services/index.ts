@@ -17,3 +17,6 @@ export { ProveedorService } from "./ProveedorService";
 export { ProductoProveedorService } from "./ProductoProveedorService";
 export { MaterialService } from "./MaterialService";
 export { ProductoMaterialService } from "./ProductoMaterialService";
+export { ConsignacionService } from "./ConsignacionService";
+export { SolicitudMayoristaService } from "./SolicitudMayoristaService";
+export { UsuarioService } from "./UsuarioService";

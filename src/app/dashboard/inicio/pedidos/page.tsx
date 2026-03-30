@@ -72,11 +72,6 @@ const [search, setSearch] = useState("");
                 Pedidos
               </span>
             </div>
-
-            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium leading-tight text-[#708090]">
-              Gestión de pedidos
-            </h1>
-
             <p className="text-[#8C8976]">
               Pedidos personalizados, reparaciones y ajustes
             </p>
