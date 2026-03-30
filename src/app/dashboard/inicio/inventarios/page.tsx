@@ -192,7 +192,8 @@ export default function InventariosPage() {
     opciones?: OpcionForm[],
     relacionProveedor?: { id_proveedor: number; precio_compra: number; tiempo_entrega: number },
     insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[],
-    materialesSeleccionados?: number[]
+    materialesSeleccionados?: number[],
+    id_actualizar?: number
   ) => {
     try {
       setFormLoading(true);
@@ -224,11 +225,13 @@ export default function InventariosPage() {
         ? { ...data, url_imagen: urlImagen }
         : data;
 
-      if (selectedProducto) {
+      const targetId = id_actualizar || selectedProducto?.id;
+
+      if (targetId) {
         // ── Actualizar ──────────────────────────────────────────────
         const { producto: productoActualizado, error } =
           await productoService.actualizar(
-            selectedProducto.id,
+            targetId,
             dataConImagen as UpdateProductoDTO
           );
 
@@ -238,17 +241,22 @@ export default function InventariosPage() {
         } // ← verificar error ANTES de guardar opciones
 
         // Luego en ambos bloques (actualizar y crear):
-        if (data.es_personalizable && opciones?.length) {
+        // Sincronizar Opciones de Personalización (Elimina anteriores y guarda nuevas)
+        // Se llama siempre que sea personalizable, o si deja de serlo para limpiar
+        if (data.es_personalizable) {
           await personalizacionService.guardarOpcionesProducto(
-            selectedProducto.id,
-            mapOpcionesParaServicio(opciones)
+            targetId,
+            mapOpcionesParaServicio(opciones || [])
           );
+        } else {
+          const personalizacionSvc = new ProductoPersonalizacionService(supabase);
+          await personalizacionSvc.eliminarOpcionesDeProducto(targetId);
         }
 
         // Guardar relación proveedor si es revendido
         if (data.tipo === "revendido" && relacionProveedor) {
           const provResult = await productoProveedorService.guardarRelacion({
-            id_producto: selectedProducto.id,
+            id_producto: targetId,
             id_proveedor: relacionProveedor.id_proveedor,
             precio_compra: relacionProveedor.precio_compra,
             tiempo_entrega: relacionProveedor.tiempo_entrega,
@@ -256,17 +264,17 @@ export default function InventariosPage() {
           if (provResult?.error) console.error("Error guardando proveedor:", provResult.error);
         } else if (data.tipo === "fabricado") {
           // Si cambia de revendido a fabricado, eliminar relación proveedor
-          await productoProveedorService.eliminarPorProducto(selectedProducto.id);
+          await productoProveedorService.eliminarPorProducto(targetId);
         }
 
         // Guardar insumos: siempre, ya sea lista llena o vacía (para borrar al cambiar tipo)
         const insumosParaGuardar = data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
-        const insumoResult = await productoInsumoService.guardarInsumosProducto(selectedProducto.id, insumosParaGuardar);
+        const insumoResult = await productoInsumoService.guardarInsumosProducto(targetId, insumosParaGuardar);
         if (insumoResult && !insumoResult.success) console.error("Error guardando insumos:", insumoResult.error);
 
         // Guardar materiales
         if (materialesSeleccionados) {
-          const materialResult = await productoMaterialService.guardarRelaciones(selectedProducto.id, materialesSeleccionados);
+          const materialResult = await productoMaterialService.guardarRelaciones(targetId, materialesSeleccionados);
           if (!materialResult.success) console.error("Error guardando materiales:", materialResult.error);
         }
 
@@ -278,9 +286,9 @@ export default function InventariosPage() {
 
         setProductos(prev =>
           prev.map(p =>
-            p.id === selectedProducto.id
+            p.id === targetId
               ? {
-                  id: productoActualizado?.id || 0,
+                  id: productoActualizado?.id || targetId,
                   nombre: productoActualizado?.nombre || "",
                   precio: productoActualizado?.precio || 0,
                   costo: productoActualizado?.costo || 0,

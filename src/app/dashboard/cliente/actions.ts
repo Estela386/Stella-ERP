@@ -35,6 +35,8 @@ export async function obtenerProductosCatalogo(): Promise<{
       category: p.nombre?.split(" ")[0] || undefined,
       rating: 5,
       materiales: p.producto_material?.map((pm: any) => pm.materiales?.nombre).filter(Boolean) || [],
+      es_personalizable: !!(p as any).es_personalizable,
+      created_at: (p as any).created_at as string,
     }));
 
     return { productos: productosFormatted, error: null };
@@ -81,6 +83,8 @@ export async function buscarProductosCatalogo(termino: string): Promise<{
       category: p.nombre?.split(" ")[0] || undefined,
       rating: 5,
       materiales: p.producto_material?.map((pm: any) => pm.materiales?.nombre).filter(Boolean) || [],
+      es_personalizable: (p as any).es_personalizable ?? false,
+      created_at: (p as any).created_at,
     }));
 
     return { productos: productosFormatted, error: null };
@@ -124,6 +128,8 @@ export async function obtenerProductosPorCategoria(
       category: p.nombre?.split(" ")[0] || undefined,
       rating: 5,
       materiales: p.producto_material?.map((pm: any) => pm.materiales?.nombre).filter(Boolean) || [],
+      es_personalizable: !!(p as any).es_personalizable,
+      created_at: (p as any).created_at as string,
     }));
 
     return { productos: productosFormatted, error: null };
@@ -167,6 +173,8 @@ export async function obtenerProductosMayoreo(): Promise<{
       image: p.url_imagen || "",
       category: p.nombre?.split(" ")[0] || undefined,
       materiales: p.producto_material?.map((pm: any) => pm.materiales?.nombre).filter(Boolean) || [],
+      es_personalizable: p.es_personalizable ?? false,
+      created_at: (p as any).created_at,
     }));
 
     return { productos: productosFormatted, error: null };

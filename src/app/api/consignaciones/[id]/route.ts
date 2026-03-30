@@ -50,3 +50,34 @@ export async function DELETE(
     );
   }
 }
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
+    const body = await req.json().catch(() => ({}));
+
+    // El único uso del PATCH en consignaciones es para reactivar
+    if (body.action === "reactivar") {
+      const service = new ConsignacionService(supabase);
+      const { success, error } = await service.reactivar(
+        parseInt(id),
+        supabase,
+        body?.admin_id
+      );
+
+      if (error) return NextResponse.json({ error }, { status: 400 });
+      return NextResponse.json({ success });
+    }
+
+    return NextResponse.json({ error: "Acción no válida" }, { status: 400 });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Error" },
+      { status: 500 }
+    );
+  }
+}

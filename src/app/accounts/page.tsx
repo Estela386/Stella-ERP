@@ -8,15 +8,7 @@ import AccountModal from "./_components/AccountModal";
 import PaymentModal from "./_components/PaymentModal";
 import ClientModal from "./_components/ClientModal";
 import SidebarMenu from "@/app/_components/SideBarMenu";
-
-export type Account = {
-  id: number;
-  cliente: string;
-  concepto: string;
-  monto: number;
-  pagado: number;
-  activo: boolean;
-};
+import { useCuentasPorCobrar } from "@lib/hooks/useCuentasPorCobrar";
 
 export default function AccountsPage() {
   const [openAccount, setOpenAccount] = useState(false);
@@ -24,25 +16,16 @@ export default function AccountsPage() {
   const [openClient, setOpenClient] = useState(false);
   const [search, setSearch] = useState("");
 
-  // 🔥 ESTADO GLOBAL
-  const [accounts, setAccounts] = useState<Account[]>([
-    {
-      id: 1,
-      cliente: "María López",
-      concepto: "Venta de productos",
-      monto: 3000,
-      pagado: 1000,
-      activo: true,
-    },
-    {
-      id: 2,
-      cliente: "Carlos Ramírez",
-      concepto: "Servicio mensual",
-      monto: 5000,
-      pagado: 5000,
-      activo: true,
-    },
-  ]);
+  const {
+    cuentas,
+    clientes,
+    loading,
+    error,
+    crearCuentaConCliente,
+    crearCuenta,
+    registrarPago,
+    obtenerPagos,
+  } = useCuentasPorCobrar();
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f6f4ef]">
@@ -50,7 +33,6 @@ export default function AccountsPage() {
 
       <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto">
         <div className="mx-auto max-w-7xl space-y-8">
-
           <header className="space-y-1">
             <div className="flex items-center gap-4">
               <span className="h-px w-12 bg-[#B76E79]" />
@@ -58,20 +40,42 @@ export default function AccountsPage() {
                 Cuentas por Cobrar
               </span>
             </div>
+
+            <h1 className="font-serif text-5xl md:text-6xl font-medium leading-tight text-[#708090]">
+              Inventario de materia prima
+            </h1>
           </header>
+
           <div className="rounded-3xl bg-white p-10 space-y-8 border border-[#8c8976]/30 shadow-lg">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
-            <AccountsStats accounts={accounts} />
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#B76E79]" />
+              </div>
+            ) : (
+              <>
+                <AccountsStats cuentas={cuentas} />
 
-            <AccountsToolbar
-              search={search}
-              onSearchChange={setSearch}
-              onAddAccount={() => setOpenAccount(true)}
-              onAddPayment={() => setOpenPayment(true)}
-              onAddClient={() => setOpenClient(true)}
-            />
+                <AccountsToolbar
+                  search={search}
+                  onSearchChange={setSearch}
+                  onAddAccount={() => setOpenAccount(true)}
+                  onAddPayment={() => setOpenPayment(true)}
+                  onAddClient={() => setOpenClient(true)}
+                />
 
-            <AccountsTable search={search} accounts={accounts} />
+                <AccountsTable
+                  search={search}
+                  cuentas={cuentas}
+                  onVerPagos={obtenerPagos}
+                />
+              </>
+            )}
           </div>
         </div>
       </main>
@@ -79,12 +83,22 @@ export default function AccountsPage() {
       <PaymentModal
         open={openPayment}
         onClose={() => setOpenPayment(false)}
-        accounts={accounts}
-        setAccounts={setAccounts}
+        cuentas={cuentas}
+        onPago={registrarPago}
       />
 
-      <AccountModal open={openAccount} onClose={() => setOpenAccount(false)} />
-      <ClientModal open={openClient} onClose={() => setOpenClient(false)} />
+      <AccountModal
+        open={openAccount}
+        onClose={() => setOpenAccount(false)}
+        clientes={clientes}
+        onGuardar={crearCuenta}
+      />
+
+      <ClientModal
+        open={openClient}
+        onClose={() => setOpenClient(false)}
+        onGuardar={crearCuentaConCliente}
+      />
     </div>
   );
 }

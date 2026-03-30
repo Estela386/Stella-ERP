@@ -23,7 +23,7 @@ export async function POST(req: Request) {
 
     requests.set(ip, now);
 
-    const { name, phone, email, businessType, message } = await req.json();
+    const { name, phone, email, businessType, location, message } = await req.json();
 
     const response = await resend.emails.send({
       from: "onboarding@resend.dev", // temporal
@@ -32,6 +32,7 @@ export async function POST(req: Request) {
       html: `
         <h2>Nueva solicitud de contacto</h2>
         <p><strong>Nombre:</strong> ${name}</p>
+        <p><strong>Ubicación:</strong> ${location}</p>
         <p><strong>Teléfono:</strong> ${phone}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Tipo:</strong> ${businessType}</p>

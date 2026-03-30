@@ -16,4 +16,5 @@ export interface ProductoCard {
   materiales?: string[];
   stock_actual?: number;
   stock_min?: number;
+  created_at?: string;
 }

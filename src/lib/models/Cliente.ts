@@ -6,6 +6,7 @@ export interface ICliente {
   id: number;
   nombre: string;
   telefono: string;
+  id_usuario?: number; // Relación opcional con usuario
 }
 
 /**

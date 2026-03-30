@@ -44,6 +44,12 @@ export default function NosotrosPage() {
   const router = useRouter()
   const { usuario } = useAuth()
 
+  const usuarioId = usuario
+    ? typeof usuario.id === "string"
+      ? parseInt(usuario.id, 10)
+      : (usuario.id as number)
+    : null
+
   return (
     <div className="min-h-screen bg-[#F8F6F3] flex flex-col">
       <HeaderClient user={usuario} />
@@ -132,7 +138,7 @@ export default function NosotrosPage() {
         </div>
 
         {/* Wholesale Section */}
-        <WholesaleSection />
+        <WholesaleSection usuarioId={usuarioId} />
 
         {/* Banner Section */}
         <div className="

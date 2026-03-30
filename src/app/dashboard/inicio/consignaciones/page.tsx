@@ -73,7 +73,6 @@ export default function ConsignacionesPage() {
   };
 
   const handleCancelar = async (c: IConsignacion) => {
-    if (!confirm(`¿Cancelar la consignación #${c.id}? Se devolverá el stock al inventario.`)) return;
     try {
       const res = await fetch(`/api/consignaciones/${c.id}`, {
         method: "DELETE",
@@ -86,6 +85,66 @@ export default function ConsignacionesPage() {
       adminHook.reload();
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Error", "err");
+    }
+  };
+
+  const handleReactivar = async (c: IConsignacion) => {
+    try {
+      const res = await fetch(`/api/consignaciones/${c.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reactivar", admin_id: usuarioId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      showToast("Consignación reactivada y stock asignado de nuevo");
+      adminHook.reload();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Error al reactivar", "err");
+    }
+  };
+
+  const handleEliminarMayorista = async (m: import("@lib/models").IUsuarioMayorista) => {
+    try {
+      const res = await fetch(`/api/mayoristas/${m.id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      showToast(`✓ ${m.nombre ?? "Mayorista"} ya no tiene rol de Mayorista`);
+      adminHook.reload();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Error al quitar mayorista", "err");
+    }
+  };
+
+  const handleSuspenderMayorista = async (m: import("@lib/models").IUsuarioMayorista, motivo: string) => {
+    try {
+      const res = await fetch(`/api/mayoristas/${m.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activo: false, motivo }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      showToast(`Cuenta de ${m.nombre ?? "Mayorista"} suspendida. Notificación enviada por email.`);
+      adminHook.reload();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Error al suspender", "err");
+    }
+  };
+
+  const handleReactivarMayorista = async (m: import("@lib/models").IUsuarioMayorista) => {
+    try {
+      const res = await fetch(`/api/mayoristas/${m.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activo: true }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      showToast(`✓ Cuenta de ${m.nombre ?? "Mayorista"} reactivada`);
+      adminHook.reload();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Error al reactivar", "err");
     }
   };
 
@@ -188,14 +247,18 @@ export default function ConsignacionesPage() {
                   onNueva={() => { setEditando(null); setModalConsignacion(true); }}
                   onEditar={c => { setEditando(c); setModalConsignacion(true); }}
                   onCancelar={handleCancelar}
+                  onReactivar={handleReactivar}
                 />
               )}
 
               {activeTab === "mayoristas" && (
                 <MayoristasTable
                   mayoristas={adminHook.mayoristas}
+                  consignaciones={adminHook.consignaciones}
                   loading={adminHook.loading}
-                  onPromover={() => setModalPromover(true)}
+                  onEliminar={handleEliminarMayorista}
+                  onSuspender={handleSuspenderMayorista}
+                  onReactivar={handleReactivarMayorista}
                 />
               )}
 

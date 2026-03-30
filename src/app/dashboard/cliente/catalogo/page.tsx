@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import HeaderClient from "@auth/_components/HeaderClient";
 import Footer from "@auth/_components/Footer";
 import { ProductoCard } from "../types";
@@ -12,6 +12,7 @@ import { ChevronDown, X, Grid, List, Search, SlidersHorizontal, Sparkles } from 
 import { createClient } from "@utils/supabase/client";
 import ChatbotPage from "@/app/chatbot/page";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { Suspense } from "react";
 
 // ─── Design tokens ────────────────────────────────────────
 const ROSE   = "#b76e79";
@@ -227,20 +228,20 @@ function ProductListCard({ product, onClick, esMayorista }: { product: ProductoC
       style={{
         display: "flex", alignItems: "stretch",
         background: "white",
-        borderRadius: 16,
-        border: hovered ? `1px solid rgba(183,110,121,0.3)` : "1px solid rgba(112,128,144,0.15)",
-        boxShadow: hovered ? "0 12px 32px rgba(140,151,104,0.18)" : "0 2px 12px rgba(140,151,104,0.08)",
+        borderRadius: 8,
+        border: "none",
+        boxShadow: hovered ? "0 12px 40px rgba(0,0,0,0.06)" : "0 4px 14px rgba(0,0,0,0.03)",
         overflow: "hidden",
         cursor: "pointer",
-        transition: "all 0.22s ease",
-        transform: hovered ? "translateY(-3px)" : "translateY(0)",
+        transition: "all 0.4s cubic-bezier(0.25, 1, 0.5, 1)",
+        transform: hovered ? "translateY(-4px)" : "translateY(0)",
       }}
     >
       {/* Imagen */}
       <div style={{
-        width: "clamp(120px,18vw,180px)",
+        width: "clamp(120px,22vw,220px)", // Slightly wider for luxury portrait feel
         flexShrink: 0,
-        background: BG,
+        background: "#FAF9F6",
         position: "relative",
         overflow: "hidden",
       }}>
@@ -250,50 +251,46 @@ function ProductListCard({ product, onClick, esMayorista }: { product: ProductoC
           src={product.image || "/placeholder.png"}
           alt={product.name}
           fill
-          style={{ objectFit: "cover", transform: hovered ? "scale(1.06)" : "scale(1)", transition: "transform 0.5s ease" }}
+          style={{ objectFit: "cover", transform: hovered ? "scale(1.05)" : "scale(1)", transition: "transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)" }}
         />
-        {(product as any).es_personalizable && (
-          <div style={{
-            position: "absolute", top: 10, left: 10, zIndex: 2,
-            padding: "3px 8px", borderRadius: 20,
-            background: "rgba(183,110,121,0.9)",
-            color: "white", fontSize: "0.6rem", fontWeight: 600,
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
-            display: "flex", alignItems: "center", gap: 3,
-          }}>
-            <Sparkles size={9} /> Personalizable
-          </div>
-        )}
       </div>
 
       {/* Info */}
-      <div style={{ flex: 1, padding: "clamp(16px,2.5vw,24px)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+      <div style={{ flex: 1, padding: "clamp(20px,3vw,32px)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div>
           {(product as any).category && (
-            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.62rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 6px" }}>
+            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.62rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em", color: "#8c9768", margin: "0 0 8px" }}>
               {(product as any).category}
             </p>
           )}
-          <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(1.1rem,2vw,1.4rem)", fontWeight: 600, color: DEEP, margin: "0 0 8px", lineHeight: 1.2 }}>
+          <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(1.4rem,2.5vw,1.8rem)", fontWeight: 400, color: hovered ? "#b76e79" : "#2D3748", margin: "0 0 10px", lineHeight: 1.2, transition: "color 0.3s ease", letterSpacing: "0.01em" }}>
             {product.name}
           </h3>
           {(product as any).descripcion && (
-            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", color: SLATE, lineHeight: 1.6, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.85rem", color: "#708090", lineHeight: 1.65, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
               {(product as any).descripcion}
             </p>
           )}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, flexWrap: "wrap", gap: 10 }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.5rem", fontWeight: 500, color: esMayorista ? ROSE : DEEP, fontStyle: "italic" }}>
-              ${discountPrice?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
-            </span>
-            {esMayorista && (
-              <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.6rem", fontWeight: 700, color: ROSE, background: "rgba(183,110,121,0.1)", padding: "2px 6px", borderRadius: 4 }}>
-                Socio Stella -30%
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginTop: 24, gap: 16 }}>
+          <div style={{ flex: 1 }} />
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 3, marginBottom: 6, opacity: 0.8 }}>
+              {[...Array(5)].map((_, i) => (
+                <span key={i} style={{ color: "#b76e79", fontSize: "0.7rem", lineHeight: 1 }}>★</span>
+              ))}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "1.05rem", fontWeight: 500, color: "#4a5568", letterSpacing: "0.03em" }}>
+                ${discountPrice?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
               </span>
-            )}
+              {esMayorista && (
+                <span style={{ fontSize: '0.6rem', fontWeight: 600, letterSpacing: "0.05em", color: "#b76e79", border: "1px solid rgba(183,110,121,0.3)", padding: "2px 6px", borderRadius: 3 }}>
+                  -30%
+                </span>
+              )}
+            </div>
           </div>
 
           {(product as any).stock_actual !== undefined && (
@@ -333,15 +330,15 @@ function ProductGridCard({ product, onClick, esMayorista }: { product: ProductoC
       {/* Imagen */}
       <div style={{
         position: "relative",
-        aspectRatio: "1/1",
-        borderRadius: 14,
+        aspectRatio: "3/4", // More elegant portrait aspect ratio for jewelry
+        borderRadius: 8,
         overflow: "hidden",
-        background: BG,
-        border: hovered ? "1px solid rgba(183,110,121,0.25)" : "1px solid rgba(112,128,144,0.12)",
-        boxShadow: hovered ? "0 18px 40px rgba(140,151,104,0.22)" : "0 2px 12px rgba(140,151,104,0.08)",
-        marginBottom: 14,
-        transition: "all 0.22s ease",
-        transform: hovered ? "translateY(-5px)" : "translateY(0)",
+        background: "#FAF9F6", // Very soft, high-end off-white
+        border: "none",
+        boxShadow: hovered ? "0 12px 40px rgba(0,0,0,0.06)" : "none",
+        marginBottom: 16,
+        transition: "all 0.4s cubic-bezier(0.25, 1, 0.5, 1)",
+        transform: hovered ? "translateY(-4px)" : "translateY(0)",
       }}>
         {/* Sheen */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.9),transparent)", zIndex: 2 }} />
@@ -353,23 +350,8 @@ function ProductGridCard({ product, onClick, esMayorista }: { product: ProductoC
           src={product.image || "/placeholder.png"}
           alt={product.name}
           fill
-          style={{ objectFit: "cover", transform: hovered ? "scale(1.07)" : "scale(1)", transition: "transform 0.5s ease" }}
+          style={{ objectFit: "cover", transform: hovered ? "scale(1.05)" : "scale(1)", transition: "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)" }}
         />
-
-        {/* Badge personalizable */}
-        {(product as any).es_personalizable && (
-          <div style={{
-            position: "absolute", top: 10, left: 10, zIndex: 3,
-            padding: "3px 8px", borderRadius: 20,
-            background: "rgba(183,110,121,0.88)",
-            backdropFilter: "blur(4px)",
-            color: "white", fontSize: "0.58rem", fontWeight: 600,
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
-            display: "flex", alignItems: "center", gap: 3,
-          }}>
-            <Sparkles size={8} /> Personalizable
-          </div>
-        )}
 
         {/* Stock badge */}
         {(product as any).stock_actual === 0 && (
@@ -385,39 +367,48 @@ function ProductGridCard({ product, onClick, esMayorista }: { product: ProductoC
         )}
       </div>
 
-      {/* Info */}
-      <div style={{ padding: "0 2px" }}>
+      {/* Info Premium */}
+      <div style={{ padding: "12px 4px 6px", textAlign: "left" }}>
         {(product as any).category && (
-          <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.6rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.16em", color: SAGE, margin: "0 0 4px" }}>
+          <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.62rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em", color: "#8c9768", margin: "0 0 8px" }}>
             {(product as any).category}
           </p>
         )}
-        <h3 style={{
-          fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
-          fontSize: "1.05rem", fontWeight: 600,
-          color: hovered ? DEEP : SLATE,
-          margin: "0 0 6px", lineHeight: 1.2,
-          transition: "color 0.18s",
-        }}>
-          {product.name}
-        </h3>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          {[...Array(5)].map((_, i) => (
-            <span key={i} style={{ color: ROSE, fontSize: "0.62rem" }}>★</span>
-          ))}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <h3 style={{
+            fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
+            fontSize: "1.3rem", fontWeight: 400, // Lighter weight for elegance
+            color: hovered ? "#b76e79" : "#2D3748",
+            margin: "0", lineHeight: 1.15,
+            transition: "color 0.3s ease",
+            letterSpacing: "0.01em",
+            flex: 1,
+            wordBreak: "break-word"
+          }}>
+            {product.name}
+          </h3>
+          
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 3, marginBottom: 2, opacity: 0.8 }}>
+              {[...Array(5)].map((_, i) => (
+                <span key={i} style={{ color: "#b76e79", fontSize: "0.62rem", lineHeight: 1 }}>★</span>
+              ))}
+            </div>
+            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.95rem", fontWeight: 500, color: "#4a5568", margin: "0", letterSpacing: "0.03em", textAlign: "right" }}>
+              ${discountPrice?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+              {esMayorista && <span style={{ display: "block", marginTop: 2, fontSize: '0.6rem', fontWeight: 600, letterSpacing: "0.05em", color: "#b76e79", border: "1px solid rgba(183,110,121,0.3)", padding: "2px 6px", borderRadius: 3 }}>-30%</span>}
+            </p>
+          </div>
         </div>
-        <p style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.15rem", fontWeight: 500, color: esMayorista ? ROSE : DEEP, fontStyle: "italic", margin: "6px 0 0" }}>
-          ${discountPrice?.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
-          {esMayorista && <span style={{ fontSize: '0.6rem', fontStyle: 'normal', opacity: 0.8, marginLeft: 4 }}>(-30%)</span>}
-        </p>
       </div>
     </motion.div>
   );
 }
 
-// ─── Página principal ──────────────────────────────────────
-export default function CatalogPage() {
+// ─── Componente Principal ────────────────────────────────────
+function CatalogContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { usuario } = useAuth();
   const esMayorista = usuario?.id_rol === 3 || usuario?.id_rol === 1;
 
@@ -438,6 +429,13 @@ export default function CatalogPage() {
   // Rango de precio dinámico
   const [priceRange, setPriceRange]   = useState<PriceRange>({ min: 0, max: 5000 });
   const [priceFilter, setPriceFilter] = useState<PriceRange | null>(null);
+
+  // ── Leer query params para defaults ──
+  useEffect(() => {
+    const cat = searchParams.get("categoria");
+    if (cat === "personalizada") setSortBy("Personalizables");
+    else if (cat === "nuevos") setSortBy("Novedades");
+  }, [searchParams]);
 
   // ── Cargar productos ──
   useEffect(() => {
@@ -529,7 +527,8 @@ export default function CatalogPage() {
     // Ordenamiento
     if (sortBy === "Precio: Menor a Mayor") r.sort((a, b) => (a.price || 0) - (b.price || 0));
     else if (sortBy === "Precio: Mayor a Menor") r.sort((a, b) => (b.price || 0) - (a.price || 0));
-    else if (sortBy === "Personalizables") r = r.filter(p => (p as any).es_personalizable);
+    else if (sortBy === "Personalizables") r = r.filter(p => p.es_personalizable);
+    else if (sortBy === "Novedades") r.sort((a, b) => b.id - a.id);
 
     return r;
   }, [productos, searchTerm, activeFilters, priceFilter, sortBy]);
@@ -994,5 +993,13 @@ export default function CatalogPage() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>Cargando catálogo...</div>}>
+      <CatalogContent />
+    </Suspense>
   );
 }

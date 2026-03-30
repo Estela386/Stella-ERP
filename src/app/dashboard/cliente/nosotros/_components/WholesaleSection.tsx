@@ -4,11 +4,16 @@ import { useState } from "react";
 import { Handshake, TrendingUp, Percent, Send } from "lucide-react";
 import { toast } from "sonner";
 
-export default function WholesaleSection() {
+interface WholesaleSectionProps {
+  usuarioId?: number | null;
+}
+
+export default function WholesaleSection({ usuarioId }: WholesaleSectionProps = {}) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
+    location: "",
     businessType: "consignacion",
     message: "",
   });
@@ -25,18 +30,36 @@ export default function WholesaleSection() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/contact", {
+      // 1) Enviar correo de notificación (flujo existente)
+      const emailRes = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
+      const emailData = await emailRes.json();
+      if (!emailRes.ok) throw new Error(emailData.error || "Error al enviar correo");
 
-      if (!res.ok) {
-        throw new Error(data.error || "Error");
+      // 2) Crear solicitud en el módulo de consignaciones (solo si hay usuario autenticado)
+      if (usuarioId) {
+        const mensaje = [
+          `Ubicación: ${formData.location}`,
+          `Tel: ${formData.phone}`,
+          `Esquema: ${formData.businessType}`,
+          formData.message ? `Negocio: ${formData.name} — ${formData.message}` : `Negocio: ${formData.name}`,
+        ]
+          .filter(Boolean)
+          .join(" | ");
+
+        await fetch("/api/solicitudes-mayorista", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id_usuario: usuarioId,
+            mensaje,
+          }),
+        });
+        // No bloqueamos el flujo si esta llamada falla — el correo ya se envió
       }
 
       setSubmitted(true);
@@ -56,9 +79,8 @@ export default function WholesaleSection() {
           Únete como <span className="text-[#b76e79]">Mayorista</span>
         </h2>
         <p className="text-[#708090]/80 max-w-2xl mx-auto text-sm md:text-base">
-          Crece tu negocio junto a Stella Joyería. Ofrecemos precios
-          preferenciales y esquemas a consignación para emprendedores y
-          boutiques.
+          Crece tu negocio junto a Stella Joyería. Ofrecemos beneficios exclusivos
+          diseñados para maximizar tu rentabilidad y el éxito de tu emprendimiento.
         </p>
       </div>
 
@@ -78,29 +100,27 @@ export default function WholesaleSection() {
             <div className="space-y-6">
               <div className="flex gap-4">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#b76e79]/10 flex items-center justify-center">
-                  <Handshake className="text-[#b76e79]" size={24} />
+                  <Percent className="text-[#b76e79]" size={24} />
                 </div>
                 <div>
                   <h4 className="font-bold text-[#708090] text-lg">
-                    Venta a Consignación
+                    Margen de Ganancia
                   </h4>
                   <p className="text-[#708090]/80 text-sm mt-1">
-                    Lleva nuestro catálogo a tus clientes y paga solo por lo que
-                    vendas. Ideal para comenzar sin riesgo.
+                    Obtén un 30% de descuento fijo en todas tus compras desde el primer pedido.
                   </p>
                 </div>
               </div>
               <div className="flex gap-4">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#b76e79]/10 flex items-center justify-center">
-                  <Percent className="text-[#b76e79]" size={24} />
+                  <Handshake className="text-[#b76e79]" size={24} />
                 </div>
                 <div>
                   <h4 className="font-bold text-[#708090] text-lg">
-                    Precios Preferenciales
+                    Inventario Inteligente
                   </h4>
                   <p className="text-[#708090]/80 text-sm mt-1">
-                    Obtén descuentos exclusivos por volumen. Mayor margen de
-                    ganancia para tu negocio al vender nuestras piezas.
+                    Acceso a nuestro modelo de consignación para mayoristas consolidados en ZMG.
                   </p>
                 </div>
               </div>
@@ -110,11 +130,10 @@ export default function WholesaleSection() {
                 </div>
                 <div>
                   <h4 className="font-bold text-[#708090] text-lg">
-                    Apoyo y Crecimiento
+                    Exclusividad
                   </h4>
                   <p className="text-[#708090]/80 text-sm mt-1">
-                    Recibirás material de marketing, empaques oficiales y
-                    asesoría constante para maximizar tus ventas.
+                    Piezas de edición limitada y colecciones de autor que no encontrarás en otros lados.
                   </p>
                 </div>
               </div>
@@ -179,25 +198,42 @@ export default function WholesaleSection() {
                       setFormData({ ...formData, phone: e.target.value })
                     }
                     className="w-full bg-[#f6f4ef] border border-[#708090]/20 rounded-xl px-4 py-3 text-[#708090] text-sm focus:outline-none focus:border-[#b76e79]/50 focus:shadow-[0_0_0_3px_rgba(183,110,121,0.1)] transition-all"
-                    placeholder="Ej. 55 1234 5678"
+                    placeholder="Ej. 33 1234 5678"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#708090] uppercase tracking-wide">
-                  Correo Electrónico
-                </label>
-                <input
-                  required
-                  type="email"
-                  value={formData.email}
-                  onChange={e =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full bg-[#f6f4ef] border border-[#708090]/20 rounded-xl px-4 py-3 text-[#708090] text-sm focus:outline-none focus:border-[#b76e79]/50 focus:shadow-[0_0_0_3px_rgba(183,110,121,0.1)] transition-all"
-                  placeholder="tu@correo.com"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-[#708090] uppercase tracking-wide">
+                    Correo Electrónico
+                  </label>
+                  <input
+                    required
+                    type="email"
+                    value={formData.email}
+                    onChange={e =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    className="w-full bg-[#f6f4ef] border border-[#708090]/20 rounded-xl px-4 py-3 text-[#708090] text-sm focus:outline-none focus:border-[#b76e79]/50 focus:shadow-[0_0_0_3px_rgba(183,110,121,0.1)] transition-all"
+                    placeholder="tu@correo.com"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-[#708090] uppercase tracking-wide">
+                    ¿Dónde vives? / Ciudad
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    value={formData.location}
+                    onChange={e =>
+                      setFormData({ ...formData, location: e.target.value })
+                    }
+                    className="w-full bg-[#f6f4ef] border border-[#708090]/20 rounded-xl px-4 py-3 text-[#708090] text-sm focus:outline-none focus:border-[#b76e79]/50 focus:shadow-[0_0_0_3px_rgba(183,110,121,0.1)] transition-all"
+                    placeholder="Ej. Guadalajara (ZMG)"
+                  />
+                </div>
               </div>
 
               <div className="space-y-1.5">
@@ -238,7 +274,7 @@ export default function WholesaleSection() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#b76e79] text-[#f6f4ef] font-bold py-3.5 rounded-xl disabled:opacity-50"
+                className="w-full bg-[#b76e79] text-[#f6f4ef] font-bold py-3.5 rounded-xl disabled:opacity-50 transition-colors hover:bg-[#a05d68]"
               >
                 {loading ? "Enviando..." : "Solicitar Información"}
               </button>

@@ -221,6 +221,79 @@ export class ConsignacionService {
     return { success: !error, error };
   }
 
+  /** Reactivar consignación (de cancelada/finalizada) */
+  async reactivar(
+    id: number,
+    supabase: SupabaseClient,
+    adminId?: number
+  ): Promise<{ success: boolean; error: string | null }> {
+    const { data: cons, error: getErr } = await supabase
+      .from("consignacion")
+      .select(`
+        *,
+        detalles:consignacion_detalle(
+          id_producto, cantidad, cantidad_devuelta, cantidad_vendida,
+          producto:producto!fk_detalle_producto(id, stock_actual, stock_consignado, nombre)
+        )
+      `)
+      .eq("id", id)
+      .single();
+
+    if (getErr || !cons) return { success: false, error: getErr?.message ?? "No encontrada" };
+    if (cons.estado === "activa") return { success: false, error: "La consignación ya está activa" };
+
+    const movimientosInsert = [];
+
+    // Verificar stock primero
+    if (cons.detalles && Array.isArray(cons.detalles)) {
+      for (const det of cons.detalles) {
+        const cantidadPendiente = det.cantidad - (det.cantidad_devuelta ?? 0) - (det.cantidad_vendida ?? 0);
+        if (cantidadPendiente > 0 && det.producto) {
+          if (det.producto.stock_actual < cantidadPendiente) {
+            return {
+              success: false,
+              error: `Stock insuficiente para ${det.producto.nombre}. Necesita ${cantidadPendiente}, hay ${det.producto.stock_actual}`
+            };
+          }
+        }
+      }
+    }
+
+    // Efectuar cambios
+    if (cons.detalles && Array.isArray(cons.detalles)) {
+      for (const det of cons.detalles) {
+        const cantidadPendiente = det.cantidad - (det.cantidad_devuelta ?? 0) - (det.cantidad_vendida ?? 0);
+
+        if (cantidadPendiente > 0 && det.producto) {
+          await supabase
+            .from("producto")
+            .update({
+              stock_actual: det.producto.stock_actual - cantidadPendiente,
+              stock_consignado: (det.producto.stock_consignado ?? 0) + cantidadPendiente,
+            })
+            .eq("id", det.id_producto);
+
+          movimientosInsert.push({
+            id_producto: det.id_producto,
+            tipo: "salida",
+            cantidad: cantidadPendiente,
+            motivo: "reactivacion_consignacion",
+            referencia_id: id,
+            creado_por: adminId,
+          });
+        }
+      }
+    }
+
+    if (movimientosInsert.length > 0) {
+      await supabase.from("movimientos_producto").insert(movimientosInsert);
+    }
+
+    // Marcar como activa
+    const { error } = await this.repo.updateConsignacion(id, { estado: "activa" });
+    return { success: !error, error };
+  }
+
   /** Listar mayoristas disponibles */
   async listarMayoristas(): Promise<{
     mayoristas: IUsuarioMayorista[];

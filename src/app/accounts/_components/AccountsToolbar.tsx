@@ -47,7 +47,7 @@ export default function AccountsToolbar({
       {/* BOTONES */}
       <div className="flex flex-wrap gap-3">
         {/* + Cliente */}
-        <button
+        {/* <button
           onClick={onAddClient}
           className="
             px-5 py-2.5
@@ -59,10 +59,11 @@ export default function AccountsToolbar({
             hover:bg-[#708090]
             hover:text-[#f6f4ef]
             transition
+            cursor-pointer
           "
         >
           + Cliente
-        </button>
+        </button> */}
 
         {/* + Cuenta */}
         <button
@@ -77,6 +78,7 @@ export default function AccountsToolbar({
               hover:bg-[#708090]
             hover:text-[#f6f4ef]
             transition
+            cursor-pointer
           "
         >
           + Cuenta
@@ -95,6 +97,7 @@ export default function AccountsToolbar({
               hover:bg-[#708090]
             hover:text-[#f6f4ef]
             transition
+            cursor-pointer
           "
         >
           + Abono

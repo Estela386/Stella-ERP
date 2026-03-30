@@ -626,6 +626,75 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                         </select>
                       )}
 
+                      {op.tipo === "color" && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 12 }}>
+                          {op.valores?.map((v: any) => {
+                            const val = v.valor || "";
+                            const [colorName, colorHex] = val.includes('|') ? val.split('|') : [val, val];
+                            const isSelected = configuracion[op.id] === val;
+                            
+                            return (
+                              <button
+                                key={v.id}
+                                type="button"
+                                onClick={() => {
+                                  setConfiguracion(prev => ({ ...prev, [op.id]: val }));
+                                  if (erroresPersonalizacion[op.id]) {
+                                    setErroresPersonalizacion(prev => {
+                                      const next = { ...prev };
+                                      delete next[op.id];
+                                      return next;
+                                    });
+                                  }
+                                }}
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                  gap: 6,
+                                  background: "none",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                                  padding: 0
+                                }}
+                              >
+                                <div 
+                                  style={{ 
+                                    width: 36, 
+                                    height: 36, 
+                                    borderRadius: "50%", 
+                                    backgroundColor: colorHex.startsWith('#') ? colorHex : '#ffffff',
+                                    border: isSelected ? "2.5px solid #b76e79" : "1.5px solid rgba(112,128,144,0.1)",
+                                    boxShadow: isSelected ? "0 4px 12px rgba(183,110,121,0.25)" : "0 2px 6px rgba(0,0,0,0.03)",
+                                    transform: isSelected ? "scale(1.15)" : "scale(1)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    transition: "all 0.3s ease"
+                                  }}
+                                >
+                                  {isSelected && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "white", boxShadow: "0 1px 2px rgba(0,0,0,0.2)" }} />}
+                                </div>
+                                <span 
+                                  style={{ 
+                                    fontSize: "0.6rem", 
+                                    fontWeight: 700, 
+                                    textTransform: "uppercase", 
+                                    letterSpacing: "0.08em",
+                                    color: isSelected ? "#b76e79" : "#708090",
+                                    opacity: isSelected ? 1 : 0.6,
+                                    transition: "all 0.2s ease"
+                                  }}
+                                >
+                                  {colorName}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
                       {op.tipo === "text" && (
                         <input
                           type="text"

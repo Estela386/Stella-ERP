@@ -21,14 +21,29 @@ import {
   ChevronRight,
   PlusCircle,
   Info,
-  X as FiX
+  X as FiX,
+  Palette
 } from "lucide-react";
+
+const LUXURY_PALETTE = [
+  { name: "Verde Bandera", hex: "#006847" },
+  { name: "Verde Limón", hex: "#A4D307" },
+  { name: "Azul Brante", hex: "#08ACE4" },
+  { name: "Azul Marino", hex: "#000080" },
+  { name: "Negro", hex: "#000000" },
+  { name: "Café", hex: "#6F4E37" },
+  { name: "Rosa", hex: "#FE83C0" },
+  { name: "Beige", hex: "#F5F5DC" },
+  { name: "Blanco", hex: "#FFFFFF" },
+  { name: "Lila", hex: "#DBC3FE" },
+  { name: "Rojo Stella", hex: "#DB001A" },
+];
 
 export interface OpcionForm {
   nombre: string;
-  tipo: IProductoOpcion["tipo"];
+  tipo: any; 
   obligatorio: boolean;
-  valores: string[];
+  valores: { valor: string; stock: number }[];
 }
 
 interface ProductFormProps {
@@ -43,7 +58,8 @@ interface ProductFormProps {
     opciones?: OpcionForm[],
     relacionProveedor?: { id_proveedor: number; precio_compra: number; tiempo_entrega: number },
     insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[],
-    materialesSeleccionados?: number[]
+    materialesSeleccionados?: number[],
+    id_actualizar?: number
   ) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
@@ -85,7 +101,7 @@ export default function ProductForm({
 
   const [opciones, setOpciones] = useState<OpcionForm[]>([]);
   const [imagenFile, setImagenFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(
+  const [previewUrl, setPreviewUrl] = useState<string | null | undefined>(
     producto?.url_imagen || null
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -117,18 +133,18 @@ export default function ProductForm({
   const agregarValor = (i: number) => {
     setOpciones(prev =>
       prev.map((op, idx) =>
-        idx === i ? { ...op, valores: [...op.valores, ""] } : op
+        idx === i ? { ...op, valores: [...op.valores, { valor: "", stock: 0 }] } : op
       )
     );
   };
 
-  const updateValor = (opIdx: number, valIdx: number, value: string) => {
+  const updateValor = (opIdx: number, valIdx: number, field: "valor" | "stock", value: any) => {
     setOpciones(prev =>
       prev.map((op, idx) =>
         idx === opIdx
           ? {
               ...op,
-              valores: op.valores.map((v, vi) => (vi === valIdx ? value : v)),
+              valores: op.valores.map((v, vi) => (vi === valIdx ? { ...v, [field]: value } : v)),
             }
           : op
       )
@@ -252,6 +268,57 @@ export default function ProductForm({
     }
   }, [formData.costo, formData.precio, formData.isManualPrecio, formData.tipo, formData.tiempo, proveedorRelacion.precio_compra, insumosSeleccionados, insumosDisponibles]);
 
+  // -- Inteligencia de Capacidad de Producción --
+  const capacidadInfo = useMemo(() => {
+    if (formData.tipo !== "fabricado" || insumosSeleccionados.length === 0) {
+      return { capacidad: null, cuelloBotella: null };
+    }
+
+    let minCap = Infinity;
+    let bottleneck = null;
+
+    insumosSeleccionados.forEach(sel => {
+      const insumo = insumosDisponibles.find(i => i.id === sel.id_insumo);
+      if (insumo && sel.cantidad_necesaria > 0) {
+        const cap = Math.floor(Number(insumo.cantidad) / sel.cantidad_necesaria);
+        if (cap < minCap) {
+          minCap = cap;
+          bottleneck = insumo.nombre;
+        }
+      }
+    });
+
+    return {
+      capacidad: minCap === Infinity ? 0 : minCap,
+      cuelloBotella: bottleneck,
+    };
+  }, [insumosSeleccionados, insumosDisponibles, formData.tipo]);
+  
+  // -- Cálculo de Stock Total por Variantes --
+  useEffect(() => {
+    if (!formData.es_personalizable || opciones.length === 0) return;
+    
+    // Solo sumamos si hay al menos una opción con valores que tengan stock
+    // Normalmente el stock se define en UNA de las opciones (ej: Talla)
+    // Buscamos la primera opción que tenga stock definido en sus valores (> 0)
+    // o simplemente sumamos la opción con más stock total para ser conservadores
+    
+    let maxStockEnOpcion = 0;
+    let tieneVariantesConStock = false;
+
+    opciones.forEach(op => {
+      if (op.tipo === 'select' || op.tipo === 'color') {
+        const totalOp = op.valores.reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
+        if (totalOp > 0) tieneVariantesConStock = true;
+        if (totalOp > maxStockEnOpcion) maxStockEnOpcion = totalOp;
+      }
+    });
+
+    if (tieneVariantesConStock && maxStockEnOpcion !== formData.stock_actual) {
+      setFormData(prev => ({ ...prev, stock_actual: maxStockEnOpcion }));
+    }
+  }, [opciones, formData.es_personalizable, formData.stock_actual]);
+
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
     setFormData(prev => ({ ...prev, [name]: checked }));
@@ -303,7 +370,8 @@ export default function ProductForm({
         opciones,
         formData.tipo === "revendido" ? proveedorRelacion : undefined,
         formData.tipo === "fabricado" ? insumosSeleccionados : undefined,
-        materialesSeleccionados
+        materialesSeleccionados,
+        producto?.id
       );
     } catch (error) {
       console.error("Error al guardar producto:", error);
@@ -325,7 +393,10 @@ export default function ProductForm({
             nombre: op.nombre,
             tipo: op.tipo,
             obligatorio: op.obligatorio,
-            valores: op.valores?.map((v: any) => v.valor) ?? [],
+            valores: op.valores?.map((v: any) => ({
+              valor: v.valor,
+              stock: v.stock || 0
+            })) ?? [],
           }));
           setOpciones(opcionesMapeadas);
         }
@@ -525,16 +596,109 @@ export default function ProductForm({
                   </div>
                 </div>
                 {opcion.tipo !== "text" && opcion.tipo !== "number" && (
-                  <div className="pt-2 border-t border-[rgba(112,128,144,0.08)]">
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {opcion.valores.map((val, vIdx) => (
-                        <div key={vIdx} className="flex items-center gap-1 bg-[#f6f4ef] px-3 py-1.5 rounded-xl border border-transparent hover:border-[#b76e79]/20">
-                          <input value={val} onChange={(e) => updateValor(index, vIdx, e.target.value)} className="bg-transparent border-none p-0 text-xs font-bold text-[#4a5568] w-20 focus:ring-0 outline-none" />
-                          <button type="button" onClick={() => eliminarValor(index, vIdx)} className="text-[#708090]/30 hover:text-rose-500"><PlusCircle size={11} className="rotate-45" /></button>
+                  <div className="pt-3 border-t border-[rgba(112,128,144,0.08)]">
+                    {/* Paleta sugerida solo para tipo color */}
+                    {opcion.tipo === "color" && (
+                      <div className="mb-4 px-1">
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <Palette size={12} className="text-[#b76e79]" />
+                          <span className="text-[0.65rem] font-bold text-[#708090] uppercase tracking-widest">Paleta de Lujo Sugerida</span>
                         </div>
-                      ))}
-                      <button type="button" onClick={() => agregarValor(index)} className="px-3 py-1.5 rounded-xl border border-dashed border-[#b76e79]/40 text-[#b76e79] text-xs font-bold hover:bg-[#b76e79]/5 transition-all flex items-center gap-1">
-                        <Plus size={12} /> Valor
+                        <div className="flex flex-wrap gap-2">
+                          {LUXURY_PALETTE.map((p, pIdx) => (
+                            <button
+                              key={pIdx}
+                              type="button"
+                              onClick={() => {
+                                // Agregar nuevo valor con el color de la paleta y stock inicial 0
+                                setOpciones(prev => prev.map((op, idx) => 
+                                  idx === index ? { ...op, valores: [...op.valores, { valor: `${p.name}|${p.hex}`, stock: 0 }] } : op
+                                ));
+                              }}
+                              className="group relative w-7 h-7 rounded-full border border-white shadow-sm transition-all hover:scale-110 active:scale-95"
+                              style={{ backgroundColor: p.hex }}
+                              title={p.name}
+                            >
+                              <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 ring-2 ring-[#b76e79] ring-offset-2 transition-all" />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {opcion.valores.map((val, vIdx) => {
+                        const valorTexto = val.valor || "";
+                        const [colorName, colorHex] = valorTexto.includes('|') ? valorTexto.split('|') : ['', valorTexto];
+                        
+                        return (
+                          <div key={vIdx} className="flex items-center gap-2 bg-[#f6f4ef] px-3 py-1.5 rounded-[12px] border border-transparent hover:border-[#b76e79]/20 transition-all group/val">
+                            {opcion.tipo === "color" && (
+                              <label className="relative w-5 h-5 rounded-full border border-[rgba(112,128,144,0.3)] shadow-[inset_0_1px_3px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer flex-shrink-0 block" style={{ backgroundColor: colorHex || '#ffffff' }}>
+                                <input 
+                                  type="color" 
+                                  value={colorHex.startsWith('#') && colorHex.length === 7 ? colorHex : '#ffffff'} 
+                                  onChange={(e) => updateValor(index, vIdx, "valor", `${colorName}|${e.target.value}`)}
+                                  className="absolute inset-[-10px] w-10 h-10 opacity-0 cursor-pointer"
+                                />
+                              </label>
+                            )}
+                            
+                            <div className="flex flex-col gap-0.5">
+                              {opcion.tipo === "color" && (
+                                <input 
+                                  value={colorName} 
+                                  onChange={(e) => updateValor(index, vIdx, "valor", `${e.target.value}|${colorHex}`)} 
+                                  placeholder="Nombre"
+                                  className="bg-transparent border-none p-0 text-[0.75rem] font-black text-[#b76e79] w-20 focus:ring-0 outline-none h-4 leading-none placeholder-[#b76e79]/40" 
+                                />
+                              )}
+                              <input 
+                                value={opcion.tipo === "color" ? colorHex : val.valor} 
+                                onChange={(e) => {
+                                  if (opcion.tipo === "color") {
+                                    updateValor(index, vIdx, "valor", `${colorName}|${e.target.value}`);
+                                  } else {
+                                    updateValor(index, vIdx, "valor", e.target.value);
+                                  }
+                                }} 
+                                placeholder={opcion.tipo === "color" ? "#HEX" : "Valor"}
+                                className="bg-transparent border-none p-0 text-xs font-bold text-[#4a5568] w-20 focus:ring-0 outline-none uppercase" 
+                              />
+                            </div>
+
+                            {/* Input de Stock por Variante */}
+                            <div className="flex flex-col items-center border-l border-[rgba(112,128,144,0.15)] pl-2 ml-1">
+                              <span className="text-[0.55rem] font-bold text-[#708090] uppercase opacity-60">Stock</span>
+                              <input 
+                                type="number"
+                                value={val.stock}
+                                onChange={(e) => updateValor(index, vIdx, "stock", parseInt(e.target.value) || 0)}
+                                className="bg-transparent border-none p-0 text-xs font-black text-[#8c9768] w-8 text-center focus:ring-0 outline-none"
+                              />
+                            </div>
+                            
+                            <button type="button" onClick={() => eliminarValor(index, vIdx)} className="text-[#708090]/30 hover:text-rose-500 transition-colors ml-1 opacity-0 group-hover/val:opacity-100">
+                              <PlusCircle size={12} className="rotate-45" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                      
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          if (opcion.tipo === "color") {
+                            setOpciones(prev => prev.map((op, idx) => 
+                              idx === index ? { ...op, valores: [...op.valores, { valor: "Nuevo|#000000", stock: 0 }] } : op
+                            ));
+                          } else {
+                            agregarValor(index);
+                          }
+                        }} 
+                        className="px-3 py-1.5 rounded-[12px] border border-dashed border-[#b76e79]/40 text-[#b76e79] text-xs font-bold hover:bg-[#b76e79]/5 transition-all flex items-center gap-1"
+                      >
+                        <Plus size={12} strokeWidth={2.5} /> {opcion.tipo === "color" ? "Agregar Color" : "Valor"}
                       </button>
                     </div>
                   </div>
@@ -645,12 +809,32 @@ export default function ProductForm({
         {/* BLOQUE INSUMOS (Solo Fabricado) */}
         {formData.tipo === "fabricado" && (
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-y-2">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-[#f6f4ef] flex items-center justify-center text-[#708090]"><Package size={14} strokeWidth={1.5} /></div>
                 <span className="text-sm font-bold text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>Insumos <span className="text-[#b76e79]">Configuración</span></span>
               </div>
-              <button type="button" onClick={agregarInsumo} className="bg-[#2d3748] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black flex items-center gap-2">
+              
+              {/* Badge de Capacidad de Producción */}
+              {capacidadInfo.capacidad !== null && (
+                <div className={`px-4 py-1.5 rounded-full border flex items-center gap-2 transition-all ${
+                  capacidadInfo.capacidad === 0 
+                    ? 'bg-rose-50 border-rose-200 text-rose-600' 
+                    : 'bg-[#8c9768]/10 border-[#8c9768]/30 text-[#8c9768]'
+                }`}>
+                  <TrendingUp size={14} className={capacidadInfo.capacidad === 0 ? 'text-rose-400' : 'text-[#8c9768]'} />
+                  <span className="text-[0.65rem] font-bold uppercase tracking-wider">
+                    Capacidad: <span className="text-sm font-black">{capacidadInfo.capacidad}</span> unidades
+                  </span>
+                  {capacidadInfo.capacidad < 5 && capacidadInfo.cuelloBotella && (
+                    <span className="text-[0.55rem] font-medium opacity-70 italic hidden md:inline">
+                      (Limita: {capacidadInfo.cuelloBotella})
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <button type="button" onClick={agregarInsumo} className="bg-[#2d3748] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black flex items-center gap-2 transition-all">
                 <PlusCircle size={13} /> Agregar
               </button>
             </div>
@@ -869,7 +1053,7 @@ export default function ProductForm({
             <p className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest">Imagen</p>
             <div className="w-full aspect-square bg-[#f6f4ef] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] overflow-hidden relative group">
               {previewUrl ? (
-                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={previewUrl || undefined} alt="Preview" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#708090]/30">
                   <ImageIcon size={28} strokeWidth={1} />

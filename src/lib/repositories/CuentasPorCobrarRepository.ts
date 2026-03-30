@@ -4,6 +4,7 @@ import {
   ICuentasPorCobrar,
   CreateCuentasPorCobrarDTO,
   UpdateCuentasPorCobrarDTO,
+  CreatePagoDTO,
 } from "@/lib/models/CuentasPorCobrar";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -14,6 +15,28 @@ import { SupabaseClient } from "@supabase/supabase-js";
 export class CuentasPorCobrarRepository extends BaseRepository<CuentasPorCobrar> {
   constructor(client: SupabaseClient) {
     super(client, "cuentasporcobrar");
+  }
+  // En CuentasPorCobrarRepository.ts — agrega este método
+  async getAll(): Promise<{ data: any[] | null; error: string | null }> {
+    try {
+      const { data, error } = await this.client
+        .from("cuentasporcobrar")
+        .select(
+          `
+        *,
+        cliente:id_cliente(id, nombre, telefono)
+      `
+        )
+        .order("fecha_registro", { ascending: false });
+
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      return {
+        data: null,
+        error: err instanceof Error ? err.message : "Error desconocido",
+      };
+    }
   }
 
   /**
@@ -122,13 +145,10 @@ export class CuentasPorCobrarRepository extends BaseRepository<CuentasPorCobrar>
       .from("cuentasporcobrar")
       .update(data)
       .eq("id", id)
-      .select()
+      .select(`*, cliente:id_cliente(id, nombre, telefono)`) // ← agregar join
       .single();
 
-    if (error) {
-      throw error;
-    }
-
+    if (error) throw error;
     return new CuentasPorCobrar(resultado);
   }
 
@@ -167,5 +187,26 @@ export class CuentasPorCobrarRepository extends BaseRepository<CuentasPorCobrar>
       (total: number, item: any) => total + (item.monto_pendiente || 0),
       0
     );
+  }
+  async getPagosByCuenta(id_cuenta: number) {
+    return await this.client
+      .from("pagos")
+      .select("*")
+      .eq("id_cuenta", id_cuenta)
+      .order("fecha_pago", { ascending: false });
+  }
+
+  async createPago(data: CreatePagoDTO) {
+    return await this.client.from("pagos").insert(data).select().single();
+  }
+  async getAllClientes() {
+    return await this.client
+      .from("cliente")
+      .select("id, nombre, telefono")
+      .order("nombre", { ascending: true });
+  }
+
+  async createCliente(data: { nombre: string; telefono: string }) {
+    return await this.client.from("cliente").insert(data).select().single();
   }
 }
