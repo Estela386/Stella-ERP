@@ -1,14 +1,11 @@
-import { createServerClient } from "@supabase/auth-helpers-nextjs";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Rutas protegidas que requieren autenticación
   const protectedRoutes = ["/dashboard"];
-
-  // Rutas que requieren rol específico (rol 1 = admin)
   const adminOnlyRoutes = ["/dashboard/inicio/inventarios"];
 
   const isProtectedRoute = protectedRoutes.some(route =>
@@ -19,52 +16,39 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  // Si es una ruta protegida, validar autenticación
   if (isProtectedRoute) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const response = NextResponse.next();
 
-    let supabaseResponse = NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
-
-    const supabase = createServerClient(supabaseUrl!, supabaseKey!, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => request.cookies.getAll(),
+          setAll: cookies => {
+            cookies.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
+          },
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    });
+      }
+    );
 
     const {
       data: { user },
     } = await supabase.auth.getUser();
+
     if (!user) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // Si es ruta solo para admin, verificar rol
     if (isAdminRoute) {
       const { data: userData } = await supabase
         .from("usuario")
         .select("id_rol")
         .eq("id_auth", user.id)
         .single();
-      console.log("Middleware - Datos del usuario:", userData);
-      // Si no tiene rol 1 (admin), redirigir al dashboard principal
+
       if (!userData || userData.id_rol !== 1) {
         return NextResponse.redirect(
           new URL("/dashboard/cliente", request.url)
@@ -72,20 +56,12 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    return supabaseResponse;
+    return response;
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
