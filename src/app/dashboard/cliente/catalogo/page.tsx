@@ -582,25 +582,6 @@ function CatalogContent() {
         <HeaderClient />
         <ChatbotPage />
         <main style={{ maxWidth: 1280, margin: "0 auto", padding: "clamp(24px,4vw,48px) clamp(16px,4vw,40px)" }}>
-
-          {/* ── Header de sección ── */}
-          <div style={{ marginBottom: 32 }}>
-            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.63rem", fontWeight: 500, letterSpacing: "0.2em", textTransform: "uppercase", color: SAGE, margin: "0 0 8px" }}>
-              Stella Designs
-            </p>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-              <h1 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 400, color: DEEP, margin: 0, lineHeight: 1.1 }}>
-                Nuestro <em style={{ color: ROSE, fontStyle: "italic" }}>Catálogo</em>
-              </h1>
-              {!loading && (
-                <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: SLATE, padding: "3px 12px", borderRadius: 20, background: "rgba(112,128,144,0.08)", border: "1px solid rgba(112,128,144,0.15)" }}>
-                  {filtered.length} {filtered.length === 1 ? "producto" : "productos"}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* ── Barra de herramientas ── */}
           <div style={{
             background: "white",
             borderRadius: 14,
@@ -784,6 +765,15 @@ function CatalogContent() {
                   </button>
                 ))}
               </div>
+            </div>
+          </div>
+            <div style={{ marginBottom: 32 }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+              {!loading && (
+                <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: SLATE, padding: "3px 12px", borderRadius: 20, background: "rgba(112,128,144,0.08)", border: "1px solid rgba(112,128,144,0.15)" }}>
+                  {filtered.length} {filtered.length === 1 ? "producto" : "productos"}
+                </span>
+              )}
             </div>
           </div>
 

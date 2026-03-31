@@ -92,7 +92,7 @@ export default function ProductCard({
           {category && (
             <p
               style={{
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
+                fontFamily: "var(--font-subtitle)",
                 fontSize: "0.62rem",
                 fontWeight: 500,
                 textTransform: "uppercase",
@@ -107,7 +107,7 @@ export default function ProductCard({
 
           <h3
             style={{
-              fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
+              fontFamily: "var(--font-subtitle)",
               fontSize: "1.05rem",
               fontWeight: 600,
               color: hovered ? "#4a5568" : "#708090",
@@ -145,7 +145,7 @@ export default function ProductCard({
           {/* Price */}
           <p
             style={{
-              fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
+              fontFamily: "var(--font-serif)",
               fontSize: "1.2rem",
               fontWeight: 500,
               color: "#4a5568",
