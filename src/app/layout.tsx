@@ -1,31 +1,26 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter, Manrope } from "next/font/google";
+import { Poppins, Lora, Marcellus } from "next/font/google";
 import { CartProvider } from "@lib/context/CartContext";
-import "./globals.css";
+import "./styles/globals.css";
+import ChatbotPage from "./chatbot/page";
 
-// ── Serif elegante — Títulos, Branding, Logo ──────────────────
-const cormorant = Cormorant_Garamond({
-  variable: "--font-serif",
+const poppins = Poppins({
   subsets: ["latin"],
+  variable: "--font-poppins",
   weight: ["300", "400", "500", "600", "700"],
+});
+
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora",
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  display: "swap",
 });
 
-// ── Sans-serif primaria — UI, ERP, Formularios ─────────────────
-const inter = Inter({
-  variable: "--font-sans",
+const marcellus = Marcellus({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  display: "swap",
-});
-
-// ── Sans-serif expresiva — Subtítulos, Botones, Badges ─────────
-const manrope = Manrope({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  display: "swap",
+  variable: "--font-marcellus",
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -33,22 +28,20 @@ export const metadata: Metadata = {
   description: "ERP orientado a venta de joyería",
 };
 
-import ChatbotPage from "./chatbot/page";
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" className={`${poppins.variable} ${lora.variable} ${marcellus.variable}`}>
       <head>
         <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
         <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body
-        className={`${cormorant.variable} ${inter.variable} ${manrope.variable} antialiased bg-[#f6f4ef] text-[#708090]`}
+        className="antialiased bg-[#f6f4ef] text-[#708090]"
       >
         <CartProvider>
           {children}

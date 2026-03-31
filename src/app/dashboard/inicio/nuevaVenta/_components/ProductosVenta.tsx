@@ -10,6 +10,8 @@ interface ProductoDisponible {
   nombre: string;
   precio: number;
   stock?: number;
+  categoria_nombre?: string;
+  opciones?: any[];
 }
 
 type Props = {
@@ -18,6 +20,7 @@ type Props = {
   onEliminar: (id: number) => void;
   onAumentar: (id: number) => void;
   onDisminuir: (id: number) => void;
+  onActualizar: (id: number, cambios: Partial<Producto>) => void;
 };
 
 export default function ProductosVenta({
@@ -26,6 +29,7 @@ export default function ProductosVenta({
   onEliminar,
   onAumentar,
   onDisminuir,
+  onActualizar,
 }: Props) {
   const [productosDisponibles, setProductosDisponibles] = useState<
     ProductoDisponible[]
@@ -170,13 +174,81 @@ export default function ProductosVenta({
             >
               {/* INFO PRODUCTO */}
               <div className="flex flex-col flex-1">
-                <p className="font-semibold text-[#708090]">{p.nombre}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-[#708090]">{p.nombre}</p>
+                  {p.categoria_nombre && (
+                    <span className="text-[10px] bg-[#B76E79]/10 text-[#B76E79] px-2 py-0.5 rounded-full font-medium">
+                      {p.categoria_nombre}
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-[#8C9796]">
                   ${p.precio.toLocaleString()}
                   {p.stock !== undefined && (
                     <span className="ml-2">Stock: {p.stock}</span>
                   )}
                 </p>
+
+                {/* OPCIONES DE JUEGO (Si aplica) */}
+                {p.categoria_nombre?.toLowerCase().includes("juego") && (
+                  <div className="mt-3 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    {/* Checkboxes de partes */}
+                    <div className="flex flex-wrap gap-2">
+                      {(() => {
+                        const opJuego = p.opciones?.find((o: any) => o.nombre === "Componentes del Juego");
+                        const componentes = opJuego && opJuego.valores 
+                          ? opJuego.valores.map((v: any) => v.valor) 
+                          : ["Anillo", "Collar", "Aretes"];
+                        
+                        return componentes.map((parte: string) => {
+                          const seleccionadas = p.partes_seleccionadas || [];
+                          const isSelected = seleccionadas.includes(parte);
+                          return (
+                            <button
+                              key={parte}
+                              onClick={() => {
+                                const nuevas = isSelected
+                                  ? seleccionadas.filter(s => s !== parte)
+                                  : [...seleccionadas, parte];
+                                onActualizar(p.id, { partes_seleccionadas: nuevas });
+                              }}
+                              className={`
+                                text-[10px] px-3 py-1 rounded-lg border transition-all flex items-center gap-1
+                                ${isSelected 
+                                  ? "bg-[#B76E79] text-white border-[#B76E79] shadow-sm" 
+                                  : "bg-white text-[#708090] border-[#8C9796]/30 hover:border-[#B76E79]/50"}
+                              `}
+                            >
+                              {parte}
+                            </button>
+                          );
+                        });
+                      })()}
+                    </div>
+
+                    {/* Precios rápidos */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-[#8C9796] uppercase">Precio x:</span>
+                      {[1, 2, 3].map(num => (
+                        <button
+                          key={num}
+                          onClick={() => {
+                            const nuevoPrecio = prompt(`Ingrese precio para ${num} artículo(s):`, p.precio.toString());
+                            if (nuevoPrecio !== null) {
+                              const val = parseFloat(nuevoPrecio);
+                              if (!isNaN(val)) {
+                                onActualizar(p.id, { precio: val });
+                              }
+                            }
+                          }}
+                          className="bg-white border border-[#8C9796]/30 text-[#708090] hover:border-[#B76E79] hover:text-[#B76E79] text-[10px] font-bold w-12 py-1 rounded-md transition-all shadow-sm"
+                        >
+                          {num} Art
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* DERECHA */}
@@ -209,9 +281,16 @@ export default function ProductosVenta({
                 </div>
 
                 {/* SUBTOTAL */}
-                <p className="font-semibold text-[#B76E79] text-lg min-w-fit">
-                  ${(p.precio * p.cantidad).toLocaleString()}
-                </p>
+                <div className="flex flex-col items-end min-w-[80px]">
+                  <p className="font-semibold text-[#B76E79] text-lg leading-tight">
+                    ${(p.precio * p.cantidad).toLocaleString()}
+                  </p>
+                  {p.cantidad > 1 && (
+                    <p className="text-[9px] text-[#8C9796] mt-0.5">
+                      ${p.precio.toLocaleString()} c/u
+                    </p>
+                  )}
+                </div>
 
                 {/* ELIMINAR */}
                 <button

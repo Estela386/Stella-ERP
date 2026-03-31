@@ -1,58 +1,68 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   CUSTOM FONTS: AURA & CLASSY VOGUE
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Aura';
+  src: url('/fonts/Aura.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Classy Vogue';
+  src: url('/fonts/Classyvogueregular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-brand: var(--font-lora), serif;
+  --font-serif: var(--font-lora), serif;
+  --font-sans: var(--font-poppins), sans-serif;
+  --font-title: var(--font-lora), serif;
+  --font-subtitle: var(--font-marcellus), serif;
+}
+
+/* Base Styles */
+body {
+  font-family: var(--font-sans);
+  color: #708090;
+  background-color: #f6f4ef;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+}
+
 /* =====================
-   KEYFRAMES
-===================== */
+   KEYFRAMES (Manteniendo las animaciones del diseño previo)
+   ===================== */
 
 @keyframes slideIn {
-  from {
-    transform: translateX(-40px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  from { transform: translateX(-40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(0px); }
 }
 
 /* =====================
    UTILIDADES CUSTOM
-===================== */
+   ===================== */
 
 @layer utilities {
-  .preserve-3d {
-    transform-style: preserve-3d;
-  }
-
-  .rotate-x-6 {
-    transform: rotateX(6deg);
-  }
-
-  .shadow-soft {
-    box-shadow: 0 6px 16px rgba(140, 151, 102, 0.25);
-  }
-
-  .shadow-medium {
-    box-shadow: 0 14px 30px rgba(140, 151, 102, 0.35);
-  }
-
-  .shadow-accent {
-    box-shadow: 0 14px 30px rgba(183, 110, 121, 0.55);
-  }
-
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
+  .preserve-3d { transform-style: preserve-3d; }
+  .rotate-x-6 { transform: rotateX(6deg); }
+  .shadow-soft { box-shadow: 0 6px 16px rgba(140, 151, 102, 0.25); }
+  .shadow-medium { box-shadow: 0 14px 30px rgba(140, 151, 102, 0.35); }
+  .shadow-accent { box-shadow: 0 14px 30px rgba(183, 110, 121, 0.55); }
+  .animate-float { animation: float 3s ease-in-out infinite; }
 }

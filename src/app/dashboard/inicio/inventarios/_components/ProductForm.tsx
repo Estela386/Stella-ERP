@@ -108,6 +108,8 @@ export default function ProductForm({
   const [loadingOpciones, setLoadingOpciones] = useState(false);
   const [insumosSeleccionados, setInsumosSeleccionados] = useState<{ id_insumo: number, cantidad_necesaria: number }[]>([]);
   const [materialesSeleccionados, setMaterialesSeleccionados] = useState<number[]>([]);
+  const [juegoComponents, setJuegoComponents] = useState<string[]>(["Anillo", "Collar", "Aretes"]);
+  const [newComponent, setNewComponent] = useState("");
   const [debugLog, setDebugLog] = useState<string[]>([]);
   
   const COSTO_MINUTO = 1.0; 
@@ -179,6 +181,7 @@ export default function ProductForm({
       "stock_actual",
       "stock_min",
       "tiempo",
+      "id_categoria",
     ];
 
     let newValue = numericFields.includes(name) ? parseFloat(value) || 0 : value;
@@ -363,11 +366,32 @@ export default function ProductForm({
     // Filtrar campos que no van a la base de datos
     const { isManualPrecio, ganancia, roi_porcentaje, ...dataToSave } = formData;
 
+    // Preparar opciones incluyendo los componentes del juego si aplica
+    const esJuego = categorias.find(c => c.id === formData.id_categoria)?.nombre?.toLowerCase().includes("juego");
+    const opcionesFinales = [...opciones];
+    
+    if (esJuego && juegoComponents.length > 0) {
+      // Buscar si ya existe la opción de componentes para no duplicar
+      const idx = opcionesFinales.findIndex(o => o.nombre === "Componentes del Juego");
+      const opcionJuego = {
+        nombre: "Componentes del Juego",
+        tipo: "multi" as any,
+        obligatorio: true,
+        valores: juegoComponents.map(c => ({ valor: c, stock: 0 }))
+      };
+      
+      if (idx !== -1) {
+        opcionesFinales[idx] = opcionJuego;
+      } else {
+        opcionesFinales.push(opcionJuego);
+      }
+    }
+
     try {
       await onSubmit(
         dataToSave as any,
         imagenFile || undefined,
-        opciones,
+        opcionesFinales,
         formData.tipo === "revendido" ? proveedorRelacion : undefined,
         formData.tipo === "fabricado" ? insumosSeleccionados : undefined,
         materialesSeleccionados,
@@ -398,7 +422,15 @@ export default function ProductForm({
               stock: v.stock || 0
             })) ?? [],
           }));
-          setOpciones(opcionesMapeadas);
+          
+          // Extraer componentes del juego si existen
+          const opJuego = opcionesMapeadas.find(o => o.nombre === "Componentes del Juego");
+          if (opJuego) {
+            setJuegoComponents(opJuego.valores.map(v => v.valor));
+            setOpciones(opcionesMapeadas.filter(o => o.nombre !== "Componentes del Juego"));
+          } else {
+            setOpciones(opcionesMapeadas);
+          }
         }
 
         // Cargar Relación Proveedor if revendido
@@ -536,6 +568,64 @@ export default function ProductForm({
             </div>
           </div>
         </div>
+
+        {/* COMPONENTES DEL JUEGO (Solo si la categoría es Juego) */}
+        {categorias.find(c => c.id == formData.id_categoria)?.nombre?.toLowerCase().includes("juego") && (
+          <div className="mt-4 p-4 bg-[#b76e79]/5 border-2 border-[#b76e79]/20 rounded-[18px] animate-in slide-in-from-top-2 duration-400">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 rounded-lg bg-white flex items-center justify-center text-[#b76e79] border border-[#b76e79]/20 shadow-sm">
+                <Box size={14} />
+              </div>
+              <span className="text-sm font-bold text-[#4a5568]">Artículos que componen el <span className="text-[#b76e79]">Juego</span></span>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 mb-3">
+              {juegoComponents.map((comp, i) => (
+                <div key={i} className="flex items-center gap-1 bg-white border-2 border-[#b76e79]/20 px-3 py-1.5 rounded-full text-xs font-bold text-[#4a5568]">
+                  {comp}
+                  <button 
+                    type="button" 
+                    onClick={() => setJuegoComponents(prev => prev.filter((_, idx) => idx !== i))}
+                    className="text-[#b76e79] hover:text-red-500 ml-1"
+                  >
+                    <FiX size={13} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              <input 
+                value={newComponent}
+                onChange={(e) => setNewComponent(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (newComponent.trim()) {
+                      setJuegoComponents(prev => [...prev, newComponent.trim()]);
+                      setNewComponent("");
+                    }
+                  }
+                }}
+                placeholder="Ej: Pulsera, Reloj..." 
+                className="flex-1 bg-white border-2 border-transparent focus:border-[#b76e79] rounded-xl px-4 py-2 text-sm text-[#4a5568] outline-none transition-all"
+              />
+              <button 
+                type="button"
+                onClick={() => {
+                  if (newComponent.trim()) {
+                    setJuegoComponents(prev => [...prev, newComponent.trim()]);
+                    setNewComponent("");
+                  }
+                }}
+                className="bg-[#b76e79] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#a45f69] transition-all"
+              >
+                Agregar
+              </button>
+            </div>
+            <p className="text-[10px] text-[#708090] mt-2 italic px-1">Presiona Enter para agregar rápidamente.</p>
+          </div>
+        )}
       </div>
 
 

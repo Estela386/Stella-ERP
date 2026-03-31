@@ -14,6 +14,9 @@ export type Producto = {
   precio: number;
   cantidad: number;
   stock?: number;
+  categoria_nombre?: string;
+  partes_seleccionadas?: string[];
+  opciones?: any[];
 };
 
 interface Cliente {
@@ -27,6 +30,8 @@ interface ProductoDisponible {
   nombre: string;
   precio: number;
   stock?: number;
+  categoria_nombre?: string;
+  opciones?: any[];
 }
 
 export default function NuevaVentaPage() {
@@ -55,6 +60,20 @@ export default function NuevaVentaPage() {
         );
       } else {
         // Si no existe, agregarlo
+        const esJuego = productoDisponible.categoria_nombre?.toLowerCase().includes("juego");
+        
+        // Buscar componentes en las opciones
+        let componentes: string[] = [];
+        if (esJuego) {
+          const opJuego = productoDisponible.opciones?.find((o: any) => o.nombre === "Componentes del Juego");
+          if (opJuego && opJuego.valores) {
+            componentes = opJuego.valores.map((v: any) => v.valor);
+          } else {
+            // Fallback si no hay componentes definidos
+            componentes = ["Anillo", "Collar", "Aretes"];
+          }
+        }
+
         return [
           ...prev,
           {
@@ -63,6 +82,9 @@ export default function NuevaVentaPage() {
             precio: productoDisponible.precio,
             cantidad: 1,
             stock: productoDisponible.stock,
+            categoria_nombre: productoDisponible.categoria_nombre,
+            partes_seleccionadas: esJuego ? componentes : undefined,
+            opciones: productoDisponible.opciones,
           },
         ];
       }
@@ -96,6 +118,12 @@ export default function NuevaVentaPage() {
 
   const eliminarProducto = (id: number) => {
     setProductos(prev => prev.filter(p => p.id !== id));
+  };
+  
+  const actualizarProducto = (id: number, cambios: Partial<Producto>) => {
+    setProductos(prev =>
+      prev.map(p => (p.id === id ? { ...p, ...cambios } : p))
+    );
   };
 
   const handleVentaConfirmada = () => {
@@ -133,6 +161,7 @@ export default function NuevaVentaPage() {
             onEliminar={eliminarProducto}
             onAumentar={aumentarCantidad}
             onDisminuir={disminuirCantidad}
+            onActualizar={actualizarProducto}
           />
 
           <VentaResumen

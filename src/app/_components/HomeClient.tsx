@@ -115,7 +115,7 @@ function FeatureCard({ icon, title, text }: FeatureCardProps) {
       <div style={{ width: 48, height: 48, borderRadius: 12, margin: "0 auto 16px", background: C.slateIcon, border: `1px solid ${C.slateBorder}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
         {icon}
       </div>
-      <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.18rem", fontWeight: 600, color: C.slateDeep, marginBottom: 8, letterSpacing: "-0.01em" }}>
+      <h3 style={{ fontFamily: "var(--font-subtitle)", fontSize: "1.18rem", fontWeight: 600, color: C.slateDeep, marginBottom: 8, letterSpacing: "-0.01em" }}>
         {title}
       </h3>
       <p style={{ fontSize: "0.86rem", lineHeight: 1.68, color: C.slate, fontWeight: 400, margin: 0 }}>
@@ -143,7 +143,7 @@ function RoleCard({ badge, title, desc, perks }: RoleCardProps) {
         <span style={{ width: 10, height: 1, background: C.rose, display: "inline-block" }} />
         {badge}
       </div>
-      <h3 style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(1.25rem,1.9vw,1.52rem)", fontWeight: 600, color: C.slateDeep, marginBottom: 10, letterSpacing: "-0.01em" }}>
+      <h3 style={{ fontFamily: "var(--font-subtitle)", fontSize: "clamp(1.25rem,1.9vw,1.52rem)", fontWeight: 600, color: C.slateDeep, marginBottom: 10, letterSpacing: "-0.01em" }}>
         {title}
       </h3>
       <p style={{ fontSize: "0.86rem", lineHeight: 1.70, color: C.slate, fontWeight: 400, marginBottom: 18 }}>
@@ -152,7 +152,7 @@ function RoleCard({ badge, title, desc, perks }: RoleCardProps) {
       <div style={{ height: 1, background: C.slateBorder, marginBottom: 14 }} />
       <ul style={{ display: "flex", flexDirection: "column", gap: 9, listStyle: "none", padding: 0, margin: 0 }}>
         {perks.map((p) => (
-          <li key={p} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.84rem", color: C.slate }}>
+          <li key={p} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.84rem", color: C.slate, fontFamily: "var(--font-subtitle)" }}>
             <ChevronRight size={13} color={C.rose} style={{ flexShrink: 0 }} />
             {p}
           </li>
@@ -178,7 +178,7 @@ function ModuleCard({ num, icon, name, desc }: ModuleCardProps) {
       }}
     >
       {/* number watermark */}
-      <span style={{ position: "absolute", top: -8, right: 10, lineHeight: 1, fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "4.5rem", fontWeight: 600, color: "rgba(112,128,144,0.06)", pointerEvents: "none", userSelect: "none" }}>
+      <span style={{ position: "absolute", top: -8, right: 10, lineHeight: 1, fontFamily: "var(--font-serif)", fontSize: "4.5rem", fontWeight: 600, color: "rgba(112,128,144,0.06)", pointerEvents: "none", userSelect: "none" }}>
         {num}
       </span>
       {/* left accent */}
@@ -219,7 +219,7 @@ function ReviewCard({ text, initials, name, role }: ReviewCardProps) {
         <div style={{ marginLeft: "auto", color: C.rose, fontSize: "0.82rem", letterSpacing: 1 }}>★★★★★</div>
       </div>
       <div style={{ height: 1, background: C.slateBorder, marginBottom: 14 }} />
-      <p style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.08rem", fontStyle: "italic", color: C.slateDeep, lineHeight: 1.67, fontWeight: 400, margin: 0 }}>
+      <p style={{ fontFamily: "var(--font-serif)", fontSize: "1.08rem", fontStyle: "italic", color: C.slateDeep, lineHeight: 1.67, fontWeight: 400, margin: 0 }}>
         &ldquo;{text}&rdquo;
       </p>
     </motion.div>
@@ -240,11 +240,11 @@ function SectionHeader({
   return (
     <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }} variants={containerV} style={{ textAlign: "center", marginBottom: 36 }}>
       {eyebrow && (
-        <motion.p variants={d(0)} style={{ fontSize: "0.65rem", letterSpacing: "0.18em", textTransform: "uppercase", color: C.sage, marginBottom: 10, margin: "0 0 10px" }}>
+        <motion.p variants={d(0)} style={{ fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: C.rose, marginBottom: 10, fontWeight: 600, fontFamily: "var(--font-subtitle)" }}>
           {eyebrow}
         </motion.p>
       )}
-      <motion.h2 variants={d(0.06)} style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(2.1rem,4vw,3.2rem)", fontWeight: 500, lineHeight: 1.18, letterSpacing: "-0.01em", margin: "0 0 0" }}>
+      <motion.h2 variants={d(0.06)} style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.1rem,4vw,3.2rem)", fontWeight: 500, lineHeight: 1.18, letterSpacing: "-0.01em", margin: "0 0 0" }}>
         <span style={{ color: C.slateDeep }}>{before} </span>
         <span style={{ color: C.rose }}>{accent}</span>
         {after && <span style={{ color: C.slateDeep }}> {after}</span>}
@@ -378,7 +378,7 @@ export default function HomeClient() {
         }
       `}</style>
 
-      <main style={{ background: C.bg, color: C.slate, fontFamily: "var(--font-sans, Inter, sans-serif)", overflowX: "hidden" }}>
+      <main style={{ background: C.bg, color: C.slate, fontFamily: "var(--font-sans, 'Tan Mon Cheri', sans-serif)", overflowX: "hidden" }}>
 
         {/* ══════════ NAV ══════════ */}
         {/* Estilo igual a la imagen: fondo blanco, links slate, CTA rose */}
@@ -445,7 +445,7 @@ export default function HomeClient() {
               <div style={{ flex: 1, paddingTop: 24 }}>
                 {navLinks.map(({ label, href }) => (
                   <a key={label} href={href} onClick={() => setMobileOpen(false)}
-                    style={{ display: "block", textDecoration: "none", color: C.slateDeep, fontSize: "1.4rem", fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontWeight: 300, padding: "13px 0", borderBottom: `1px solid ${C.slateBorder}` }}>
+                    style={{ display: "block", textDecoration: "none", color: C.slateDeep, fontSize: "1.4rem", fontFamily: "var(--font-serif, 'Celestial', serif)", fontWeight: 300, padding: "13px 0", borderBottom: `1px solid ${C.slateBorder}` }}>
                     {label}
                   </a>
                 ))}
@@ -474,13 +474,13 @@ export default function HomeClient() {
             {/* TEXT */}
             <motion.div initial="hidden" animate="show" variants={containerV}>
               {/* eyebrow pill — como en la imagen */}
-              <motion.div variants={d(0)} style={{ display: "inline-flex", alignItems: "center", gap: 7, background: C.roseBg, border: `1px solid ${C.roseBorder}`, color: C.rose, borderRadius: 4, padding: "4px 12px", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 24 }}>
+              <motion.div variants={d(0)} style={{ display: "inline-flex", alignItems: "center", gap: 7, background: C.roseBg, border: `1px solid ${C.roseBorder}`, color: C.rose, borderRadius: 4, padding: "4px 12px", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 24, fontFamily: "var(--font-subtitle)" }}>
                 <span style={{ width: 4, height: 4, background: C.rose, borderRadius: "50%", display: "inline-block" }} />
                 ERP + E-Commerce · Joyería Artesanal
               </motion.div>
 
               {/* h1: palabra clave en rose */}
-              <motion.h1 variants={d(0.07)} style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(2.8rem,5.2vw,5.2rem)", fontWeight: 400, lineHeight: 1.10, marginBottom: 20, letterSpacing: "-0.02em" }}>
+              <motion.h1 variants={d(0.07)} style={{ fontFamily: "var(--font-title)", fontSize: "clamp(2.8rem,5.2vw,5.2rem)", fontWeight: 400, lineHeight: 1.10, marginBottom: 20, letterSpacing: "-0.02em" }}>
                 <span style={{ color: C.slateDeep }}>Gestión inteligente<br />para </span>
                 <em style={{ fontStyle: "italic", color: C.rose }}>joyería</em>
                 <span style={{ color: C.slateDeep }}><br />de alto valor</span>
@@ -505,7 +505,7 @@ export default function HomeClient() {
               <motion.div variants={d(0.26)} className="hero-stats" style={{ display: "flex", gap: "clamp(16px,3.5vw,34px)", marginTop: 40 }}>
                 {[{ num: "50%", label: "Menos errores" }, { num: "3", label: "Roles de usuario" }, { num: "10+", label: "Módulos ERP" }].map((s, i) => (
                   <div key={s.label} style={{ display: "flex", flexDirection: "column", gap: 2, paddingRight: i < 2 ? "clamp(12px,3vw,30px)" : 0, borderRight: i < 2 ? `1px solid ${C.slateBorder}` : "none" }}>
-                    <span style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "2.1rem", fontWeight: 600, color: C.rose, lineHeight: 1 }}>{s.num}</span>
+                    <span style={{ fontFamily: "var(--font-serif, 'Celestial', serif)", fontSize: "2.1rem", fontWeight: 600, color: C.rose, lineHeight: 1 }}>{s.num}</span>
                     <span style={{ fontSize: "0.74rem", color: C.slate, letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 400 }}>{s.label}</span>
                   </div>
                 ))}
@@ -529,7 +529,7 @@ export default function HomeClient() {
                     ))}
                   </div>
                   <div style={{ fontSize: "0.60rem", letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.6, marginBottom: 5 }}>Ventas del mes</div>
-                  <div style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.6rem", fontWeight: 600, color: "#f6f4ef", lineHeight: 1 }}>$284,500</div>
+                  <div style={{ fontFamily: "var(--font-serif, 'Celestial', serif)", fontSize: "1.6rem", fontWeight: 600, color: "#f6f4ef", lineHeight: 1 }}>$284,500</div>
                   <div style={{ fontSize: "0.64rem", opacity: 0.55, marginTop: 4 }}>MXN · ↑ 18% este mes</div>
                 </motion.div>
 
@@ -547,7 +547,7 @@ export default function HomeClient() {
                   </div>
                   {/* card body */}
                   <div style={{ padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column" }}>
-                    <div style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.28rem", fontWeight: 600, color: C.slateDeep, marginBottom: 2, letterSpacing: "-0.01em" }}>Anillo Stella</div>
+                    <div style={{ fontFamily: "var(--font-serif, 'Celestial', serif)", fontSize: "1.28rem", fontWeight: 600, color: C.slateDeep, marginBottom: 2, letterSpacing: "-0.01em" }}>Anillo Stella</div>
                     <div style={{ fontSize: "0.72rem", color: C.slate, marginBottom: 8 }}>Colección Primavera 2025 · Talla 7</div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                       <div style={{ fontSize: "0.96rem", color: C.rose, fontWeight: 600 }}>$12,500 MXN</div>
@@ -652,7 +652,7 @@ export default function HomeClient() {
             style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "clamp(16px,4vw,40px)", maxWidth: 1000, margin: "0 auto", position: "relative", zIndex: 1 }}>
             {statsData.map((st) => (
               <motion.div key={st.label} variants={scaleV} style={{ textAlign: "center" }}>
-                <div style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(2.2rem,4.2vw,3.2rem)", fontWeight: 600, color: "#f6f4ef", lineHeight: 1, marginBottom: 6, letterSpacing: "-0.02em" }}>{st.num}</div>
+                <div style={{ fontFamily: "var(--font-serif, 'Celestial', serif)", fontSize: "clamp(2.2rem,4.2vw,3.2rem)", fontWeight: 600, color: "#f6f4ef", lineHeight: 1, marginBottom: 6, letterSpacing: "-0.02em" }}>{st.num}</div>
                 <div style={{ width: 24, height: 2, background: C.rose, margin: "0 auto 8px", borderRadius: 1 }} />
                 <div style={{ fontSize: "0.67rem", color: "rgba(246,244,239,0.60)", letterSpacing: "0.12em", textTransform: "uppercase" }}>{st.label}</div>
               </motion.div>
@@ -700,10 +700,10 @@ export default function HomeClient() {
             <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
               {/* left */}
               <div style={{ flex: 1, minWidth: 260 }}>
-                <motion.p variants={d(0)} style={{ fontSize: "0.65rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(246,244,239,0.45)", marginBottom: 8 }}>
+                <motion.p variants={d(0)} style={{ fontSize: "0.65rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(246,244,239,0.45)", marginBottom: 8, fontFamily: "var(--font-subtitle)" }}>
                   Únete al proyecto
                 </motion.p>
-                <motion.h2 variants={d(0.06)} style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "clamp(1.7rem,3.4vw,2.8rem)", fontWeight: 500, color: "#f6f4ef", lineHeight: 1.18, letterSpacing: "-0.01em", margin: 0 }}>
+                <motion.h2 variants={d(0.06)} style={{ fontFamily: "var(--font-serif, 'Celestial', serif)", fontSize: "clamp(1.7rem,3.4vw,2.8rem)", fontWeight: 500, color: "#f6f4ef", lineHeight: 1.18, letterSpacing: "-0.01em", margin: 0 }}>
                   Descubre tu{" "}
                   <em style={{ fontStyle: "italic", color: C.rose }}>brillo interior</em>
                 </motion.h2>

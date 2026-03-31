@@ -29,7 +29,8 @@ export class ProductoRepository extends BaseRepository<IProducto> {
         `
           *,
           categoria:id_categoria(id, nombre),
-          producto_material(materiales(nombre))
+          producto_material(materiales(nombre)),
+          opciones:producto_opciones(*, valores:producto_opcion_valores(*))
         `
       );
 

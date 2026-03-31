@@ -23,6 +23,8 @@ export async function GET(request: NextRequest) {
         precio: p.precio,
         stock: p.stock_actual,
         url_imagen: p.url_imagen,
+        categoria_nombre: (p as any).categoria?.nombre || "Sin categoría",
+        opciones: (p as any).opciones || [],
       })),
     });
   } catch (err) {
