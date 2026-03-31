@@ -174,7 +174,7 @@ function WholesalerDashboard({ onDownloadClick }: { onDownloadClick: () => void 
       <div style={cardStyle}>
         <div style={iconBoxStyle}><FileText size={24} color={STYLES.slate} /></div>
         <h3 style={cardTitleStyle}>Catálogo de <em style={{color: STYLES.rose}}>Precios</em></h3>
-        <p style={cardDescStyle}>Descarga el catálogo PDF actualizado con tus descuentos exclusivos del 30% aplicados.</p>
+        <p style={cardDescStyle}>Descarga el catálogo PDF actualizado con tus descuentos exclusivos del 25% aplicados.</p>
         <button 
           onClick={onDownloadClick}
           style={primaryButtonStyle}
@@ -196,7 +196,7 @@ function WholesalerDashboard({ onDownloadClick }: { onDownloadClick: () => void 
         <div style={iconBoxStyle}><BadgePercent size={24} color={STYLES.slate} /></div>
         <h3 style={cardTitleStyle}>Tus <em style={{color: STYLES.rose}}>Beneficios</em></h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 15 }}>
-          <BenefitItem text="30% de descuento automático" />
+          <BenefitItem text="25% de descuento automático" />
           <BenefitItem text="Envío prioritario express" />
           <BenefitItem text="Soporte exclusivo 24/7" />
         </div>
@@ -214,7 +214,7 @@ function ProspectLanding() {
         <BenefitCard 
           icon={<BadgePercent size={24} />} 
           title="Margen de Ganancia" 
-          desc="Obtén un 30% de descuento fijo en todas tus compras desde el primer pedido." 
+          desc="Obtén un 25% de descuento fijo en todas tus compras desde el primer pedido." 
         />
         <BenefitCard 
           icon={<ShoppingBag size={24} />} 

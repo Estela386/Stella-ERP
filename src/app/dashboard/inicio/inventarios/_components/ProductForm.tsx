@@ -247,7 +247,7 @@ export default function ProductForm({
       nuevoPrecio = Number((costo / 0.4).toFixed(2));
     }
 
-    // 2. Mayoreo siempre es 30% descuento del venta actual
+    // 2. Mayoreo siempre es 25% descuento del venta actual
     const nuevoMayoreo = Number((nuevoPrecio * 0.7).toFixed(2));
 
     // 3. Métricas
@@ -1063,7 +1063,7 @@ export default function ProductForm({
                   style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
                 />
               </div>
-              <p className="text-[0.65rem] text-white italic">−30% del público</p>
+              <p className="text-[0.65rem] text-white italic">−25% del público</p>
             </div>
           </div>
         </div>

@@ -441,7 +441,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                     color: "#b76e79",
                   }}
                 >
-                  ${producto.precio.toLocaleString()}
+                  ${producto.precio.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
                 <span
                   style={{

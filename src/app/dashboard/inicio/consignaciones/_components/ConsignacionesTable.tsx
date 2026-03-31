@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import { IConsignacion, EstadoConsignacion } from "@lib/models";
 import {
-  Pencil, Ban, Search, Plus, X,
-  ChevronDown, ChevronUp, AlertTriangle, Clock,
-  CalendarDays, Package, DollarSign, User, RotateCcw,
+  Pencil, Ban, Search, Plus,
+  ChevronDown, ChevronUp, Clock,
+  CalendarDays, Package, User, RotateCcw,
 } from "lucide-react";
 
 const BADGE: Record<EstadoConsignacion, { bg: string; color: string; label: string; dot: string }> = {
@@ -15,6 +15,7 @@ const BADGE: Record<EstadoConsignacion, { bg: string; color: string; label: stri
 };
 
 function fmt(date: string) {
+  if (!date) return "—";
   const raw = date.split("T")[0];
   return new Date(raw + "T12:00:00Z").toLocaleDateString("es-MX", {
     day: "2-digit", month: "short", year: "numeric", timeZone: "America/Mexico_City",
@@ -22,6 +23,7 @@ function fmt(date: string) {
 }
 
 function diasRetraso(fechaFin: string): number {
+  if (!fechaFin) return 0;
   const fin = new Date(fechaFin.split("T")[0] + "T12:00:00Z");
   const hoy = new Date();
   hoy.setHours(12, 0, 0, 0);
@@ -37,227 +39,6 @@ interface ConsignacionesTableProps {
   onReactivar: (c: IConsignacion) => void;
 }
 
-function ConfirmActionModal({
-  title,
-  message,
-  confirmText,
-  confirmColor,
-  icon: Icon,
-  onConfirm,
-  onCancel,
-}: {
-  title: string;
-  message: React.ReactNode;
-  confirmText: string;
-  confirmColor: string;
-  icon: any;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) {
-  return (
-    <div
-      style={{
-        position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
-        backdropFilter: "blur(4px)", zIndex: 2000,
-        display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
-      }}
-      onClick={e => e.target === e.currentTarget && onCancel()}
-    >
-      <div style={{ background: "#fff", borderRadius: 18, padding: 28, maxWidth: 400, width: "100%", boxShadow: "0 24px 60px rgba(0,0,0,0.2)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: `${confirmColor}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Icon size={18} style={{ color: confirmColor }} />
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1C1C1C", margin: 0 }}>{title}</h3>
-          </div>
-          <button onClick={onCancel} style={{ background: "none", border: "none", cursor: "pointer", color: "#8C9796" }}>
-            <X size={18} />
-          </button>
-        </div>
-        <p style={{ fontSize: "0.85rem", color: "#4a5568", marginBottom: 20, lineHeight: 1.6 }}>
-          {message}
-        </p>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={onCancel}
-            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "1.5px solid rgba(112,128,144,0.25)", background: "#fff", color: "#708090", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer" }}
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={onConfirm}
-            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "none", background: confirmColor, color: "#fff", fontWeight: 700, fontSize: "0.85rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
-          >
-            <Icon size={14} /> {confirmText}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ConsignacionCard({
-  c,
-  onEditar,
-  onCancelar,
-  onReactivar,
-}: {
-  c: IConsignacion;
-  onEditar: (c: IConsignacion) => void;
-  onCancelar: (c: IConsignacion) => void;
-  onReactivar: (c: IConsignacion) => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const badge   = BADGE[c.estado] ?? BADGE.activa;
-  const retraso = c.estado === "activa" ? diasRetraso(c.fecha_fin) : 0;
-  const vencida = retraso > 0;
-  const proxima = !vencida && retraso > -7 && c.estado === "activa";
-
-  // Totales calculados una sola vez
-  const totalItems    = c.detalles?.reduce((acc, d) => acc + d.cantidad, 0) ?? 0;
-  const totalVendidos = c.detalles?.reduce((acc, d) => acc + (d.cantidad_vendida ?? 0), 0) ?? 0;
-  const valorMayorista = c.detalles?.reduce((acc, d) => acc + d.cantidad * (d.precio_mayorista ?? 0), 0) ?? 0;
-
-  return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 16,
-        border: vencida
-          ? "1.5px solid rgba(239,68,68,0.35)"
-          : "1px solid rgba(112,128,144,0.12)",
-        boxShadow: vencida
-          ? "0 4px 20px rgba(239,68,68,0.08)"
-          : "0 1px 6px rgba(0,0,0,0.05)",
-        overflow: "hidden",
-      }}
-    >
-      {/* Franja superior de estado */}
-      <div style={{ height: 3, background: vencida ? "linear-gradient(90deg,#ef4444,#f87171)" : badge.dot }} />
-
-      {/* Cuerpo principal */}
-      <div style={{ padding: "16px 20px" }}>
-
-        {/* Fila 1: Mayorista + Estado + Acciones */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#B76E79,#9d5a64)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <User size={16} style={{ color: "#fff" }} />
-            </div>
-            <div>
-              <p style={{ fontWeight: 700, fontSize: "0.9rem", color: "#1C1C1C", margin: 0 }}>
-                {c.mayorista?.nombre ?? "—"}
-              </p>
-              {vencida && (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: "0.68rem", color: "#ef4444", fontWeight: 700 }}>
-                  <AlertTriangle size={10} /> {retraso} día{retraso !== 1 ? "s" : ""} de retraso
-                </span>
-              )}
-              {proxima && !vencida && (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: "0.68rem", color: "#f59e0b", fontWeight: 700 }}>
-                  <Clock size={10} /> Vence pronto
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: badge.bg, color: badge.color, borderRadius: 20, padding: "3px 12px", fontSize: "0.72rem", fontWeight: 700 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: badge.dot, display: "inline-block" }} />
-              {badge.label}
-            </span>
-            {c.estado === "activa" && (
-              <>
-                <button title="Editar" onClick={() => onEditar(c)} style={iconBtn("#708090")}>
-                  <Pencil size={13} />
-                </button>
-                <button title="Cancelar" onClick={() => onCancelar(c)} style={iconBtn("#c0856d")}>
-                  <Ban size={13} />
-                </button>
-              </>
-            )}
-            {c.estado !== "activa" && (
-              <button title="Reactivar consignación" onClick={() => onReactivar(c)} style={iconBtn("#10b981")}>
-                <RotateCcw size={13} />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Fila 2: Métricas rápidas */}
-        <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
-          {/* Fechas */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <CalendarDays size={13} style={{ color: "#8C9796", flexShrink: 0 }} />
-            <span style={{ fontSize: "0.76rem", color: "#4a5568" }}>
-              {fmt(c.fecha_inicio)} → <span style={{ fontWeight: vencida ? 700 : 400, color: vencida ? "#ef4444" : "#4a5568" }}>{fmt(c.fecha_fin)}</span>
-            </span>
-          </div>
-
-          {/* Items */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Package size={13} style={{ color: "#8C9796", flexShrink: 0 }} />
-            <span style={{ fontSize: "0.76rem", color: "#4a5568" }}>
-              {totalItems} items
-              {totalVendidos > 0 && (
-                <span style={{ color: "#B76E79", fontWeight: 600 }}> · {totalVendidos} vendidos</span>
-              )}
-            </span>
-          </div>
-
-          {/* Valor */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <DollarSign size={13} style={{ color: "#8C9796", flexShrink: 0 }} />
-            <span style={{ fontSize: "0.76rem", color: "#4a5568", fontWeight: 600 }}>
-              ${valorMayorista.toLocaleString()} <span style={{ fontWeight: 400 }}>valor consignado</span>
-            </span>
-          </div>
-        </div>
-
-        {/* Botón expandir productos */}
-        {c.detalles && c.detalles.length > 0 && (
-          <button
-            onClick={() => setExpanded(v => !v)}
-            style={{
-              display: "flex", alignItems: "center", gap: 5, marginTop: 12,
-              background: "none", border: "none", cursor: "pointer",
-              color: "#708090", fontSize: "0.75rem", fontWeight: 600, padding: 0,
-            }}
-          >
-            {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-            {expanded ? "Ocultar productos" : `Ver ${c.detalles.length} producto${c.detalles.length !== 1 ? "s" : ""}`}
-          </button>
-        )}
-      </div>
-
-      {/* Panel de productos expandido */}
-      {expanded && c.detalles && c.detalles.length > 0 && (
-        <div style={{ borderTop: "1px solid #F1F5F9", background: "#FAFAF8", padding: "12px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
-          {c.detalles.map(d => (
-            <div
-              key={d.id_producto}
-              style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 10px", background: "#fff", borderRadius: 10, border: "1px solid rgba(112,128,144,0.1)", flexWrap: "wrap" }}
-            >
-              <p style={{ flex: 1, fontSize: "0.82rem", fontWeight: 600, color: "#1C1C1C", margin: 0, minWidth: 120 }}>
-                {d.producto?.nombre ?? `Producto #${d.id_producto}`}
-              </p>
-              <div style={{ display: "flex", gap: 16, fontSize: "0.75rem", color: "#4a5568", flexWrap: "wrap" }}>
-                <span>Precio normal: <strong>${d.producto?.precio?.toFixed(2)}</strong></span>
-                <span style={{ color: "#B76E79", fontWeight: 700 }}>Mayorista: ${d.precio_mayorista?.toFixed(2)}</span>
-                <span>Cant: <strong>{d.cantidad}</strong></span>
-                {(d.cantidad_vendida ?? 0) > 0 && (
-                  <span style={{ color: "#10b981", fontWeight: 600 }}>{d.cantidad_vendida} vendidos</span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function ConsignacionesTable({
   consignaciones,
   loading,
@@ -268,6 +49,7 @@ export default function ConsignacionesTable({
 }: ConsignacionesTableProps) {
   const [search, setSearch] = useState("");
   const [filtroEstado, setFiltroEstado] = useState<EstadoConsignacion | "todas">("todas");
+  const [expandido, setExpandido] = useState<number | null>(null);
   
   const [confirmandoCancelar, setConfirmandoCancelar] = useState<IConsignacion | null>(null);
   const [confirmandoReactivar, setConfirmandoReactivar] = useState<IConsignacion | null>(null);
@@ -282,185 +64,353 @@ export default function ConsignacionesTable({
     return matchSearch && matchEstado;
   });
 
-  // Agrupadas por estado para el flujo organico
-  const activas     = filtradas.filter(c => c.estado === "activa");
-  const finalizadas = filtradas.filter(c => c.estado === "finalizada");
-  const canceladas  = filtradas.filter(c => c.estado === "cancelada");
-
   if (loading) {
-    return <div style={{ textAlign: "center", padding: "48px 0", color: "#8C9796" }}>Cargando consignaciones...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-20 animate-pulse text-[#8c8976]">
+        <div className="h-10 w-10 border-4 border-[#B76E79]/20 border-t-[#B76E79] rounded-full animate-spin mb-4" />
+        <p className="text-sm font-medium uppercase tracking-widest" style={{ fontFamily: "var(--font-marcellus)" }}>Sincronizando Inventario...</p>
+      </div>
+    );
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-
-      {/* ─── Toolbar ─────────────────────────────────────── */}
-      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
-        {/* Búsqueda */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F6F3EF", border: "1px solid rgba(112,128,144,0.2)", borderRadius: 10, padding: "8px 14px", flex: 1, maxWidth: 320 }}>
-          <Search size={14} style={{ color: "#8C9796", flexShrink: 0 }} />
+    <div className="space-y-6">
+      {/* ─── TOOLBAR ─── */}
+      <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+        <div className="relative flex-1 max-w-md group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8c8976] transition-colors group-focus-within:text-[#b76e79]" size={18} />
           <input
             placeholder="Buscar por mayorista o producto..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ background: "none", border: "none", outline: "none", fontSize: "0.82rem", color: "#1C1C1C", width: "100%" }}
+            className="w-full pl-12 pr-4 py-3 rounded-2xl bg-[#F6F4EF]/50 border border-[#8c8976]/20 focus:outline-none focus:ring-4 focus:ring-[#b76e79]/10 focus:border-[#b76e79] transition-all text-sm font-medium text-[#708090]"
+            style={{ fontFamily: "var(--font-poppins)" }}
           />
         </div>
 
-        {/* Filtro de estado */}
-        <div style={{ display: "flex", gap: 6 }}>
-          {(["todas", "activa", "finalizada", "cancelada"] as const).map(f => (
-            <button
-              key={f}
-              onClick={() => setFiltroEstado(f)}
-              style={{
-                padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer",
-                fontSize: "0.75rem", fontWeight: filtroEstado === f ? 700 : 500,
-                background: filtroEstado === f ? "rgba(112,128,144,0.15)" : "transparent",
-                color: filtroEstado === f ? "#1C1C1C" : "#8C9796",
-              }}
-            >
-              {f === "todas" ? "Todas" : f.charAt(0).toUpperCase() + f.slice(1) + "s"}
-            </button>
-          ))}
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={onNueva}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-[#b76e79] text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:bg-[#a55a65] transition-all shadow-[0_8px_20px_-6px_rgba(183,110,121,0.4)] active:scale-95"
+            style={{ fontFamily: "var(--font-marcellus)" }}
+          >
+            <Plus size={16} />
+            Nueva Consignación
+          </button>
         </div>
-
-        <button
-          id="btn-nueva-consignacion"
-          onClick={onNueva}
-          style={{ display: "flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg,#B76E79,#9d5a64)", border: "none", borderRadius: 10, padding: "9px 18px", cursor: "pointer", boxShadow: "0 4px 14px rgba(183,110,121,0.35)", color: "#fff", fontSize: "0.82rem", fontWeight: 600, whiteSpace: "nowrap" }}
-        >
-          <Plus size={14} /> Nueva Consignación
-        </button>
       </div>
 
-      {/* ─── Sin resultados ───────────────────────────────── */}
-      {filtradas.length === 0 && (
-        <div style={{ textAlign: "center", padding: "48px 0", color: "#8C9796" }}>
-          <Package size={32} style={{ opacity: 0.3, display: "block", margin: "0 auto 10px" }} />
-          <p style={{ fontSize: "0.85rem", margin: 0 }}>
-            {search ? "Sin resultados para tu búsqueda" : "No hay consignaciones registradas"}
-          </p>
-        </div>
-      )}
+      {/* ─── FILTROS DE ESTADO ─── */}
+      <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-2">
+        {(["todas", "activa", "finalizada", "cancelada"] as const).map(f => (
+          <button
+            key={f}
+            onClick={() => setFiltroEstado(f)}
+            className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
+              filtroEstado === f 
+                ? "bg-[#708090] text-white shadow-md shadow-[#708090]/20" 
+                : "bg-white text-[#8c8976] border border-[#8c8976]/20 hover:bg-[#f6f4ef]"
+            }`}
+            style={{ fontFamily: "var(--font-marcellus)" }}
+          >
+            {f === "todas" ? "Todas" : f.charAt(0).toUpperCase() + f.slice(1) + "s"}
+          </button>
+        ))}
+      </div>
 
-      {/* ─── Activas ────────────────────────────────────── */}
-      {activas.length > 0 && (
-        <Section label="Activas" count={activas.length} dotColor="#B76E79">
-          {activas.map(c => (
-            <ConsignacionCard 
-              key={c.id} 
-              c={c} 
-              onEditar={onEditar} 
-              onCancelar={() => setConfirmandoCancelar(c)} 
-              onReactivar={() => setConfirmandoReactivar(c)} 
-            />
-          ))}
-        </Section>
-      )}
+      {/* ─── DESKTOP TABLE ─── */}
+      <div className="hidden md:block overflow-hidden rounded-2xl border border-[#8c8976]/20 bg-white shadow-sm transition-all duration-500">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-[#708090]/5 border-b border-[#8c8976]/20">
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest" style={{ fontFamily: "var(--font-marcellus)" }}>Mayorista</th>
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest" style={{ fontFamily: "var(--font-marcellus)" }}>Periodo</th>
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest" style={{ fontFamily: "var(--font-marcellus)" }}>Items</th>
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest" style={{ fontFamily: "var(--font-marcellus)" }}>Valor</th>
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest text-center" style={{ fontFamily: "var(--font-marcellus)" }}>Estado</th>
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest text-right" style={{ fontFamily: "var(--font-marcellus)" }}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#8c8976]/10">
+            {filtradas.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="p-20 text-center text-[#8c8976] italic text-sm">No se encontraron consignaciones</td>
+              </tr>
+            ) : (
+              filtradas.map(c => {
+                const badge = BADGE[c.estado] ?? BADGE.activa;
+                const totalItems = c.detalles?.reduce((acc, d) => acc + d.cantidad, 0) ?? 0;
+                const totalVendidos = c.detalles?.reduce((acc, d) => acc + (d.cantidad_vendida ?? 0), 0) ?? 0;
+                const valorM = c.detalles?.reduce((acc, d) => acc + d.cantidad * (d.precio_mayorista ?? 0), 0) ?? 0;
+                const isExpanded = expandido === c.id;
+                const retraso = c.estado === "activa" ? diasRetraso(c.fecha_fin) : 0;
+                const vencida = retraso > 0;
 
-      {/* ─── Finalizadas ────────────────────────────────── */}
-      {finalizadas.length > 0 && (filtroEstado === "todas" || filtroEstado === "finalizada") && (
-        <CollapsibleSection label="Finalizadas" count={finalizadas.length} dotColor="#708090">
-          {finalizadas.map(c => (
-            <ConsignacionCard 
-              key={c.id} 
-              c={c} 
-              onEditar={onEditar} 
-              onCancelar={() => setConfirmandoCancelar(c)} 
-              onReactivar={() => setConfirmandoReactivar(c)} 
-            />
-          ))}
-        </CollapsibleSection>
-      )}
+                return (
+                  <React.Fragment key={c.id}>
+                    <tr className={`hover:bg-[#f6f4ef]/50 transition-colors duration-200 ${isExpanded ? 'bg-[#f6f4ef]/30' : ''}`}>
+                      <td className="p-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-[#B76E79]/10 flex items-center justify-center text-[#B76E79]">
+                            <User size={18} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-[#708090] text-sm" style={{ fontFamily: "var(--font-marcellus)" }}>{c.mayorista?.nombre ?? "—"}</p>
+                            <p className="text-[10px] text-[#8c8976] uppercase tracking-tighter">ID: #{c.id}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-5">
+                        <div className="flex flex-col text-[11px] text-[#708090]" style={{ fontFamily: "var(--font-poppins)" }}>
+                          <span className="flex items-center gap-1.5"><CalendarDays size={12} className="text-[#8c8976]" /> {fmt(c.fecha_inicio)}</span>
+                          <span className={`flex items-center gap-1.5 mt-0.5 ${vencida ? 'text-red-500 font-bold' : ''}`}>
+                            <Clock size={12} className={vencida ? 'text-red-500' : 'text-[#8c8976]'} /> {fmt(c.fecha_fin)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-5">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-[#708090]" style={{ fontFamily: "var(--font-poppins)" }}>{totalItems} <span className="text-[10px] font-normal uppercase opacity-60">uds</span></span>
+                          {totalVendidos > 0 && <span className="text-[10px] font-bold text-[#3d8c60] uppercase">-{totalVendidos} vendidos</span>}
+                        </div>
+                      </td>
+                      <td className="p-5">
+                        <span className="text-sm font-bold text-[#b76e79]" style={{ fontFamily: "var(--font-poppins)" }}>${valorM.toLocaleString()}</span>
+                      </td>
+                      <td className="p-5 text-center">
+                        <span className="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border"
+                          style={{ backgroundColor: badge.bg, color: badge.color, borderColor: `${badge.color}20`, fontFamily: "var(--font-poppins)" }}>
+                          {badge.label}
+                        </span>
+                      </td>
+                      <td className="p-5 text-right">
+                        <div className="flex justify-end gap-2">
+                          {c.estado === "activa" ? (
+                             <>
+                               <button onClick={() => onEditar(c)} className="p-2.5 rounded-xl bg-[#708090]/10 text-[#708090] hover:bg-[#708090] hover:text-white transition-all shadow-sm">
+                                 <Pencil size={14} />
+                               </button>
+                               <button onClick={() => setConfirmandoCancelar(c)} className="p-2.5 rounded-xl bg-[#c0856d]/10 text-[#c0856d] hover:bg-[#c0856d] hover:text-white transition-all shadow-sm">
+                                 <Ban size={14} />
+                               </button>
+                             </>
+                          ) : (
+                            <button onClick={() => setConfirmandoReactivar(c)} className="p-2.5 rounded-xl bg-[#3d8c60]/10 text-[#3d8c60] hover:bg-[#3d8c60] hover:text-white transition-all shadow-sm">
+                              <RotateCcw size={14} />
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => setExpandido(isExpanded ? null : c.id)}
+                            className={`p-2.5 rounded-xl transition-all ${isExpanded ? 'bg-[#1C1C1C] text-white shadow-md' : 'bg-[#F6F4EF] text-[#8c8976] hover:text-[#708090]'}`}
+                          >
+                            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    
+                    {/* DETAILS ROW */}
+                    {isExpanded && (
+                      <tr className="bg-[#fcfbf9]">
+                        <td colSpan={6} className="p-0 overflow-hidden border-b border-[#8c8976]/20">
+                          <div className="p-8 animate-in slide-in-from-top-4 duration-300">
+                             <div className="flex flex-col gap-4">
+                                <div className="flex items-center gap-2 text-[#708090] mb-2">
+                                  <Package size={18} />
+                                  <h4 className="font-bold text-xs uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-marcellus)" }}>Inventario Consignado</h4>
+                                </div>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                   {c.detalles?.map(d => (
+                                     <div key={d.id_producto} className="flex justify-between items-center p-4 bg-white rounded-2xl border border-[#8c8976]/10 shadow-sm">
+                                        <div className="flex flex-col">
+                                           <span className="font-bold text-sm text-[#708090]" style={{ fontFamily: "var(--font-marcellus)" }}>{d.producto?.nombre}</span>
+                                           <span className="text-[10px] text-[#8c8976] uppercase tracking-tighter">SKU: {d.id_producto}</span>
+                                        </div>
+                                        <div className="flex items-center gap-6">
+                                           <div className="text-right">
+                                              <p className="text-[10px] text-[#8c8976] uppercase font-bold tracking-tighter">Precio May.</p>
+                                              <p className="text-sm font-bold text-[#B76E79]" style={{ fontFamily: "var(--font-poppins)" }}>${d.precio_mayorista?.toLocaleString()}</p>
+                                           </div>
+                                           <div className="text-right px-4 border-l border-[#8c8976]/10">
+                                              <p className="text-[10px] text-[#8c8976] uppercase font-bold tracking-tighter">Entregado</p>
+                                              <p className="text-sm font-bold text-[#708090]" style={{ fontFamily: "var(--font-poppins)" }}>{d.cantidad} <span className="text-[9px] opacity-40">uds</span></p>
+                                           </div>
+                                           {(d.cantidad_vendida ?? 0) > 0 && (
+                                              <div className="text-right px-4 border-l border-[#8c8976]/10">
+                                                <p className="text-[10px] text-[#3d8c60] uppercase font-bold tracking-tighter">Vendidos</p>
+                                                <p className="text-sm font-black text-[#3d8c60]" style={{ fontFamily: "var(--font-poppins)" }}>{d.cantidad_vendida}</p>
+                                              </div>
+                                           )}
+                                        </div>
+                                     </div>
+                                   ))}
+                                </div>
+                             </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
 
-      {/* ─── Canceladas ─────────────────────────────────── */}
-      {canceladas.length > 0 && (filtroEstado === "todas" || filtroEstado === "cancelada") && (
-        <CollapsibleSection label="Canceladas" count={canceladas.length} dotColor="#c0856d">
-          {canceladas.map(c => (
-            <ConsignacionCard 
-              key={c.id} 
-              c={c} 
-              onEditar={onEditar} 
-              onCancelar={() => setConfirmandoCancelar(c)} 
-              onReactivar={() => setConfirmandoReactivar(c)} 
-            />
-          ))}
-        </CollapsibleSection>
-      )}
+      {/* ─── MOBILE EXPERIENCE ─── */}
+      <div className="md:hidden space-y-4 pb-10">
+        {filtradas.length === 0 ? (
+          <div className="text-center py-20 text-[#8c8976] italic">No hay resultados</div>
+        ) : (
+          filtradas.map(c => {
+            const badge = BADGE[c.estado] ?? BADGE.activa;
+            const isExpanded = expandido === c.id;
+            const totalItems = c.detalles?.reduce((acc, d) => acc + d.cantidad, 0) ?? 0;
+            const valorM = c.detalles?.reduce((acc, d) => acc + d.cantidad * (d.precio_mayorista ?? 0), 0) ?? 0;
+            const retraso = c.estado === "activa" ? diasRetraso(c.fecha_fin) : 0;
+            const vencida = retraso > 0;
 
-      {/* ─── Modales de Confirmación ────────────────────── */}
+            return (
+              <div key={c.id} className={`bg-white rounded-3xl border border-[#8c8976]/20 shadow-sm overflow-hidden transition-all ${vencida ? 'border-red-300 ring-2 ring-red-50' : ''}`}>
+                <div className="p-5">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#B76E79]/10 flex items-center justify-center text-[#B76E79]">
+                        <User size={18} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-[#1C1C1C] text-sm leading-tight" style={{ fontFamily: "var(--font-marcellus)" }}>{c.mayorista?.nombre ?? "—"}</span>
+                        <span className="text-[9px] text-[#8c8976] uppercase tracking-widest mt-0.5">#{c.id}</span>
+                      </div>
+                    </div>
+                    <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"
+                      style={{ backgroundColor: badge.bg, color: badge.color, borderColor: `${badge.color}20` }}>
+                      {badge.label}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 py-4 border-y border-[#8c8976]/10 mb-4">
+                    <div className="flex flex-col">
+                      <span className="text-[9px] text-[#8c8976] uppercase font-bold tracking-wider mb-0.5">Items</span>
+                      <span className="font-bold text-[#708090] text-sm" style={{ fontFamily: "var(--font-poppins)" }}>{totalItems} unidades</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[9px] text-[#8c8976] uppercase font-bold tracking-wider mb-0.5">Vencimiento</span>
+                      <span className={`font-bold text-sm ${vencida ? 'text-red-500' : 'text-[#708090]'}`} style={{ fontFamily: "var(--font-poppins)" }}>{fmt(c.fecha_fin)}</span>
+                    </div>
+                    <div className="flex flex-col col-span-2 pt-2 border-t border-[#8c8976]/5">
+                      <p className="text-[9px] text-[#8c8976] uppercase font-bold tracking-wider mb-0.5 text-center">Valor Consignado</p>
+                      <p className="text-2xl font-black text-[#B76E79] text-center" style={{ fontFamily: "var(--font-poppins)" }}>${valorM.toLocaleString()}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <button onClick={() => setExpandido(isExpanded ? null : c.id)} className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#F6F4EF] text-[#708090] text-[11px] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-marcellus)" }}>
+                      <Package size={16} />
+                      {isExpanded ? "Ocultar Productos" : `Ver ${c.detalles?.length} Productos`}
+                    </button>
+                    <div className="grid grid-cols-2 gap-2">
+                       {c.estado === "activa" ? (
+                         <>
+                           <button onClick={() => onEditar(c)} className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#708090] text-white text-[11px] font-bold uppercase" style={{ fontFamily: "var(--font-marcellus)" }}>
+                             <Pencil size={14} /> Editar
+                           </button>
+                           <button onClick={() => setConfirmandoCancelar(c)} className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#c0856d] text-white text-[11px] font-bold uppercase" style={{ fontFamily: "var(--font-marcellus)" }}>
+                             <Ban size={14} /> Cancelar
+                           </button>
+                         </>
+                       ) : (
+                         <button onClick={() => setConfirmandoReactivar(c)} className="col-span-2 flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#3d8c60] text-white text-[11px] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-marcellus)" }}>
+                           <RotateCcw size={14} /> Reactivar Consignación
+                         </button>
+                       )}
+                    </div>
+                  </div>
+                </div>
+
+                {isExpanded && (
+                  <div className="bg-[#FAFAF8] p-5 space-y-3 animate-in fade-in duration-300">
+                     {c.detalles?.map(d => (
+                       <div key={d.id_producto} className="bg-white p-4 rounded-2xl border border-[#8c8976]/10 flex flex-col gap-1 shadow-sm">
+                          <span className="font-bold text-[#1C1C1C] text-sm" style={{ fontFamily: "var(--font-marcellus)" }}>{d.producto?.nombre}</span>
+                          <div className="flex justify-between items-end mt-1">
+                             <div className="flex flex-col">
+                                <span className="text-[9px] text-[#8c8976] uppercase font-bold tracking-tighter">Total Entregado</span>
+                                <span className="font-bold text-[#708090] text-xs" style={{ fontFamily: "var(--font-poppins)" }}>{d.cantidad} unidades</span>
+                             </div>
+                             <div className="text-right">
+                                <span className="text-[9px] text-[#B76E79] uppercase font-bold tracking-tighter">Precio Mayorista</span>
+                                <p className="font-bold text-[#B76E79]" style={{ fontFamily: "var(--font-poppins)" }}>${d.precio_mayorista?.toLocaleString()}</p>
+                             </div>
+                          </div>
+                          {(d.cantidad_vendida ?? 0) > 0 && (
+                            <div className="mt-2 pt-2 border-t border-[#8c8976]/5 flex justify-between items-center text-[#3d8c60]">
+                               <span className="text-[10px] font-black uppercase">Unidades Vendidas</span>
+                               <span className="text-sm font-black" style={{ fontFamily: "var(--font-poppins)" }}>{d.cantidad_vendida}</span>
+                            </div>
+                          )}
+                       </div>
+                     ))}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* ─── MODALES DE CONFIRMACIÓN (PRO) ─── */}
       {confirmandoCancelar && (
         <ConfirmActionModal
-          title="Cancelar Consignación"
-          message={<>¿Estás seguro de cancelar la consignación <strong>#{confirmandoCancelar.id}</strong>? Todo el stock consignado volverá a estar disponible en el inventario.</>}
+          title="Cancelar"
+          message={<>¿Deseas cancelar la consignación <strong>#{confirmandoCancelar.id}</strong>? El stock volverá al inventario general.</>}
           confirmText="Sí, cancelar"
-          confirmColor="#ef4444"
+          confirmColor="#c0856d"
           icon={Ban}
           onCancel={() => setConfirmandoCancelar(null)}
-          onConfirm={() => {
-            onCancelar(confirmandoCancelar);
-            setConfirmandoCancelar(null);
-          }}
+          onConfirm={() => { onCancelar(confirmandoCancelar); setConfirmandoCancelar(null); }}
         />
       )}
 
       {confirmandoReactivar && (
         <ConfirmActionModal
-          title="Reactivar Consignación"
-          message={<>¿Volver a activar la consignación <strong>#{confirmandoReactivar.id}</strong>? El stock requerido se volverá a descontar del inventario general. Si no hay suficiente, la operación fallará.</>}
+          title="Reactivar"
+          message={<>¿Volver a activar la consignación <strong>#{confirmandoReactivar.id}</strong>? Se reasignará el stock de inmediato.</>}
           confirmText="Sí, reactivar"
-          confirmColor="#10b981"
+          confirmColor="#3d8c60"
           icon={RotateCcw}
           onCancel={() => setConfirmandoReactivar(null)}
-          onConfirm={() => {
-            onReactivar(confirmandoReactivar);
-            setConfirmandoReactivar(null);
-          }}
+          onConfirm={() => { onReactivar(confirmandoReactivar); setConfirmandoReactivar(null); }}
         />
       )}
     </div>
   );
 }
 
-// Sección siempre visible
-function Section({ label, count, dotColor, children }: { label: string; count: number; dotColor: string; children: React.ReactNode }) {
+function ConfirmActionModal({ title, message, confirmText, confirmColor, icon: Icon, onConfirm, onCancel }: any) {
   return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-        <span style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
-        <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "#1C1C1C", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</span>
-        <span style={{ background: dotColor, color: "#fff", borderRadius: "50%", width: 18, height: 18, fontSize: "0.6rem", fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{count}</span>
+    <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-[#8c8976]/40 backdrop-blur-md animate-in fade-in duration-300" onClick={e => e.target === e.currentTarget && onCancel()}>
+      <div className="w-full max-w-sm bg-white rounded-[2rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300 border border-[#8c8976]/30">
+        <div className="flex flex-col items-center text-center gap-6">
+          <div className="w-16 h-16 rounded-3xl bg-[#F6F4EF] flex items-center justify-center shadow-inner"
+            style={{ color: confirmColor }}>
+            <Icon size={28} />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold text-[#1C1C1C]" style={{ fontFamily: "var(--font-marcellus)" }}>{title}</h3>
+            <p className="text-sm text-[#8c8976] leading-relaxed" style={{ fontFamily: "var(--font-poppins)" }}>{message}</p>
+          </div>
+          <div className="flex flex-col w-full gap-3">
+             <button onClick={onConfirm} className="w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-[.15em] text-white shadow-xl transition-all" style={{ backgroundColor: confirmColor, fontFamily: "var(--font-marcellus)" }}>
+               {confirmText}
+             </button>
+             <button onClick={onCancel} className="w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-[.15em] text-[#8c8976] hover:bg-[#F6F4EF] transition-all" style={{ fontFamily: "var(--font-marcellus)" }}>
+               Descartar
+             </button>
+          </div>
+        </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{children}</div>
     </div>
   );
-}
-
-// Sección colapsable (finalizadas/canceladas)
-function CollapsibleSection({ label, count, dotColor, children }: { label: string; count: number; dotColor: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div>
-      <button
-        onClick={() => setOpen(v => !v)}
-        style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", padding: "6px 0", color: "#8C9796", fontSize: "0.76rem", fontWeight: 600, marginBottom: open ? 10 : 0 }}
-      >
-        {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-        <span style={{ width: 7, height: 7, borderRadius: "50%", background: dotColor }} />
-        {label} · {count}
-      </button>
-      {open && <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{children}</div>}
-    </div>
-  );
-}
-
-function iconBtn(color: string): React.CSSProperties {
-  return {
-    width: 30, height: 30, borderRadius: 8,
-    border: `1px solid ${color}33`,
-    background: `${color}12`,
-    color, display: "flex", alignItems: "center",
-    justifyContent: "center", cursor: "pointer",
-  };
 }

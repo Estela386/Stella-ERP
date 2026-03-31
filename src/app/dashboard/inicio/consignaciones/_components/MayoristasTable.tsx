@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { IUsuarioMayorista, IConsignacion } from "@lib/models";
 import {
   UserCheck, Search, Mail, BadgeCheck, BadgeX,
@@ -12,326 +12,41 @@ interface MayoristasTableProps {
   mayoristas: IUsuarioMayorista[];
   consignaciones: IConsignacion[];
   loading: boolean;
-  onPromover?: () => void;
   onEliminar: (m: IUsuarioMayorista) => void;
   onSuspender: (m: IUsuarioMayorista, motivo: string) => Promise<void>;
   onReactivar: (m: IUsuarioMayorista) => Promise<void>;
 }
 
-function diasRetraso(fechaFin: string): number {
-  const fin = new Date(fechaFin.split("T")[0] + "T12:00:00Z");
-  const hoy = new Date();
-  hoy.setHours(12, 0, 0, 0);
-  return Math.floor((hoy.getTime() - fin.getTime()) / (1000 * 60 * 60 * 24));
-}
-
 function fmt(date: string) {
+  if (!date) return "—";
   const raw = date.split("T")[0];
   return new Date(raw + "T12:00:00Z").toLocaleDateString("es-MX", {
     day: "2-digit", month: "short", year: "numeric", timeZone: "America/Mexico_City",
   });
 }
 
-function ConfirmModal({
-  mayorista,
-  onConfirm,
-  onCancel,
-  loading,
-}: {
-  mayorista: IUsuarioMayorista;
-  onConfirm: () => void;
-  onCancel: () => void;
-  loading: boolean;
-}) {
-  return (
-    <div
-      style={{
-        position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
-        backdropFilter: "blur(4px)", zIndex: 2000,
-        display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
-      }}
-      onClick={e => e.target === e.currentTarget && onCancel()}
-    >
-      <div style={{ background: "#fff", borderRadius: 18, padding: 28, maxWidth: 400, width: "100%", boxShadow: "0 24px 60px rgba(0,0,0,0.2)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Trash2 size={18} style={{ color: "#ef4444" }} />
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1C1C1C", margin: 0 }}>Quitar Mayorista</h3>
-          </div>
-          <button onClick={onCancel} style={{ background: "none", border: "none", cursor: "pointer", color: "#8C9796" }}>
-            <X size={18} />
-          </button>
-        </div>
-        <p style={{ fontSize: "0.85rem", color: "#4a5568", marginBottom: 20, lineHeight: 1.6 }}>
-          ¿Quitar el rol de Mayorista a <strong>{mayorista.nombre}</strong>?
-          <br />
-          <span style={{ fontSize: "0.78rem", color: "#8C9796" }}>Su cuenta volverá a ser Cliente. Esta acción no elimina sus registros históricos.</span>
-        </p>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={onCancel}
-            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "1.5px solid rgba(112,128,144,0.25)", background: "#fff", color: "#708090", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer" }}
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "none", background: loading ? "#ccc" : "#ef4444", color: "#fff", fontWeight: 700, fontSize: "0.85rem", cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
-          >
-            {loading ? "Procesando..." : <><Trash2 size={14} /> Quitar rol</>}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+function diasRetraso(fechaFin: string): number {
+  if (!fechaFin) return 0;
+  const fin = new Date(fechaFin.split("T")[0] + "T12:00:00Z");
+  const hoy = new Date();
+  hoy.setHours(12, 0, 0, 0);
+  return Math.floor((hoy.getTime() - fin.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-function SuspendModal({
-  mayorista,
-  onConfirm,
-  onCancel,
-  loading,
-}: {
-  mayorista: IUsuarioMayorista;
-  onConfirm: (motivo: string) => void;
-  onCancel: () => void;
-  loading: boolean;
-}) {
-  const [motivo, setMotivo] = useState("");
-  return (
-    <div
-      style={{
-        position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
-        backdropFilter: "blur(4px)", zIndex: 2000,
-        display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
-      }}
-      onClick={e => e.target === e.currentTarget && onCancel()}
-    >
-      <div style={{ background: "#fff", borderRadius: 18, padding: 28, maxWidth: 420, width: "100%", boxShadow: "0 24px 60px rgba(0,0,0,0.2)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <ShieldOff size={18} style={{ color: "#f59e0b" }} />
-            </div>
-            <div>
-              <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1C1C1C", margin: 0 }}>Suspender cuenta</h3>
-              <p style={{ fontSize: "0.72rem", color: "#8C9796", margin: "2px 0 0" }}>Se notificará al usuario por email</p>
-            </div>
-          </div>
-          <button onClick={onCancel} style={{ background: "none", border: "none", cursor: "pointer", color: "#8C9796" }}>
-            <X size={18} />
-          </button>
-        </div>
-
-        <p style={{ fontSize: "0.85rem", color: "#4a5568", lineHeight: 1.6, marginBottom: 16 }}>
-          ¿Suspender la cuenta de <strong>{mayorista.nombre}</strong>? El usuario no podrá acceder a sus consignaciones hasta que se reactive.
-        </p>
-
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, color: "#708090", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>
-            Motivo (opcional — se incluirá en el email)
-          </label>
-          <textarea
-            value={motivo}
-            onChange={e => setMotivo(e.target.value)}
-            placeholder="Ej. Consignación vencida sin liquidar..."
-            rows={3}
-            style={{
-              width: "100%", borderRadius: 10, border: "1.5px solid rgba(112,128,144,0.25)",
-              padding: "10px 12px", fontSize: "0.85rem", color: "#1C1C1C",
-              background: "#FAFAF8", resize: "none", outline: "none", boxSizing: "border-box",
-            }}
-          />
-        </div>
-
-        <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={onCancel}
-            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "1.5px solid rgba(112,128,144,0.25)", background: "#fff", color: "#708090", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer" }}
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={() => onConfirm(motivo)}
-            disabled={loading}
-            style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "none", background: loading ? "#ccc" : "linear-gradient(135deg,#f59e0b,#d97706)", color: "#fff", fontWeight: 700, fontSize: "0.85rem", cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
-          >
-            {loading ? "Procesando..." : <><ShieldOff size={14} /> Suspender y notificar</>}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MayoristaRow({
-  m,
-  consignacionesMayorista,
-  onEliminar,
-  onSuspender,
-}: {
-  m: IUsuarioMayorista;
-  consignacionesMayorista: IConsignacion[];
-  onEliminar: () => void;
-  onSuspender: () => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  const activas = consignacionesMayorista.filter(c => c.estado === "activa");
-  const conRetraso = activas.filter(c => diasRetraso(c.fecha_fin) > 0);
-
-  return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 14,
-        border: conRetraso.length > 0
-          ? "1.5px solid rgba(239,68,68,0.35)"
-          : "1px solid rgba(112,128,144,0.12)",
-        boxShadow: conRetraso.length > 0
-          ? "0 4px 16px rgba(239,68,68,0.08)"
-          : "0 1px 4px rgba(0,0,0,0.05)",
-        overflow: "hidden",
-      }}
-    >
-      {/* Franja de alerta */}
-      {conRetraso.length > 0 && (
-        <div style={{ height: 3, background: "linear-gradient(90deg,#ef4444,#f87171)" }} />
-      )}
-
-      {/* Fila principal */}
-      <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", flexWrap: "wrap" }}>
-        {/* Avatar */}
-        <div style={{ width: 40, height: 40, borderRadius: "50%", background: "linear-gradient(135deg,#B76E79,#9d5a64)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <UserCheck size={18} style={{ color: "#fff" }} />
-        </div>
-
-        {/* Info */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <p style={{ fontWeight: 700, fontSize: "0.88rem", color: "#1C1C1C", margin: 0 }}>{m.nombre ?? "—"}</p>
-            {conRetraso.length > 0 && (
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(239,68,68,0.1)", color: "#ef4444", borderRadius: 20, padding: "2px 8px", fontSize: "0.68rem", fontWeight: 700 }}>
-                <AlertTriangle size={10} /> {conRetraso.length} consignación{conRetraso.length > 1 ? "es" : ""} vencida{conRetraso.length > 1 ? "s" : ""}
-              </span>
-            )}
-          </div>
-          <p style={{ fontSize: "0.75rem", color: "#708090", margin: "2px 0 0", display: "flex", alignItems: "center", gap: 4 }}>
-            <Mail size={11} />{m.correo}
-          </p>
-        </div>
-
-        {/* Estado + Consignaciones badge */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          {activas.length > 0 && (
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(112,128,144,0.1)", color: "#708090", borderRadius: 20, padding: "3px 10px", fontSize: "0.7rem", fontWeight: 600 }}>
-              <Package size={10} /> {activas.length} activa{activas.length > 1 ? "s" : ""}
-            </span>
-          )}
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: m.activo ? "rgba(183,110,121,0.1)" : "rgba(112,128,144,0.1)", color: m.activo ? "#B76E79" : "#708090", borderRadius: 20, padding: "3px 10px", fontSize: "0.7rem", fontWeight: 700 }}>
-            {m.activo ? <BadgeCheck size={11} /> : <BadgeX size={11} />}
-            {m.activo ? "Activo" : "Inactivo"}
-          </span>
-        </div>
-
-        {/* Botones */}
-        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-          {consignacionesMayorista.length > 0 && (
-            <button
-              onClick={() => setExpanded(v => !v)}
-              title="Ver consignaciones"
-              style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(112,128,144,0.2)", background: "#F6F3EF", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#708090" }}
-            >
-              {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
-          )}
-          <button
-            onClick={onSuspender}
-            title={m.activo ? "Suspender cuenta" : "Reactivar cuenta"}
-            style={{ width: 32, height: 32, borderRadius: 8, border: m.activo ? "1px solid rgba(245,158,11,0.3)" : "1px solid rgba(16,185,129,0.3)", background: m.activo ? "rgba(245,158,11,0.08)" : "rgba(16,185,129,0.08)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: m.activo ? "#f59e0b" : "#10b981" }}
-          >
-            {m.activo ? <ShieldOff size={14} /> : <ShieldCheck size={14} />}
-          </button>
-          <button
-            onClick={onEliminar}
-            title="Quitar mayorista"
-            style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#ef4444" }}
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* Panel expandido: consignaciones */}
-      {expanded && consignacionesMayorista.length > 0 && (
-        <div style={{ borderTop: "1px solid #F1F5F9", padding: "14px 18px", background: "#FAFAF8", display: "flex", flexDirection: "column", gap: 10 }}>
-          {consignacionesMayorista.map(c => {
-            const retraso = diasRetraso(c.fecha_fin);
-            const vencida = retraso > 0;
-            const proxima = !vencida && retraso > -7;
-            const totalItems = c.detalles?.reduce((acc, d) => acc + d.cantidad, 0) ?? 0;
-
-            return (
-              <div
-                key={c.id}
-                style={{
-                  borderRadius: 10,
-                  padding: "12px 14px",
-                  background: vencida ? "rgba(239,68,68,0.05)" : "#fff",
-                  border: vencida
-                    ? "1px solid rgba(239,68,68,0.2)"
-                    : proxima
-                    ? "1px solid rgba(245,158,11,0.25)"
-                    : "1px solid rgba(112,128,144,0.12)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 14,
-                  flexWrap: "wrap",
-                }}
-              >
-                {/* Dot */}
-                <span style={{ width: 8, height: 8, borderRadius: "50%", flexShrink: 0, background: vencida ? "#ef4444" : proxima ? "#f59e0b" : "#10b981" }} />
-
-                {/* Fechas */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#1C1C1C", margin: 0 }}>
-                    Consignación #{c.id} · {totalItems} item{totalItems !== 1 ? "s" : ""}
-                  </p>
-                  <p style={{ fontSize: "0.72rem", color: "#8C9796", margin: "2px 0 0", display: "flex", alignItems: "center", gap: 4 }}>
-                    <Clock size={10} /> {fmt(c.fecha_inicio)} → {fmt(c.fecha_fin)}
-                  </p>
-                </div>
-
-                {/* Alerta de retraso */}
-                {vencida ? (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(239,68,68,0.1)", color: "#ef4444", borderRadius: 20, padding: "3px 10px", fontSize: "0.7rem", fontWeight: 700, whiteSpace: "nowrap" }}>
-                    <AlertTriangle size={10} /> {retraso} día{retraso !== 1 ? "s" : ""} de retraso
-                  </span>
-                ) : proxima ? (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(245,158,11,0.1)", color: "#f59e0b", borderRadius: 20, padding: "3px 10px", fontSize: "0.7rem", fontWeight: 700, whiteSpace: "nowrap" }}>
-                    <Clock size={10} /> Vence pronto
-                  </span>
-                ) : (
-                  <span style={{ fontSize: "0.7rem", color: "#10b981", fontWeight: 600 }}>Al día</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function MayoristasTable({ mayoristas, consignaciones, loading, onEliminar, onSuspender, onReactivar }: MayoristasTableProps) {
+export default function MayoristasTable({ 
+  mayoristas, 
+  consignaciones, 
+  loading, 
+  onEliminar, 
+  onSuspender, 
+  onReactivar 
+}: MayoristasTableProps) {
   const [search, setSearch] = useState("");
+  const [expandido, setExpandido] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState<IUsuarioMayorista | null>(null);
   const [suspendiendo, setSuspendiendo] = useState<IUsuarioMayorista | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [suspLoading, setSuspLoading] = useState(false);
+  const [delLoading, setDelLoading] = useState(false);
 
   const filtrados = mayoristas.filter(m => {
     const q = search.toLowerCase();
@@ -340,9 +55,9 @@ export default function MayoristasTable({ mayoristas, consignaciones, loading, o
 
   const handleConfirmarEliminar = async () => {
     if (!confirmando) return;
-    setDeleting(true);
+    setDelLoading(true);
     await onEliminar(confirmando);
-    setDeleting(false);
+    setDelLoading(false);
     setConfirmando(null);
   };
 
@@ -355,88 +70,337 @@ export default function MayoristasTable({ mayoristas, consignaciones, loading, o
   };
 
   if (loading) {
-    return <div style={{ textAlign: "center", padding: "48px 0", color: "#8C9796" }}>Cargando...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-20 animate-pulse text-[#8c8976]">
+        <div className="h-10 w-10 border-4 border-[#B76E79]/20 border-t-[#B76E79] rounded-full animate-spin mb-4" />
+        <p className="text-sm font-medium uppercase tracking-widest" style={{ fontFamily: "var(--font-marcellus)" }}>Cargando Red de Mayoristas...</p>
+      </div>
+    );
   }
 
-  // Alertas globales de retraso
-  const conRetraso = mayoristas.filter(m =>
+  const mConRetraso = mayoristas.filter(m =>
     consignaciones.some(c =>
       c.id_mayorista === m.id && c.estado === "activa" && diasRetraso(c.fecha_fin) > 0
     )
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-      {/* Banner de alertas globales */}
-      {conRetraso.length > 0 && (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(239,68,68,0.06)", border: "1.5px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: "12px 16px" }}>
-          <AlertTriangle size={16} style={{ color: "#ef4444", flexShrink: 0 }} />
-          <p style={{ fontSize: "0.82rem", color: "#ef4444", fontWeight: 600, margin: 0 }}>
-            {conRetraso.length} mayorista{conRetraso.length > 1 ? "s" : ""} con consignaciones vencidas sin liquidar
-          </p>
+    <div className="space-y-6">
+      {/* ─── ALERTAS GLOBALES ─── */}
+      {mConRetraso.length > 0 && (
+        <div className="flex items-center gap-4 bg-red-50 border border-red-200/50 p-4 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-500">
+           <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-600 shadow-sm">
+             <AlertTriangle size={20} />
+           </div>
+           <p className="text-sm font-bold text-red-700" style={{ fontFamily: "var(--font-marcellus)" }}>
+             {mConRetraso.length} mayorista{mConRetraso.length > 1 ? "s" : ""} con consignaciones vencidas
+           </p>
         </div>
       )}
 
-      {/* Búsqueda */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F6F3EF", border: "1px solid rgba(112,128,144,0.2)", borderRadius: 10, padding: "8px 14px", maxWidth: 340 }}>
-        <Search size={14} style={{ color: "#8C9796", flexShrink: 0 }} />
-        <input
-          placeholder="Buscar por nombre o correo..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ background: "none", border: "none", outline: "none", fontSize: "0.82rem", color: "#1C1C1C", width: "100%" }}
-        />
+      {/* ─── TOOLBAR ─── */}
+      <div className="flex flex-col md:flex-row gap-4 md:items-center">
+        <div className="relative flex-1 max-w-md group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/group text-[#8c8976] transition-colors group-focus-within:text-[#b76e79]" size={18} />
+          <input
+            placeholder="Buscar por nombre o correo..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 rounded-2xl bg-[#F6F3EF]/50 border border-[#8c8976]/20 focus:outline-none focus:ring-4 focus:ring-[#b76e79]/10 focus:border-[#b76e79] transition-all text-sm font-medium text-[#708090]"
+            style={{ fontFamily: "var(--font-poppins)" }}
+          />
+        </div>
       </div>
 
-      {/* Lista */}
-      {filtrados.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "48px 0", color: "#8C9796", fontSize: "0.85rem" }}>
-          <UserCheck size={32} style={{ opacity: 0.3, display: "block", margin: "0 auto 10px" }} />
-          {search ? "Sin resultados para tu búsqueda" : "Sin mayoristas registrados aún"}
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {filtrados.map(m => (
-            <MayoristaRow
-              key={m.id}
-              m={m}
-              consignacionesMayorista={consignaciones.filter(c => c.id_mayorista === m.id)}
-              onEliminar={() => setConfirmando(m)}
-              onSuspender={() => {
-                if (!m.activo) { onReactivar(m); } else { setSuspendiendo(m); }
-              }}
-            />
-          ))}
-        </div>
-      )}
+      {/* ─── DESKTOP TABLE ─── */}
+      <div className="hidden md:block overflow-hidden rounded-2xl border border-[#8c8976]/20 bg-white shadow-sm">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-[#708090]/5 border-b border-[#8c8976]/20">
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest" style={{ fontFamily: "var(--font-marcellus)" }}>Mayorista</th>
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest text-center" style={{ fontFamily: "var(--font-marcellus)" }}>Consignaciones</th>
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest text-center" style={{ fontFamily: "var(--font-marcellus)" }}>Estado</th>
+              <th className="p-5 text-[#708090] font-bold text-[10px] uppercase tracking-widest text-right" style={{ fontFamily: "var(--font-marcellus)" }}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#8c8976]/10">
+            {filtrados.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="p-20 text-center text-[#8c8976] italic text-sm">No hay resultados</td>
+              </tr>
+            ) : (
+              filtrados.map(m => {
+                const cMayorista = consignaciones.filter(c => c.id_mayorista === m.id);
+                const activas = cMayorista.filter(c => c.estado === "activa");
+                const conRetraso = activas.filter(c => diasRetraso(c.fecha_fin) > 0);
+                const isExpanded = expandido === m.id;
 
-      {/* Contador */}
-      {filtrados.length > 0 && (
-        <p style={{ fontSize: "0.72rem", color: "#8C9796", textAlign: "right", margin: 0 }}>
-          {filtrados.length} mayorista{filtrados.length !== 1 ? "s" : ""} registrado{filtrados.length !== 1 ? "s" : ""}
-        </p>
-      )}
+                return (
+                  <React.Fragment key={m.id}>
+                    <tr className={`hover:bg-[#f6f4ef]/50 transition-colors ${isExpanded ? 'bg-[#f6f4ef]/30' : ''} ${conRetraso.length > 0 ? 'bg-red-50/20' : ''}`}>
+                      <td className="p-5">
+                        <div className="flex items-center gap-3">
+                           <div className="w-10 h-10 rounded-full bg-[#B76E79]/10 flex items-center justify-center text-[#B76E79] shadow-sm">
+                              <UserCheck size={18} />
+                           </div>
+                           <div>
+                             <p className="font-bold text-[#1C1C1C] text-sm" style={{ fontFamily: "var(--font-marcellus)" }}>{m.nombre ?? "—"}</p>
+                             <p className="text-[10px] text-[#8c8976] flex items-center gap-1"><Mail size={10} /> {m.correo}</p>
+                           </div>
+                        </div>
+                      </td>
+                      <td className="p-5 text-center">
+                         <div className="flex flex-col items-center gap-1">
+                           <span className="text-sm font-bold text-[#708090]">{activas.length} Activas</span>
+                           {conRetraso.length > 0 && (
+                             <span className="text-[9px] font-black text-red-500 uppercase tracking-tighter">
+                               {conRetraso.length} vencidas
+                             </span>
+                           )}
+                         </div>
+                      </td>
+                      <td className="p-5 text-center">
+                        <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${
+                          m.activo 
+                            ? "bg-[#B76E79]/10 text-[#B76E79] border-[#B76E79]/20" 
+                            : "bg-[#708090]/10 text-[#708090] border-[#708090]/20"
+                        }`} style={{ fontFamily: "var(--font-poppins)" }}>
+                          {m.activo ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+                      <td className="p-5 text-right">
+                        <div className="flex justify-end gap-2">
+                           <button onClick={() => m.activo ? setSuspendiendo(m) : onReactivar(m)} 
+                             className={`p-2.5 rounded-xl transition-all shadow-sm ${
+                                m.activo 
+                                  ? "bg-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white" 
+                                  : "bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white"
+                             }`} title={m.activo ? "Suspender cuenta" : "Reactivar cuenta"}>
+                             {m.activo ? <ShieldOff size={14} /> : <ShieldCheck size={14} />}
+                           </button>
+                           <button onClick={() => setConfirmando(m)} className="p-2.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Quitar mayorista">
+                             <Trash2 size={14} />
+                           </button>
+                           {cMayorista.length > 0 && (
+                             <button onClick={() => setExpandido(isExpanded ? null : m.id)} className={`p-2.5 rounded-xl transition-all ${isExpanded ? 'bg-[#1C1C1C] text-white' : 'bg-[#F6F4EF] text-[#8c8976]'}`}>
+                               {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                             </button>
+                           )}
+                        </div>
+                      </td>
+                    </tr>
+                    {isExpanded && (
+                      <tr className="bg-[#fcfbf9]">
+                        <td colSpan={4} className="p-0 overflow-hidden border-b border-[#8c8976]/20">
+                          <div className="p-8 animate-in slide-in-from-top-4 duration-300">
+                             <div className="flex flex-col gap-4">
+                                <div className="flex items-center gap-2 text-[#708090] mb-2 uppercase tracking-[0.2em] font-bold text-[10px]" style={{ fontFamily: "var(--font-marcellus)" }}>
+                                  <Package size={16} /> Consignaciones del Socio
+                                </div>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                   {cMayorista.map(c => {
+                                      const retraso = diasRetraso(c.fecha_fin);
+                                      const vencida = c.estado === "activa" && retraso > 0;
+                                      return (
+                                        <div key={c.id} className={`flex justify-between items-center p-4 bg-white rounded-2xl border transition-all ${vencida ? 'border-red-300 shadow-red-50 shadow-sm' : 'border-[#8c8976]/10'}`}>
+                                           <div className="flex flex-col">
+                                              <span className="font-bold text-sm text-[#708090]" style={{ fontFamily: "var(--font-marcellus)" }}>Consig. #{c.id}</span>
+                                              <span className="text-[10px] text-[#8c8976] uppercase tracking-tighter tabular-nums">{fmt(c.fecha_inicio)} → {fmt(c.fecha_fin)}</span>
+                                           </div>
+                                           <div className="text-right">
+                                              {vencida ? (
+                                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">{retraso} días retraso</span>
+                                              ) : (
+                                                <span className={`text-[10px] font-bold uppercase tracking-widest ${c.estado === 'activa' ? 'text-emerald-600' : 'text-[#708090]'}`}>{c.estado}</span>
+                                              )}
+                                           </div>
+                                        </div>
+                                      );
+                                   })}
+                                </div>
+                             </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Modal quitar mayorista */}
+      {/* ─── MOBILE EXPERIENCE ─── */}
+      <div className="md:hidden space-y-4 pb-10">
+        {filtrados.map(m => {
+          const cMayorista = consignaciones.filter(c => c.id_mayorista === m.id);
+          const activas = cMayorista.filter(c => c.estado === "activa");
+          const conRetraso = activas.filter(c => diasRetraso(c.fecha_fin) > 0);
+          const isExpanded = expandido === m.id;
+
+          return (
+            <div key={m.id} className={`bg-white rounded-3xl border border-[#8c8976]/20 shadow-sm overflow-hidden transition-all ${conRetraso.length > 0 ? 'border-red-300 ring-2 ring-red-50' : ''}`}>
+              <div className="p-5">
+                 <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-full bg-[#B76E79]/10 flex items-center justify-center text-[#B76E79]">
+                          <UserCheck size={18} />
+                       </div>
+                       <div className="flex flex-col">
+                         <span className="font-bold text-[#1C1C1C] text-sm leading-tight uppercase font-marcellus">{m.nombre}</span>
+                         <span className="text-[10px] text-[#8c8976]">{m.correo}</span>
+                       </div>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${m.activo ? 'bg-[#B76E79]/10 text-[#B76E79]' : 'bg-[#708090]/10 text-[#708090]'}`}>
+                      {m.activo ? "Activo" : "Suspendido"}
+                    </span>
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-4 py-4 border-y border-[#8c8976]/10 mb-4">
+                    <div className="flex flex-col">
+                       <span className="text-[9px] text-[#8c8976] uppercase font-bold tracking-wider mb-0.5">Activas</span>
+                       <span className="font-bold text-[#708090] text-sm font-poppins">{activas.length} consignaciones</span>
+                    </div>
+                    <div className="flex flex-col text-right">
+                       <span className="text-[9px] text-[#8c8976] uppercase font-bold tracking-wider mb-0.5">Problemas</span>
+                       <span className={`font-bold text-sm ${conRetraso.length > 0 ? 'text-red-500' : 'text-[#3d8c60]'} font-poppins`}>{conRetraso.length > 0 ? `${conRetraso.length} vencidas` : 'Ninguno'}</span>
+                    </div>
+                 </div>
+
+                 <div className="flex flex-col gap-2">
+                    <button onClick={() => setExpandido(isExpanded ? null : m.id)} className="w-full py-3 rounded-2xl bg-[#F6F4EF] text-[#708090] text-[11px] font-bold uppercase tracking-widest font-marcellus">
+                       {isExpanded ? "Ocultar Historial" : `Ver Historial (${cMayorista.length})`}
+                    </button>
+                    <div className="grid grid-cols-2 gap-2">
+                       <button onClick={() => m.activo ? setSuspendiendo(m) : onReactivar(m)} 
+                          className={`flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-bold uppercase ${m.activo ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'} font-marcellus`}>
+                          {m.activo ? <ShieldOff size={14} /> : <ShieldCheck size={14} />} 
+                          {m.activo ? "Suspender" : "Reactivar"}
+                       </button>
+                       <button onClick={() => setConfirmando(m)} className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-red-100 text-red-700 text-[11px] font-bold uppercase font-marcellus">
+                          <Trash2 size={14} /> Quitar
+                       </button>
+                    </div>
+                 </div>
+              </div>
+
+              {isExpanded && (
+                <div className="bg-[#FAFAF8] p-5 space-y-2 animate-in fade-in duration-300 border-t border-[#8c8976]/10">
+                   {cMayorista.map(c => {
+                      const dist = diasRetraso(c.fecha_fin);
+                      const isVencida = c.estado === "activa" && dist > 0;
+                      return (
+                        <div key={c.id} className="bg-white p-4 rounded-2xl border border-[#8c8976]/10 flex justify-between items-center shadow-sm">
+                           <div className="flex flex-col">
+                              <span className="font-bold text-[#1C1C1C] text-[11px] font-marcellus">ID: #{c.id}</span>
+                              <span className="text-[10px] text-[#8c8976]">{fmt(c.fecha_fin)}</span>
+                           </div>
+                           <span className={`text-[10px] font-black uppercase ${isVencida ? 'text-red-500' : 'text-[#708090]'}`}>
+                              {isVencida ? `${dist} DÍAS RETRASO` : c.estado}
+                           </span>
+                        </div>
+                      );
+                   })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ─── MODALES PRO ─── */}
       {confirmando && (
-        <ConfirmModal
-          mayorista={confirmando}
-          onConfirm={handleConfirmarEliminar}
+        <ConfirmActionModal
+          title="Quitar Rol"
+          message={<>¿Deseas quitar el rol de mayorista a <strong>{confirmando.nombre}</strong>? La cuenta volverá a ser Cliente.</>}
+          confirmText="Sí, quitar rol"
+          confirmColor="#ef4444"
+          icon={Trash2}
           onCancel={() => setConfirmando(null)}
-          loading={deleting}
+          onConfirm={handleConfirmarEliminar}
+          loading={delLoading}
         />
       )}
 
-      {/* Modal suspender */}
       {suspendiendo && (
-        <SuspendModal
+        <SuspendActionModal
           mayorista={suspendiendo}
-          onConfirm={handleConfirmarSuspender}
           onCancel={() => setSuspendiendo(null)}
+          onConfirm={handleConfirmarSuspender}
           loading={suspLoading}
         />
       )}
+    </div>
+  );
+}
+
+// Subcomponente de Modal para Suspender con Motivo
+function SuspendActionModal({ mayorista, onConfirm, onCancel, loading }: any) {
+  const [motivo, setMotivo] = useState("");
+  return (
+    <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-[#8c8976]/40 backdrop-blur-md animate-in fade-in duration-300" onClick={e => e.target === e.currentTarget && onCancel()}>
+      <div className="w-full max-w-sm bg-white rounded-[2.5rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300 border border-[#8c8976]/30">
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center gap-4">
+             <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shadow-inner">
+                <ShieldOff size={28} />
+             </div>
+             <div>
+               <h3 className="text-xl font-bold text-[#1C1C1C]" style={{ fontFamily: "var(--font-marcellus)" }}>Suspender Socio</h3>
+               <p className="text-[10px] text-[#8c8976] uppercase font-bold tracking-widest mt-0.5">Acción Preventiva</p>
+             </div>
+          </div>
+          
+          <p className="text-sm text-[#8c8976] leading-relaxed" style={{ fontFamily: "var(--font-poppins)" }}>
+            Explica brevemente el motivo para <strong>{mayorista.nombre}</strong>. Se incluirá en la notificación.
+          </p>
+
+          <textarea
+            value={motivo}
+            onChange={e => setMotivo(e.target.value)}
+            placeholder="Ej: Retraso en liquidaciones..."
+            className="w-full p-4 rounded-2xl bg-[#F6F4EF] border border-[#8c8976]/20 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all text-sm font-medium resize-none"
+            rows={3}
+            style={{ fontFamily: "var(--font-poppins)" }}
+          />
+
+          <div className="flex flex-col w-full gap-3">
+             <button onClick={() => onConfirm(motivo)} disabled={loading} className="w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-[.15em] text-white bg-amber-600 shadow-xl shadow-amber-600/20 active:scale-95 transition-all disabled:opacity-50" style={{ fontFamily: "var(--font-marcellus)" }}>
+               {loading ? "Procesando..." : "Confirmar Suspensión"}
+             </button>
+             <button onClick={onCancel} className="w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-[.15em] text-[#8c8976] hover:bg-[#F6F4EF] transition-all" style={{ fontFamily: "var(--font-marcellus)" }}>
+               Descartar
+             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ConfirmActionModal({ title, message, confirmText, confirmColor, icon: Icon, onConfirm, onCancel, loading }: any) {
+  return (
+    <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-[#8c8976]/40 backdrop-blur-md animate-in fade-in duration-300" onClick={e => e.target === e.currentTarget && onCancel()}>
+      <div className="w-full max-w-sm bg-white rounded-[2rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300 border border-[#8c8976]/30">
+        <div className="flex flex-col items-center text-center gap-6">
+          <div className="w-16 h-16 rounded-3xl bg-[#F6F4EF] flex items-center justify-center shadow-inner" style={{ color: confirmColor }}>
+            <Icon size={28} />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold text-[#1C1C1C]" style={{ fontFamily: "var(--font-marcellus)" }}>{title}</h3>
+            <p className="text-sm text-[#8c8976] leading-relaxed" style={{ fontFamily: "var(--font-poppins)" }}>{message}</p>
+          </div>
+          <div className="flex flex-col w-full gap-3">
+             <button onClick={onConfirm} disabled={loading} className="w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-[.15em] text-white shadow-xl transition-all disabled:opacity-50" style={{ backgroundColor: confirmColor, fontFamily: "var(--font-marcellus)" }}>
+               {loading ? "Eliminando..." : confirmText}
+             </button>
+             <button onClick={onCancel} className="w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-[.15em] text-[#8c8976] hover:bg-[#F6F4EF] transition-all" style={{ fontFamily: "var(--font-marcellus)" }}>
+               Descartar
+             </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

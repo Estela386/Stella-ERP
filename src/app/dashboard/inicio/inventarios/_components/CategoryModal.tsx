@@ -23,7 +23,7 @@ export default function CategoryModal({
 
       {/* Modal */}
       <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full z-50">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-6" style={{ fontFamily: "var(--font-marcellus)", fontWeight: 400 }}>
           Nueva Categoría
         </h2>
 

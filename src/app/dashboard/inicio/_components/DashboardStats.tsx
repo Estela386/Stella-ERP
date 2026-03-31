@@ -161,7 +161,7 @@ export default function DashboardStats() {
             >
               <p
                 style={{
-                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontFamily: "var(--font-sans)",
                   fontSize: "0.85rem",
                   fontWeight: 500,
                   color: "rgba(255, 255, 255, 0.8)",
@@ -172,9 +172,9 @@ export default function DashboardStats() {
               </p>
               <p
                 style={{
-                  fontFamily: "var(--font-display, Manrope, sans-serif)",
+                  fontFamily: "var(--font-marcellus)",
                   fontSize: "2rem",
-                  fontWeight: 700,
+                  fontWeight: 400,
                   color: "#FFFFFF",
                   margin: 0,
                   lineHeight: 1,

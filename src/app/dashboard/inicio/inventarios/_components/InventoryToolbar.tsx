@@ -24,7 +24,7 @@ export default function InventoryToolbar({ search, setSearch }: Props) {
     >
       {/* BUSCADOR */}
       <div className="flex flex-col gap-1 w-[280px] sm:w-[340px] md:w-[380px]">
-        <span className="text-xs tracking-wide text-[#8C9796] uppercase">
+        <span className="text-xs tracking-wide text-[#8C9796] uppercase" style={{ fontFamily: "var(--font-sans)", fontWeight: 600 }}>
           Filtrar
         </span>
 
@@ -49,6 +49,7 @@ export default function InventoryToolbar({ search, setSearch }: Props) {
  
             hover:border-[#708090]/50
           "
+          style={{ fontFamily: "var(--font-sans)" }}
         />
       </div>
     </div>

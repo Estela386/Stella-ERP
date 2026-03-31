@@ -55,13 +55,13 @@ export default function SalesLineChart({ periodo }: Props) {
     }}>
       <div style={{ marginBottom: 14 }}>
         <h3 style={{
-          fontFamily: "var(--font-display, Manrope, sans-serif)",
+          fontFamily: "var(--font-marcellus)",
           fontSize: "0.9rem", fontWeight: 700, color: "#1C1C1C", margin: 0,
         }}>
           Ventas por {periodo === "hoy" ? "hora" : periodo === "mes" ? "semana" : "día"}
         </h3>
         <p style={{
-          fontFamily: "var(--font-sans, Inter, sans-serif)",
+          fontFamily: "var(--font-poppins)",
           fontSize: "0.67rem", color: "#8C9796", margin: "2px 0 0",
         }}>
           Línea de tendencia de ingresos
@@ -73,12 +73,12 @@ export default function SalesLineChart({ periodo }: Props) {
           <CartesianGrid stroke="#F0EDE8" strokeDasharray="3 3" vertical={false} />
           <XAxis
             dataKey="dia"
-            tick={{ fontSize: 11, fill: "#8C9796", fontFamily: "Inter, sans-serif" }}
+            tick={{ fontSize: 11, fill: "#8C9796", fontFamily: "var(--font-poppins)" }}
             axisLine={false} tickLine={false}
           />
           <YAxis
             tickFormatter={fmt}
-            tick={{ fontSize: 11, fill: "#8C9796", fontFamily: "Inter, sans-serif" }}
+            tick={{ fontSize: 11, fill: "#8C9796", fontFamily: "var(--font-poppins)" }}
             axisLine={false} tickLine={false} width={42}
           />
           <Tooltip
@@ -87,9 +87,9 @@ export default function SalesLineChart({ periodo }: Props) {
               background: "#fff", borderRadius: 10,
               border: "1px solid #F0EDE8",
               boxShadow: "0 4px 14px rgba(112,128,144,0.18)",
-              fontFamily: "Inter, sans-serif", fontSize: 12,
+              fontFamily: "var(--font-poppins)", fontSize: 12,
             }}
-            labelStyle={{ color: "#708090", fontWeight: 600 }}
+            labelStyle={{ color: "#708090", fontWeight: 600, fontFamily: "var(--font-marcellus)" }}
           />
           <Line
             type="monotone" dataKey="ventas"

@@ -17,22 +17,22 @@ export default function ProductRow({
 }: ProductRowProps) {
   return (
     <tr className="border-b border-gray-200 hover:bg-gray-50 transition">
-      <td className="px-4 py-3 text-center">JOY-{producto.id}</td>
-      <td className="px-4 py-3">{producto.nombre}</td>
-      <td className="px-4 py-3">{producto.categoria.nombre}</td>
+      <td className="px-4 py-3 text-center" style={{ fontFamily: "var(--font-sans)" }}>JOY-{producto.id}</td>
+      <td className="px-4 py-3" style={{ fontFamily: "var(--font-marcellus)", fontSize: "1rem", fontWeight: 400 }}>{producto.nombre}</td>
+      <td className="px-4 py-3" style={{ fontFamily: "var(--font-sans)" }}>{producto.categoria.nombre}</td>
       <td className="px-4 py-3 text-center">
         <span className={`px-2 py-0.5 rounded-full text-[0.65rem] font-bold uppercase tracking-wider ${
           producto.tipo === "fabricado" 
             ? "bg-[#8c9768]/15 text-[#8c9768]" 
             : "bg-[#b76e79]/15 text-[#b76e79]"
-        }`}>
+        }`} style={{ fontFamily: "var(--font-sans)" }}>
           {producto.tipo === "fabricado" ? "Fabricado" : "Revendido"}
         </span>
       </td>
-      <td className="px-4 py-3 text-center">{producto.stock_actual}</td>
-      <td className="px-4 py-3 text-center">${producto.precio}</td>
-      <td className="px-4 py-3 text-center">${producto.costo}</td>
-      <td className="px-4 py-3 text-center">
+      <td className="px-4 py-3 text-center" style={{ fontFamily: "var(--font-sans)" }}>{producto.stock_actual}</td>
+      <td className="px-4 py-3 text-center" style={{ fontFamily: "var(--font-marcellus)", fontWeight: 400, fontSize: "1rem" }}>${producto.precio}</td>
+      <td className="px-4 py-3 text-center" style={{ fontFamily: "var(--font-sans)" }}>${producto.costo}</td>
+      <td className="px-4 py-3 text-center" style={{ fontFamily: "var(--font-sans)" }}>
         ${producto.costo_mayorista || "N/A"}
       </td>
 
@@ -54,6 +54,7 @@ export default function ProductRow({
               ? "bg-[#b76e79]/15 text-[#b76e79]"
               : "bg-gray-100 text-[#708090]"
           }`}
+          style={{ fontFamily: "var(--font-sans)" }}
         >
           {producto.es_personalizable ? "Sí" : "No"}
         </div>

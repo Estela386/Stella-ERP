@@ -33,9 +33,9 @@ function Avatar({ name }: { name: string }) {
   return (
     <div style={{
       width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-      background: `hsl(${hue}, 30%, 88%)`,
+      background: `hsl(${hue}, 25%, 88%)`,
       display: "flex", alignItems: "center", justifyContent: "center",
-      fontFamily: "var(--font-display, Manrope, sans-serif)",
+      fontFamily: "var(--font-sans)",
       fontSize: "0.65rem", fontWeight: 700,
       color: `hsl(${hue}, 40%, 38%)`,
     }}>
@@ -67,14 +67,14 @@ export default function RecentOrders() {
       }}>
         <div>
           <h3 style={{
-            fontFamily: "var(--font-display, Manrope, sans-serif)",
-            fontSize: "0.9rem", fontWeight: 700,
+            fontFamily: "var(--font-marcellus)",
+            fontSize: "0.95rem", fontWeight: 400,
             color: "#1C1C1C", margin: 0,
           }}>
             Pedidos Recientes
           </h3>
           <p style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.67rem", color: "#8C9796", margin: "2px 0 0",
           }}>
             Últimas órdenes registradas
@@ -83,7 +83,7 @@ export default function RecentOrders() {
         <button
           onClick={() => router.push("/dashboard/inicio/pedidos")}
           style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.72rem", fontWeight: 600,
             color: "#708090", background: "none",
             border: "none", cursor: "pointer", padding: 0,
@@ -118,7 +118,7 @@ export default function RecentOrders() {
 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{
-                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontFamily: "var(--font-sans)",
                   fontSize: "0.79rem", fontWeight: 600,
                   color: "#1C1C1C", margin: 0,
                   overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
@@ -126,7 +126,7 @@ export default function RecentOrders() {
                   {p.cliente}
                 </p>
                 <p style={{
-                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontFamily: "var(--font-sans)",
                   fontSize: "0.63rem", color: "#8C9796", margin: "1px 0 0",
                 }}>
                   {p.id} · {p.items} {p.items === 1 ? "pieza" : "piezas"} · {p.fecha}
@@ -136,8 +136,8 @@ export default function RecentOrders() {
               {/* Amount + badge */}
               <div style={{ textAlign: "right", flexShrink: 0 }}>
                 <p style={{
-                  fontFamily: "var(--font-display, Manrope, sans-serif)",
-                  fontSize: "0.86rem", fontWeight: 700,
+                  fontFamily: "var(--font-marcellus)",
+                  fontSize: "0.86rem", fontWeight: 400,
                   color: "#1C1C1C", margin: 0,
                 }}>
                   {p.monto}
@@ -145,7 +145,7 @@ export default function RecentOrders() {
                 <span style={{
                   display: "inline-flex", alignItems: "center", gap: 3,
                   background: cfg.bg, borderRadius: 20, padding: "2px 8px",
-                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontFamily: "var(--font-sans)",
                   fontSize: "0.59rem", fontWeight: 700,
                   color: cfg.color, marginTop: 2,
                 }}>
@@ -171,7 +171,7 @@ export default function RecentOrders() {
             border: "1px solid rgba(112,128,144,0.15)",
             borderRadius: 9,
             padding: "8px",
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.75rem", fontWeight: 600,
             color: "#708090", cursor: "pointer",
             transition: "all 0.15s",

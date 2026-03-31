@@ -450,7 +450,7 @@ export default function InventariosPage() {
       <section className="min-h-screen bg-[#F8F6F2] px-8 py-14 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B76E79] mx-auto mb-4" />
-          <p className="text-gray-600">Cargando inventario...</p>
+          <p className="text-gray-600" style={{ fontFamily: "var(--font-sans)" }}>Cargando inventario...</p>
         </div>
       </section>
     );
@@ -472,7 +472,7 @@ export default function InventariosPage() {
             {/* Línea editorial */}
             <div className="flex items-center gap-4">
               <span className="h-px w-12 bg-[#B76E79]" />
-              <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
+              <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium" style={{ fontFamily: "var(--font-marcellus)" }}>
                 Inventarios
               </span>
             </div>
@@ -497,7 +497,7 @@ export default function InventariosPage() {
 
             {/* Error message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" style={{ fontFamily: "var(--font-sans)" }}>
                 {error}
               </div>
             )}
@@ -520,6 +520,7 @@ export default function InventariosPage() {
             hover:shadow-md
             transition
           "
+                  style={{ fontFamily: "var(--font-sans)" }}
                 >
                   + Categoría
                 </button>
@@ -537,6 +538,7 @@ export default function InventariosPage() {
             transition
             flex items-center gap-2
           "
+                  style={{ fontFamily: "var(--font-sans)" }}
                 >
                   <FileText className="w-4 h-4" />
                   Imprimir Etiquetas
@@ -554,6 +556,7 @@ export default function InventariosPage() {
             hover:shadow-md
             transition
           "
+                  style={{ fontFamily: "var(--font-sans)" }}
                 >
                   + Nuevo Producto
                 </button>

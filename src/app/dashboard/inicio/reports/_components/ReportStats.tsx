@@ -82,6 +82,7 @@ function Stat({
           tracking-wide
           ${isDark ? "text-white/70" : "text-[#111111]/70"}
         `}
+        style={{ fontFamily: "var(--font-marcellus)" }}
       >
         {label}
       </p>
@@ -94,6 +95,7 @@ function Stat({
           font-semibold
           ${textColor}
         `}
+        style={{ fontFamily: "var(--font-poppins)" }}
       >
         {value}
       </p>

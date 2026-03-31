@@ -40,14 +40,14 @@ export default function SalesChart() {
       }}>
         <div>
           <h3 style={{
-            fontFamily: "var(--font-display, Manrope, sans-serif)",
-            fontSize: "0.9rem", fontWeight: 700,
+            fontFamily: "var(--font-marcellus)",
+            fontSize: "0.95rem", fontWeight: 400,
             color: "#1C1C1C", margin: 0,
           }}>
             Ventas de la Semana
           </h3>
           <p style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.67rem", color: "#8C9796", margin: "2px 0 0",
           }}>
             Ingresos diarios — semana actual
@@ -56,8 +56,8 @@ export default function SalesChart() {
         <span style={{
           background: "#EDF5F0", color: "#4a8c6a",
           borderRadius: 20, padding: "3px 11px",
-          fontFamily: "var(--font-sans, Inter, sans-serif)",
-          fontSize: "0.67rem", fontWeight: 700,
+          fontFamily: "var(--font-marcellus)",
+          fontSize: "0.75rem", fontWeight: 400,
         }}>
           $85,540 total
         </span>
@@ -120,7 +120,7 @@ export default function SalesChart() {
                       background: "#1C1C1C",
                       color: "#fff",
                       borderRadius: 7, padding: "4px 9px",
-                      fontFamily: "var(--font-sans, Inter, sans-serif)",
+                      fontFamily: "var(--font-sans)",
                       fontSize: "0.68rem", fontWeight: 700,
                       whiteSpace: "nowrap", zIndex: 20,
                       boxShadow: "0 3px 10px rgba(0,0,0,0.2)",
@@ -161,7 +161,7 @@ export default function SalesChart() {
             {data.map((d, i) => (
               <div key={d.day} style={{ flex: 1, textAlign: "center" }}>
                 <span style={{
-                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontFamily: "var(--font-sans)",
                   fontSize: "0.62rem",
                   fontWeight: hovered === i ? 700 : 400,
                   color: hovered === i ? "#B76E79" : "#8C9796",

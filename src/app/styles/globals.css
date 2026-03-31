@@ -21,10 +21,10 @@
 }
 
 :root {
-  --font-brand: var(--font-lora), serif;
-  --font-serif: var(--font-lora), serif;
+  --font-brand: var(--font-marcellus), serif;
+  --font-serif: var(--font-marcellus), serif;
   --font-sans: var(--font-poppins), sans-serif;
-  --font-title: var(--font-bodoni), serif;
+  --font-title: var(--font-marcellus), serif;
   --font-subtitle: var(--font-marcellus), serif;
 }
 
@@ -36,7 +36,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
+  font-family: var(--font-marcellus);
 }
 
 /* =====================

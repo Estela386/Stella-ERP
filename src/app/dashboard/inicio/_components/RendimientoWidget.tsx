@@ -33,14 +33,14 @@ export default function RendimientoWidget() {
       }}>
         <div>
           <h3 style={{
-            fontFamily: "var(--font-display, Manrope, sans-serif)",
-            fontSize: "0.9rem", fontWeight: 700,
+            fontFamily: "var(--font-marcellus)",
+            fontSize: "0.95rem", fontWeight: 400,
             color: "#1C1C1C", margin: 0,
           }}>
             Rendimiento
           </h3>
           <p style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.67rem", color: "#8C9796", margin: "2px 0 0",
           }}>
             Métricas del período actual
@@ -49,7 +49,7 @@ export default function RendimientoWidget() {
         <button
           onClick={() => router.push("/dashboard/inicio/reports")}
           style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.72rem", fontWeight: 600,
             color: "#708090", background: "none",
             border: "none", cursor: "pointer", padding: 0,
@@ -71,12 +71,12 @@ export default function RendimientoWidget() {
           <div key={r.label} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
+                fontFamily: "var(--font-sans)",
                 fontSize: "0.75rem", fontWeight: 600, color: "#1C1C1C"
               }}>{r.label}</span>
               <span style={{
-                fontFamily: "var(--font-mono, monospace)",
-                fontSize: "0.75rem", fontWeight: 700, color: r.color
+                fontFamily: "var(--font-marcellus)",
+                fontSize: "0.85rem", fontWeight: 400, color: r.color
               }}>{r.value}%</span>
             </div>
             {/* Progress Bar Track */}

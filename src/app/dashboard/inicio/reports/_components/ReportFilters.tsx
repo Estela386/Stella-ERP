@@ -34,8 +34,8 @@ export default function ReportFilters({
     }}>
       {/* Title */}
       <h2 style={{
-        fontFamily: "var(--font-display, Manrope, sans-serif)",
-        fontSize: "1.4rem", fontWeight: 800, color: "#2A2E34", margin: 0,
+        fontFamily: "var(--font-marcellus)",
+        fontSize: "1.4rem", fontWeight: 800, color: "#708090", margin: 0,
       }}>
         Reportes
       </h2>
@@ -47,7 +47,7 @@ export default function ReportFilters({
             key={t}
             onClick={() => onTabChange(t)}
             style={{
-              fontFamily: "var(--font-sans, Inter, sans-serif)",
+              fontFamily: "var(--font-marcellus)",
               fontSize: "0.75rem", fontWeight: activeTab === t ? 700 : 500,
               textTransform: "uppercase",
               letterSpacing: "0.05em",
@@ -70,7 +70,7 @@ export default function ReportFilters({
           style={{
             padding: "8px 14px", borderRadius: 8,
             border: "1px solid #E2E8F0",
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-poppins)",
             fontSize: "0.75rem", fontWeight: 600, color: "#4A5568",
             outline: "none", cursor: "pointer",
             background: "#fff"
@@ -83,7 +83,7 @@ export default function ReportFilters({
           style={{
             padding: "8px 14px", borderRadius: 8,
             border: "1px solid #E2E8F0",
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-poppins)",
             fontSize: "0.75rem", fontWeight: 600, color: "#4A5568",
             outline: "none", cursor: "pointer",
             background: "#fff"

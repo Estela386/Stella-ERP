@@ -73,14 +73,14 @@ export default function ReportKPIs({
           }}
         >
           <p style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-marcellus)",
             fontSize: "0.8rem", fontWeight: 600,
             opacity: 0.9, margin: "0 0 6px 0",
           }}>
             {k.label}
           </p>
           <p style={{
-            fontFamily: "var(--font-display, Manrope, sans-serif)",
+            fontFamily: "var(--font-poppins)",
             fontSize: "2rem", fontWeight: 700,
             margin: 0, lineHeight: 1,
             textShadow: "0 1px 2px rgba(0,0,0,0.1)"

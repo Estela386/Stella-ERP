@@ -97,26 +97,22 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         id: "e2",
         category: "envios",
-        question: "¿Hacen envíos a todo México?",
+        question: "¿Cómo funcionan los envíos?",
         answer: (
           <>
-            Sí, enviamos a toda la República Mexicana a través de paquetería certificada.<br /><br />
-            También contamos con <strong>envío a domicilio en Guadalajara y Zona Metropolitana</strong> para pedidos superiores a <strong>$800 MXN</strong>.
+            Solo realizamos envíos siempre y cuando el usuario **seleccione una paquetería** para coordinar la entrega y realice el pago del **monto correspondiente al envío**.<br /><br />
+            Trabajamos principalmente con <strong>Casa Blanca Paquetería</strong>, asegurando que tu pedido llegue de forma segura una vez cubierto el costo de traslado.
           </>
         ),
       },
       {
         id: "e3",
         category: "envios",
-        question: "¿Cuánto cuesta el envío?",
+        question: "¿Cuál es el costo del envío?",
         answer: (
           <>
-            El costo de envío depende de la paquetería y destino:<br /><br />
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
-              <li><FaqInlineIcon icon={<MapPin size={18} />} /> <strong>ZMG (compra +$800 MXN):</strong> <span style={{ color: "#b76e79", fontWeight: 600 }}>Gratis</span></li>
-              <li><FaqInlineIcon icon={<MapPin size={18} />} /> <strong>ZMG (compra -$800 MXN):</strong> $60 – $80 MXN</li>
-              <li><FaqInlineIcon icon={<Building2 size={18} />} /> <strong>Nacional express:</strong> $120 – $180 MXN</li>
-            </ul>
+            El costo es determinado directamente por la paquetería (ej. <strong>Casa Blanca</strong>). <br /><br />
+            Para procesar la entrega, el cliente debe **enviar el monto total del envío** cotizado. Una vez confirmado este pago, se procede con el despacho de la mercancía.
           </>
         ),
       },
@@ -246,11 +242,11 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         id: "u3",
         category: "ubicacion",
-        question: "¿Puedo recoger mi pedido en tienda?",
+        question: "¿Cómo funciona el pago para recoger en tienda física?",
         answer: (
           <>
-            ¡Claro que sí! Selecciona la opción <strong>"Recoger en tienda"</strong> al momento de comprar. Tu pedido estará listo el mismo día si el artículo está en existencia.<br /><br />
-            Te avisaremos por WhatsApp cuando puedas venir a recogerlo.
+            Para pedidos que se recojan directamente en nuestra tienda física, **solo se necesita pagar el 50% del monto total** para procesar y apartar tu pedido.<br /><br />
+            El 50% restante se liquida al momento de recibir tus piezas en la tienda. Esta opción es ideal si prefieres revisar tu mercancía antes de completar el pago.
           </>
         ),
       },
@@ -386,7 +382,7 @@ const FAQ_SECTIONS: FaqSection[] = [
         question: "¿Qué descuento tienen los mayoristas?",
         answer: (
           <>
-            Los mayoristas activos reciben un <strong style={{ color: "#b76e79" }}>descuento permanente del 30%</strong> sobre el precio de lista en todos los productos del catálogo.<br /><br />
+            Los mayoristas activos reciben un <strong style={{ color: "#b76e79" }}>descuento permanente del 25%</strong> sobre el precio de lista en todos los productos del catálogo.<br /><br />
             Este descuento se aplica automáticamente en cada pedido mayorista confirmado.
           </>
         ),
@@ -446,7 +442,7 @@ const FAQ_SECTIONS: FaqSection[] = [
           <>
             No hay penalización. Al finalizar el periodo de consignación (usualmente <strong>30 – 60 días</strong> según acuerdo):<br /><br />
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
-              <li><FaqInlineIcon icon={<CheckCircle2 size={18} />} /> Liquidas el importe de las piezas vendidas (con tu descuento del 30%)</li>
+              <li><FaqInlineIcon icon={<CheckCircle2 size={18} />} /> Liquidas el importe de las piezas vendidas (con tu descuento del 25%)</li>
               <li><FaqInlineIcon icon={<CheckCircle2 size={18} />} /> Las piezas no vendidas las devuelves en perfecto estado</li>
               <li><FaqInlineIcon icon={<AlertCircle size={18} />} /> Piezas dañadas se cobran al precio mayorista correspondiente</li>
             </ul>
@@ -586,7 +582,7 @@ export default function FaqPage() {
             </div>
           </div>
           <span style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.82rem", color: "#708090",
           }}>
             {currentSection.description}
@@ -602,7 +598,7 @@ export default function FaqPage() {
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:8 }}>
               <span style={{ height:1, width:36, background:"#b76e79" }} />
               <span style={{
-                fontFamily:"var(--font-sans, Inter, sans-serif)",
+                fontFamily:"var(--font-sans)",
                 fontSize:"0.62rem", fontWeight:500,
                 textTransform:"uppercase", letterSpacing:"0.2em",
                 color:"#b76e79",
@@ -610,13 +606,13 @@ export default function FaqPage() {
               <span style={{ height:1, width:36, background:"#b76e79" }} />
             </div>
             <h2 style={{
-              fontFamily:"var(--font-serif, 'Cormorant Garamond', serif)",
+              fontFamily:"var(--font-marcellus)",
               fontSize:"clamp(1.8rem,3vw,2.6rem)",
-              fontWeight:500, color:"#4a5568",
+              fontWeight:400, color:"#4a5568",
               margin:0,
             }}>
               Nuestra{" "}
-              <em style={{ color:"#b76e79", fontStyle:"italic" }}>tienda</em>
+              <em style={{ color:"#b76e79", fontStyle:"italic", fontFamily:"var(--font-marcellus)" }}>tienda</em>
             </h2>
           </div>
           <FaqLocation />
@@ -628,7 +624,7 @@ export default function FaqPage() {
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:8 }}>
               <span style={{ height:1, width:36, background:"#b76e79" }} />
               <span style={{
-                fontFamily:"var(--font-sans, Inter, sans-serif)",
+                fontFamily:"var(--font-sans)",
                 fontSize:"0.62rem", fontWeight:500,
                 textTransform:"uppercase", letterSpacing:"0.2em",
                 color:"#b76e79",
@@ -636,13 +632,13 @@ export default function FaqPage() {
               <span style={{ height:1, width:36, background:"#b76e79" }} />
             </div>
             <h2 style={{
-              fontFamily:"var(--font-serif, 'Cormorant Garamond', serif)",
+              fontFamily:"var(--font-marcellus)",
               fontSize:"clamp(1.8rem,3vw,2.6rem)",
-              fontWeight:500, color:"#4a5568",
+              fontWeight:400, color:"#4a5568",
               margin:0,
             }}>
               ¿Te interesa el{" "}
-              <em style={{ color:"#b76e79", fontStyle:"italic" }}>mayoreo?</em>
+              <em style={{ color:"#b76e79", fontStyle:"italic", fontFamily:"var(--font-marcellus)" }}>mayoreo?</em>
             </h2>
           </div>
           <FaqWholesale />

@@ -18,7 +18,7 @@ export default function TopSellers() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl md:text-2xl font-semibold text-[#708090]">
+      <h3 className="text-xl md:text-2xl font-semibold text-[#708090]" style={{ fontFamily: "var(--font-marcellus)" }}>
         Mejores Vendedores
       </h3>
 
@@ -41,12 +41,12 @@ export default function TopSellers() {
                 {i + 1}
               </span>
 
-              <p className="text-base md:text-lg font-medium text-[#708090]">
+              <p className="text-base md:text-lg font-medium text-[#708090]" style={{ fontFamily: "var(--font-marcellus)" }}>
                 {v.nombre}
               </p>
             </div>
 
-            <p className="font-bold text-lg md:text-xl text-[#708090]">
+            <p className="font-bold text-lg md:text-xl text-[#708090]" style={{ fontFamily: "var(--font-poppins)" }}>
               {v.total}
             </p>
           </div>

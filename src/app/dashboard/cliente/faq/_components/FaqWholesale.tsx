@@ -39,8 +39,8 @@ export default function FaqWholesale() {
       <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
         <span style={{ height:1, width:36, background:"#b76e79", flexShrink:0 }} />
         <span style={{
-          fontFamily:"var(--font-sans, Inter, sans-serif)",
-          fontSize:"0.62rem", fontWeight:500,
+          fontFamily:"var(--font-sans)",
+          fontSize:"0.62rem", fontWeight: 500,
           textTransform:"uppercase", letterSpacing:"0.2em",
           color:"#b76e79",
         }}>
@@ -50,18 +50,18 @@ export default function FaqWholesale() {
 
       {/* Título */}
       <h2 style={{
-        fontFamily:"'Cormorant Garamond',Georgia,serif",
+        fontFamily:"var(--font-marcellus)",
         fontSize:"clamp(1.7rem,3vw,2.4rem)",
-        fontWeight:500,
+        fontWeight:400,
         color:"rgba(246,244,239,0.92)",
         lineHeight:1.2,
         margin:"0 0 10px",
       }}>
         Crece con{" "}
-        <em style={{ color:"#b76e79" }}>Stella</em>
+        <em style={{ color:"#b76e79", fontStyle:"italic", fontFamily:"var(--font-marcellus)" }}>Stella</em>
       </h2>
       <p style={{
-        fontFamily:"var(--font-sans, Inter, sans-serif)",
+        fontFamily:"var(--font-sans)",
         fontSize:"0.9rem",
         color:"rgba(246,244,239,0.55)",
         margin:"0 0 32px",
@@ -69,7 +69,7 @@ export default function FaqWholesale() {
         lineHeight:1.7,
       }}>
         Únete a nuestra red de distribuidores y mayoristas. Descuento exclusivo del 
-        <strong style={{ color:"#b76e79" }}> 30%</strong> sobre precio de lista, 
+        <strong style={{ color:"#b76e79", fontFamily:"var(--font-sans)" }}> 25%</strong> sobre precio de lista, 
         acceso anticipado a colecciones y la posibilidad de consignación para quienes 
         viven en la Zona Metropolitana de Guadalajara.
       </p>
@@ -94,7 +94,7 @@ export default function FaqWholesale() {
               {/* Número */}
               <span style={{
                 position:"absolute", top:12, right:14,
-                fontFamily:"var(--font-serif, 'Cormorant Garamond', serif)",
+                fontFamily:"var(--font-marcellus)",
                 fontSize:"2rem", fontWeight:400,
                 color:"rgba(246,244,239,0.08)",
                 lineHeight:1,
@@ -112,14 +112,14 @@ export default function FaqWholesale() {
               </div>
 
               <p style={{
-                fontFamily:"var(--font-serif, 'Cormorant Garamond', serif)",
+                fontFamily:"var(--font-marcellus)",
                 fontSize:"1rem", fontWeight:600, fontStyle:"italic",
                 color:"rgba(246,244,239,0.82)", margin:"0 0 6px",
               }}>
                 {step.title}
               </p>
               <p style={{
-                fontFamily:"var(--font-sans, Inter, sans-serif)",
+                fontFamily:"var(--font-sans)",
                 fontSize:"0.8rem",
                 color:"rgba(246,244,239,0.45)",
                 margin:0, lineHeight:1.6,
@@ -137,7 +137,7 @@ export default function FaqWholesale() {
         marginBottom:28,
       }}>
         {[
-          "30% descuento permanente",
+          "25% descuento permanente",
           "Mínimo 10 piezas por pedido",
           "Consignación ZMG (después de 1er pedido)",
           "Acceso a nuevas colecciones",
@@ -148,7 +148,7 @@ export default function FaqWholesale() {
             padding:"5px 13px", borderRadius:99,
             background:"rgba(183,110,121,0.12)",
             border:"1px solid rgba(183,110,121,0.3)",
-            fontFamily:"var(--font-sans, Inter, sans-serif)",
+            fontFamily:"var(--font-sans)",
             fontSize:"0.75rem",
             color:"rgba(246,244,239,0.7)",
           }}>
@@ -165,7 +165,7 @@ export default function FaqWholesale() {
           display:"inline-flex", alignItems:"center", gap:8,
           padding:"11px 24px", borderRadius:99,
           background:"#b76e79", color:"#f6f4ef",
-          fontFamily:"var(--font-sans, Inter, sans-serif)",
+          fontFamily:"var(--font-sans)",
           fontSize:"0.84rem", fontWeight:500,
           textDecoration:"none",
           boxShadow:"0 4px 16px rgba(183,110,121,0.35)",

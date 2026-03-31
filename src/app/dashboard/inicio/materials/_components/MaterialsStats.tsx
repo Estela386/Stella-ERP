@@ -67,7 +67,7 @@ function StatCard({ title, value, onClick, color }: StatCardProps) {
         transition-all duration-200
       `}
     >
-      <p className="text-sm opacity-80 font-sans tracking-wide">{title}</p>
+      <p className="text-sm opacity-80 font-serif tracking-wide" style={{ fontFamily: "var(--font-marcellus)" }}>{title}</p>
       <p className="text-4xl font-sans font-bold tracking-tight">
         {value}
       </p>

@@ -16,61 +16,28 @@ interface TabBarProps {
 
 export default function TabBar({ active, onSelect, pendientes = 0 }: TabBarProps) {
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: 6,
-        background: "#F3F0EB",
-        borderRadius: 14,
-        padding: 5,
-        width: "fit-content",
-        flexWrap: "wrap",
-      }}
-    >
+    <div className="flex w-full lg:w-auto bg-[#8c8976]/10 p-1 rounded-2xl border border-[#8c8976]/20 overflow-x-auto no-scrollbar">
       {TABS.map(tab => {
         const isActive = active === tab.id;
+        const isSolicitudes = tab.id === "solicitudes";
+        
         return (
           <button
             key={tab.id}
             id={`tab-${tab.id}`}
             onClick={() => onSelect(tab.id)}
-            style={{
-              position: "relative",
-              padding: "8px 20px",
-              borderRadius: 10,
-              border: "none",
-              cursor: "pointer",
-              fontSize: "0.82rem",
-              fontWeight: isActive ? 700 : 500,
-              fontFamily: "Manrope,sans-serif",
-              color: isActive ? "#fff" : "#708090",
-              background: isActive
-                ? "linear-gradient(135deg,#B76E79,#9d5a64)"
-                : "transparent",
-              boxShadow: isActive ? "0 4px 12px rgba(183,110,121,0.3)" : "none",
-              transition: "all 0.2s ease",
-              whiteSpace: "nowrap",
-            }}
+            className={`
+              relative flex-1 lg:flex-none px-5 md:px-8 py-2.5 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all duration-300 whitespace-nowrap
+              ${isActive 
+                ? "bg-white text-[#b76e79] shadow-sm" 
+                : "text-[#708090] hover:bg-white/50"
+              }
+            `}
+            style={{ fontFamily: "var(--font-marcellus)" }}
           >
             {tab.label}
-            {tab.id === "solicitudes" && pendientes > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: -4,
-                  right: -4,
-                  background: "#e53e3e",
-                  color: "#fff",
-                  borderRadius: "50%",
-                  width: 18,
-                  height: 18,
-                  fontSize: "0.6rem",
-                  fontWeight: 800,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+            {isSolicitudes && pendientes > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#e53e3e] text-white rounded-full w-5 h-5 text-[9px] font-black flex items-center justify-center shadow-sm border-2 border-white animate-pulse">
                 {pendientes > 9 ? "9+" : pendientes}
               </span>
             )}

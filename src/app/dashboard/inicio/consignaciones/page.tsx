@@ -151,10 +151,10 @@ export default function ConsignacionesPage() {
   // ─── Loading global ────────────────────────────────────────────
   if (authLoading) {
     return (
-      <div style={{ display: "flex", height: "100vh", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ textAlign: "center", color: "#8C9796" }}>
-          <div style={{ fontSize: "2rem", marginBottom: 8 }}>⏳</div>
-          <p>Cargando...</p>
+      <div className="flex h-screen items-center justify-center bg-[#f6f4ef]">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B76E79]" />
+          <p className="text-[#708090] font-medium tracking-widest uppercase text-xs" style={{ fontFamily: "var(--font-marcellus)" }}>Cargando Panel...</p>
         </div>
       </div>
     );
@@ -163,10 +163,10 @@ export default function ConsignacionesPage() {
   // ─── Vista Mayorista ───────────────────────────────────────────
   if (isMayorista) {
     return (
-      <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#F6F3EF" }}>
+      <div className="flex h-screen overflow-hidden bg-[#f6f4ef]">
         <SidebarMenu />
-        <main style={{ flex: 1, overflowY: "auto", padding: "24px 20px" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto">
+          <div className="mx-auto max-w-7xl">
             <MayoristaView
               consignaciones={mayoristaHook.consignaciones}
               loading={mayoristaHook.loading}
@@ -182,40 +182,24 @@ export default function ConsignacionesPage() {
   // ─── Vista Admin ───────────────────────────────────────────────
   if (isAdmin) {
     return (
-      <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#F6F3EF" }}>
+      <div className="flex h-screen overflow-hidden bg-[#f6f4ef]">
         <SidebarMenu />
 
-        <main style={{ flex: 1, overflowY: "auto", padding: "24px 20px" }}>
-          <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
+        <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto">
+          <div className="mx-auto max-w-7xl space-y-8">
 
             {/* Header */}
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ height: 1, width: 40, background: "#B76E79", display: "block" }} />
-                  <span
-                    style={{
-                      fontSize: "0.65rem",
-                      letterSpacing: "0.3em",
-                      textTransform: "uppercase",
-                      color: "#B76E79",
-                      fontWeight: 700,
-                    }}
+            <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+              <div className="space-y-1">
+                <div className="flex items-center gap-4">
+                  <span className="h-px w-12 bg-[#B76E79]" />
+                  <span 
+                    className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium"
+                    style={{ fontFamily: "var(--font-marcellus)" }}
                   >
-                    Gestión
+                    Gestión de Consignaciones
                   </span>
                 </div>
-                <h1
-                  style={{
-                    fontSize: "clamp(1.4rem,3vw,2rem)",
-                    fontWeight: 800,
-                    color: "#1C1C1C",
-                    margin: "4px 0 0",
-                    fontFamily: "Manrope,sans-serif",
-                  }}
-                >
-                  Consignaciones
-                </h1>
               </div>
 
               <TabBar
@@ -223,22 +207,18 @@ export default function ConsignacionesPage() {
                 onSelect={setActiveTab}
                 pendientes={solicitudesHook.pendientes}
               />
-            </div>
+            </header>
 
             {/* Stats (solo en tab consignaciones) */}
             {activeTab === "consignaciones" && (
-              <StatsCards {...adminHook.stats} />
+              <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                <StatsCards {...adminHook.stats} />
+              </div>
             )}
 
             {/* Card principal */}
             <div
-              style={{
-                background: "#fff",
-                borderRadius: 20,
-                padding: "24px",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
-                border: "1px solid rgba(112,128,144,0.12)",
-              }}
+              className={`rounded-3xl bg-white p-5 md:p-10 shadow-lg border border-[#8c8976]/30 min-h-[500px] transition-all duration-500 ${activeTab !== 'consignaciones' ? 'mt-4' : ''}`}
             >
               {activeTab === "consignaciones" && (
                 <ConsignacionesTable
@@ -273,14 +253,14 @@ export default function ConsignacionesPage() {
 
               {/* Error messages */}
               {activeTab === "consignaciones" && adminHook.error && (
-                <p style={{ color: "#e53e3e", fontSize: "0.82rem", marginTop: 10 }}>
-                  ⚠️ {adminHook.error}
-                </p>
+                <div className="mt-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm flex items-center gap-2">
+                  <span>⚠️</span> {adminHook.error}
+                </div>
               )}
               {activeTab === "solicitudes" && solicitudesHook.error && (
-                <p style={{ color: "#e53e3e", fontSize: "0.82rem", marginTop: 10 }}>
-                  ⚠️ {solicitudesHook.error}
-                </p>
+                <div className="mt-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm flex items-center gap-2">
+                  <span>⚠️</span> {solicitudesHook.error}
+                </div>
               )}
             </div>
           </div>
@@ -306,23 +286,15 @@ export default function ConsignacionesPage() {
         {/* Toast */}
         {toast && (
           <div
-            style={{
-              position: "fixed",
-              bottom: 24,
-              right: 24,
-              background: toast.tipo === "ok" ? "#1C1C1C" : "#e53e3e",
-              color: "#fff",
-              borderRadius: 12,
-              padding: "12px 20px",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-              zIndex: 2000,
-              maxWidth: 340,
-              animation: "slideIn 0.25s ease",
-            }}
+            className={`fixed bottom-8 right-8 z-[2000] px-6 py-4 rounded-2xl shadow-xl animate-in slide-in-from-right-10 duration-300 ${
+              toast.tipo === "ok" ? "bg-[#1C1C1C] text-white" : "bg-red-600 text-white"
+            }`}
+            style={{ fontFamily: "var(--font-marcellus)" }}
           >
-            {toast.msg}
+            <div className="flex items-center gap-3">
+              <span>{toast.tipo === 'ok' ? '✓' : '✕'}</span>
+              <p className="text-sm tracking-wide">{toast.msg}</p>
+            </div>
           </div>
         )}
       </div>
@@ -331,26 +303,14 @@ export default function ConsignacionesPage() {
 
   // ─── Acceso no autorizado ──────────────────────────────────────
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#F6F3EF" }}>
+    <div className="flex h-screen overflow-hidden bg-[#f6f4ef]">
       <SidebarMenu />
-      <main
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          gap: 12,
-          color: "#8C9796",
-        }}
-      >
-        <div style={{ fontSize: "3rem" }}>🔒</div>
-        <h2 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#1C1C1C" }}>
-          Acceso restringido
-        </h2>
-        <p style={{ fontSize: "0.85rem" }}>
-          No tienes permisos para ver esta sección.
-        </p>
+      <main className="flex-1 flex flex-col items-center justify-center gap-6 p-10 text-center">
+        <div className="text-6xl bg-white p-10 rounded-full shadow-sm border border-[#8c8976]/20">🔒</div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-[#1C1C1C]" style={{ fontFamily: "var(--font-marcellus)" }}>Acceso restringido</h2>
+          <p className="text-[#8c8976]">No tienes permisos para ver esta sección administrativa.</p>
+        </div>
       </main>
     </div>
   );

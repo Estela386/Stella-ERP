@@ -107,7 +107,7 @@ export default function WholesaleSection({ usuarioId }: WholesaleSectionProps = 
                     Margen de Ganancia
                   </h4>
                   <p className="text-[#708090]/80 text-sm mt-1">
-                    Obtén un 30% de descuento fijo en todas tus compras desde el primer pedido.
+                    Obtén un 25% de descuento fijo en todas tus compras desde el primer pedido.
                   </p>
                 </div>
               </div>

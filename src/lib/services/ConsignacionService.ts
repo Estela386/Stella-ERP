@@ -109,7 +109,7 @@ export class ConsignacionService {
 
     for (const item of dto.productos) {
       const dbProd = productosDb.find(p => p.id === item.id_producto)!;
-      // Cálculo del precio mayorista (30% de descuento)
+      // Cálculo del precio mayorista (25% de descuento)
       const precioMayorista = Number((dbProd.precio * 0.70).toFixed(2));
 
       detallesInsert.push({

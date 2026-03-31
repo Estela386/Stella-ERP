@@ -82,8 +82,8 @@ function Stat({
         transition-all duration-300
       `}
     >
-      <p className="text-xs opacity-80">{label}</p>
-      <p className="text-2xl font-semibold">{value}</p>
+      <p className="text-xs opacity-80" style={{ fontFamily: "var(--font-sans)" }}>{label}</p>
+      <p className="text-2xl font-semibold" style={{ fontFamily: "var(--font-marcellus)", fontWeight: 400 }}>{value}</p>
     </div>
   );
 }

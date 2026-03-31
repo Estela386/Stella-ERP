@@ -80,10 +80,10 @@ export default function SuppliersModal({ onClose }: Props) {
         {/* Header */}
         <header className="p-8 pb-6 border-b border-[rgba(112,128,144,0.12)] flex justify-between items-center bg-white">
           <div className="space-y-1">
-            <p className="text-[#8c9768] text-[0.65rem] font-medium uppercase tracking-[0.18em] font-sans">
+            <p className="text-[#8c9768] text-[0.65rem] font-medium uppercase tracking-[0.18em] font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>
               Base de Datos
             </p>
-            <h2 className="text-3xl font-sans font-bold text-[#4a5568] tracking-tight">Gestión de <em className="text-[#b76e79] not-italic">Proveedores</em></h2>
+            <h2 className="text-3xl font-serif font-bold text-[#4a5568] tracking-tight">Gestión de <em className="text-[#b76e79] not-italic">Proveedores</em></h2>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-[#f6f4ef] rounded-full transition-all text-[#708090]">
             <FiX className="w-6 h-6" />
@@ -95,14 +95,14 @@ export default function SuppliersModal({ onClose }: Props) {
           {/* Formulario */}
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-2xl shadow-[0_2px_12px_rgba(140,151,104,0.08)] border border-[rgba(112,128,144,0.18)] sticky top-0">
-              <h3 className="text-lg font-sans font-bold text-[#4a5568] mb-6 flex items-center gap-2">
+              <h3 className="text-lg font-serif font-bold text-[#4a5568] mb-6 flex items-center gap-2" style={{ fontFamily: "var(--font-marcellus)" }}>
                 {editingId ? <FiEdit2 className="text-[#b76e79]" /> : <FiPlus className="text-[#b76e79]" />}
                 {editingId ? "Actualizar Proveedor" : "Registrar Proveedor"}
               </h3>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Contacto Principal</label>
+                  <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Contacto Principal</label>
                   <input
                     required
                     value={form.nombre}
@@ -111,7 +111,7 @@ export default function SuppliersModal({ onClose }: Props) {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Nombre Empresa</label>
+                  <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Nombre Empresa</label>
                   <input
                     value={form.empresa}
                     onChange={e => setForm({...form, empresa: e.target.value})}
@@ -119,7 +119,7 @@ export default function SuppliersModal({ onClose }: Props) {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Teléfono</label>
+                  <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Teléfono</label>
                   <input
                     value={form.telefono}
                     onChange={e => setForm({...form, telefono: e.target.value})}
@@ -127,7 +127,7 @@ export default function SuppliersModal({ onClose }: Props) {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Correo Electrónico</label>
+                  <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Correo Electrónico</label>
                   <input
                     type="email"
                     value={form.correo}
@@ -160,11 +160,11 @@ export default function SuppliersModal({ onClose }: Props) {
           {/* Lista */}
           <div className="lg:col-span-2 space-y-4">
             {loading ? (
-              <div className="text-center py-20 font-serif text-[#708090] text-xl">Cargando proveedores...</div>
+              <div className="text-center py-20 font-serif text-[#708090] text-xl" style={{ fontFamily: "var(--font-marcellus)" }}>Cargando proveedores...</div>
             ) : proveedores.length === 0 ? (
               <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-[rgba(112,128,144,0.25)] flex flex-col items-center gap-4">
-                <p className="font-serif text-[#708090] text-xl">No hay proveedores registrados aún.</p>
-                <p className="text-sm text-[#708090]/60 max-w-xs">Comienza por añadir tu primer contacto en el formulario de la izquierda.</p>
+                <p className="font-serif text-[#708090] text-xl" style={{ fontFamily: "var(--font-marcellus)" }}>No hay proveedores registrados aún.</p>
+                <p className="text-sm text-[#708090]/60 max-w-xs font-sans">Comienza por añadir tu primer contacto en el formulario de la izquierda.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4 pb-12">
@@ -181,18 +181,18 @@ export default function SuppliersModal({ onClose }: Props) {
 
                     <div className="space-y-3">
                       <div>
-                        <h4 className="font-serif text-xl text-[#4a5568]">{p.nombre}</h4>
-                        {p.empresa && <p className="text-xs font-semibold text-[#b76e79] uppercase tracking-wider">{p.empresa}</p>}
+                        <h4 className="font-serif text-xl text-[#4a5568]" style={{ fontFamily: "var(--font-marcellus)" }}>{p.nombre}</h4>
+                        {p.empresa && <p className="text-xs font-serif font-extrabold text-[#b76e79] uppercase tracking-wider" style={{ fontFamily: "var(--font-marcellus)" }}>{p.empresa}</p>}
                       </div>
                       
                       <div className="space-y-1.5 border-t border-[rgba(112,128,144,0.08)] pt-3">
                         <div className="flex items-center gap-3 text-xs text-[#708090]">
-                          <span className="w-16 font-semibold uppercase tracking-tight opacity-40">Teléfono:</span>
-                          <span className="font-medium">{p.telefono || "—"}</span>
+                          <span className="w-16 font-serif font-extrabold uppercase tracking-tight opacity-40 text-[0.6rem]" style={{ fontFamily: "var(--font-marcellus)" }}>Teléfono:</span>
+                          <span className="font-medium font-sans">{p.telefono || "—"}</span>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-[#708090]">
-                          <span className="w-16 font-semibold uppercase tracking-tight opacity-40">Correo:</span>
-                          <span className="font-medium truncate">{p.correo || "—"}</span>
+                          <span className="w-16 font-serif font-extrabold uppercase tracking-tight opacity-40 text-[0.6rem]" style={{ fontFamily: "var(--font-marcellus)" }}>Correo:</span>
+                          <span className="font-medium truncate font-sans">{p.correo || "—"}</span>
                         </div>
                       </div>
                     </div>

@@ -47,7 +47,7 @@ export default function AnalyticsDonut({ ventas }: AnalyticsDonutProps) {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <h3 style={{
-          fontFamily: "var(--font-sans, Inter, sans-serif)",
+          fontFamily: "var(--font-marcellus)",
           fontSize: "0.9rem", fontWeight: 600, color: "#2A2E34", margin: 0,
         }}>
           Estado de Ventas
@@ -81,10 +81,10 @@ export default function AnalyticsDonut({ ventas }: AnalyticsDonutProps) {
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
           pointerEvents: "none",
         }}>
-          <span style={{ fontFamily: "var(--font-display, Manrope, sans-serif)", fontSize: "1.6rem", fontWeight: 800, color: "#2A2E34" }}>
+          <span style={{ fontFamily: "var(--font-poppins)", fontSize: "1.6rem", fontWeight: 800, color: "#2A2E34" }}>
             {percentage}%
           </span>
-          <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", color: "#8A94A6" }}>
+          <span style={{ fontFamily: "var(--font-marcellus)", fontSize: "0.65rem", color: "#8A94A6" }}>
             Éxito
           </span>
         </div>
@@ -95,12 +95,12 @@ export default function AnalyticsDonut({ ventas }: AnalyticsDonutProps) {
         {total > 0 ? DATA.map(d => (
           <div key={d.name} style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <div style={{ width: 10, height: 10, borderRadius: 3, background: d.color }} />
-            <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.7rem", color: "#8A94A6" }}>
+            <span style={{ fontFamily: "var(--font-marcellus)", fontSize: "0.7rem", color: "#8A94A6" }}>
               {d.name}
             </span>
           </div>
         )) : (
-          <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.7rem", color: "#8A94A6" }}>Sin registros en este periodo</span>
+          <span style={{ fontFamily: "var(--font-marcellus)", fontSize: "0.7rem", color: "#8A94A6" }}>Sin registros en este periodo</span>
         )}
       </div>
     </div>

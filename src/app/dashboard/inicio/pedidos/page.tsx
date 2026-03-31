@@ -72,9 +72,6 @@ const [search, setSearch] = useState("");
                 Pedidos
               </span>
             </div>
-            <p className="text-[#8C8976]">
-              Pedidos personalizados, reparaciones y ajustes
-            </p>
           </header>
 
           {/* CARD */}
