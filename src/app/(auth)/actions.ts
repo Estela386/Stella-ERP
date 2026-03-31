@@ -8,7 +8,6 @@ export async function login(formData: FormData) {
   const password = formData.get("password") as string;
 
   const supabase = await createClient();
-  console.log(email, password);
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -22,7 +21,7 @@ export async function login(formData: FormData) {
   const { data: user, error: userError } = await supabase
     .from("usuario")
     .select("id_rol")
-    .eq("email", email)
+    .eq("correo", email)
     .single();
 
   if (userError || !user) {
