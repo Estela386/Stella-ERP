@@ -23,11 +23,12 @@ export async function POST(req: Request) {
 
     requests.set(ip, now);
 
-    const { name, phone, email, businessType, location, message } = await req.json();
+    const { name, phone, email, businessType, location, message } =
+      await req.json();
 
     const response = await resend.emails.send({
-      from: "onboarding@resend.dev", // temporal
-      to: "anarmc94@gmail.com",
+      from: "stella.joyeriaart@gmail.com", // temporal
+      to: "stella.joyeriaart@gmail.com",
       subject: "Nueva solicitud - Stella",
       html: `
         <h2>Nueva solicitud de contacto</h2>

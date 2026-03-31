@@ -23,7 +23,8 @@ export async function DELETE(
       .update({ id_rol: 2, es_mayorista: false })
       .eq("id", idNum);
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
 
     return NextResponse.json({ success: true });
   } catch (err) {
@@ -57,7 +58,10 @@ export async function PATCH(
       .single();
 
     if (fetchErr || !usuario) {
-      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Usuario no encontrado" },
+        { status: 404 }
+      );
     }
 
     // 2) Actualizar campo activo en Supabase
@@ -66,12 +70,13 @@ export async function PATCH(
       .update({ activo })
       .eq("id", idNum);
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
 
     // 3) Enviar email de notificación si se suspende
     if (!activo && usuario.correo) {
       await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: "stella.joyeriaart@gmail.com",
         to: usuario.correo,
         subject: "Tu cuenta de Mayorista ha sido suspendida — Stella Joyería",
         html: `
@@ -85,11 +90,15 @@ export async function PATCH(
               <p style="font-size:0.9rem;color:#4a5568;line-height:1.6;margin:0 0 16px">
                 Te informamos que tu cuenta de <strong>Mayorista</strong> en Stella Joyería ha sido <strong style="color:#ef4444">suspendida temporalmente</strong>.
               </p>
-              ${motivo ? `
+              ${
+                motivo
+                  ? `
               <div style="background:#fef2f2;border-left:4px solid #ef4444;border-radius:6px;padding:12px 16px;margin-bottom:16px">
                 <p style="margin:0;font-size:0.85rem;color:#991b1b;font-weight:600">Motivo:</p>
                 <p style="margin:4px 0 0;font-size:0.85rem;color:#7f1d1d">${motivo}</p>
-              </div>` : ""}
+              </div>`
+                  : ""
+              }
               <p style="font-size:0.85rem;color:#4a5568;line-height:1.6;margin:0 0 20px">
                 Si consideras que esto es un error o necesitas más información, por favor contáctanos respondiendo este correo.
               </p>
@@ -108,4 +117,3 @@ export async function PATCH(
     );
   }
 }
-
