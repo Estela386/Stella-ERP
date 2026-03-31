@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { createClient } from "@utils/supabase/client";
 
-// import { intercambiarCodigoPorSesion, actualizarContraseña } from "../actions";
+import { intercambiarCodigoPorSesion, actualizarContraseña } from "../actions";
 
 export default function NewPasswordCard() {
   const [pass, setPass] = useState("");
@@ -62,7 +62,7 @@ export default function NewPasswordCard() {
     const result = await actualizarContraseña(pass);
 
     if (!result.success) {
-      setError(result.error);
+      setError(result.error || "Error desconocido");
       setLoading(false);
       return;
     }
