@@ -54,13 +54,13 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
         <h3 style={{
-          fontFamily: "var(--font-sans, Inter, sans-serif)",
+          fontFamily: "var(--font-marcellus)",
           fontSize: "0.8rem", fontWeight: 700, color: "#2A2E34", margin: 0,
         }}>
           Registro de Ventas
         </h3>
         <p style={{
-          fontFamily: "var(--font-sans, Inter, sans-serif)",
+          fontFamily: "var(--font-poppins)",
           fontSize: "0.65rem", color: "#8A94A6", margin: "2px 0 0",
         }}>
           Bitácora completa extraída de la base de datos
@@ -75,7 +75,7 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
             style={{
               background: "#B76E79", color: "#fff", border: "none", borderRadius: 8,
               padding: "6px 14px", display: "flex", alignItems: "center", gap: 6,
-              fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.7rem", fontWeight: 600, cursor: "pointer",
+              fontFamily: "var(--font-marcellus)", fontSize: "0.7rem", fontWeight: 600, cursor: "pointer",
           }}>
             <Plus size={14} /> Nueva
           </button>
@@ -96,7 +96,7 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
             <input
               value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="Buscar folio o cliente..."
-              style={{ background: "transparent", border: "none", outline: "none", fontSize: "0.7rem", fontFamily: "var(--font-sans, Inter, sans-serif)", color: "#2A2E34", width: "100%" }}
+              style={{ background: "transparent", border: "none", outline: "none", fontSize: "0.7rem", fontFamily: "var(--font-poppins)", color: "#2A2E34", width: "100%" }}
             />
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
                 {["FOLIO (INVOICE)", "CLIENTE", "FECHA", "MONTO", "ESTADO"].map(th => (
                   <th key={th} style={{
                     textAlign: "left", padding: "12px 10px",
-                    fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.6rem", fontWeight: 800, color: "#8A94A6",
+                    fontFamily: "var(--font-marcellus)", fontSize: "0.6rem", fontWeight: 800, color: "#8A94A6",
                     borderBottom: "1px solid #F0F2F5", letterSpacing: "0.05em"
                   }}>
                     {th}
@@ -137,23 +137,23 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
                   
                   return (
                     <tr key={v.id} style={{ borderBottom: "1px solid #F7F9FA" }}>
-                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-display, Manrope, sans-serif)", fontSize: "0.75rem", fontWeight: 700, color: "#2A2E34" }}>
+                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-poppins)", fontSize: "0.75rem", fontWeight: 700, color: "#2A2E34" }}>
                         #{v.id}
                       </td>
-                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.75rem", color: "#8A94A6" }}>
+                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-poppins)", fontSize: "0.75rem", color: "#8A94A6" }}>
                         {v.id_usuario === "guest" || !v.id_usuario ? "Cliente General" : v.id_usuario}
                       </td>
-                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.75rem", color: "#8A94A6" }}>
+                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-poppins)", fontSize: "0.75rem", color: "#8A94A6" }}>
                         {fDate}
                       </td>
-                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-display, Manrope, sans-serif)", fontSize: "0.75rem", fontWeight: 700, color: "#3d8c60" }}>
+                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-poppins)", fontSize: "0.75rem", fontWeight: 700, color: "#3d8c60" }}>
                         ${v.total.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
                       </td>
                       <td style={{ padding: "14px 10px" }}>
                         <span style={{
                           background: sc.bg, color: sc.color,
                           padding: "4px 12px", borderRadius: 12, display: "inline-block",
-                          fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", fontWeight: 700,
+                          fontFamily: "var(--font-marcellus)", fontSize: "0.65rem", fontWeight: 700,
                         }}>
                           {getStatusName(v.estado)}
                         </span>
@@ -169,7 +169,7 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
 
       {/* Footer / Pagination */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16 }}>
-        <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", color: "#8A94A6" }}>
+        <span style={{ fontFamily: "var(--font-poppins)", fontSize: "0.65rem", color: "#8A94A6" }}>
           Mostrando {paged.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 0} a {Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length}
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -179,7 +179,8 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
               width: 20, height: 20, borderRadius: "50%", border: "none", cursor: "pointer",
               background: p === page ? "#708090" : "transparent",
               color: p === page ? "#fff" : "#8A94A6", fontSize: "0.65rem", fontWeight: 600,
-              display: "flex", alignItems: "center", justifyContent: "center"
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "var(--font-marcellus)"
             }}>
               {p}
             </button>

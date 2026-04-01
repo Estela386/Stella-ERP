@@ -26,17 +26,19 @@ interface CreateConsignacionModalProps {
   mayoristas: IUsuarioMayorista[];
   adminId: number;
   editando?: IConsignacion | null;
+  pedidoBaseId?: string | null;
 }
 
 const campo = (label: string, children: React.ReactNode) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
     <label
       style={{
-        fontSize: "0.72rem",
+        fontSize: "0.75rem",
         fontWeight: 700,
-        letterSpacing: "0.08em",
+        letterSpacing: "0.1em",
         textTransform: "uppercase",
         color: "#708090",
+        fontFamily: "var(--font-sans)",
       }}
     >
       {label}
@@ -55,6 +57,7 @@ const inputStyle: React.CSSProperties = {
   outline: "none",
   width: "100%",
   boxSizing: "border-box",
+  fontFamily: "var(--font-sans)",
 };
 
 export default function CreateConsignacionModal({
@@ -64,6 +67,7 @@ export default function CreateConsignacionModal({
   mayoristas,
   adminId,
   editando,
+  pedidoBaseId,
 }: CreateConsignacionModalProps) {
   // Estado general de la consignacion
   const [form, setForm] = useState({
@@ -85,20 +89,66 @@ export default function CreateConsignacionModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar productos
+  // Cargar productos y posible pedido
   useEffect(() => {
     if (!open) return;
     const load = async () => {
+      setLoading(true);
       const supabase = createClient();
       const { data } = await supabase
         .from("producto")
         .select("id, nombre, precio, stock_actual")
         .gt("stock_actual", 0)
         .order("nombre");
-      setProductosDisponibles((data as ProductoBasico[]) ?? []);
+      const disponibles = (data as ProductoBasico[]) ?? [];
+      setProductosDisponibles(disponibles);
+
+      // Revisar si venimos de un pedido pasador por PROPS para auto-llenar
+      if (pedidoBaseId && !editando) {
+        try {
+          const SELECT_FULL = `*, usuario:usuario(id, nombre, correo, id_rol), detalles:pedido_detalle(id, id_producto, cantidad, precio_unitario, subtotal, producto:producto(id, nombre, url_imagen))`;
+          const { data, error } = await supabase
+            .from('pedidos')
+            .select(SELECT_FULL)
+            .eq('id', pedidoBaseId)
+            .single();
+
+          if (data) {
+            // Asignar el mayorista automáticamente si corresponde
+            if (data.id_usuario) {
+              setForm(f => ({ ...f, id_mayorista: String(data.id_usuario) }));
+            }
+            // Mapear los detalles del pedido a productos seleccionados de consignación
+            if (data.detalles) {
+              const mapped: ProductoSeleccionado[] = data.detalles.map((det: any) => {
+                const info = disponibles.find(p => p.id === det.id_producto);
+                return {
+                  id_producto: det.id_producto,
+                  productoInfo: info || {
+                    id: det.id_producto,
+                    nombre: det.producto?.nombre || "Producto desconocido",
+                    precio: det.precio_unitario,
+                    stock_actual: det.cantidad // Mocking para que no de error
+                  },
+                  cantidad: det.cantidad
+                };
+              });
+              setProductosSeleccionados(mapped);
+            }
+          } else if (error) {
+            console.error("Error al cargar productos del pedido base:", error);
+            setError("No se pudieron cargar los productos del pedido solicitado.");
+          }
+        } catch (err) {
+          console.error("Excepción al cargar productos del pedido base:", err);
+          setError("Error de red cargando pedido.");
+        }
+      }
+      
+      setLoading(false);
     };
     load();
-  }, [open]);
+  }, [open, editando, pedidoBaseId]);
 
   // Si estamos editando, rellenar form
   useEffect(() => {
@@ -111,16 +161,20 @@ export default function CreateConsignacionModal({
       });
       setProductosSeleccionados([]); // En modo edicion no editamos productos por ahora
     } else {
-      setForm({
-        id_mayorista: "",
-        fecha_inicio: new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()),
-        fecha_fin: "",
-        notas: "",
-      });
-      setProductosSeleccionados([]);
+      // Solo resetear si NO hay un pedido id pendiente de cargar
+      if (!pedidoBaseId) {
+        setForm(f => ({
+          ...f,
+          id_mayorista: "",
+          fecha_inicio: new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()),
+          fecha_fin: "",
+          notas: "",
+        }));
+        setProductosSeleccionados([]);
+      }
     }
     setError(null);
-  }, [editando, open]);
+  }, [editando, open, pedidoBaseId]);
 
   // Agregar producto a la lista
   const handleAddProducto = () => {
@@ -228,7 +282,7 @@ export default function CreateConsignacionModal({
 
   // Calculos totales
   const totalGeneralVenta = productosSeleccionados.reduce((sum, p) => sum + (p.productoInfo.precio * p.cantidad), 0);
-  const totalGeneralMayorista = productosSeleccionados.reduce((sum, p) => sum + (p.productoInfo.precio * 0.70 * p.cantidad), 0);
+  const totalGeneralMayorista = productosSeleccionados.reduce((sum, p) => sum + (p.productoInfo.precio * 0.75 * p.cantidad), 0);
 
   if (!open) return null;
 
@@ -262,10 +316,10 @@ export default function CreateConsignacionModal({
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
           <div>
-            <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#1C1C1C", margin: 0 }}>
+            <h2 style={{ fontSize: "1.3rem", fontWeight: 400, color: "#1C1C1C", margin: 0, fontFamily: "var(--font-marcellus)" }}>
               {editando ? "Editar Consignación" : "Nueva Consignación"}
             </h2>
-            <p style={{ fontSize: "0.78rem", color: "#8C9796", margin: "4px 0 0" }}>
+            <p style={{ fontSize: "0.78rem", color: "#8C9796", margin: "4px 0 0", fontFamily: "var(--font-sans)" }}>
               {editando ? "Modificar período o notas" : "Asigna productos a un mayorista"}
             </p>
           </div>
@@ -302,6 +356,7 @@ export default function CreateConsignacionModal({
               gap: 8,
               color: "#e53e3e",
               fontSize: "0.82rem",
+              fontFamily: "var(--font-sans)",
             }}
           >
             <AlertCircle size={14} />
@@ -355,7 +410,7 @@ export default function CreateConsignacionModal({
               padding: "16px",
               marginBottom: "20px"
             }}>
-              <h4 style={{ margin: "0 0 12px 0", fontSize: "0.85rem", color: "#475569" }}>Agregar Producto</h4>
+              <h4 style={{ margin: "0 0 12px 0", fontSize: "0.95rem", color: "#475569", fontFamily: "var(--font-marcellus)", fontWeight: 400 }}>Agregar Producto</h4>
               <div style={{ display: "flex", gap: "12px", alignItems: "flex-end" }}>
                 <div style={{ flex: 1 }}>
                   {campo("Producto",
@@ -399,7 +454,8 @@ export default function CreateConsignacionModal({
                     display: "flex",
                     alignItems: "center",
                     gap: "6px",
-                    height: "38px"
+                    height: "38px",
+                    fontFamily: "var(--font-sans)",
                   }}
                 >
                   <Plus size={16} /> Agregar
@@ -418,28 +474,28 @@ export default function CreateConsignacionModal({
               }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", textAlign: "left" }}>
                   <thead>
-                    <tr style={{ background: "#F1F5F9", color: "#64748B", fontWeight: 600 }}>
+                    <tr style={{ background: "#F1F5F9", color: "#64748B", fontWeight: 700, fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.68rem", letterSpacing: "0.05em" }}>
                       <th style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0" }}>Producto</th>
                       <th style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0" }}>Cant.</th>
                       <th style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0" }}>Precio Unit</th>
-                      <th style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0" }}>P. Mayorista (-30%)</th>
+                      <th style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0" }}>P. Mayorista (-25%)</th>
                       <th style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0" }}>Subtotal May.</th>
                       <th style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0" }}></th>
                     </tr>
                   </thead>
                   <tbody>
                     {productosSeleccionados.map((item, i) => {
-                      const pMay = item.productoInfo.precio * 0.7;
+                      const pMay = item.productoInfo.precio * 0.75;
                       const subTotal = pMay * item.cantidad;
                       return (
                         <tr key={item.id_producto} style={{ background: i % 2 === 0 ? "#fff" : "#FAFAFA" }}>
-                          <td style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0", fontWeight: 500, color: "#334155" }}>
+                          <td style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0", fontWeight: 400, color: "#334155", fontFamily: "var(--font-marcellus)", fontSize: "0.9rem" }}>
                             {item.productoInfo.nombre}
                           </td>
                           <td style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0" }}>{item.cantidad}</td>
                           <td style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0" }}>${item.productoInfo.precio.toFixed(2)}</td>
                           <td style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0", color: "#10B981" }}>${pMay.toFixed(2)}</td>
-                          <td style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0", fontWeight: 600 }}>${subTotal.toFixed(2)}</td>
+                          <td style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0", fontWeight: 400, color: "#1C1C1C", fontFamily: "var(--font-marcellus)", fontSize: "0.95rem" }}>${subTotal.toFixed(2)}</td>
                           <td style={{ padding: "10px 14px", borderBottom: "1px solid #E2E8F0", textAlign: "right" }}>
                             <button
                               type="button"
@@ -455,9 +511,9 @@ export default function CreateConsignacionModal({
                   </tbody>
                 </table>
               </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", padding: "12px 14px", background: "#F8FAFC", borderRadius: "10px", marginTop: "12px", gap: "24px", fontSize: "0.85rem" }}>
-                <span>Valor de vta: <strong>${totalGeneralVenta.toFixed(2)}</strong></span>
-                <span style={{ color: "#B76E79" }}>Total a Pagar (Si vende todo): <strong style={{ fontSize: "1rem" }}>${totalGeneralMayorista.toFixed(2)}</strong></span>
+              <div style={{ display: "flex", justifyContent: "flex-end", padding: "12px 14px", background: "#F8FAFC", borderRadius: "10px", marginTop: "12px", gap: "24px", fontSize: "0.85rem", fontFamily: "var(--font-sans)" }}>
+                <span>Valor de vta: <strong style={{ fontWeight: 600 }}>${totalGeneralVenta.toFixed(2)}</strong></span>
+                <span style={{ color: "#B76E79" }}>Total a Pagar (Si vende todo): <strong style={{ fontSize: "1.1rem", fontFamily: "var(--font-marcellus)", fontWeight: 400 }}>${totalGeneralMayorista.toFixed(2)}</strong></span>
               </div>
             </div>
           )}
@@ -489,6 +545,7 @@ export default function CreateConsignacionModal({
                 fontSize: "0.85rem",
                 fontWeight: 600,
                 cursor: "pointer",
+                fontFamily: "var(--font-sans)",
               }}
             >
               Cancelar
@@ -506,6 +563,7 @@ export default function CreateConsignacionModal({
                 fontWeight: 700,
                 cursor: loading ? "not-allowed" : "pointer",
                 boxShadow: loading ? "none" : "0 4px 14px rgba(183,110,121,0.35)",
+                fontFamily: "var(--font-sans)",
               }}
             >
               {loading ? "Guardando..." : editando ? "Actualizar" : "Crear Consignación"}

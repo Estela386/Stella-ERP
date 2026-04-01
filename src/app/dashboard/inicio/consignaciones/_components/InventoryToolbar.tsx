@@ -28,7 +28,7 @@ export default function InventoryToolbar({
     >
       {/* Filtro */}
       <div className="flex flex-col gap-1 w-full md:max-w-sm">
-        <span className="text-xs tracking-wide text-[#8C9796] uppercase">
+        <span className="text-xs tracking-wide text-[#8C9796] uppercase" style={{ fontFamily: "var(--font-sans)", fontWeight: 600 }}>
           Filtrar
         </span>
 
@@ -50,6 +50,7 @@ export default function InventoryToolbar({
             focus:ring-1 focus:ring-[#B76E79]
             hover:border-[#C8B6B0]
           "
+          style={{ fontFamily: "var(--font-sans)" }}
         />
       </div>
 
@@ -70,6 +71,7 @@ export default function InventoryToolbar({
             hover:shadow-md
             transition
           "
+          style={{ fontFamily: "var(--font-sans)" }}
         >
           + Nueva consignación
         </button>

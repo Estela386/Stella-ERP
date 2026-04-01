@@ -38,7 +38,7 @@ function money(n: number) { return `$${n.toLocaleString("es-MX")}`; }
 function pct(n: number) { return `${n.toFixed(1)}%`; }
 
 const COL: React.CSSProperties = {
-  fontFamily: "var(--font-sans, Inter, sans-serif)",
+  fontFamily: "var(--font-marcellus)",
   fontSize: "0.72rem", fontWeight: 600,
   color: "#8C9796",
   padding: "10px 14px",
@@ -105,13 +105,13 @@ export default function ReportTable() {
       }}>
         <div>
           <h3 style={{
-            fontFamily: "var(--font-display, Manrope, sans-serif)",
+            fontFamily: "var(--font-marcellus)",
             fontSize: "0.9rem", fontWeight: 700, color: "#1C1C1C", margin: 0,
           }}>
             Detalle de Productos
           </h3>
           <p style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-poppins)",
             fontSize: "0.67rem", color: "#8C9796", margin: "2px 0 0",
           }}>
             {filtered.length} productos · haz clic en columnas para ordenar
@@ -130,7 +130,7 @@ export default function ReportTable() {
             placeholder="Buscar producto o categoría..."
             style={{
               background: "none", border: "none", outline: "none",
-              fontFamily: "var(--font-sans, Inter, sans-serif)",
+              fontFamily: "var(--font-poppins)",
               fontSize: "0.78rem", color: "#1C1C1C", width: 200,
             }}
           />
@@ -166,7 +166,7 @@ export default function ReportTable() {
                 >
                   <td style={{ padding: "10px 14px" }}>
                     <p style={{
-                      fontFamily: "var(--font-sans, Inter, sans-serif)",
+                      fontFamily: "var(--font-poppins)",
                       fontSize: "0.78rem", fontWeight: 600, color: "#1C1C1C",
                       margin: 0, whiteSpace: "nowrap",
                     }}>{p.nombre}</p>
@@ -174,21 +174,21 @@ export default function ReportTable() {
                   <td style={{ padding: "10px 14px" }}>
                     <span style={{
                       background: "#F0EDE8", borderRadius: 20, padding: "2px 10px",
-                      fontFamily: "var(--font-sans, Inter, sans-serif)",
+                      fontFamily: "var(--font-poppins)",
                       fontSize: "0.65rem", fontWeight: 600, color: "#708090",
                     }}>{p.categoria}</span>
                   </td>
                   {[p.cantidad, null, null, null, null].map((_, idx) => null)}
-                  <td style={{ padding: "10px 14px", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: "#1C1C1C", fontWeight: 500 }}>{p.cantidad}</td>
-                  <td style={{ padding: "10px 14px", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: "#708090" }}>{money(p.costo)}</td>
-                  <td style={{ padding: "10px 14px", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.78rem", color: "#1C1C1C", fontWeight: 600 }}>{money(p.precio)}</td>
-                  <td style={{ padding: "10px 14px", fontFamily: "var(--font-display, Manrope, sans-serif)", fontSize: "0.85rem", fontWeight: 700, color: "#3d8c60" }}>{money(p.ganancia)}</td>
+                  <td style={{ padding: "10px 14px", fontFamily: "var(--font-poppins)", fontSize: "0.78rem", color: "#1C1C1C", fontWeight: 500 }}>{p.cantidad}</td>
+                  <td style={{ padding: "10px 14px", fontFamily: "var(--font-poppins)", fontSize: "0.78rem", color: "#708090" }}>{money(p.costo)}</td>
+                  <td style={{ padding: "10px 14px", fontFamily: "var(--font-poppins)", fontSize: "0.78rem", color: "#1C1C1C", fontWeight: 600 }}>{money(p.precio)}</td>
+                  <td style={{ padding: "10px 14px", fontFamily: "var(--font-poppins)", fontSize: "0.85rem", fontWeight: 700, color: "#3d8c60" }}>{money(p.ganancia)}</td>
                   <td style={{ padding: "10px 14px" }}>
                     <span style={{
                       display: "inline-flex", alignItems: "center",
                       background: margenColor === "#3d8c60" ? "#EDF5F0" : margenColor === "#b07830" ? "#FDF3E7" : "#FDECEA",
                       borderRadius: 20, padding: "3px 10px",
-                      fontFamily: "var(--font-sans, Inter, sans-serif)",
+                      fontFamily: "var(--font-poppins)",
                       fontSize: "0.7rem", fontWeight: 700,
                       color: margenColor,
                     }}>
@@ -216,7 +216,7 @@ export default function ReportTable() {
         flexWrap: "wrap", gap: 8,
       }}>
         <span style={{
-          fontFamily: "var(--font-sans, Inter, sans-serif)",
+          fontFamily: "var(--font-marcellus)",
           fontSize: "0.7rem", color: "#8C9796",
         }}>
           Mostrando {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length}
@@ -242,7 +242,7 @@ export default function ReportTable() {
                 width: 30, height: 30, borderRadius: 8, border: "1px solid #E8E5E0",
                 background: page === n ? "#B76E79" : "#fff",
                 cursor: "pointer",
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
+                fontFamily: "var(--font-marcellus)",
                 fontSize: "0.72rem", fontWeight: 600,
                 color: page === n ? "#fff" : "#708090",
                 boxShadow: page === n ? "0 2px 6px rgba(183,110,121,0.3)" : "none",

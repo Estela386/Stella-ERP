@@ -38,7 +38,7 @@ export default function FaqLocation() {
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
             <span style={{ height: 1, width: 36, background: "#b76e79", flexShrink: 0 }} />
             <span style={{
-              fontFamily: "var(--font-sans, Inter, sans-serif)",
+              fontFamily: "var(--font-sans)",
               fontSize: "0.62rem", fontWeight: 500,
               textTransform: "uppercase", letterSpacing: "0.2em",
               color: "#b76e79",
@@ -48,13 +48,13 @@ export default function FaqLocation() {
           </div>
 
           <h3 style={{
-            fontFamily: "'Cormorant Garamond',Georgia,serif",
+            fontFamily: "var(--font-marcellus)",
             fontSize: "clamp(1.5rem,2.5vw,2rem)",
-            fontWeight: 500, color: "#4a5568",
+            fontWeight: 400, color: "#4a5568",
             lineHeight: 1.2, marginBottom: 20,
           }}>
             Visítanos en{" "}
-            <em style={{ color: "#b76e79", fontStyle: "italic" }}>Guadalajara</em>
+            <em style={{ color: "#b76e79", fontStyle: "italic", fontFamily: "var(--font-marcellus)" }}>Guadalajara</em>
           </h3>
 
           {/* Dirección */}
@@ -67,10 +67,10 @@ export default function FaqLocation() {
               <MapPin size={16} style={{ color: "#b76e79" }} />
             </div>
             <div>
-              <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", fontWeight: 500, color: "#4a5568", margin: "0 0 2px" }}>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.82rem", fontWeight: 500, color: "#4a5568", margin: "0 0 2px" }}>
                 Dirección
               </p>
-              <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.875rem", color: "#708090", margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.875rem", color: "#708090", margin: 0, lineHeight: 1.6 }}>
                 {ADDRESS}
               </p>
             </div>
@@ -86,15 +86,15 @@ export default function FaqLocation() {
               <Clock size={16} style={{ color: "#8c9768" }} />
             </div>
             <div>
-              <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", fontWeight: 500, color: "#4a5568", margin: "0 0 8px" }}>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.82rem", fontWeight: 500, color: "#4a5568", margin: "0 0 8px" }}>
                 Horarios de atención
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 {HOURS.map(h => (
                   <div key={h.day} style={{ display: "flex", justifyContent: "space-between", gap: 24 }}>
-                    <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", color: "#708090" }}>{h.day}</span>
+                    <span style={{ fontFamily: "var(--font-sans)", fontSize: "0.82rem", color: "#708090" }}>{h.day}</span>
                     <span style={{
-                      fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem",
+                      fontFamily: "var(--font-sans)", fontSize: "0.82rem",
                       fontWeight: 500,
                       color: h.time === "Cerrado" ? "#C0404F" : "#4a5568",
                     }}>{h.time}</span>
@@ -113,7 +113,7 @@ export default function FaqLocation() {
               display: "inline-flex", alignItems: "center", gap: 8,
               padding: "10px 20px", borderRadius: 99,
               background: "#b76e79", color: "#f6f4ef",
-              fontFamily: "var(--font-sans, Inter, sans-serif)",
+              fontFamily: "var(--font-sans)",
               fontSize: "0.82rem", fontWeight: 500,
               textDecoration: "none",
               boxShadow: "0 4px 14px rgba(183,110,121,0.3)",
@@ -157,7 +157,7 @@ export default function FaqLocation() {
             background: "#fff",
             borderRadius: 10, padding: "6px 12px",
             boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.72rem", color: "#4a5568",
             display: "flex", alignItems: "center", gap: 5,
           }}>

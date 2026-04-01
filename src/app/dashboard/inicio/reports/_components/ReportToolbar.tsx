@@ -11,6 +11,7 @@ export default function ReportToolbar() {
           bg-[#708090]
           hover:opacity-90
         "
+        style={{ fontFamily: "var(--font-marcellus)" }}
       >
         Seleccionar período
       </button>
@@ -24,6 +25,7 @@ export default function ReportToolbar() {
           bg-[#B76E79]
           hover:opacity-90
         "
+        style={{ fontFamily: "var(--font-marcellus)" }}
       >
         Exportar PDF
       </button>

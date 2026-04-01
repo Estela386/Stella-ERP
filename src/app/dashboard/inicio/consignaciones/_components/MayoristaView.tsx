@@ -61,13 +61,13 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
             background: "rgba(255,255,255,0.08)",
           }}
         />
-        <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.7)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+        <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)", letterSpacing: "0.15em", textTransform: "uppercase", fontFamily: "var(--font-marcellus)" }}>
           Portal Mayorista
         </p>
-        <h2 style={{ fontSize: "1.4rem", fontWeight: 800, color: "#fff", margin: "6px 0 4px" }}>
+        <h2 style={{ fontSize: "1.6rem", fontWeight: 400, color: "#fff", margin: "6px 0 4px", fontFamily: "var(--font-marcellus)" }}>
           Bienvenido, {nombre}
         </h2>
-        <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.75)" }}>
+        <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.75)", fontFamily: "var(--font-sans)" }}>
           Aquí encontrarás todas tus consignaciones y productos asignados
         </p>
       </div>
@@ -95,15 +95,15 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
               boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
             }}
           >
-            <p style={{ fontSize: "1.6rem", fontWeight: 800, color: s.color, margin: 0 }}>{s.value}</p>
-            <p style={{ fontSize: "0.72rem", color: "#8C9796", marginTop: 2, textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</p>
+            <p style={{ fontSize: "1.8rem", fontWeight: 400, color: s.color, margin: 0, fontFamily: "var(--font-marcellus)" }}>{s.value}</p>
+            <p style={{ fontSize: "0.72rem", color: "#8C9796", marginTop: 2, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "var(--font-sans)" }}>{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Consignaciones */}
       <div>
-        <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "#1C1C1C", marginBottom: 12 }}>
+        <h3 style={{ fontSize: "1.1rem", fontWeight: 400, color: "#1C1C1C", marginBottom: 12, fontFamily: "var(--font-marcellus)" }}>
           Mis Consignaciones
         </h3>
 
@@ -118,7 +118,7 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
             }}
           >
             <Package size={36} style={{ color: "#ccc", marginBottom: 12 }} />
-            <p style={{ color: "#8C9796", fontSize: "0.88rem" }}>
+            <p style={{ color: "#8C9796", fontSize: "0.88rem", fontFamily: "var(--font-sans)" }}>
               Aún no tienes consignaciones asignadas
             </p>
           </div>
@@ -165,10 +165,10 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
                         <Package size={20} style={{ color: "#fff" }} />
                       </div>
                       <div>
-                        <p style={{ fontWeight: 700, fontSize: "1rem", color: "#1C1C1C", margin: 0 }}>
+                        <p style={{ fontWeight: 400, fontSize: "1.1rem", color: "#1C1C1C", margin: 0, fontFamily: "var(--font-marcellus)" }}>
                           Asignación #{c.id}
                         </p>
-                        <p style={{ fontSize: "0.78rem", color: "#708090", margin: "2px 0 0" }}>
+                        <p style={{ fontSize: "0.78rem", color: "#708090", margin: "2px 0 0", fontFamily: "var(--font-sans)" }}>
                           {totalItems} items en {c.detalles?.length || 0} productos
                         </p>
                       </div>
@@ -176,8 +176,8 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
 
                     <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                       <div style={{ textAlign: "right", display: "flex", flexDirection: "column", gap: 4 }}>
-                        <span style={{ fontSize: "0.7rem", color: "#8C9796", textTransform: "uppercase", letterSpacing: "0.05em" }}>Total a Pagar</span>
-                        <span style={{ fontSize: "1rem", fontWeight: 700, color: "#1C1C1C" }}>${valTotal.toLocaleString()}</span>
+                        <span style={{ fontSize: "0.7rem", color: "#8C9796", textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "var(--font-sans)" }}>Total a Pagar</span>
+                        <span style={{ fontSize: "1.1rem", fontWeight: 400, color: "#1C1C1C", fontFamily: "var(--font-marcellus)" }}>${valTotal.toLocaleString()}</span>
                       </div>
                       <span
                         style={{
@@ -186,7 +186,8 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
                           borderRadius: 20,
                           padding: "4px 12px",
                           fontSize: "0.75rem",
-                          fontWeight: 700,
+                          fontWeight: 400,
+                          fontFamily: "var(--font-marcellus)",
                           display: "flex",
                           alignItems: "center",
                           gap: 6,
@@ -212,8 +213,8 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
                     }}
                   >
                     <div style={{ flex: 1, minWidth: "120px" }}>
-                      <p style={{ fontSize: "0.68rem", color: "#8C9796", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>Período</p>
-                      <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "#1C1C1C", margin: "2px 0 0" }}>
+                      <p style={{ fontSize: "0.68rem", color: "#8C9796", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0, fontFamily: "var(--font-sans)" }}>Período</p>
+                      <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "#1C1C1C", margin: "2px 0 0", fontFamily: "var(--font-sans)" }}>
                         {fmt(c.fecha_inicio)} → {fmt(c.fecha_fin)}
                       </p>
                     </div>
@@ -229,7 +230,8 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
                             fontWeight: 600,
                             color: diasRestantes < 0 ? "#ef4444" : diasRestantes < 7 ? "#f59e0b" : "#10b981",
                             textAlign: "center",
-                            whiteSpace: "nowrap"
+                            whiteSpace: "nowrap",
+                            fontFamily: "var(--font-sans)"
                           }}
                         >
                           {diasRestantes < 0
@@ -243,7 +245,7 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
                   </div>
 
                   {c.notas && (
-                    <p style={{ fontSize: "0.8rem", color: "#4a5568", margin: "4px 0 0", padding: "0 4px", fontStyle: "italic" }}>
+                    <p style={{ fontSize: "0.8rem", color: "#4a5568", margin: "4px 0 0", padding: "0 4px", fontStyle: "italic", fontFamily: "var(--font-sans)" }}>
                       <span style={{ fontWeight: 600, fontStyle: "normal" }}>Nota Admin: </span> {c.notas}
                     </p>
                   )}
@@ -262,6 +264,7 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
                         alignItems: "center",
                         gap: 6,
                         padding: 0,
+                        fontFamily: "var(--font-sans)",
                       }}
                     >
                       {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -270,7 +273,7 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
 
                     {isExpanded && c.detalles && c.detalles.length > 0 && (
                       <div style={{ marginTop: 16, overflowX: "auto" }}>
-                        <table style={{ width: "100%", fontSize: "0.82rem", borderCollapse: "collapse" }}>
+                        <table style={{ width: "100%", fontSize: "0.82rem", borderCollapse: "collapse", fontFamily: "var(--font-sans)" }}>
                           <thead>
                             <tr style={{ borderBottom: "1px solid #E2E8F0", color: "#64748B", textAlign: "left" }}>
                               <th style={{ padding: "8px 12px", fontWeight: 600 }}>Producto</th>
@@ -283,7 +286,7 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
                           <tbody>
                             {c.detalles.map(d => (
                               <tr key={d.id_producto} style={{ borderBottom: "1px solid #F1F5F9" }}>
-                                <td style={{ padding: "10px 12px", fontWeight: 500, color: "#334155" }}>
+                                <td style={{ padding: "10px 12px", fontWeight: 400, color: "#334155", fontFamily: "var(--font-marcellus)", fontSize: "0.9rem" }}>
                                   {d.producto?.nombre}
                                 </td>
                                 <td style={{ padding: "10px 12px" }}>{d.cantidad}</td>

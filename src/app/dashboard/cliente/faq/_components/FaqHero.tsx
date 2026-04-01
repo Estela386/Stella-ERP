@@ -36,7 +36,7 @@ export default function FaqHero() {
           <Sparkles size={12} style={{ color:"#b76e79" }} />
         </div>
         <span style={{
-          fontFamily:"var(--font-sans, Inter, sans-serif)",
+          fontFamily:"var(--font-sans)",
           fontSize:"0.62rem", fontWeight:500,
           textTransform:"uppercase", letterSpacing:"0.2em",
           color:"#b76e79",
@@ -47,7 +47,7 @@ export default function FaqHero() {
 
       {/* Título */}
       <h1 style={{
-        fontFamily:"'Cormorant Garamond',Georgia,serif",
+        fontFamily:"var(--font-marcellus)",
         fontSize:"clamp(2.6rem,5vw,4.4rem)",
         fontWeight:400,
         lineHeight:1.1,
@@ -56,12 +56,12 @@ export default function FaqHero() {
         animation:"fadeUp 0.55s cubic-bezier(.22,1,.36,1) 0.06s both",
       }}>
         Todo lo que necesitas{" "}
-        <em style={{ color:"#b76e79", fontStyle:"italic" }}>saber</em>
+        <em style={{ color:"#b76e79", fontStyle:"italic", fontFamily:"var(--font-marcellus)" }}>saber</em>
       </h1>
 
       {/* Subtítulo */}
       <p style={{
-        fontFamily:"var(--font-sans, Inter, sans-serif)",
+        fontFamily:"var(--font-sans)",
         fontSize:"clamp(0.9rem,1.5vw,1.05rem)",
         color:"#708090",
         maxWidth:520,
@@ -76,7 +76,7 @@ export default function FaqHero() {
       {/* Breadcrumb */}
       <div style={{
         display:"flex", alignItems:"center", justifyContent:"center", gap:6,
-        fontFamily:"var(--font-sans, Inter, sans-serif)", fontSize:"0.78rem", color:"#708090",
+        fontFamily:"var(--font-sans)", fontSize:"0.78rem", color:"#708090",
         animation:"fadeUp 0.55s cubic-bezier(.22,1,.36,1) 0.18s both",
       }}>
         <Link href="/dashboard/cliente" style={{ color:"#b76e79", textDecoration:"none" }}>Inicio</Link>

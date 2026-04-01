@@ -10,7 +10,9 @@ interface CreateClientModalProps {
     id: number;
     nombre: string;
     telefono: string;
+    id_usuario?: number;
   }) => void;
+  usuarioId?: string | number;
   isLoading?: boolean;
   error?: string;
 }
@@ -19,6 +21,7 @@ export default function CreateClientModal({
   isOpen,
   onClose,
   onCreated,
+  usuarioId,
   isLoading = false,
   error,
 }: CreateClientModalProps) {
@@ -50,6 +53,7 @@ export default function CreateClientModal({
         body: JSON.stringify({
           nombre: nombre.trim(),
           telefono: telefono.trim(),
+          id_usuario: usuarioId,
         }),
       });
 

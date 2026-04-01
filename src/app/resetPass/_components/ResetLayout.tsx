@@ -85,8 +85,8 @@ export default function ResetLayout({
           <div
             className="absolute rounded-full"
             style={{
-              width: "130%",
-              paddingBottom: "130%",
+              width: "125%",
+              paddingBottom: "125%",
               background:
                 "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18) 0%, transparent 65%)",
               top: "-15%",

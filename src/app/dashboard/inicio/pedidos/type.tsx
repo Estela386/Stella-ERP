@@ -1,25 +1,37 @@
+// Archivo de tipos alineado con la base de datos real
+
 export type PedidoEstado =
   | "PENDIENTE"
   | "EN_PRODUCCION"
   | "EN_TALLER"
   | "ENTREGADO";
 
-export type Prioridad = "Alta" | "Media" | "Baja";
-
 export type Pedido = {
-  id: string;
-  cliente: string;
-  tipo: string;
-  descripcion: string;
-  entrega: string;
+  id: number;
+  fecha_pedido: string;
+  fecha_entrega?: string | null;
+  origen?: string | null;
   estado: PedidoEstado;
-  prioridad: Prioridad;
-
-  productos: ProductoPedido[];
+  total_estimado: number;
+  observaciones?: string | null;
+  id_usuario: number;
+  usuario?: {
+    id: number;
+    nombre: string;
+    id_rol?: number;
+  };
+  detalles?: DetallePedido[];
 };
 
-export type ProductoPedido = {
-  codigo: string;
-  nombre: string;
+export type DetallePedido = {
+  id: number;
+  id_producto: number;
   cantidad: number;
+  precio_unitario: number;
+  subtotal: number;
+  producto?: {
+    id: number;
+    nombre: string;
+    url_imagen?: string;
+  };
 };

@@ -18,13 +18,13 @@ export default function SellerModal({ vendedor, onClose }: Props) {
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
       <div className="bg-white p-6 rounded-xl w-80 shadow-xl">
         
-        <h2 className="text-xl font-semibold mb-4 text-[#708090]">
+        <h2 className="text-xl font-semibold mb-4 text-[#708090]" style={{ fontFamily: "var(--font-marcellus)" }}>
           {vendedor.nombre}
         </h2>
 
-        <p className="mb-4 text-gray-800">
+        <p className="mb-4 text-gray-800" style={{ fontFamily: "var(--font-marcellus)" }}>
           Total vendido:{" "}
-          <span className="font-semibold text-[#708090]">
+          <span className="font-semibold text-[#708090]" style={{ fontFamily: "var(--font-poppins)" }}>
             {vendedor.total}
           </span>
         </p>
@@ -32,7 +32,7 @@ export default function SellerModal({ vendedor, onClose }: Props) {
         <button
           onClick={onClose}
           className="px-4 py-2 rounded-lg text-white font-semibold transition hover:opacity-90"
-          style={{ background: "#B76E79" }}
+          style={{ background: "#B76E79", fontFamily: "var(--font-marcellus)" }}
         >
           Cerrar
         </button>

@@ -33,6 +33,7 @@ function Badge({
         whitespace-nowrap
         ${styles[color]}
       `}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       {text}
     </span>

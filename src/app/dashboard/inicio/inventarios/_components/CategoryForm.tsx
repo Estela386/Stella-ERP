@@ -49,6 +49,7 @@ export default function CategoryForm({
         <label
           htmlFor="nombre"
           className="block text-sm font-medium text-gray-700 mb-2"
+          style={{ fontFamily: "var(--font-sans)", fontWeight: 600 }}
         >
           Nombre de la Categoría
         </label>
@@ -61,9 +62,10 @@ export default function CategoryForm({
           className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#b76e79] ${
             error ? "border-red-500" : "border-gray-300"
           }`}
+          style={{ fontFamily: "var(--font-sans)" }}
           placeholder="Ej: Anillos, Pulseras, Collares"
         />
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-1 text-sm text-red-600" style={{ fontFamily: "var(--font-sans)" }}>{error}</p>}
       </div>
 
       <div className="flex gap-4 pt-4 border-t">
@@ -71,6 +73,7 @@ export default function CategoryForm({
           type="submit"
           disabled={loading}
           className="flex-1 bg-[#b76e79] text-[#f6f4ef] py-2 rounded-lg hover:bg-[#a05a65] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition shadow-sm hover:shadow-md"
+          style={{ fontFamily: "var(--font-sans)" }}
         >
           {loading ? "Guardando..." : "Crear Categoría"}
         </button>
@@ -79,6 +82,7 @@ export default function CategoryForm({
           onClick={onCancel}
           disabled={loading}
           className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
+          style={{ fontFamily: "var(--font-sans)" }}
         >
           Cancelar
         </button>

@@ -95,9 +95,9 @@ export default function StockAlerts() {
           <div>
             <h3
               style={{
-                fontFamily: "var(--font-display, Manrope, sans-serif)",
-                fontSize: "0.9rem",
-                fontWeight: 700,
+                fontFamily: "var(--font-marcellus)",
+                fontSize: "0.95rem",
+                fontWeight: 400,
                 color: "#1C1C1C",
                 margin: 0,
               }}
@@ -106,7 +106,7 @@ export default function StockAlerts() {
             </h3>
             <p
               style={{
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
+                fontFamily: "var(--font-sans)",
                 fontSize: "0.67rem",
                 color: "#8C9796",
                 margin: 0,
@@ -120,7 +120,7 @@ export default function StockAlerts() {
         <button
           onClick={() => router.push("/dashboard/inicio/inventarios")}
           style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.72rem",
             fontWeight: 600,
             color: "#B76E79",
@@ -183,7 +183,7 @@ export default function StockAlerts() {
                   <div style={{ minWidth: 0 }}>
                     <p
                       style={{
-                        fontFamily: "var(--font-sans, Inter, sans-serif)",
+                        fontFamily: "var(--font-sans)",
                         fontSize: "0.76rem",
                         fontWeight: 600,
                         color: "#1C1C1C",
@@ -197,7 +197,7 @@ export default function StockAlerts() {
                     </p>
                     <p
                       style={{
-                        fontFamily: "var(--font-sans, Inter, sans-serif)",
+                        fontFamily: "var(--font-sans)",
                         fontSize: "0.62rem",
                         color: "#8C9796",
                         margin: "2px 0 0",
@@ -209,9 +209,9 @@ export default function StockAlerts() {
                   <div style={{ flexShrink: 0, textAlign: "right" }}>
                     <span
                       style={{
-                        fontFamily: "var(--font-display, Manrope, sans-serif)",
+                        fontFamily: "var(--font-marcellus)",
                         fontSize: "1.1rem",
-                        fontWeight: 800,
+                        fontWeight: 400,
                         color: cfg.color,
                         display: "block",
                         lineHeight: 1,
@@ -224,7 +224,7 @@ export default function StockAlerts() {
                         background: cfg.bg,
                         borderRadius: 20,
                         padding: "1px 7px",
-                        fontFamily: "var(--font-sans, Inter, sans-serif)",
+                        fontFamily: "var(--font-sans)",
                         fontSize: "0.58rem",
                         fontWeight: 700,
                         color: cfg.color,
@@ -248,7 +248,7 @@ export default function StockAlerts() {
                   >
                     <span
                       style={{
-                        fontFamily: "var(--font-sans, Inter, sans-serif)",
+                        fontFamily: "var(--font-sans)",
                         fontSize: "0.58rem",
                         color: "#8C9796",
                       }}
@@ -285,7 +285,7 @@ export default function StockAlerts() {
               padding: "20px",
               textAlign: "center",
               color: "#8C9796",
-              fontFamily: "var(--font-sans, Inter, sans-serif)",
+              fontFamily: "var(--font-sans)",
               fontSize: "0.85rem",
             }}
           >
@@ -306,7 +306,7 @@ export default function StockAlerts() {
             border: "1px solid rgba(183,110,121,0.25)",
             borderRadius: 9,
             padding: "9px",
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.75rem",
             fontWeight: 600,
             color: "#B76E79",

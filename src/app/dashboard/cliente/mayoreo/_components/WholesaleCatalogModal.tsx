@@ -499,7 +499,7 @@ export default function WholesaleCatalogModal({ isOpen, onClose }: Props) {
               <thead>
                 <tr style={{ background: "#fafafa", borderBottom: STYLES.border }}>
                   <th style={thStyle}>Producto</th>
-                  <th style={thStyle}>Costo Soc. (-30%)</th>
+                  <th style={thStyle}>Costo Soc. (-25%)</th>
                   <th style={thStyle}>Tu Ganancia</th>
                   <th style={thStyle}>Precio Final</th>
                 </tr>

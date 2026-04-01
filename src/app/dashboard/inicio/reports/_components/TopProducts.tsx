@@ -40,7 +40,7 @@ export default function TopProducts() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl md:text-2xl font-semibold text-[#708090]">
+      <h3 className="text-xl md:text-2xl font-semibold text-[#708090]" style={{ fontFamily: "var(--font-marcellus)" }}>
         Productos Más Vendidos
       </h3>
 
@@ -63,12 +63,12 @@ export default function TopProducts() {
                 {i + 1}
               </span>
 
-              <p className="text-base md:text-lg font-medium text-[#708090]">
+              <p className="text-base md:text-lg font-medium text-[#708090]" style={{ fontFamily: "var(--font-marcellus)" }}>
                 {p.nombre}
               </p>
             </div>
 
-            <p className="font-bold text-lg md:text-xl text-[#708090]">
+            <p className="font-bold text-lg md:text-xl text-[#708090]" style={{ fontFamily: "var(--font-poppins)" }}>
               {p.total}
             </p>
           </div>

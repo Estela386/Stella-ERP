@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { nombre, telefono } = body;
+    const { nombre, telefono, id_usuario } = body;
 
     // Validación básica
     if (!nombre || !telefono) {
@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
     const { cliente, error } = await clienteService.crear({
       nombre: nombre.trim(),
       telefono: telefono.trim(),
+      id_usuario: id_usuario,
     });
 
     if (error || !cliente) {

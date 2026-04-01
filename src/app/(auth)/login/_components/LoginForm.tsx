@@ -1,22 +1,39 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useActionState, useEffect } from "react";
 import Link from "next/link";
 import { login } from "@auth/actions";
-import { Eye, EyeOff } from "lucide-react";
+import { Facebook, Mail, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface LoginFormProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
   error?: string;
 }
 
-export default function LoginForm({ onSubmit, error }: LoginFormProps) {
+export default function LoginForm({ onSubmit, error: propError }: LoginFormProps) {
   const [showPass, setShowPass] = useState(false);
   const [email, setEmail] = useState("");
 
+  const [state, formAction, isPending] = useActionState(login, { success: true, message: "" });
+
+  useEffect(() => {
+    if (state?.success === false && state?.message) {
+      toast.error(state.message, {
+        description: "Verifica tus credenciales e inténtalo de nuevo.",
+      });
+    }
+  }, [state]);
+
+  const hasError = state?.success === false || !!propError;
+  const errorMessage = propError || state?.message;
+
   return (
-    <form
-      action={login}
+    <motion.form
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      action={formAction}
       onSubmit={onSubmit}
       className="
         w-full
@@ -31,9 +48,10 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
       <div className="text-center space-y-2">
         <div className="w-8 h-8 sm:w-10 sm:h-10 border-4 border-[#B76E79] rounded-full mx-auto" />
 
-        <h2 className="text-lg sm:text-xl font-semibold text-[#708090]">
-          Iniciar sesión
+        <h2 className="text-lg sm:text-xl font-semibold text-[#708090] tracking-tight">
+          Bienvenido de nuevo
         </h2>
+        <p className="text-xs text-[#708090]/60">Ingresa tus datos para continuar</p>
       </div>
 
       {/* EMAIL */}
@@ -46,27 +64,26 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
           type="email"
           name="email"
           placeholder="correo@ejemplo.com"
+          value={email}
           onChange={e => setEmail(e.target.value)}
-          className="
+          className={`
             w-full
             border
-            border-[#B76E79]
+            ${hasError ? "border-red-400 ring-1 ring-red-100" : "border-[#B76E79] focus:ring-[#B76E79]/40"}
             text-[#708090]
-            placeholder-[#708090]/60
+            placeholder-[#708090]/40
             rounded-full
             px-4 sm:px-6
             py-2 sm:py-2.5
             text-sm sm:text-base
             focus:outline-none
             focus:ring-2
-            focus:ring-[#B76E79]/40
-          "
+            transition-all
+            duration-200
+          `}
         />
       </div>
 
-      <div className="text-xs sm:text-sm text-[#B76E79] text-center">
-        {error}
-      </div>
 
       {/* PASSWORD */}
       <div className="space-y-1">
@@ -79,12 +96,12 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
             type={showPass ? "text" : "password"}
             name="password"
             placeholder="••••••••"
-            className="
+            className={`
               w-full
               border
-              border-[#B76E79]
+              ${hasError ? "border-red-400 ring-1 ring-red-100" : "border-[#B76E79] focus:ring-[#B76E79]/40"}
               text-[#708090]
-              placeholder-[#708090]/60
+              placeholder-[#708090]/40
               rounded-full
               px-4 sm:px-6
               py-2 sm:py-2.5
@@ -92,8 +109,9 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
               text-sm sm:text-base
               focus:outline-none
               focus:ring-2
-              focus:ring-[#B76E79]/40
-            "
+              transition-all
+              duration-200
+            `}
           />
 
           <button
@@ -123,16 +141,29 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
         </Link>
       </div>
 
-      {/* ERROR */}
-      {error && (
-        <div className="text-xs sm:text-sm text-[#B76E79] text-center">
-          {error}
-        </div>
-      )}
+      <AnimatePresence>
+        {hasError && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, x: 0 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              x: [0, -4, 4, -4, 4, 0] // Shake animation
+            }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.4 }}
+            className="flex items-center justify-center gap-2 text-xs sm:text-sm text-red-500 bg-red-50 py-2 px-4 rounded-lg font-medium border border-red-100"
+          >
+            <AlertCircle size={14} />
+            {errorMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* LOGIN BUTTON */}
       <button
         type="submit"
+        disabled={isPending}
         className="
           w-full
           py-2.5 sm:py-3
@@ -146,9 +177,11 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
           shadow-lg
           hover:opacity-90
           transition
+          disabled:opacity-50
+          disabled:cursor-not-allowed
         "
       >
-        Ingresar
+        {isPending ? "Validando..." : "Ingresar"}
       </button>
 
       {/* SIGN UP */}
@@ -158,6 +191,6 @@ export default function LoginForm({ onSubmit, error }: LoginFormProps) {
           Regístrate
         </Link>
       </p>
-    </form>
+    </motion.form>
   );
 }

@@ -71,13 +71,13 @@ export default function SalesAreaChart({ ventas, insumos }: SalesAreaChartProps)
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 14 }}>
         <div>
           <h3 style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-marcellus)",
             fontSize: "0.8rem", fontWeight: 700, color: "#2A2E34", margin: 0,
           }}>
             Análisis de Ventas (Completadas)
           </h3>
           <p style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-poppins)",
             fontSize: "0.65rem", color: "#8A94A6", margin: "2px 0 0",
           }}>
             Resumen del periodo seleccionado
@@ -90,19 +90,19 @@ export default function SalesAreaChart({ ventas, insumos }: SalesAreaChartProps)
         <div style={{ width: 140, flexShrink: 0, display: "flex", flexDirection: "column", gap: 20 }}>
           <div>
             <h2 style={{
-              fontFamily: "var(--font-display, Manrope, sans-serif)",
+              fontFamily: "var(--font-poppins)",
               fontSize: "1.5rem", fontWeight: 800, color: "#2A2E34", margin: 0, lineHeight: 1.1,
             }}>${totalIngresos.toLocaleString("es-MX", { minimumFractionDigits: 2 })}</h2>
-            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", color: "#8A94A6", margin: "4px 0 0" }}>
+            <p style={{ fontFamily: "var(--font-marcellus)", fontSize: "0.65rem", color: "#8A94A6", margin: "4px 0 0" }}>
               Ingresos Totales
             </p>
           </div>
           <div>
             <h2 style={{
-              fontFamily: "var(--font-display, Manrope, sans-serif)",
+              fontFamily: "var(--font-poppins)",
               fontSize: "1.5rem", fontWeight: 800, color: "#2A2E34", margin: 0, lineHeight: 1.1,
             }}>${totalInversion.toLocaleString("es-MX", { minimumFractionDigits: 2 })}</h2>
-            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.65rem", color: "#8A94A6", margin: "4px 0 0" }}>
+            <p style={{ fontFamily: "var(--font-marcellus)", fontSize: "0.65rem", color: "#8A94A6", margin: "4px 0 0" }}>
               Costo / Inversión
             </p>
           </div>
@@ -123,10 +123,10 @@ export default function SalesAreaChart({ ventas, insumos }: SalesAreaChartProps)
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-              <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#8A94A6", fontFamily: "Inter" }} dy={10} />
+              <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#8A94A6", fontFamily: "var(--font-poppins)" }} dy={10} />
               <YAxis 
                 axisLine={false} tickLine={false} 
-                tick={{ fontSize: 10, fill: "#8A94A6", fontFamily: "Inter" }}
+                tick={{ fontSize: 10, fill: "#8A94A6", fontFamily: "var(--font-poppins)" }}
                 tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`}
               />
               <Tooltip 

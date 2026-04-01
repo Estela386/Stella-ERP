@@ -44,27 +44,17 @@ export default function ProductTable({
       <table className="min-w-full text-sm text-[#111111]">
         <thead className="bg-[#D1BBAA]/35">
           <tr>
-            <th className="px-4 py-3 text-left font-medium text-[#708090]">
-              Código
-            </th>
-            <th className="px-4 py-3 text-left font-medium text-[#708090]">
-              Nombre
-            </th>
-            <th className="px-4 py-3 font-medium text-[#708090]">Categoría</th>
-            <th className="px-4 py-3 font-medium text-[#708090]">Tipo</th>
-            <th className="px-4 py-3 font-medium text-[#708090]">Stock</th>
-            <th className="px-4 py-3 font-medium text-[#708090]">Precio</th>
-            <th className="px-4 py-3 font-medium text-[#708090]">Costo</th>
-            <th className="px-4 py-3 font-medium text-[#708090]">
-              Costo Mayorista
-            </th>
-            <th className="px-4 py-3 font-medium text-[#708090]">Estado</th>
-            <th className="px-4 py-3 font-medium text-[#708090]">
-              Personalizable
-            </th>
-            <th className="px-4 py-3 text-right font-medium text-[#708090]">
-              Acciones
-            </th>
+            <th className="px-4 py-3 text-left font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Código</th>
+            <th className="px-4 py-3 text-left font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Nombre</th>
+            <th className="px-4 py-3 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Categoría</th>
+            <th className="px-4 py-3 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Tipo</th>
+            <th className="px-4 py-3 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Stock</th>
+            <th className="px-4 py-3 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Precio</th>
+            <th className="px-4 py-3 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Costo</th>
+            <th className="px-4 py-3 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Costo Mayorista</th>
+            <th className="px-4 py-3 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Estado</th>
+            <th className="px-4 py-3 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Personalizable</th>
+            <th className="px-4 py-3 text-right font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Acciones</th>
           </tr>
         </thead>
 
@@ -80,7 +70,7 @@ export default function ProductTable({
 
           {productosFiltrados.length === 0 && (
             <tr>
-              <td colSpan={10} className="px-4 py-6 text-center text-[#708090]">
+              <td colSpan={11} className="px-4 py-6 text-center text-[#708090]" style={{ fontFamily: "var(--font-sans)" }}>
                 No se encontraron productos
               </td>
             </tr>

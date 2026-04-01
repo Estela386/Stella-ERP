@@ -180,7 +180,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     { label: "Personalizados",       href: "/dashboard/cliente/catalogo?categoria=personalizada" },
     { label: "Nuevos",               href: "/dashboard/cliente/catalogo?categoria=nuevos" },
     { label: "Accesorios",           href: "/dashboard/cliente/catalogo?categoria=accesorios" },
-    { label: "Mayoreo",              href: "/dashboard/cliente/mayoreo" },
+    { label: id_rol === 3 ? "Panel Mayorista" : "Mayoreo", href: "/dashboard/cliente/mayoreo" },
     { label: "Preguntas frecuentes", href: "/dashboard/cliente/faq" },
     { label: "Nosotros",             href: "/dashboard/cliente/nosotros" },
     { label: "Contacto",             href: "/dashboard/cliente/contacto" },
@@ -294,8 +294,8 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
           {/* Acciones derecha */}
           <div className="flex items-center justify-end gap-3">
 
-            {/* Botón ERP */}
-            {id_rol === 1 && (
+            {/* Botón ERP (Admin y Mayoristas) */}
+            {(id_rol === 1 || id_rol === 3) && (
               <button
                 className="hidden sm:flex items-center gap-2 rounded-full border cursor-pointer transition-all duration-200 font-medium"
                 style={{ padding: "8px 16px", fontSize: 14, borderColor: BORDER, background: WHITE, color: SLATE }}
@@ -355,7 +355,14 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  initials
+                  <div className="relative">
+                    {initials}
+                    {id_rol === 3 && (
+                      <div className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-0.5 border border-white shadow-sm">
+                        <Star size={8} fill="white" color="white" />
+                      </div>
+                    )}
+                  </div>
                 )}
               </button>
 
@@ -392,11 +399,18 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                         {initials}
                       </div>
                       <div className="overflow-hidden">
-                        <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
-                          {usuario?.nombre || "Mi cuenta"}
-                        </p>
+                        <div className="flex items-center gap-1.5 overflow-hidden">
+                          <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
+                            {usuario?.nombre || "Mi cuenta"}
+                          </p>
+                          {id_rol === 3 && (
+                            <span className="bg-yellow-100 text-yellow-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-yellow-200 uppercase tracking-wider flex-shrink-0">
+                              Socio
+                            </span>
+                          )}
+                        </div>
                         <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                          {usuario?.correo || ""}
+                          {id_rol === 3 ? "Cuenta Mayorista" : (usuario?.correo || "")}
                         </p>
                       </div>
                     </div>
@@ -421,7 +435,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                         </>
                       )}
 
-                      {id_rol === 1 && (
+                      {(id_rol === 1 || id_rol === 3) && (
                         <NavBtn
                           icon={<LayoutDashboard size={15} />}
                           label="Dashboard ERP"
@@ -545,7 +559,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
                   <SectionLabel>Mi cuenta</SectionLabel>
 
-                  {id_rol === 1 && (
+                  {(id_rol === 1 || id_rol === 3) && (
                     <NavBtn
                       icon={<LayoutDashboard size={18} />}
                       label="Dashboard ERP"
@@ -592,11 +606,18 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                     {initials}
                   </div>
                   <div className="overflow-hidden">
-                    <p className="m-0 font-semibold truncate" style={{ fontSize: 15, color: DARK }}>
-                      {usuario?.nombre || "Mi cuenta"}
-                    </p>
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <p className="m-0 font-semibold truncate" style={{ fontSize: 15, color: DARK }}>
+                        {usuario?.nombre || "Mi cuenta"}
+                      </p>
+                      {id_rol === 3 && (
+                        <span className="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-200 uppercase tracking-wider flex-shrink-0">
+                          Socio
+                        </span>
+                      )}
+                    </div>
                     <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                      {usuario?.correo || ""}
+                      {id_rol === 3 ? "Cuenta Mayorista" : (usuario?.correo || "")}
                     </p>
                   </div>
                 </div>

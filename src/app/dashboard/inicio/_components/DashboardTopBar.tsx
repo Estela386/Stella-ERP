@@ -33,17 +33,17 @@ export default function DashboardTopBar() {
       {/* Greeting */}
       <div>
         <h1 style={{
-          fontFamily: "var(--font-display, Manrope, sans-serif)",
+          fontFamily: "var(--font-marcellus)",
           fontSize: "clamp(1rem, 2vw, 1.35rem)",
-          fontWeight: 800,
-          color: "#1C1C1C",
+          fontWeight: 400,
+          color: "#708090",
           margin: 0, lineHeight: 1.2,
           letterSpacing: "-0.01em",
         }}>
           ¡{saludo}, {nombre}!
         </h1>
         <p style={{
-          fontFamily: "var(--font-sans, Inter, sans-serif)",
+          fontFamily: "var(--font-sans)",
           fontSize: "0.72rem",
           color: "#8C9796",
           margin: "3px 0 0",
@@ -71,7 +71,7 @@ export default function DashboardTopBar() {
             onBlur={() => setFocused(false)}
             style={{
               background: "none", border: "none", outline: "none",
-              fontFamily: "var(--font-sans, Inter, sans-serif)",
+              fontFamily: "var(--font-sans)",
               fontSize: "0.78rem",
               color: "#1C1C1C", width: "100%",
             }}
@@ -112,7 +112,7 @@ export default function DashboardTopBar() {
         >
           <Plus size={13} style={{ color: "#fff" }} />
           <span style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.78rem", fontWeight: 600,
             color: "#fff", whiteSpace: "nowrap",
           }}>

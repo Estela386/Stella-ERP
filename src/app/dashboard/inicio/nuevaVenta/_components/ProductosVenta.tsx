@@ -12,6 +12,8 @@ interface ProductoDisponible {
   stock?: number;
   categoria_nombre?: string;
   opciones?: any[];
+  es_consignado?: boolean;
+  id_consignacion_detalle?: number;
 }
 
 type Props = {
@@ -21,6 +23,8 @@ type Props = {
   onAumentar: (id: number) => void;
   onDisminuir: (id: number) => void;
   onActualizar: (id: number, cambios: Partial<Producto>) => void;
+  clienteSeleccionado: { id: number; nombre: string; id_usuario?: number } | null;
+  usuario: any;
 };
 
 export default function ProductosVenta({
@@ -30,19 +34,81 @@ export default function ProductosVenta({
   onAumentar,
   onDisminuir,
   onActualizar,
+  clienteSeleccionado,
+  usuario,
 }: Props) {
-  const [productosDisponibles, setProductosDisponibles] = useState<
-    ProductoDisponible[]
-  >([]);
-  const [productosFiltrados, setProductosFiltrados] = useState<
-    ProductoDisponible[]
-  >([]);
+  const [productosDisponibles, setProductosDisponibles] = useState<ProductoDisponible[]>([]);
+  const [productosFiltrados, setProductosFiltrados] = useState<ProductoDisponible[]>([]);
+  const [productosConsignados, setProductosConsignados] = useState<ProductoDisponible[]>([]);
+  const [verConsignacion, setVerConsignacion] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [qrInput, setQrInput] = useState("");
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingConsignacion, setLoadingConsignacion] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Cargar productos consignados cuando cambia el cliente o si el usuario es mayorista
+  useEffect(() => {
+    const cargarConsignados = async () => {
+      // El ID de mayorista a buscar es:
+      // - El propio ID del usuario si es rol 3
+      // - El id_usuario del cliente seleccionado si el usuario actual es admin (rol 1)
+      const idMayoristaBusqueda = usuario?.id_rol === 3 
+        ? usuario.id 
+        : clienteSeleccionado?.id_usuario;
+
+      if (!idMayoristaBusqueda) {
+        setProductosConsignados([]);
+        if (usuario?.id_rol !== 3) setVerConsignacion(false);
+        return;
+      }
+
+      try {
+        setLoadingConsignacion(true);
+        const response = await fetch(`/api/consignaciones?id_mayorista=${idMayoristaBusqueda}`);
+        const result = await response.json();
+
+        if (response.ok && result.data) {
+          // Aplanar los detalles de todas las consignaciones activas
+          const consignados: ProductoDisponible[] = [];
+          result.data.forEach((c: any) => {
+            if (c.estado === "activa") {
+              c.detalles.forEach((d: any) => {
+                const stockPendiente = d.cantidad - (d.cantidad_vendida || 0) - (d.cantidad_devuelta || 0);
+                if (stockPendiente > 0) {
+                  consignados.push({
+                    id: d.id_producto,
+                    nombre: d.producto.nombre,
+                    precio: d.precio_venta || d.producto.precio,
+                    stock: stockPendiente,
+                    categoria_nombre: d.producto.categoria?.nombre || "Consignado",
+                    es_consignado: true,
+                    id_consignacion_detalle: d.id,
+                  });
+                }
+              });
+            }
+          });
+          setProductosConsignados(consignados);
+        }
+      } catch (err) {
+        console.error("Error al cargar consignados:", err);
+      } finally {
+        setLoadingConsignacion(false);
+      }
+    };
+
+    cargarConsignados();
+  }, [clienteSeleccionado, usuario]);
+
+  // Forzar verConsignacion si es mayorista
+  useEffect(() => {
+    if (usuario?.id_rol === 3) {
+      setVerConsignacion(true);
+    }
+  }, [usuario]);
 
   // Cargar productos disponibles
   useEffect(() => {
@@ -65,19 +131,18 @@ export default function ProductosVenta({
     cargarProductos();
   }, []);
 
-  // Filtrar productos por búsqueda
+  // Filtrar productos por búsqueda y pestaña
   useEffect(() => {
+    const source = verConsignacion ? productosConsignados : productosDisponibles;
     if (busqueda.trim() === "") {
-      setProductosFiltrados(productosDisponibles);
+      setProductosFiltrados(source);
     } else {
       const termino = busqueda.toLowerCase();
       setProductosFiltrados(
-        productosDisponibles.filter(p =>
-          p.nombre.toLowerCase().includes(termino)
-        )
+        source.filter(p => p.nombre.toLowerCase().includes(termino))
       );
     }
-  }, [busqueda, productosDisponibles]);
+  }, [busqueda, productosDisponibles, productosConsignados, verConsignacion]);
 
   // Cerrar dropdown al hacer click afuera
   useEffect(() => {
@@ -174,14 +239,19 @@ export default function ProductosVenta({
             >
               {/* INFO PRODUCTO */}
               <div className="flex flex-col flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-[#708090]">{p.nombre}</p>
-                  {p.categoria_nombre && (
-                    <span className="text-[10px] bg-[#B76E79]/10 text-[#B76E79] px-2 py-0.5 rounded-full font-medium">
-                      {p.categoria_nombre}
-                    </span>
-                  )}
-                </div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-[#708090]">{p.nombre}</p>
+                    {p.es_consignado && (
+                      <span className="text-[9px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold border border-amber-200">
+                        CONSIGNACIÓN
+                      </span>
+                    )}
+                    {p.categoria_nombre && (
+                      <span className="text-[10px] bg-[#B76E79]/10 text-[#B76E79] px-2 py-0.5 rounded-full font-medium">
+                        {p.categoria_nombre}
+                      </span>
+                    )}
+                  </div>
                 <p className="text-xs text-[#8C9796]">
                   ${p.precio.toLocaleString()}
                   {p.stock !== undefined && (
@@ -370,6 +440,41 @@ export default function ProductosVenta({
           {/* Dropdown */}
           {showDropdown && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-[#B76E79]/50 rounded-xl shadow-2xl z-50 w-full">
+              {/* Selector de origen de productos (Solo si el usuario es Admin o Invitado y hay cliente con consignación) */}
+              {(usuario?.id_rol === 1 || !usuario?.id_rol) && clienteSeleccionado?.id_usuario && (
+                <div className="flex p-2 bg-[#F6F4EF] border-b border-[#8C9796]/20">
+                  <button
+                    onClick={() => setVerConsignacion(false)}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                      !verConsignacion 
+                      ? "bg-white text-[#B76E79] shadow-sm" 
+                      : "text-[#8C9796] hover:bg-white/50"
+                    }`}
+                  >
+                    Inventario General
+                  </button>
+                  <button
+                    onClick={() => setVerConsignacion(true)}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+                      verConsignacion 
+                      ? "bg-[#B76E79] text-white shadow-sm" 
+                      : "text-[#8C9796] hover:bg-white/50"
+                    }`}
+                  >
+                    Consignación ({productosConsignados.length})
+                  </button>
+                </div>
+              )}
+
+              {/* Título informativo para Mayoristas */}
+              {usuario?.id_rol === 3 && (
+                <div className="p-3 bg-amber-50 border-b border-amber-200">
+                  <p className="text-[10px] uppercase font-bold text-amber-700 tracking-wider">
+                    Vediendo desde tu Consignación
+                  </p>
+                </div>
+              )}
+
               {/* Búsqueda */}
               <div className="p-3 border-b border-[#8C9796]/20">
                 <div className="relative">
@@ -379,7 +484,7 @@ export default function ProductosVenta({
                   />
                   <input
                     type="text"
-                    placeholder="Buscar producto..."
+                    placeholder={verConsignacion ? "Buscar en consignación..." : "Buscar producto..."}
                     value={busqueda}
                     onChange={e => setBusqueda(e.target.value)}
                     autoFocus

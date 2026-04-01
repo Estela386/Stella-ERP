@@ -32,7 +32,7 @@ export default function RecentSalesTable() {
     >
       {/* Header */}
       <div className="bg-[#708090] px-6 py-4">
-        <h2 className="text-lg font-medium text-[#F6F4EF]">
+        <h2 style={{ fontFamily: "var(--font-marcellus)" }} className="text-xl font-medium text-[#F6F4EF]">
           Ventas Recientes
         </h2>
       </div>
@@ -57,8 +57,9 @@ export default function RecentSalesTable() {
                   px-6 py-3
                   text-left
                   text-[#708090]
-                  font-medium
+                  font-semibold
                 "
+                style={{ fontFamily: "var(--font-sans)" }}
               >
                 {h}
               </th>
@@ -77,36 +78,37 @@ export default function RecentSalesTable() {
                 transition
               "
             >
-              <td className="px-6 py-4 font-medium text-[#708090]">
+              <td className="px-6 py-4 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)" }}>
                 {v.id}
               </td>
 
-              <td className="px-6 py-4 text-[#1C1C1C]">
+              <td className="px-6 py-4 text-[#1C1C1C]" style={{ fontFamily: "var(--font-sans)" }}>
                 {v.fecha}
               </td>
 
-              <td className="px-6 py-4 text-[#1C1C1C]">
+              <td className="px-6 py-4 text-[#1C1C1C]" style={{ fontFamily: "var(--font-sans)" }}>
                 {v.cliente}
               </td>
 
-              <td className="px-6 py-4 text-[#1C1C1C]">
+              <td className="px-6 py-4 text-[#1C1C1C]" style={{ fontFamily: "var(--font-sans)" }}>
                 {v.items}
               </td>
 
-              <td className="px-6 py-4 font-semibold text-[#B76E79]">
+              <td className="px-6 py-4 font-normal text-[#B76E79]" style={{ fontFamily: "var(--font-marcellus)", fontSize: "1rem" }}>
                 {v.total}
               </td>
 
-              <td className="px-6 py-4 text-[#1C1C1C]">
+              <td className="px-6 py-4 text-[#1C1C1C]" style={{ fontFamily: "var(--font-sans)" }}>
                 {v.pago}
               </td>
 
-              <td className="px-6 py-4 text-[#1C1C1C]">
+              <td className="px-6 py-4 text-[#1C1C1C]" style={{ fontFamily: "var(--font-sans)" }}>
                 {v.vendedor}
               </td>
 
               <td className="px-6 py-4">
                 <span
+                  style={{ fontFamily: "var(--font-sans)" }}
                   className="
                     text-[#B76E79]
                     font-medium

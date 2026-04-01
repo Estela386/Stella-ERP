@@ -45,15 +45,15 @@ export default function StatsRing({
         <div style={{
           position: "absolute", inset: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "var(--font-display, Manrope, sans-serif)",
-          fontSize: "0.95rem", fontWeight: 800,
+          fontFamily: "var(--font-marcellus)",
+          fontSize: "1rem", fontWeight: 400,
           color: valueColor,
         }}>
           {value}%
         </div>
       </div>
       <span style={{
-        fontFamily: "var(--font-sans, Inter, sans-serif)",
+        fontFamily: "var(--font-sans)",
         fontSize: "0.62rem", fontWeight: 600,
         letterSpacing: "0.07em", textTransform: "uppercase",
         color: labelColor,

@@ -9,12 +9,19 @@ import PaymentModal from "./_components/PaymentModal";
 import ClientModal from "./_components/ClientModal";
 import SidebarMenu from "@/app/_components/SideBarMenu";
 import { useCuentasPorCobrar } from "@lib/hooks/useCuentasPorCobrar";
+import { useAuth } from "@lib/hooks/useAuth";
 
 export default function AccountsPage() {
   const [openAccount, setOpenAccount] = useState(false);
   const [openPayment, setOpenPayment] = useState(false);
   const [openClient, setOpenClient] = useState(false);
   const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState<"pending" | "paid">("pending");
+  const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null);
+
+  const { usuario, loading: authLoading } = useAuth();
+  const isAdmin = usuario?.id_rol === 1;
+  const usuarioId = typeof usuario?.id === "string" ? parseInt(usuario.id) : (usuario?.id as number | undefined) ?? null;
 
   const {
     cuentas,
@@ -27,26 +34,66 @@ export default function AccountsPage() {
     obtenerPagos,
   } = useCuentasPorCobrar();
 
+  const handleOpenPayment = (id?: number) => {
+    setSelectedAccountId(id || null);
+    setOpenPayment(true);
+  };
+
+  const misClientes = isAdmin ? clientes : clientes.filter(c => (c as any).id_usuario === usuarioId);
+
+  const filteredByTab = cuentas.filter(c => {
+    const isTabMatch = activeTab === "pending" ? c.estado !== "pagado" : c.estado === "pagado";
+    const isUserMatch = isAdmin ? true : (c.cliente as any)?.id_usuario === usuarioId;
+    return isTabMatch && isUserMatch;
+  });
+
   return (
     <div className="flex h-screen overflow-hidden bg-[#f6f4ef]">
       <SidebarMenu />
 
-      <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto">
-        <div className="mx-auto max-w-7xl space-y-8">
-          <header className="space-y-1">
-            <div className="flex items-center gap-4">
-              <span className="h-px w-12 bg-[#B76E79]" />
-              <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
-                Cuentas por Cobrar
-              </span>
+      <main className="flex-1 px-3 md:px-8 py-5 md:py-8 overflow-y-auto">
+        <div className="mx-auto max-w-7xl space-y-6 md:space-y-8">
+          <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <span className="h-px w-8 md:w-12 bg-[#B76E79]" />
+                <span 
+                  className="text-[10px] md:text-xs tracking-[0.3em] md:tracking-[0.4em] uppercase text-[#B76E79] font-medium"
+                  style={{ fontFamily: "var(--font-marcellus)" }}
+                >
+                  Cuentas por cobrar
+                </span>
+              </div>
             </div>
 
-            <h1 className="font-serif text-5xl md:text-6xl font-medium leading-tight text-[#708090]">
-              Inventario de materia prima
-            </h1>
+            {/* TABS ELEGANTES */}
+            <div className="flex w-full lg:w-auto bg-[#8c8976]/10 p-1 rounded-2xl border border-[#8c8976]/20">
+              <button
+                onClick={() => setActiveTab("pending")}
+                className={`flex-1 lg:flex-none px-4 md:px-8 py-2.5 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                  activeTab === "pending"
+                    ? "bg-white text-[#b76e79] shadow-sm"
+                    : "text-[#708090] hover:bg-white/50"
+                }`}
+                style={{ fontFamily: "var(--font-marcellus)" }}
+              >
+                Pendientes
+              </button>
+              <button
+                onClick={() => setActiveTab("paid")}
+                className={`flex-1 lg:flex-none px-4 md:px-8 py-2.5 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                  activeTab === "paid"
+                    ? "bg-white text-[#708090] shadow-sm"
+                    : "text-[#708090] hover:bg-white/50"
+                }`}
+                style={{ fontFamily: "var(--font-marcellus)" }}
+              >
+                Pagadas
+              </button>
+            </div>
           </header>
 
-          <div className="rounded-3xl bg-white p-10 space-y-8 border border-[#8c8976]/30 shadow-lg">
+          <div className="rounded-2xl md:rounded-3xl bg-white p-5 md:p-10 space-y-6 md:space-y-8 border border-[#8c8976]/30 shadow-lg min-h-[500px]">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                 {error}
@@ -65,14 +112,15 @@ export default function AccountsPage() {
                   search={search}
                   onSearchChange={setSearch}
                   onAddAccount={() => setOpenAccount(true)}
-                  onAddPayment={() => setOpenPayment(true)}
+                  onAddPayment={() => handleOpenPayment()}
                   onAddClient={() => setOpenClient(true)}
                 />
 
                 <AccountsTable
                   search={search}
-                  cuentas={cuentas}
+                  cuentas={filteredByTab}
                   onVerPagos={obtenerPagos}
+                  onAddPayment={handleOpenPayment}
                 />
               </>
             )}
@@ -84,13 +132,14 @@ export default function AccountsPage() {
         open={openPayment}
         onClose={() => setOpenPayment(false)}
         cuentas={cuentas}
+        selectedCuentaId={selectedAccountId}
         onPago={registrarPago}
       />
 
       <AccountModal
         open={openAccount}
         onClose={() => setOpenAccount(false)}
-        clientes={clientes}
+        clientes={misClientes}
         onGuardar={crearCuenta}
       />
 

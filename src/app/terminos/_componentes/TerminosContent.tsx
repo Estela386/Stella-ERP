@@ -219,7 +219,7 @@ export default function TerminosContent({ data }: { data: TerminosPageData }) {
 
       const obs = new IntersectionObserver(
         ([entry]) => { if (entry.isIntersecting) setActiveId(section.id); },
-        { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+        { rootMargin: "-25% 0px -60% 0px", threshold: 0 }
       );
       obs.observe(el);
       observers.push(obs);

@@ -91,10 +91,10 @@ export default function PromoverMayoristaModal({
               <UserPlus size={20} style={{ color: "#fff" }} />
             </div>
             <div>
-              <h2 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#1C1C1C", margin: 0 }}>
+              <h2 style={{ fontSize: "1.2rem", fontWeight: 400, color: "#1C1C1C", margin: 0, fontFamily: "var(--font-marcellus)" }}>
                 Promover a Mayorista
               </h2>
-              <p style={{ fontSize: "0.75rem", color: "#8C9796", margin: "3px 0 0" }}>
+              <p style={{ fontSize: "0.75rem", color: "#8C9796", margin: "3px 0 0", fontFamily: "var(--font-sans)" }}>
                 Cambiará el rol del usuario a Mayorista (rol 3)
               </p>
             </div>
@@ -124,6 +124,7 @@ export default function PromoverMayoristaModal({
               marginBottom: 14,
               color: "#e53e3e",
               fontSize: "0.82rem",
+              fontFamily: "var(--font-sans)",
             }}
           >
             {error}
@@ -139,6 +140,7 @@ export default function PromoverMayoristaModal({
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
                 color: "#708090",
+                fontFamily: "var(--font-sans)",
               }}
             >
               Seleccionar Usuario
@@ -155,6 +157,7 @@ export default function PromoverMayoristaModal({
                 color: "#1C1C1C",
                 outline: "none",
                 appearance: "auto",
+                fontFamily: "var(--font-sans)",
               }}
             >
               <option value="">Seleccionar usuario...</option>
@@ -179,6 +182,7 @@ export default function PromoverMayoristaModal({
               marginBottom: 20,
               fontSize: "0.78rem",
               color: "#92400e",
+              fontFamily: "var(--font-sans)",
             }}
           >
             ⚠️ Esta acción cambiará el rol del usuario a <strong>Mayorista</strong>. El usuario
@@ -198,6 +202,7 @@ export default function PromoverMayoristaModal({
                 fontSize: "0.85rem",
                 fontWeight: 600,
                 cursor: "pointer",
+                fontFamily: "var(--font-sans)",
               }}
             >
               Cancelar
@@ -218,6 +223,7 @@ export default function PromoverMayoristaModal({
                 fontWeight: 700,
                 cursor: loading || !usuarioSel ? "not-allowed" : "pointer",
                 boxShadow: loading ? "none" : "0 4px 14px rgba(112,128,144,0.3)",
+                fontFamily: "var(--font-sans)",
               }}
             >
               {loading ? "Procesando..." : "Promover"}

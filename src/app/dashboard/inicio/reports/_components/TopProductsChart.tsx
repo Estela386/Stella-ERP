@@ -67,25 +67,16 @@ export default function TopProductsChart() {
       }}
     >
       <div style={{ marginBottom: 14 }}>
-        <h3
-          style={{
-            fontFamily: "var(--font-display, Manrope, sans-serif)",
-            fontSize: "0.9rem",
-            fontWeight: 700,
-            color: "#1C1C1C",
-            margin: 0,
-          }}
-        >
+        <h3 style={{
+          fontFamily: "var(--font-marcellus)",
+          fontSize: "0.9rem", fontWeight: 700, color: "#1C1C1C", margin: 0,
+        }}>
           Top 5 — Productos más vendidos
         </h3>
-        <p
-          style={{
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
-            fontSize: "0.67rem",
-            color: "#8C9796",
-            margin: "2px 0 0",
-          }}
-        >
+        <p style={{
+          fontFamily: "var(--font-poppins)",
+          fontSize: "0.67rem", color: "#8C9796", margin: "2px 0 0",
+        }}>
           Por ingresos generados en el período
         </p>
       </div>
@@ -110,24 +101,13 @@ export default function TopProductsChart() {
           <XAxis
             type="number"
             tickFormatter={v => `$${(v / 1000).toFixed(0)}k`}
-            tick={{
-              fontSize: 10,
-              fill: "#8C9796",
-              fontFamily: "Inter, sans-serif",
-            }}
-            axisLine={false}
-            tickLine={false}
+            tick={{ fontSize: 10, fill: "#8C9796", fontFamily: "var(--font-poppins)" }}
+            axisLine={false} tickLine={false}
           />
           <YAxis
-            type="category"
-            dataKey="nombre"
-            tick={{
-              fontSize: 10,
-              fill: "#708090",
-              fontFamily: "Inter, sans-serif",
-            }}
-            axisLine={false}
-            tickLine={false}
+            type="category" dataKey="nombre"
+            tick={{ fontSize: 10, fill: "#708090", fontFamily: "var(--font-poppins)" }}
+            axisLine={false} tickLine={false}
             width={148}
           />
           <Tooltip
@@ -144,10 +124,9 @@ export default function TopProductsChart() {
               borderRadius: 10,
               border: "1px solid #F0EDE8",
               boxShadow: "0 4px 14px rgba(112,128,144,0.18)",
-              fontFamily: "Inter, sans-serif",
-              fontSize: 12,
+              fontFamily: "var(--font-poppins)", fontSize: 12,
             }}
-            labelStyle={{ color: "#708090", fontWeight: 600 }}
+            labelStyle={{ color: "#708090", fontWeight: 600, fontFamily: "var(--font-marcellus)" }}
           />
           <Bar dataKey="ventas" radius={[0, 5, 5, 0]}>
             {displayData.map((_, i) => (

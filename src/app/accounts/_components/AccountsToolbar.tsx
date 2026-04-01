@@ -1,4 +1,4 @@
-"use client";
+import { Search, Plus, HandCoins, UserPlus } from "lucide-react";
 
 interface Props {
   search: string;
@@ -16,91 +16,81 @@ export default function AccountsToolbar({
   onAddClient,
 }: Props) {
   return (
-    <div className="flex flex-col lg:flex-row gap-6 lg:items-center lg:justify-between">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-6 md:items-center md:justify-between py-2">
       {/* 🔍 BUSCADOR */}
-
-      <div className="relative w-full lg:max-w-sm">
-        {/* Icono */}
-
+      <div className="relative w-full md:max-w-md group">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8c8976] group-focus-within:text-[#b76e79] transition-colors">
+          <Search size={18} />
+        </div>
         <input
           value={search}
           onChange={e => onSearchChange(e.target.value)}
-          placeholder="Buscar cliente o cuenta..."
+          placeholder="Buscar..."
           className="
             w-full
-            pl-10 pr-4 py-3
-            rounded-xl
-            bg-[#f6f4ef]
-            border border-[#8c8976]/40
-            text-[#708090]
-            placeholder:text-[#8c8976]
+            pl-12 pr-4 py-3
+            rounded-2xl
+            bg-white
+            border border-[#8c8976]/30
+            text-sm text-[#708090]
+            placeholder:text-[#8c8976]/60
             focus:outline-none
-            focus:ring-2
-            focus:ring-[#b76e79]
+            focus:ring-4
+            focus:ring-[#b76e79]/10
             focus:border-[#b76e79]
-            shadow-[0_5px_15px_rgba(140,137,118,0.25)]
-            transition
+            shadow-sm
+            hover:shadow-md
+            transition-all
+            duration-300
           "
+          style={{ fontFamily: "var(--font-poppins)" }}
         />
       </div>
 
       {/* BOTONES */}
-      <div className="flex flex-wrap gap-3">
-        {/* + Cliente */}
-        {/* <button
-          onClick={onAddClient}
-          className="
-            px-5 py-2.5
-            rounded-xl
-            border border-[#b76e79]/40
-            bg-[#b76e79]
-            text-[#f6f4ef]
-            shadow-[0_5px_15px_rgba(140,137,118,0.25)]
-            hover:bg-[#708090]
-            hover:text-[#f6f4ef]
-            transition
-            cursor-pointer
-          "
-        >
-          + Cliente
-        </button> */}
-
-        {/* + Cuenta */}
+      <div className="grid grid-cols-2 lg:flex items-center gap-2 md:gap-3">
         <button
           onClick={onAddAccount}
           className="
-            px-5 py-2.5
-            rounded-xl
-            bg-[#b76e79]
-            text-[#f6f4ef]
-            shadow-[0_10px_25px_rgba(140,137,118,0.4)]
-            hover:scale-105
-              hover:bg-[#708090]
-            hover:text-[#f6f4ef]
-            transition
-            cursor-pointer
+            flex items-center justify-center gap-2
+            px-4 md:px-6 py-3
+            rounded-2xl
+            bg-[#708090]
+            text-white
+            text-xs
+            hover:bg-[#5a6a7a]
+            hover:shadow-lg
+            active:scale-95
+            transition-all
+            duration-300
+            shadow-[0_8px_20px_-6px_rgba(112,128,144,0.4)]
           "
+          style={{ fontFamily: "var(--font-marcellus)" }}
         >
-          + Cuenta
+          <Plus size={16} />
+          <span>Nueva Cuenta</span>
         </button>
 
-        {/* + Abono */}
         <button
           onClick={onAddPayment}
           className="
-            px-5 py-2.5
-            rounded-xl
+            flex items-center justify-center gap-2
+            px-4 md:px-6 py-3
+            rounded-2xl
             bg-[#b76e79]
-            text-[#f6f4ef]
-            shadow-[0_10px_25px_rgba(140,137,118,0.4)]
-            hover:scale-105
-              hover:bg-[#708090]
-            hover:text-[#f6f4ef]
-            transition
-            cursor-pointer
+            text-white
+            text-xs
+            hover:bg-[#a55a65]
+            hover:shadow-lg
+            active:scale-95
+            transition-all
+            duration-300
+            shadow-[0_8px_20px_-6px_rgba(183,110,121,0.4)]
           "
+          style={{ fontFamily: "var(--font-marcellus)" }}
         >
-          + Abono
+          <HandCoins size={16} />
+          <span>Registrar Abono</span>
         </button>
       </div>
     </div>

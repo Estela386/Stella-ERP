@@ -9,7 +9,8 @@ interface ConfirmarVentaRequest {
     id_producto: number;
     cantidad: number;
     descuento_aplicado?: number | null;
-    personalizacion?: Record<number, any> | null; // ← nuevo
+    personalizacion?: Record<number, any> | null;
+    id_consignacion_detalle?: number;
   }>;
   fecha: string;
   totalConIva?: number;

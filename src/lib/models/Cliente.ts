@@ -29,11 +29,13 @@ export class Cliente implements ICliente {
   id: number;
   nombre: string;
   telefono: string;
+  id_usuario?: number;
 
   constructor(data: ICliente) {
     this.id = data.id;
     this.nombre = data.nombre;
     this.telefono = data.telefono;
+    this.id_usuario = data.id_usuario;
   }
 
   /**

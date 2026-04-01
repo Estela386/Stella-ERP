@@ -42,8 +42,8 @@ export default function MiniCalendar() {
           <ChevronLeft size={14} />
         </button>
         <span style={{
-          fontFamily: "var(--font-display, Manrope, sans-serif)",
-          fontSize: "0.8rem", fontWeight: 700, color: "#1C1C1C",
+          fontFamily: "var(--font-marcellus)",
+          fontSize: "0.85rem", fontWeight: 400, color: "#1C1C1C",
         }}>
           {MONTHS[month]} {year}
         </span>
@@ -60,7 +60,7 @@ export default function MiniCalendar() {
         {DAYS.map(d => (
           <div key={d} style={{
             textAlign: "center",
-            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontFamily: "var(--font-sans)",
             fontSize: "0.6rem", fontWeight: 700,
             letterSpacing: "0.07em",
             color: "#8C9796",
@@ -100,7 +100,7 @@ export default function MiniCalendar() {
               }}
             >
               <span style={{
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
+                fontFamily: "var(--font-sans)",
                 fontSize: "0.7rem", fontWeight: isToday ? 700 : 400,
                 color: isToday ? "#fff" : hasEvent ? "#708090" : "#1C1C1C",
               }}>

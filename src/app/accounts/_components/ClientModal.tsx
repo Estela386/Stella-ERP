@@ -56,79 +56,101 @@ export default function ClientModal({ open, onClose, onGuardar }: Props) {
 
   return (
     <div className="fixed inset-0 bg-[#708090]/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="w-full max-w-lg bg-[#f6f4ef] rounded-[32px] p-8 shadow-[0_40px_120px_rgba(140,137,118,0.35)] border border-[#8c8976]/30 space-y-5">
-        <h2 className="text-2xl font-semibold text-[#708090]">
+      <div className="w-full max-w-lg bg-white rounded-[2.5rem] p-10 shadow-[0_40px_100px_rgba(112,128,144,0.25)] border border-[#8c8976]/20 space-y-6 animate-in zoom-in-95 duration-300">
+        <h2 
+          className="text-2xl font-bold text-[#708090] tracking-tight"
+          style={{ fontFamily: "var(--font-marcellus)" }}
+        >
           Nuevo Cliente y Cuenta
         </h2>
 
         {error && (
-          <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl">
-            {error}
-          </p>
+          <div className="flex items-center gap-2 text-sm text-[#b76e79] bg-[#b76e79]/5 px-4 py-3 rounded-2xl border border-[#b76e79]/10">
+            <span>{error}</span>
+          </div>
         )}
 
-        {[
-          {
-            label: "Nombre del cliente",
-            value: nombre,
-            setter: setNombre,
-            type: "text",
-          },
-          {
-            label: "Teléfono",
-            value: telefono,
-            setter: (v: string) => setTelefono(v.replace(/\D/g, "")),
-            type: "tel",
-            maxLength: 10,
-          },
-          {
-            label: "Concepto",
-            value: concepto,
-            setter: setConcepto,
-            type: "text",
-          },
-        ].map(({ label, value, setter, type, maxLength }) => (
-          <div key={label} className="space-y-1">
-            <label className="text-sm font-medium text-[#708090]">
-              {label}
-            </label>
-            <input
-              type={type}
-              value={value}
-              maxLength={maxLength}
-              onChange={e => setter(e.target.value)}
-              className="w-full p-3 rounded-xl border border-[#8C8976]/40 bg-[#f6f4ef] text-[#3F3A34] focus:outline-none focus:ring-2 focus:ring-[#B76379] transition"
-            />
-          </div>
-        ))}
+        <div className="space-y-4">
+          {[
+            {
+              label: "Nombre del cliente",
+              value: nombre,
+              setter: setNombre,
+              type: "text",
+              placeholder: "Ej: Juan Pérez"
+            },
+            {
+              label: "Teléfono",
+              value: telefono,
+              setter: (v: string) => setTelefono(v.replace(/\D/g, "")),
+              type: "tel",
+              maxLength: 10,
+              placeholder: "10 dígitos"
+            },
+            {
+              label: "Concepto de deuda",
+              value: concepto,
+              setter: setConcepto,
+              type: "text",
+              placeholder: "Ej: Venta de joyería"
+            },
+          ].map(({ label, value, setter, type, maxLength, placeholder }) => (
+            <div key={label} className="space-y-1.5">
+              <label 
+                className="text-xs font-bold text-[#708090] uppercase tracking-widest ml-1"
+                style={{ fontFamily: "var(--font-marcellus)" }}
+              >
+                {label}
+              </label>
+              <input
+                type={type}
+                value={value}
+                maxLength={maxLength}
+                placeholder={placeholder}
+                onChange={e => setter(e.target.value)}
+                className="w-full p-4 rounded-2xl border border-[#8c8976]/20 bg-[#fcfbf9] text-[#3F3A34] focus:outline-none focus:ring-4 focus:ring-[#b76e79]/5 focus:border-[#b76e79] transition-all"
+                style={{ fontFamily: "var(--font-poppins)" }}
+              />
+            </div>
+          ))}
 
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-[#708090]">
-            Monto inicial
-          </label>
-          <input
-            type="number"
-            value={monto}
-            min={1}
-            onChange={e => setMonto(Number(e.target.value))}
-            placeholder="0.00"
-            className="w-full p-3 rounded-xl border border-[#8C8976]/40 bg-[#f6f4ef] text-[#3F3A34] focus:outline-none focus:ring-2 focus:ring-[#B76379] transition"
-          />
+          <div className="space-y-1.5">
+            <label 
+              className="text-xs font-bold text-[#708090] uppercase tracking-widest ml-1"
+              style={{ fontFamily: "var(--font-marcellus)" }}
+            >
+              Monto Inicial
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8c8976] font-bold">$</span>
+              <input
+                type="number"
+                value={monto}
+                min={1}
+                onChange={e => setMonto(Number(e.target.value))}
+                placeholder="0.00"
+                className="w-full p-4 pl-8 rounded-2xl border border-[#8c8976]/20 bg-[#fcfbf9] text-[#3F3A34] font-semibold focus:outline-none focus:ring-4 focus:ring-[#b76e79]/5 focus:border-[#b76e79] transition-all"
+                style={{ fontFamily: "var(--font-poppins)" }}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-[#708090] text-[#f6f4ef] hover:opacity-90 transition"
+            className="px-8 py-3.5 rounded-2xl bg-[#f6f4ef] text-[#708090] font-bold hover:bg-[#8c8976]/10 transition-all active:scale-95"
+            style={{ fontFamily: "var(--font-marcellus)" }}
           >
             Cancelar
           </button>
           <button
             onClick={handleGuardar}
             disabled={loading}
-            className="px-5 py-2 rounded-xl bg-[#B76379] text-[#f6f4ef] hover:scale-105 transition disabled:opacity-40"
+            className="px-8 py-3.5 rounded-2xl bg-[#b76e79] text-white font-bold shadow-[0_10px_20px_-5px_rgba(183,110,121,0.4)] hover:bg-[#a55a65] hover:shadow-lg transition-all active:scale-95 disabled:opacity-40"
+            style={{ fontFamily: "var(--font-marcellus)" }}
           >
-            {loading ? "Guardando..." : "Guardar"}
+            {loading ? "Procesando..." : "Registrar Todo"}
           </button>
         </div>
       </div>

@@ -128,7 +128,7 @@ export default function MaterialsPage() {
           <header className="space-y-4">
             <div className="flex items-center gap-4">
               <span className="h-px w-12 bg-[#b76e79]" />
-              <span className="text-[0.65rem] tracking-[0.18em] uppercase text-[#8c9768] font-medium font-sans">
+              <span className="text-[0.65rem] font-medium text-[#8c9768] uppercase tracking-[0.18em] font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>
                 Inventario
               </span>
             </div>

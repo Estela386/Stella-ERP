@@ -20,9 +20,9 @@ const CARD: React.CSSProperties = {
 };
 
 const SECTION_LABEL: React.CSSProperties = {
-  fontFamily: "var(--font-sans, Inter, sans-serif)",
-  fontSize: "0.6rem", fontWeight: 700,
-  letterSpacing: "0.13em", textTransform: "uppercase",
+  fontFamily: "var(--font-marcellus)",
+  fontSize: "0.75rem", fontWeight: 400,
+  letterSpacing: "0.15em", textTransform: "uppercase",
   color: "#8C9796",
   margin: "0 0 12px",
 };
@@ -76,7 +76,7 @@ export default function SideWidgets() {
               }} />
               <div>
                 <p style={{
-                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontFamily: "var(--font-sans)",
                   fontSize: "0.74rem", fontWeight: i === 0 ? 600 : 400,
                   color: i === 0 ? "#1C1C1C" : "#708090",
                   margin: 0,
@@ -84,7 +84,7 @@ export default function SideWidgets() {
                   {ev.title}
                 </p>
                 <p style={{
-                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontFamily: "var(--font-sans)",
                   fontSize: "0.62rem",
                   color: i === 0 ? "#B76E79" : "#8C9796",
                   margin: "1px 0 0",

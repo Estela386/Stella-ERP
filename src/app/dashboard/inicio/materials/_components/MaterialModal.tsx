@@ -87,10 +87,10 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
         </button>
 
         <header className="space-y-1">
-          <p className="text-[#8c9768] text-[0.65rem] font-medium uppercase tracking-[0.18em] font-sans">
+          <p className="text-[#8c9768] text-[0.65rem] font-medium uppercase tracking-[0.18em] font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>
             Detalle de Inventario
           </p>
-          <h2 className="text-3xl font-sans font-bold text-[#4a5568] tracking-tight">
+          <h2 className="text-3xl font-serif font-bold text-[#4a5568] tracking-tight">
             {material.nombre} <em className="text-[#b76e79] not-italic">Material</em>
           </h2>
         </header>
@@ -98,7 +98,7 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
           {/* Nombre */}
           <div className="space-y-1.5 md:col-span-2">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>
               Nombre
             </label>
             <input
@@ -110,7 +110,7 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
 
           {/* Tipo (Select) */}
           <div className="space-y-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Categoría</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Categoría</label>
             <select
               value={form.tipo}
               onChange={e => handleChange("tipo", e.target.value)}
@@ -124,7 +124,7 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Unidad</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Unidad</label>
             <select
               value={form.unidad_medida}
               onChange={e => handleChange("unidad_medida", e.target.value)}
@@ -139,7 +139,7 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
 
           {/* Precio */}
           <div className="space-y-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>
               Precio unitario (Costo)
             </label>
             <input
@@ -152,7 +152,7 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
 
           {/* Precio Sugerido */}
           <div className="space-y-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans font-bold">
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif font-extrabold" style={{ fontFamily: "var(--font-marcellus)" }}>
               Venta Sugerida (+50%)
             </label>
             <div className="w-full border border-[rgba(112,128,144,0.15)] rounded-[6px] px-4 py-2.5 text-sm text-[#708090] font-bold bg-[#708090]/5 font-sans">
@@ -162,7 +162,7 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
 
           {/* Stock Actual */}
           <div className="space-y-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>
               Stock actual
             </label>
             <input
@@ -175,7 +175,7 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
 
           {/* Stock Mínimo */}
           <div className="space-y-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>
               Stock mínimo (Alerta)
             </label>
             <input
@@ -188,7 +188,7 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
 
           {/* Proveedor */}
           <div className="space-y-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Proveedor</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Proveedor</label>
             <select
               value={form.id_proveedor || ""}
               onChange={e => handleChange("id_proveedor", e.target.value ? Number(e.target.value) : undefined)}
@@ -206,8 +206,8 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
         <section className="space-y-4 pt-4 border-t border-[rgba(112,128,144,0.12)]">
           <div className="flex items-center gap-2">
             <FiPackage className="text-[#b76e79]" />
-            <h3 className="text-sm font-bold text-[#4a5568] font-sans">Productos Vinculados</h3>
-            <span className="bg-[#f6f4ef] text-[#708090] text-[0.65rem] px-2 py-0.5 rounded-full font-bold">
+            <h3 className="text-sm font-bold text-[#4a5568] font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Productos Vinculados</h3>
+            <span className="bg-[#f6f4ef] text-[#708090] text-[0.65rem] px-2 py-0.5 rounded-full font-serif font-extrabold" style={{ fontFamily: "var(--font-marcellus)" }}>
               {productosRelacionados.length}
             </span>
           </div>
@@ -223,16 +223,16 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="bg-[#f6f4ef]/50 border-b border-[rgba(112,128,144,0.05)]">
-                    <th className="px-4 py-2.5 font-bold text-[#708090] uppercase tracking-tighter">Producto</th>
-                    <th className="px-4 py-2.5 font-bold text-[#708090] uppercase tracking-tighter text-right">Cantidad</th>
-                    <th className="px-4 py-2.5 font-bold text-[#708090] uppercase tracking-tighter">Variante</th>
+                    <th className="px-4 py-2.5 font-bold text-[#708090] uppercase tracking-tighter font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Producto</th>
+                    <th className="px-4 py-2.5 font-bold text-[#708090] uppercase tracking-tighter text-right font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Cantidad</th>
+                    <th className="px-4 py-2.5 font-bold text-[#708090] uppercase tracking-tighter font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Variante</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[rgba(112,128,144,0.05)] bg-white/30">
                   {productosRelacionados.map((rel, idx) => (
                     <tr key={idx} className="hover:bg-white/60 transition-colors">
-                      <td className="px-4 py-3 font-medium text-[#4a5568]">{rel.producto?.nombre}</td>
-                      <td className="px-4 py-3 text-right font-bold text-[#b76e79]">
+                      <td className="px-4 py-3 font-medium text-[#4a5568] font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>{rel.producto?.nombre}</td>
+                      <td className="px-4 py-3 text-right font-bold text-[#b76e79] font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>
                         {rel.cantidad_necesaria} {material.unidad_medida}
                       </td>
                       <td className="px-4 py-3 text-[0.65rem] text-[#708090]">

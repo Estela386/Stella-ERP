@@ -1,12 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import SidebarMenu from "@/app/_components/SideBarMenu";
 import NuevaVentaHeader from "./_components/NuevaVentaHeader";
 import VentaInfoForm from "./_components/VentaInfoForm";
 import ProductosVenta from "./_components/ProductosVenta";
 import VentaResumen from "./_components/VentaResumen";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { createClient } from "@/utils/supabase/client";
+
+function PedidoHydrator({
+  onLoaded,
+  onLoading,
+}: {
+  onLoaded: (productos: any[]) => void;
+  onLoading: () => void;
+}) {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("pedidoId");
+
+  useEffect(() => {
+    if (id) {
+      onLoading();
+      const load = async () => {
+        try {
+          const supabase = createClient();
+          const SELECT_FULL = `*, usuario:usuario(id, nombre, correo, id_rol), detalles:pedido_detalle(id, id_producto, cantidad, precio_unitario, subtotal, producto:producto(id, nombre, url_imagen))`;
+          const { data, error } = await supabase
+            .from('pedidos')
+            .select(SELECT_FULL)
+            .eq('id', id)
+            .single();
+
+          if (data && data.detalles) {
+            const mapped = data.detalles.map((det: any) => ({
+              id: det.id_producto,
+              nombre: det.producto?.nombre || "Producto de Pedido",
+              precio: det.precio_unitario,
+              cantidad: det.cantidad,
+            }));
+            onLoaded(mapped);
+          } else if (error) {
+            console.error("Error cargando pedido base:", error);
+          }
+        } catch (err) {
+          console.error("Excepción cargando pedido:", err);
+        }
+      };
+      load();
+    }
+  }, [id]);
+
+  return null;
+}
 
 export type Producto = {
   id: number;
@@ -17,12 +64,15 @@ export type Producto = {
   categoria_nombre?: string;
   partes_seleccionadas?: string[];
   opciones?: any[];
+  es_consignado?: boolean;
+  id_consignacion_detalle?: number;
 };
 
 interface Cliente {
   id: number;
   nombre: string;
   telefono: string;
+  id_usuario?: number;
 }
 
 interface ProductoDisponible {
@@ -32,6 +82,8 @@ interface ProductoDisponible {
   stock?: number;
   categoria_nombre?: string;
   opciones?: any[];
+  es_consignado?: boolean;
+  id_consignacion_detalle?: number;
 }
 
 export default function NuevaVentaPage() {
@@ -40,6 +92,9 @@ export default function NuevaVentaPage() {
   const [clienteSeleccionado, setClienteSeleccionado] =
     useState<Cliente | null>(null);
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
+  const [cargandoPedido, setCargandoPedido] = useState(false);
+
+  // La hidratación ocurre ahora de forma reactiva gracias a PedidoHydrator
 
   const agregarProducto = (productoDisponible: ProductoDisponible) => {
     setProductos(prev => {
@@ -85,6 +140,8 @@ export default function NuevaVentaPage() {
             categoria_nombre: productoDisponible.categoria_nombre,
             partes_seleccionadas: esJuego ? componentes : undefined,
             opciones: productoDisponible.opciones,
+            es_consignado: productoDisponible.es_consignado,
+            id_consignacion_detalle: productoDisponible.id_consignacion_detalle,
           },
         ];
       }
@@ -146,17 +203,31 @@ export default function NuevaVentaPage() {
                 Gestión
               </span>
             </div>
+            {cargandoPedido && (
+              <p className="text-xs text-[#708090] animate-pulse">
+                Cargando productos del pedido...
+              </p>
+            )}
+            <Suspense fallback={null}>
+              <PedidoHydrator 
+                onLoading={() => setCargandoPedido(true)} 
+                onLoaded={(prods) => { setProductos(prods); setCargandoPedido(false); }} 
+              />
+            </Suspense>
           </header>
 
           <NuevaVentaHeader />
 
           <VentaInfoForm
+            usuario={usuario}
             onClienteChange={setClienteSeleccionado}
             onFechaChange={setFecha}
           />
 
           <ProductosVenta
             productos={productos}
+            clienteSeleccionado={clienteSeleccionado}
+            usuario={usuario}
             onAgregar={agregarProducto}
             onEliminar={eliminarProducto}
             onAumentar={aumentarCantidad}
@@ -170,6 +241,7 @@ export default function NuevaVentaPage() {
             vendedor={usuario?.nombre || "Usuario actual"}
             idUsuario={usuario?.id || ""}
             fecha={fecha}
+            esVentaMayorista={usuario?.id_rol === 1 && !!clienteSeleccionado?.id_usuario}
             onConfirmed={handleVentaConfirmada}
           />
         </div>

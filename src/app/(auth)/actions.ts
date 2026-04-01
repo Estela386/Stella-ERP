@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@utils/supabase/server";
 
-export async function login(formData: FormData) {
+export async function login(prevState: any, formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
@@ -14,7 +14,7 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    redirect("/login?error=invalid_credentials");
+    return { success: false, message: "Correo o contraseña incorrectos" };
   }
 
   // Obtener el id_rol del usuario
@@ -36,7 +36,7 @@ export async function login(formData: FormData) {
     case 2: // Cliente
       redirect("/dashboard/cliente");
     case 3: // Mayorista
-      redirect("/dashboard/inicio");
+      redirect("/dashboard/cliente");
     default:
       redirect("/dashboard/cliente");
   }

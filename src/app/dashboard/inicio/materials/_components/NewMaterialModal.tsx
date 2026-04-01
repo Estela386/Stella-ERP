@@ -85,10 +85,10 @@ export default function NewMaterialModal({ onClose, onCreated }: Props) {
         </button>
 
         <header className="space-y-1">
-          <p className="text-[#8c9768] text-[0.65rem] font-medium uppercase tracking-[0.18em] font-sans">
+          <p className="text-[#8c9768] text-[0.65rem] font-medium uppercase tracking-[0.18em] font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>
             Materia Prima
           </p>
-            <h2 className="text-3xl font-sans font-bold text-[#4a5568] tracking-tight">
+            <h2 className="text-3xl font-serif font-bold text-[#4a5568] tracking-tight">
               Nuevo <em className="text-[#b76e79] not-italic">Material</em>
             </h2>
         </header>
@@ -102,7 +102,7 @@ export default function NewMaterialModal({ onClose, onCreated }: Props) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
           {/* Nombre */}
           <div className="flex flex-col gap-1.5 md:col-span-2">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Nombre del material</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Nombre del material</label>
             <input
               value={form.nombre}
               onChange={e => handleChange("nombre", e.target.value)}
@@ -113,7 +113,7 @@ export default function NewMaterialModal({ onClose, onCreated }: Props) {
 
           {/* Tipo (Select) */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Categoría</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Categoría</label>
             <select
               value={form.tipo}
               onChange={e => handleChange("tipo", e.target.value)}
@@ -127,7 +127,7 @@ export default function NewMaterialModal({ onClose, onCreated }: Props) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Unidad de Medida</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Unidad de Medida</label>
             <select
               value={form.unidad_medida}
               onChange={e => handleChange("unidad_medida", e.target.value)}
@@ -142,7 +142,7 @@ export default function NewMaterialModal({ onClose, onCreated }: Props) {
 
           {/* Stock Actual */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Stock Inicial</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Stock Inicial</label>
             <input
               type="number"
               value={form.cantidad}
@@ -153,7 +153,7 @@ export default function NewMaterialModal({ onClose, onCreated }: Props) {
 
           {/* Stock Mínimo */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Stock Mínimo (Alerta)</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Stock Mínimo (Alerta)</label>
             <input
               type="number"
               value={form.stock_minimo}
@@ -164,7 +164,7 @@ export default function NewMaterialModal({ onClose, onCreated }: Props) {
 
           {/* Precio */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Precio de Compra</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Precio de Compra</label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
               <input
@@ -178,7 +178,7 @@ export default function NewMaterialModal({ onClose, onCreated }: Props) {
 
           {/* Precio Sugerido */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Venta Sugerida (+50%)</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Venta Sugerida (+50%)</label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#708090] text-sm opacity-60">$</span>
               <div className="w-full border border-[rgba(112,128,144,0.15)] rounded-[6px] pl-8 pr-4 py-2.5 text-sm text-[#708090] font-bold bg-[#708090]/5 font-sans">
@@ -189,7 +189,7 @@ export default function NewMaterialModal({ onClose, onCreated }: Props) {
 
           {/* Proveedor */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-sans">Proveedor Asignado</label>
+            <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Proveedor Asignado</label>
             <select
               value={form.id_proveedor || ""}
               onChange={e => handleChange("id_proveedor", e.target.value ? Number(e.target.value) : undefined)}
