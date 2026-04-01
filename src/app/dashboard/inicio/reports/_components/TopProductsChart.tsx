@@ -1,31 +1,39 @@
 "use client";
 
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
 } from "recharts";
 
 const PRODUCTOS = [
   { nombre: "Anillo Solitario Oro 14k", ventas: 157500 },
-  { nombre: "Pulsera Tennis",           ventas: 114400 },
-  { nombre: "Collar Perlas Naturales",  ventas: 88200  },
-  { nombre: "Aretes Perla Premium",     ventas: 72600  },
-  { nombre: "Dije Oro Rosado",          ventas: 54100  },
+  { nombre: "Pulsera Tennis", ventas: 114400 },
+  { nombre: "Collar Perlas Naturales", ventas: 88200 },
+  { nombre: "Aretes Perla Premium", ventas: 72600 },
+  { nombre: "Dije Oro Rosado", ventas: 54100 },
 ];
 
 const COLORS = ["#708090", "#8a9ab0", "#a4b4c0", "#b07830", "#B76E79"];
 
 export default function TopProductsChart() {
   return (
-    <div style={{
-      background: "#fff",
-      border: "1px solid rgba(112,128,144,0.11)",
-      borderTop: "3px solid #b07830",
-      borderRadius: 14,
-      padding: "16px 18px",
-      boxShadow: "0 1px 6px rgba(112,128,144,0.07)",
-      boxSizing: "border-box",
-    }}>
+    <div
+      style={{
+        background: "#fff",
+        border: "1px solid rgba(112,128,144,0.11)",
+        borderTop: "3px solid #b07830",
+        borderRadius: 14,
+        padding: "16px 18px",
+        boxShadow: "0 1px 6px rgba(112,128,144,0.07)",
+        boxSizing: "border-box",
+      }}
+    >
       <div style={{ marginBottom: 14 }}>
         <h3 style={{
           fontFamily: "var(--font-marcellus)",
@@ -48,7 +56,11 @@ export default function TopProductsChart() {
           margin={{ top: 0, right: 20, left: 0, bottom: 0 }}
           barSize={16}
         >
-          <CartesianGrid stroke="#F0EDE8" strokeDasharray="3 3" horizontal={false} />
+          <CartesianGrid
+            stroke="#F0EDE8"
+            strokeDasharray="3 3"
+            horizontal={false}
+          />
           <XAxis
             type="number"
             tickFormatter={v => `$${(v / 1000).toFixed(0)}k`}
@@ -64,7 +76,8 @@ export default function TopProductsChart() {
           <Tooltip
             formatter={(v: any) => [`$${(v || 0).toLocaleString("es-MX")}`, "Ingresos"]}
             contentStyle={{
-              background: "#fff", borderRadius: 10,
+              background: "#fff",
+              borderRadius: 10,
               border: "1px solid #F0EDE8",
               boxShadow: "0 4px 14px rgba(112,128,144,0.18)",
               fontFamily: "var(--font-poppins)", fontSize: 12,

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ResetLayout from "../_components/ResetLayout";
 import NewPasswordCard from "../_components/NewPasswordCard";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [validToken, setValidToken] = useState(false);
@@ -60,5 +60,13 @@ export default function ResetPasswordPage() {
     <ResetLayout>
       <NewPasswordCard />
     </ResetLayout>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Validando token...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

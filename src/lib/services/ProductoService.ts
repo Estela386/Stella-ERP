@@ -120,7 +120,19 @@ export class ProductoService {
     // Crear instancia temporal para validar
     const productoTemp = new Producto({
       id: 0, // ID temporal
-      ...data,
+      nombre: data.nombre,
+      precio: data.precio,
+      costo: data.costo ?? null,
+      costo_mayorista: data.costo_mayorista ?? null,
+      tiempo: data.tiempo ?? null,
+      stock_actual: data.stock_actual ?? null,
+      stock_min: data.stock_min ?? null,
+      url_imagen: data.url_imagen ?? null,
+      id_categoria: data.id_categoria ?? null,
+      descripcion: data.descripcion ?? null,
+      es_personalizable: data.es_personalizable,
+      tipo: data.tipo,
+      producto_material: [],
     });
 
     const validacion = productoTemp.validar();

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import ResetLayout from "./_components/ResetLayout";
 import RequestEmailCard from "./_components/RequestEmailCard";
 import EmailSentModal from "./_components/EmailSentModal";
 import NewPasswordCard from "./_components/NewPasswordCard";
 
-export default function ResetPassPage() {
+function ResetPassContent() {
   const [showModal, setShowModal] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,5 +78,13 @@ export default function ResetPassPage() {
         />
       )}
     </ResetLayout>
+  );
+}
+
+export default function ResetPassPageContent() {
+  return (
+    <Suspense fallback={<div>Cargando resetPass...</div>}>
+      <ResetPassContent />
+    </Suspense>
   );
 }

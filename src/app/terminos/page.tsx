@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { TerminosPageData } from "./type";
 import TerminosContent from "./_componentes/TerminosContent";
 
@@ -362,7 +363,7 @@ const terminosData: TerminosPageData = {
           type: "list",
           items: [
             "Correo: contacto@stellajoyeria.com",
-            "Plataforma: sección \"Contacto\" en el menú principal",
+            'Plataforma: sección "Contacto" en el menú principal',
             "Dirección: Guadalajara, Jalisco, México",
           ],
         },
@@ -380,5 +381,11 @@ export const metadata = {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function TerminosPage() {
-  return <TerminosContent data={terminosData} />;
+  return (
+    <Suspense
+      fallback={<div className="p-8 text-center">Cargando términos...</div>}
+    >
+      <TerminosContent data={terminosData} />
+    </Suspense>
+  );
 }

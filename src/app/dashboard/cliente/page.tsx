@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import HeaderClient from "@/app/(auth)/_components/HeaderClient";
 import HeroSection from "./_components/HeroSection";
 import ProductGrid from "./_components/ProductGrid";
@@ -10,7 +11,9 @@ export default function ClientDashboard() {
   const { usuario } = useAuth();
   return (
     <div className="min-h-screen bg-white">
-      <HeaderClient user={usuario} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <HeaderClient user={usuario} />
+      </Suspense>
       <ChatbotPage />
       <HeroSection />
       <ProductGrid />

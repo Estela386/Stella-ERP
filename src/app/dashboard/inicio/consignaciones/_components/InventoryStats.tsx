@@ -1,12 +1,12 @@
-import { Consignacion } from "../type";
+import { IConsignacion } from "../type";
 
 export default function InventoryStats({
   consignaciones,
 }: {
-  consignaciones: Consignacion[];
+  consignaciones: IConsignacion[];
 }) {
-  const activas = consignaciones.filter(c => c.estado === "ACTIVA").length;
-  const vencidas = consignaciones.filter(c => c.estado === "VENCIDA").length;
+  const activas = consignaciones.filter(c => c.estado === "activa").length;
+  const vencidas = consignaciones.filter(c => c.estado === "finalizada").length;
 
   return (
     <div className="grid grid-cols-3 gap-4">
