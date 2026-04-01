@@ -10,7 +10,11 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-
+const formatMoney = (value: number | string | undefined) => {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "$0";
+  return `$${num.toLocaleString("es-MX")}`;
+};
 const PRODUCTOS = [
   { nombre: "Anillo Solitario Oro 14k", ventas: 157500 },
   { nombre: "Pulsera Tennis", ventas: 114400 },
@@ -94,10 +98,14 @@ export default function TopProductsChart() {
             width={148}
           />
           <Tooltip
-            formatter={(v: number | undefined) => [
-              v !== undefined ? `$${v.toLocaleString("es-MX")}` : "$0",
-              "Ingresos",
-            ]}
+            formatter={(value, name) => {
+              const typedValue =
+                Array.isArray(value) && value.length > 0 ? value[0] : value;
+              return [
+                formatMoney(typedValue as number | string | undefined),
+                name ? String(name) : "Ingresos",
+              ];
+            }}
             contentStyle={{
               background: "#fff",
               borderRadius: 10,
