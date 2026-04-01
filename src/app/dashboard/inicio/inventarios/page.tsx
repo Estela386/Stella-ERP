@@ -10,7 +10,7 @@ import ProductModalForm from "./_components/ProductModalForm";
 import CategoryModal from "./_components/CategoryModal";
 import LabelPrintModal from "./_components/LabelPrintModal";
 import { Producto } from "./type";
-import ProductForm, { type OpcionForm } from "./_components/ProductForm";
+import { type OpcionForm } from "./_components/ProductForm";
 import { FileText } from "lucide-react";
 
 import {

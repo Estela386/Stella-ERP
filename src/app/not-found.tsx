@@ -2,6 +2,7 @@ import Header from "@auth/_components/Header";
 import Footer from "@auth/_components/Footer";
 import Image from "next/image";
 import Link from "next/link";
+import logo from "@assets/logo.png";
 
 export default function NotFoundPage() {
   return (
@@ -10,7 +11,7 @@ export default function NotFoundPage() {
       <main className="flex-1 flex flex-col items-center justify-center">
         <div className="flex flex-col items-center mb-8">
           <Image
-            src="/logo.png"
+            src={logo}
             alt="Stella Logo"
             width={96}
             height={96}

@@ -94,8 +94,8 @@ export default function SalesChart() {
             width={42}
           />
           <Tooltip
-            formatter={(v: number | undefined, name: string | undefined) => [
-              v !== undefined ? `$${v.toLocaleString("es-MX")}` : "$0",
+            formatter={(value: any, name: any) => [
+              value !== undefined && typeof value === 'number' ? `$${value.toLocaleString("es-MX")}` : "$0",
               name === "ingresos" ? "Ingresos" : "Costos",
             ]}
             contentStyle={{

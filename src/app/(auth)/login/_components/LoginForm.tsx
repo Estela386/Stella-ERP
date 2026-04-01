@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { login } from "@auth/actions";
-import { Facebook, Mail, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface LoginFormProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;

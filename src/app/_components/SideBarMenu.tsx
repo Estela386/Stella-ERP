@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import logo from "@assets/logo.png";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -142,7 +143,7 @@ export default function SidebarMenu() {
           {/* Logo imagen + label — solo md+ */}
           <div className="hidden md:block" style={{ textAlign: "center" }}>
             <Image
-              src="/logo.png"
+              src={logo}
               alt="Stella Logo"
               width={120}
               height={120}

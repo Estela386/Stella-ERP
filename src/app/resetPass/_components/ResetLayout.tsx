@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import logo from "@assets/logo.png";
 
 export default function ResetLayout({
   children,
@@ -96,7 +97,7 @@ export default function ResetLayout({
           {/* Logo + tagline */}
           <div className="relative z-10 flex flex-col items-center gap-3 text-center px-10">
             <Image
-              src="/logo.png"
+              src={logo}
               alt="Stella"
               width={400}
               height={400}

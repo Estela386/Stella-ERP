@@ -26,16 +26,21 @@
       "@components/*": ["./src/app/_components/*"],
       "@utils/*": ["./src/utils/*"],
       "@auth/*": ["./src/app/(auth)/*"],
-      "@lib/*": ["./src/lib/*"]
+      "@lib/*": ["./src/lib/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@services/*": ["./src/services/*"],
+      "@types/*": ["./src/types/*"],
+      "@public/*": ["./src/public/*"]
     }
   },
   "include": [
-    "src/next-env.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "src/**/*.mts"
-  ],
+    "**/*.mts"
+, "./middleware.ts", "./next.config.ts"  ],
   "exclude": ["node_modules"]
 }
