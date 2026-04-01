@@ -9,6 +9,7 @@ import { useCart } from "@lib/hooks/useCart";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
+import SimilarProducts from "./_components/SimilarProducts";
 
 interface ProductoClientProps {
   id: string;
@@ -259,9 +260,30 @@ export default function ProductoClient({ id }: ProductoClientProps) {
       }}
     >
       <style>{`
-                @keyframes fadeIn {
+        @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        .main-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 60px;
+          align-items: start;
+        }
+        .sticky-container {
+          position: sticky;
+          top: 100px;
+        }
+        @media (max-width: 768px) {
+          .main-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+          }
+          .sticky-container {
+            position: relative !important;
+            top: 0 !important;
+            margin-bottom: 20px;
+          }
         }
       `}</style>
 
@@ -277,16 +299,9 @@ export default function ProductoClient({ id }: ProductoClientProps) {
           animation: "fadeIn 0.8s ease-out",
         }}
       >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
-            gap: 60,
-            alignItems: "start",
-          }}
-        >
+        <div className="main-grid">
           {/* Columna Izquierda: Imagen */}
-          <div style={{ position: "sticky", top: 100 }}>
+          <div className="sticky-container">
             <div
               style={{
                 position: "relative",
@@ -1090,6 +1105,16 @@ export default function ProductoClient({ id }: ProductoClientProps) {
           </div>
         </div>
       </main>
+
+      {/* CARRUSEL DE PRODUCTOS SIMILARES */}
+      {producto?.id_categoria && (
+        <div className="pb-20">
+          <SimilarProducts 
+            id_categoria={producto.id_categoria} 
+            currentProductId={id} 
+          />
+        </div>
+      )}
 
       <Footer />
     </div>

@@ -10,16 +10,19 @@ interface Cliente {
   id: number;
   nombre: string;
   telefono: string;
+  id_usuario?: number;
 }
 
 interface VentaInfoFormProps {
   onClienteChange?: (cliente: Cliente) => void;
   onFechaChange?: (fecha: string) => void;
+  usuario: any;
 }
 
 export default function VentaInfoForm({
   onClienteChange,
   onFechaChange,
+  usuario,
 }: VentaInfoFormProps) {
   const hoy = new Date().toISOString().split("T")[0];
 
@@ -48,20 +51,23 @@ export default function VentaInfoForm({
           console.error(error);
           setClientes([]);
         } else {
-          setClientes(
-            clientesData.map(c => ({
-              id: c.id,
-              nombre: c.nombre,
-              telefono: c.telefono,
-            }))
-          );
-          setClientesFiltrados(
-            clientesData.map(c => ({
-              id: c.id,
-              nombre: c.nombre,
-              telefono: c.telefono,
-            }))
-          );
+          // Filtrar clientes si el usuario es mayorista (rol 3)
+          const esMayorista = usuario?.id_rol === 3;
+          const userIntId = usuario?.id ? parseInt(usuario.id, 10) : null;
+          
+          const filtrados = esMayorista
+            ? clientesData.filter(c => (c as any).id_usuario === userIntId)
+            : clientesData;
+
+          const mapped = filtrados.map(c => ({
+            id: c.id,
+            nombre: c.nombre,
+            telefono: c.telefono,
+            id_usuario: (c as any).id_usuario,
+          }));
+
+          setClientes(mapped);
+          setClientesFiltrados(mapped);
         }
       } catch (err) {
         console.error(err);
@@ -71,7 +77,7 @@ export default function VentaInfoForm({
     };
 
     cargarClientes();
-  }, []);
+  }, [usuario?.id]);
 
   // Filtrar clientes por búsqueda
   useEffect(() => {
@@ -182,7 +188,7 @@ export default function VentaInfoForm({
 
               {/* Dropdown */}
               {showDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-[#B76E79]/50 rounded-xl shadow-lg z-10">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-[#B76E79]/30 rounded-2xl shadow-xl z-[60] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                   {/* Búsqueda */}
                   <div className="p-3 border-b border-[#8C9796]/20">
                     <div className="relative">
@@ -289,6 +295,7 @@ export default function VentaInfoForm({
       {/* Modal */}
       <CreateClientModal
         isOpen={showModal}
+        usuarioId={usuario?.id}
         onClose={() => setShowModal(false)}
         onCreated={handleClienteCreated}
         error={modalError}

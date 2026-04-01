@@ -10,6 +10,7 @@ export interface ProductoEnVenta {
   cantidad: number;
   descuento_aplicado?: number | null;
   personalizacion?: any | null;
+  id_consignacion_detalle?: number;
 }
 
 /**
@@ -127,6 +128,7 @@ export class VentaService {
           cantidad: prod.cantidad,
           id_producto: prod.id_producto,
           personalizacion: prod.personalizacion || null,
+          id_consignacion_detalle: prod.id_consignacion_detalle || null,
         });
       }
 
@@ -198,9 +200,59 @@ export class VentaService {
           montoPagado,
           "Venta registrada"
         );
+
+        // 6. Si hay productos en consignación, actualizar el detalle de consignación y stock consignado
+        for (const prod of productos) {
+          if (prod.id_consignacion_detalle) {
+            // Obtener el detalle de consignación actual
+            const { data: detail, error: detailErr } = await this.client
+              .from("consignacion_detalle")
+              .select("cantidad_vendida, id_producto")
+              .eq("id", prod.id_consignacion_detalle)
+              .single();
+
+            if (!detailErr && detail) {
+              // Incrementar cantidad vendida en consignación
+              const nuevaCantidadVendida = (detail.cantidad_vendida || 0) + prod.cantidad;
+              await this.client
+                .from("consignacion_detalle")
+                .update({ cantidad_vendida: nuevaCantidadVendida })
+                .eq("id", prod.id_consignacion_detalle);
+
+              // Decrementar stock_consignado en el producto
+              const { data: prodData } = await this.client
+                .from("producto")
+                .select("stock_consignado")
+                .eq("id", prod.id_producto)
+                .single();
+
+              if (prodData) {
+                const nuevoStockConsignado = Math.max(0, (prodData.stock_consignado || 0) - prod.cantidad);
+                await this.client
+                  .from("producto")
+                  .update({ stock_consignado: nuevoStockConsignado })
+                  .eq("id", prod.id_producto);
+              }
+            }
+          } else {
+            // Venta normal: opcionalmente descontar stock_actual si no hay triggers
+            const { data: prodData } = await this.client
+              .from("producto")
+              .select("stock_actual")
+              .eq("id", prod.id_producto)
+              .single();
+              
+            if (prodData) {
+              const nuevoStock = Math.max(0, (prodData.stock_actual || 0) - prod.cantidad);
+              await this.client
+                .from("producto")
+                .update({ stock_actual: nuevoStock })
+                .eq("id", prod.id_producto);
+            }
+          }
+        }
       } catch (cuentaError) {
-        console.error("Error al crear cuenta por cobrar:", cuentaError);
-        // No interrumpimos el flujo de la venta si hay error en cuentas
+        console.error("Error al procesar inventario/cuentas:", cuentaError);
       }
 
       const venta = new Venta(ventaDataFinal as IVenta);

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@utils/supabase/client";
 import { useAuth } from "@lib/hooks/useAuth";
 import { useConsignaciones, useConsignacionesMayorista } from "@lib/hooks/useConsignaciones";
@@ -18,6 +19,19 @@ import PromoverMayoristaModal from "./_components/PromoverMayoristaModal";
 import MayoristaView from "./_components/MayoristaView";
 
 import { IConsignacion, ISolicitudMayorista } from "@lib/models";
+
+function ConsignacionHydrator({ isAdmin, onTrigger }: { isAdmin: boolean, onTrigger: (id: string) => void }) {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("pedidoId");
+
+  useEffect(() => {
+    if (isAdmin && id) {
+      onTrigger(id);
+    }
+  }, [id, isAdmin]);
+
+  return null;
+}
 
 export default function ConsignacionesPage() {
   const { usuario, loading: authLoading } = useAuth();
@@ -40,6 +54,10 @@ export default function ConsignacionesPage() {
   const usuarioId = typeof usuario?.id === "string"
     ? parseInt(usuario.id)
     : (usuario?.id as number | undefined) ?? null;
+
+  const [pedidoDeURL, setPedidoDeURL] = useState<string | null>(null);
+
+  // La hidratación de URL ahora la controla ConsignacionHydrator
 
   const adminHook = useConsignaciones();
   const mayoristaHook = useConsignacionesMayorista(isMayorista ? usuarioId : null);
@@ -188,6 +206,16 @@ export default function ConsignacionesPage() {
         <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto">
           <div className="mx-auto max-w-7xl space-y-8">
 
+            <Suspense fallback={null}>
+              <ConsignacionHydrator 
+                 isAdmin={isAdmin} 
+                 onTrigger={(id) => {
+                   setPedidoDeURL(id);
+                   setModalConsignacion(true);
+                 }} 
+              />
+            </Suspense>
+
             {/* Header */}
             <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <div className="space-y-1">
@@ -269,11 +297,12 @@ export default function ConsignacionesPage() {
         {/* Modals */}
         <CreateConsignacionModal
           open={modalConsignacion}
-          onClose={() => { setModalConsignacion(false); setEditando(null); }}
+          onClose={() => { setModalConsignacion(false); setEditando(null); setPedidoDeURL(null); }}
           onSuccess={() => adminHook.reload()}
           mayoristas={adminHook.mayoristas}
           adminId={usuarioId ?? 0}
           editando={editando}
+          pedidoBaseId={pedidoDeURL}
         />
 
         <PromoverMayoristaModal

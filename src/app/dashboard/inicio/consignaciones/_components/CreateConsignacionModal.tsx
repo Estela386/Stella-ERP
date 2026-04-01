@@ -26,6 +26,7 @@ interface CreateConsignacionModalProps {
   mayoristas: IUsuarioMayorista[];
   adminId: number;
   editando?: IConsignacion | null;
+  pedidoBaseId?: string | null;
 }
 
 const campo = (label: string, children: React.ReactNode) => (
@@ -66,6 +67,7 @@ export default function CreateConsignacionModal({
   mayoristas,
   adminId,
   editando,
+  pedidoBaseId,
 }: CreateConsignacionModalProps) {
   // Estado general de la consignacion
   const [form, setForm] = useState({
@@ -87,20 +89,66 @@ export default function CreateConsignacionModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar productos
+  // Cargar productos y posible pedido
   useEffect(() => {
     if (!open) return;
     const load = async () => {
+      setLoading(true);
       const supabase = createClient();
       const { data } = await supabase
         .from("producto")
         .select("id, nombre, precio, stock_actual")
         .gt("stock_actual", 0)
         .order("nombre");
-      setProductosDisponibles((data as ProductoBasico[]) ?? []);
+      const disponibles = (data as ProductoBasico[]) ?? [];
+      setProductosDisponibles(disponibles);
+
+      // Revisar si venimos de un pedido pasador por PROPS para auto-llenar
+      if (pedidoBaseId && !editando) {
+        try {
+          const SELECT_FULL = `*, usuario:usuario(id, nombre, correo, id_rol), detalles:pedido_detalle(id, id_producto, cantidad, precio_unitario, subtotal, producto:producto(id, nombre, url_imagen))`;
+          const { data, error } = await supabase
+            .from('pedidos')
+            .select(SELECT_FULL)
+            .eq('id', pedidoBaseId)
+            .single();
+
+          if (data) {
+            // Asignar el mayorista automáticamente si corresponde
+            if (data.id_usuario) {
+              setForm(f => ({ ...f, id_mayorista: String(data.id_usuario) }));
+            }
+            // Mapear los detalles del pedido a productos seleccionados de consignación
+            if (data.detalles) {
+              const mapped: ProductoSeleccionado[] = data.detalles.map((det: any) => {
+                const info = disponibles.find(p => p.id === det.id_producto);
+                return {
+                  id_producto: det.id_producto,
+                  productoInfo: info || {
+                    id: det.id_producto,
+                    nombre: det.producto?.nombre || "Producto desconocido",
+                    precio: det.precio_unitario,
+                    stock_actual: det.cantidad // Mocking para que no de error
+                  },
+                  cantidad: det.cantidad
+                };
+              });
+              setProductosSeleccionados(mapped);
+            }
+          } else if (error) {
+            console.error("Error al cargar productos del pedido base:", error);
+            setError("No se pudieron cargar los productos del pedido solicitado.");
+          }
+        } catch (err) {
+          console.error("Excepción al cargar productos del pedido base:", err);
+          setError("Error de red cargando pedido.");
+        }
+      }
+      
+      setLoading(false);
     };
     load();
-  }, [open]);
+  }, [open, editando, pedidoBaseId]);
 
   // Si estamos editando, rellenar form
   useEffect(() => {
@@ -113,16 +161,20 @@ export default function CreateConsignacionModal({
       });
       setProductosSeleccionados([]); // En modo edicion no editamos productos por ahora
     } else {
-      setForm({
-        id_mayorista: "",
-        fecha_inicio: new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()),
-        fecha_fin: "",
-        notas: "",
-      });
-      setProductosSeleccionados([]);
+      // Solo resetear si NO hay un pedido id pendiente de cargar
+      if (!pedidoBaseId) {
+        setForm(f => ({
+          ...f,
+          id_mayorista: "",
+          fecha_inicio: new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()),
+          fecha_fin: "",
+          notas: "",
+        }));
+        setProductosSeleccionados([]);
+      }
     }
     setError(null);
-  }, [editando, open]);
+  }, [editando, open, pedidoBaseId]);
 
   // Agregar producto a la lista
   const handleAddProducto = () => {
@@ -230,7 +282,7 @@ export default function CreateConsignacionModal({
 
   // Calculos totales
   const totalGeneralVenta = productosSeleccionados.reduce((sum, p) => sum + (p.productoInfo.precio * p.cantidad), 0);
-  const totalGeneralMayorista = productosSeleccionados.reduce((sum, p) => sum + (p.productoInfo.precio * 0.70 * p.cantidad), 0);
+  const totalGeneralMayorista = productosSeleccionados.reduce((sum, p) => sum + (p.productoInfo.precio * 0.75 * p.cantidad), 0);
 
   if (!open) return null;
 
@@ -433,7 +485,7 @@ export default function CreateConsignacionModal({
                   </thead>
                   <tbody>
                     {productosSeleccionados.map((item, i) => {
-                      const pMay = item.productoInfo.precio * 0.7;
+                      const pMay = item.productoInfo.precio * 0.75;
                       const subTotal = pMay * item.cantidad;
                       return (
                         <tr key={item.id_producto} style={{ background: i % 2 === 0 ? "#fff" : "#FAFAFA" }}>

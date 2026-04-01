@@ -9,6 +9,7 @@ import PaymentModal from "./_components/PaymentModal";
 import ClientModal from "./_components/ClientModal";
 import SidebarMenu from "@/app/_components/SideBarMenu";
 import { useCuentasPorCobrar } from "@lib/hooks/useCuentasPorCobrar";
+import { useAuth } from "@lib/hooks/useAuth";
 
 export default function AccountsPage() {
   const [openAccount, setOpenAccount] = useState(false);
@@ -17,6 +18,10 @@ export default function AccountsPage() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"pending" | "paid">("pending");
   const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null);
+
+  const { usuario, loading: authLoading } = useAuth();
+  const isAdmin = usuario?.id_rol === 1;
+  const usuarioId = typeof usuario?.id === "string" ? parseInt(usuario.id) : (usuario?.id as number | undefined) ?? null;
 
   const {
     cuentas,
@@ -34,9 +39,13 @@ export default function AccountsPage() {
     setOpenPayment(true);
   };
 
-  const filteredByTab = cuentas.filter(c => 
-    activeTab === "pending" ? c.estado !== "pagado" : c.estado === "pagado"
-  );
+  const misClientes = isAdmin ? clientes : clientes.filter(c => (c as any).id_usuario === usuarioId);
+
+  const filteredByTab = cuentas.filter(c => {
+    const isTabMatch = activeTab === "pending" ? c.estado !== "pagado" : c.estado === "pagado";
+    const isUserMatch = isAdmin ? true : (c.cliente as any)?.id_usuario === usuarioId;
+    return isTabMatch && isUserMatch;
+  });
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f6f4ef]">
@@ -130,7 +139,7 @@ export default function AccountsPage() {
       <AccountModal
         open={openAccount}
         onClose={() => setOpenAccount(false)}
-        clientes={clientes}
+        clientes={misClientes}
         onGuardar={crearCuenta}
       />
 

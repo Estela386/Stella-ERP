@@ -16,6 +16,7 @@ type Props = {
   vendedor?: string;
   idUsuario?: string;
   fecha?: string;
+  esVentaMayorista?: boolean;
   onConfirmed?: () => void;
 };
 
@@ -25,15 +26,18 @@ export default function VentaResumen({
   vendedor = "Usuario actual",
   idUsuario = "",
   fecha = new Date().toISOString().split("T")[0],
+  esVentaMayorista = false,
   onConfirmed,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [montoPagado, setMontoPagado] = useState<string>("");
 
-  const subtotal = productos.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
-  const iva = subtotal * 0.16;
-  const total = subtotal + iva;
+  const subtotalBase = productos.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+  const descuentoGlobal = esVentaMayorista ? subtotalBase * 0.25 : 0;
+  const subtotalNeto = subtotalBase - descuentoGlobal;
+  const iva = subtotalNeto * 0.16;
+  const total = subtotalNeto + iva;
 
   const generarTicketYConfirmar = async () => {
     if (productos.length === 0) return;
@@ -67,9 +71,12 @@ export default function VentaResumen({
           id_producto: p.id,
           cantidad: p.cantidad,
           descuento_aplicado: null,
+          personalizacion: p.opciones ? { opciones: p.opciones } : null,
+          id_consignacion_detalle: p.id_consignacion_detalle ?? null,
         })),
         fecha,
         totalConIva: total,
+        descuentoAplicado: descuentoGlobal,
         montoPagado: montoAlPagar,
       };
 
@@ -159,10 +166,17 @@ export default function VentaResumen({
 
         // TOTALES
         doc.text("Subtotal:", 8, y);
-        doc.text(`$${subtotal.toFixed(2)}`, 72, y, {
+        doc.text(`$${subtotalBase.toFixed(2)}`, 72, y, {
           align: "right",
         });
         y += 4;
+
+        if (esVentaMayorista && descuentoGlobal > 0) {
+          doc.setFont("helvetica", "normal");
+          doc.text("Desc. May (25%):", 8, y);
+          doc.text(`-$${descuentoGlobal.toFixed(2)}`, 72, y, { align: "right" });
+          y += 4;
+        }
 
         doc.text("IVA (16%):", 8, y);
         doc.text(`$${iva.toFixed(2)}`, 72, y, {
@@ -255,13 +269,23 @@ export default function VentaResumen({
   return (
     <div className="bg-white rounded-2xl p-6 shadow-md shadow-[#8C9796]/20 flex flex-col gap-6">
       {/* Info de total con desglose */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
         <div>
           <p className="text-sm text-[#8C9796]">Subtotal</p>
           <p className="text-lg font-semibold text-[#708090]">
-            ${subtotal.toFixed(2)}
+            ${subtotalBase.toFixed(2)}
           </p>
         </div>
+        
+        {esVentaMayorista && (
+          <div>
+            <p className="text-sm text-[#8C9796]">Desc. Mayorista</p>
+            <p className="text-lg font-semibold text-[#10B981]">
+              -${descuentoGlobal.toFixed(2)}
+            </p>
+          </div>
+        )}
+
         <div>
           <p className="text-sm text-[#8C9796]">IVA (16%)</p>
           <p className="text-lg font-semibold text-[#708090]">

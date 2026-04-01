@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins, Lora, Marcellus, Bodoni_Moda } from "next/font/google";
 import { CartProvider } from "@lib/context/CartContext";
+import { Toaster } from "sonner";
 import "./styles/globals.css";
 import ChatbotPage from "./chatbot/page";
 
@@ -54,6 +55,7 @@ export default function RootLayout({
         <CartProvider>
           {children}
           <ChatbotPage />
+          <Toaster position="top-right" richColors />
         </CartProvider>
       </body>
     </html>

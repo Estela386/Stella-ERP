@@ -24,7 +24,7 @@ export class CuentasPorCobrarRepository extends BaseRepository<CuentasPorCobrar>
         .select(
           `
         *,
-        cliente:id_cliente(id, nombre, telefono)
+        cliente:id_cliente(id, nombre, telefono, id_usuario)
       `
         )
         .order("fecha_registro", { ascending: false });
@@ -145,7 +145,7 @@ export class CuentasPorCobrarRepository extends BaseRepository<CuentasPorCobrar>
       .from("cuentasporcobrar")
       .update(data)
       .eq("id", id)
-      .select(`*, cliente:id_cliente(id, nombre, telefono)`) // ← agregar join
+      .select(`*, cliente:id_cliente(id, nombre, telefono, id_usuario)`) // ← agregar join
       .single();
 
     if (error) throw error;
@@ -202,7 +202,7 @@ export class CuentasPorCobrarRepository extends BaseRepository<CuentasPorCobrar>
   async getAllClientes() {
     return await this.client
       .from("cliente")
-      .select("id, nombre, telefono")
+      .select("id, nombre, telefono, id_usuario")
       .order("nombre", { ascending: true });
   }
 

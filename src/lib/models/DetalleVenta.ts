@@ -10,6 +10,7 @@ export interface IDetalleVenta {
   id_venta?: number; // venta.id (para referencia)
   precio_unitario?: number; // Precio del producto en el momento de la venta
   subtotal?: number; // cantidad * precio_unitario
+  id_consignacion_detalle?: number; // Link to a consignment detail if applicable
 }
 
 /**
@@ -34,6 +35,7 @@ export class DetalleVenta implements IDetalleVenta {
   id_venta?: number;
   precio_unitario?: number;
   subtotal?: number;
+  id_consignacion_detalle?: number;
 
   constructor(data: IDetalleVenta) {
     this.id = data.id;
@@ -43,6 +45,7 @@ export class DetalleVenta implements IDetalleVenta {
     this.id_venta = data.id_venta;
     this.precio_unitario = data.precio_unitario;
     this.subtotal = data.subtotal;
+    this.id_consignacion_detalle = data.id_consignacion_detalle;
   }
 
   /**
