@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -10,22 +11,49 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+
+interface TopProduct {
+  id: number;
+  nombre: string;
+  ventas: number;
+}
+
 const formatMoney = (value: number | string | undefined) => {
   const num = Number(value);
   if (!Number.isFinite(num)) return "$0";
   return `$${num.toLocaleString("es-MX")}`;
 };
-const PRODUCTOS = [
-  { nombre: "Anillo Solitario Oro 14k", ventas: 157500 },
-  { nombre: "Pulsera Tennis", ventas: 114400 },
-  { nombre: "Collar Perlas Naturales", ventas: 88200 },
-  { nombre: "Aretes Perla Premium", ventas: 72600 },
-  { nombre: "Dije Oro Rosado", ventas: 54100 },
-];
 
 const COLORS = ["#708090", "#8a9ab0", "#a4b4c0", "#b07830", "#B76E79"];
 
 export default function TopProductsChart() {
+  const [products, setProducts] = useState<TopProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadTopProducts() {
+      try {
+        const res = await fetch("/api/dashboard/top-products");
+        if (!res.ok) throw new Error("No se pudo cargar top products");
+        const data: TopProduct[] = await res.json();
+        setProducts(data);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Error al cargar los productos"
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadTopProducts();
+  }, []);
+
+  const chartData = products.map((p) => ({ nombre: p.nombre, ventas: p.ventas }));
+
+  const displayData = loading || error ? [] : chartData;
+
   return (
     <div
       style={{
@@ -62,13 +90,18 @@ export default function TopProductsChart() {
         </p>
       </div>
 
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart
-          data={PRODUCTOS}
-          layout="vertical"
-          margin={{ top: 0, right: 20, left: 0, bottom: 0 }}
-          barSize={16}
-        >
+      {loading ? (
+        <div className="text-center py-10 text-sm text-gray-500">Cargando...</div>
+      ) : error ? (
+        <div className="text-center py-10 text-sm text-red-500">{error}</div>
+      ) : (
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart
+            data={displayData}
+            layout="vertical"
+            margin={{ top: 0, right: 20, left: 0, bottom: 0 }}
+            barSize={16}
+          >
           <CartesianGrid
             stroke="#F0EDE8"
             strokeDasharray="3 3"
@@ -117,12 +150,13 @@ export default function TopProductsChart() {
             labelStyle={{ color: "#708090", fontWeight: 600 }}
           />
           <Bar dataKey="ventas" radius={[0, 5, 5, 0]}>
-            {PRODUCTOS.map((_, i) => (
-              <Cell key={i} fill={COLORS[i]} />
+            {displayData.map((_, i) => (
+              <Cell key={i} fill={COLORS[i % COLORS.length]} />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      )}
     </div>
   );
 }
