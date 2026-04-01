@@ -1,12 +1,12 @@
 import { createClient } from "@/utils/supabase/server";
 import { PedidoService } from "@/lib/services/PedidoService";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 /**
  * GET /api/pedidos
  * Obtener historial de pedidos (Filtrado por usuario si es mayorista)
  */
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
  * POST /api/pedidos/crear
  * Levantar un nuevo pedido
  */
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { id_usuario, detalles, total_estimado, observaciones } = body;
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 /**
  * PATCH /api/pedidos (Actualizar estado)
  */
-export async function PATCH(request: NextRequest) {
+export async function PATCH(request: Request) {
     try {
       const body = await request.json();
       const { id, estado } = body;

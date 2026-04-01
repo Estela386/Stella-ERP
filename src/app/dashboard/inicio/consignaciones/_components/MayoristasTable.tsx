@@ -42,7 +42,7 @@ export default function MayoristasTable({
   onReactivar 
 }: MayoristasTableProps) {
   const [search, setSearch] = useState("");
-  const [expandido, setExpandido] = useState<string | null>(null);
+  const [expandido, setExpandido] = useState<number | null>(null);
   const [confirmando, setConfirmando] = useState<IUsuarioMayorista | null>(null);
   const [suspendiendo, setSuspendiendo] = useState<IUsuarioMayorista | null>(null);
   const [suspLoading, setSuspLoading] = useState(false);

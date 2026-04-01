@@ -12,16 +12,16 @@ export default function PedidoRow({ pedido }: { pedido: Pedido }) {
       {/* ===== FILA ===== */}
       <tr className="border-b border-[#8C8976]/30 text-[#708090] hover:bg-[#F6F3EF] transition">
         <td className="py-3 whitespace-nowrap font-medium">{pedido.id}</td>
-        <td>{pedido.cliente}</td>
-        <td>{pedido.tipo}</td>
-        <td className="max-w-[200px] truncate">{pedido.descripcion}</td>
-        <td>{pedido.entrega}</td>
+        <td>{pedido.usuario?.nombre}</td>
+        <td>{pedido.estado}</td>
+        <td className="max-w-[200px] truncate">{pedido.observaciones || "Sin observaciones"}</td>
+        <td>{pedido.fecha_entrega || "Sin fecha de entrega"}</td>
 
         <td>
           <EstadoBadge estado={pedido.estado} />
         </td>
 
-        <td>{pedido.prioridad}</td>
+        <td>{pedido.total_estimado}</td>
 
         <td>
           <button
@@ -74,7 +74,7 @@ export default function PedidoRow({ pedido }: { pedido: Pedido }) {
                 </span>
 
                 <span className="bg-[#B76E79] text-[#F6F4EF] px-4 py-1 rounded-full text-xs font-medium">
-                  Prioridad: {pedido.prioridad}
+                  Prioridad: {pedido.observaciones?.toLowerCase().includes("urgente") ? "Alta" : "Normal"}
                 </span>
               </div>
 
@@ -85,21 +85,21 @@ export default function PedidoRow({ pedido }: { pedido: Pedido }) {
                     <p className="text-xs uppercase tracking-wide text-[#8C8976]">
                       Cliente
                     </p>
-                    <p className="font-semibold">{pedido.cliente}</p>
+                    <p className="font-semibold">{pedido.usuario?.nombre}</p>
                   </div>
 
                   <div>
                     <p className="text-xs uppercase tracking-wide text-[#8C8976]">
                       Tipo
                     </p>
-                    <p className="font-semibold">{pedido.tipo}</p>
+                    <p className="font-semibold">{pedido.estado}</p>
                   </div>
 
                   <div>
                     <p className="text-xs uppercase tracking-wide text-[#8C8976]">
                       Fecha de entrega
                     </p>
-                    <p className="font-semibold">{pedido.entrega}</p>
+                    <p className="font-semibold">{pedido.fecha_entrega || "Sin fecha de entrega"}</p>
                   </div>
                 </div>
 
@@ -109,7 +109,7 @@ export default function PedidoRow({ pedido }: { pedido: Pedido }) {
                     Descripción
                   </p>
 
-                  <p className="text-[#708090] mt-1">{pedido.descripcion}</p>
+                  <p className="text-[#708090] mt-1">{pedido.observaciones || "Sin observaciones"}</p>
                 </div>
               </div>
 

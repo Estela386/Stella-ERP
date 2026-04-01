@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -14,7 +14,8 @@ export async function GET(
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const pedidoId = parseInt(params.id);
+    const { id } = await params;
+    const pedidoId = parseInt(id);
     if (isNaN(pedidoId)) {
       return NextResponse.json({ error: "ID inválido" }, { status: 400 });
     }
