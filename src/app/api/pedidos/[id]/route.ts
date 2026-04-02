@@ -15,6 +15,7 @@ export async function GET(
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
+
     const pedidoId = parseInt(id);
     if (isNaN(pedidoId)) {
       return NextResponse.json({ error: "ID inválido" }, { status: 400 });
@@ -29,6 +30,7 @@ export async function GET(
 
     return NextResponse.json({ pedido });
   } catch (err) {
+    console.error("[API Pedidos] Error interno:", err);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
