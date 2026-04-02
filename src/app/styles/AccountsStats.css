@@ -1,0 +1,91 @@
+/* AccountsStats.css - Estilos Premium para el resumen de cuentas */
+
+.accounts-stats-carousel {
+  display: flex !important;
+  overflow-x: auto !important;
+  scroll-snap-type: x mandatory !important;
+  gap: 1rem !important;
+  padding-bottom: 1rem !important;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.accounts-stats-carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+@media (min-width: 768px) {
+  .accounts-stats-carousel {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    overflow-x: visible !important;
+    scroll-snap-type: none !important;
+    padding-bottom: 0 !important;
+    gap: 1.5rem !important;
+  }
+}
+
+.accounts-stat-card {
+  min-width: 75vw;
+  scroll-snap-align: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+  padding: 1.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 768px) {
+  .accounts-stat-card {
+    min-width: 0;
+  }
+}
+
+.accounts-stat-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Variantes de color */
+.card-rose {
+  background: linear-gradient(135deg, #B76E79 0%, #c4868f 100%);
+  box-shadow: 0 10px 15px -3px rgba(183, 110, 121, 0.2);
+}
+
+.card-slate {
+  background: linear-gradient(135deg, #708090 0%, #8090a0 100%);
+  box-shadow: 0 10px 15px -3px rgba(112, 128, 144, 0.2);
+}
+
+/* Tipografía */
+.stella-stat-label {
+  color: rgba(246, 244, 239, 0.85);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  text-align: center;
+  font-family: var(--font-marcellus), serif;
+}
+
+.stella-stat-value {
+  color: #f6f4ef;
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  text-align: center;
+  font-family: var(--font-poppins), sans-serif;
+}
+
+@media (max-width: 767px) {
+  .stella-stat-value {
+    font-size: 1.5rem; /* text-2xl */
+  }
+}

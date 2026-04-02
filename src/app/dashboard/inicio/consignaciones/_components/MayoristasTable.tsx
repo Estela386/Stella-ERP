@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import { IUsuarioMayorista, IConsignacion } from "@lib/models";
 import {
-  UserCheck, Search, Mail, BadgeCheck, BadgeX,
+  UserCheck, Search, Mail,
   ChevronDown, ChevronUp, AlertTriangle, Package,
-  Trash2, X, Clock, ShieldOff, ShieldCheck,
+  Trash2, ShieldOff, ShieldCheck,
 } from "lucide-react";
 
 interface MayoristasTableProps {
@@ -42,7 +42,7 @@ export default function MayoristasTable({
   onReactivar 
 }: MayoristasTableProps) {
   const [search, setSearch] = useState("");
-  const [expandido, setExpandido] = useState<string | null>(null);
+  const [expandido, setExpandido] = useState<string | number | null>(null);
   const [confirmando, setConfirmando] = useState<IUsuarioMayorista | null>(null);
   const [suspendiendo, setSuspendiendo] = useState<IUsuarioMayorista | null>(null);
   const [suspLoading, setSuspLoading] = useState(false);
@@ -336,7 +336,12 @@ export default function MayoristasTable({
 }
 
 // Subcomponente de Modal para Suspender con Motivo
-function SuspendActionModal({ mayorista, onConfirm, onCancel, loading }: any) {
+function SuspendActionModal({ mayorista, onConfirm, onCancel, loading }: { 
+  mayorista: IUsuarioMayorista;
+  onConfirm: (motivo: string) => void;
+  onCancel: () => void;
+  loading: boolean;
+}) {
   const [motivo, setMotivo] = useState("");
   return (
     <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-[#8c8976]/40 backdrop-blur-md animate-in fade-in duration-300" onClick={e => e.target === e.currentTarget && onCancel()}>
@@ -379,7 +384,16 @@ function SuspendActionModal({ mayorista, onConfirm, onCancel, loading }: any) {
   );
 }
 
-function ConfirmActionModal({ title, message, confirmText, confirmColor, icon: Icon, onConfirm, onCancel, loading }: any) {
+function ConfirmActionModal({ title, message, confirmText, confirmColor, icon: Icon, onConfirm, onCancel, loading }: {
+  title: string;
+  message: React.ReactNode;
+  confirmText: string;
+  confirmColor: string;
+  icon: React.ElementType;
+  onConfirm: () => void;
+  onCancel: () => void;
+  loading: boolean;
+}) {
   return (
     <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-[#8c8976]/40 backdrop-blur-md animate-in fade-in duration-300" onClick={e => e.target === e.currentTarget && onCancel()}>
       <div className="w-full max-w-sm bg-white rounded-[2rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300 border border-[#8c8976]/30">

@@ -2,10 +2,9 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   motion,
-  useInView,
   useScroll,
   useTransform,
   AnimatePresence,
@@ -83,12 +82,6 @@ function d(delay: number): Variants {
     hidden: { opacity: 0, y: 18 },
     show:   { opacity: 1, y: 0, transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] } },
   };
-}
-
-function useSection() {
-  const ref    = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  return { ref, inView };
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -260,7 +253,7 @@ function SectionHeader({
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const features: FeatureCardProps[] = [
-  { icon: <ShieldCheck size={20} color={C.slate} />, title: "Pagos Seguros",             text: "Stripe, PayPal y SPEI con cifrado AES y cumplimiento PCI-DSS en cada transacción." },
+  { icon: <ShieldCheck size={20} color={C.slate} />, title: "Pagos Seguros",             text: "Stripe y SPEI con cifrado AES y cumplimiento PCI-DSS en cada transacción." },
   { icon: <Package     size={20} color={C.slate} />, title: "Inventario en Tiempo Real", text: "Control FIFO/LIFO con alertas automáticas y notificaciones push al detectar stock bajo." },
   { icon: <Sparkles    size={20} color={C.slate} />, title: "Visualización 3D",          text: "Catálogo interactivo con modelos 3D para decisiones de compra seguras y confiables." },
   { icon: <Bot         size={20} color={C.slate} />, title: "IA Integrada",              text: "Predicción de demanda, precios dinámicos y recomendaciones con TensorFlow y Gemini." },
@@ -299,7 +292,7 @@ const modules: ModuleCardProps[] = [
 const techStack = [
   "Next.js","React","Tailwind CSS","Supabase","PostgreSQL",
   "Node.js / Express","Gemini API",
-  "Stripe / PayPal","JWT / OAuth 2.0","Vercel","CI/CD Pipeline",
+  "Stripe", "JWT / OAuth 2.0", "Vercel", "CI/CD Pipeline",
 ];
 
 const reviews: ReviewCardProps[] = [
@@ -327,14 +320,6 @@ export default function HomeClient() {
   const heroRef             = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const blobY               = useTransform(scrollYProgress, [0, 1], [0, 80]);
-
-  const sFeat    = useSection();
-  const sRoles   = useSection();
-  const sMod     = useSection();
-  const sStats   = useSection();
-  const sTech    = useSection();
-  const sReviews = useSection();
-  const sCta     = useSection();
 
   const navLinks = [
     { label: "Inicio",      href: "#" },
@@ -605,9 +590,9 @@ export default function HomeClient() {
         </section>
 
         {/* ══════════ FEATURES ══════════ */}
-        <section id="modulos" ref={sFeat.ref as React.RefObject<HTMLElement>} style={{ padding: SP, background: C.bgAlt }}>
+        <section id="modulos" style={{ padding: SP, background: C.bgAlt }}>
           <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-            <motion.div initial="hidden" animate={sFeat.inView ? "show" : "hidden"} variants={containerV}>
+            <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={containerV}>
               <SectionHeader before="Lo que hace" accent="diferente" after="a Stella" sub="Cada funcionalidad diseñada para resolver un problema real de la joyería artesanal." />
               <div className="feat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "clamp(10px,1.6vw,16px)" }}>
                 {features.map((f) => <FeatureCard key={f.title} {...f} />)}
@@ -620,9 +605,9 @@ export default function HomeClient() {
         <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${C.slateMid},transparent)`, maxWidth: 1200, margin: "0 auto" }} />
 
         {/* ══════════ ROLES ══════════ */}
-        <section id="usuarios" ref={sRoles.ref as React.RefObject<HTMLElement>} style={{ padding: SP, background: C.bg }}>
+        <section id="usuarios" style={{ padding: SP, background: C.bg }}>
           <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-            <motion.div initial="hidden" animate={sRoles.inView ? "show" : "hidden"} variants={containerV}>
+            <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={containerV}>
               <SectionHeader before="Una plataforma para" accent="cada rol" sub="Accesos, vistas y herramientas diseñadas para el administrador, distribuidor y comprador." />
               <div className="roles-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "clamp(12px,2vw,18px)" }}>
                 {roles.map((r) => <RoleCard key={r.title} {...r} />)}
@@ -632,9 +617,9 @@ export default function HomeClient() {
         </section>
 
         {/* ══════════ MODULES ══════════ */}
-        <section ref={sMod.ref as React.RefObject<HTMLElement>} style={{ padding: SP, background: C.bgAlt }}>
+        <section style={{ padding: SP, background: C.bgAlt }}>
           <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-            <motion.div initial="hidden" animate={sMod.inView ? "show" : "hidden"} variants={containerV}>
+            <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={containerV}>
               <SectionHeader before="Módulos" accent="funcionales" sub="Independientes y escalables — activa solo lo que tu negocio necesita." />
               <div className="mod-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "clamp(9px,1.5vw,14px)" }}>
                 {modules.map((m) => <ModuleCard key={m.name} {...m} />)}
@@ -645,10 +630,10 @@ export default function HomeClient() {
 
         {/* ══════════ STATS ══════════ */}
         {/* En la imagen esta sección tiene fondo slate oscuro — mantenemos ese contraste */}
-        <section ref={sStats.ref as React.RefObject<HTMLElement>} style={{ padding: `clamp(40px,5vw,60px) clamp(20px,5vw,52px)`, background: "#4a5568", position: "relative", overflow: "hidden" }}>
+        <section style={{ padding: `clamp(40px,5vw,60px) clamp(20px,5vw,52px)`, background: "#4a5568", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: `radial-gradient(circle, rgba(246,244,239,0.05) 1px, transparent 1px)`, backgroundSize: "36px 36px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "rgba(246,244,239,0.10)" }} />
-          <motion.div initial="hidden" animate={sStats.inView ? "show" : "hidden"} variants={containerV} className="stats-grid"
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={containerV} className="stats-grid"
             style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "clamp(16px,4vw,40px)", maxWidth: 1000, margin: "0 auto", position: "relative", zIndex: 1 }}>
             {statsData.map((st) => (
               <motion.div key={st.label} variants={scaleV} style={{ textAlign: "center" }}>
@@ -661,9 +646,9 @@ export default function HomeClient() {
         </section>
 
         {/* ══════════ TECH ══════════ */}
-        <section id="tecnologia" ref={sTech.ref as React.RefObject<HTMLElement>} style={{ padding: SP, background: C.bg }}>
+        <section id="tecnologia" style={{ padding: SP, background: C.bg }}>
           <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-            <motion.div initial="hidden" animate={sTech.inView ? "show" : "hidden"} variants={containerV}>
+            <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={containerV}>
               <SectionHeader before="Construido con" accent="tecnología de vanguardia" />
               <motion.div variants={containerV} style={{ display: "flex", flexWrap: "wrap", gap: 9, justifyContent: "center", maxWidth: 820, margin: "0 auto" }}>
                 {techStack.map((tech) => (
@@ -681,9 +666,9 @@ export default function HomeClient() {
         </section>
 
         {/* ══════════ REVIEWS ══════════ */}
-        <section ref={sReviews.ref as React.RefObject<HTMLElement>} style={{ padding: SP, background: C.bgAlt }}>
+        <section style={{ padding: SP, background: C.bgAlt }}>
           <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-            <motion.div initial="hidden" animate={sReviews.inView ? "show" : "hidden"} variants={containerV}>
+            <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={containerV}>
               <SectionHeader before="Lo que dicen" accent="Nuestros Clientes" sub="Escuchamos cada palabra de quienes confían en nosotros para sus momentos inolvidables." />
               <div className="rev-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "clamp(10px,1.6vw,16px)" }}>
                 {reviews.map((r) => <ReviewCard key={r.name} {...r} />)}
@@ -694,9 +679,9 @@ export default function HomeClient() {
 
         {/* ══════════ CTA ══════════ */}
         {/* Como la barra inferior de la imagen: fondo slate oscuro, texto f6f4ef, botón rose */}
-        <section id="contacto" ref={sCta.ref as React.RefObject<HTMLElement>} style={{ padding: `clamp(36px,4.5vw,52px) clamp(20px,5vw,52px)`, background: "#4a5568", position: "relative", overflow: "hidden" }}>
+        <section id="contacto" style={{ padding: `clamp(36px,4.5vw,52px) clamp(20px,5vw,52px)`, background: "#4a5568", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "rgba(246,244,239,0.10)" }} />
-          <motion.div initial="hidden" animate={sCta.inView ? "show" : "hidden"} variants={containerV}>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={containerV}>
             <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
               {/* left */}
               <div style={{ flex: 1, minWidth: 260 }}>
