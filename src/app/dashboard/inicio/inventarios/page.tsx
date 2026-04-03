@@ -31,17 +31,21 @@ import {
   CreateProductoDTO,
   UpdateProductoDTO,
   CreateCategoriaDTO,
+  ICategoria,
+  IProveedor,
+  IInsumo,
 } from "@lib/models";
+import { type IMaterial } from "@lib/services/MaterialService";
 
 export default function InventariosPage() {
   const router = useRouter();
   const { usuario, loading: loadingUser } = useAuth();
   const [search, setSearch] = useState("");
   const [productos, setProductos] = useState<Producto[]>([]);
-  const [categorias, setCategorias] = useState<any[]>([]);
-  const [proveedores, setProveedores] = useState<any[]>([]);
-  const [insumos, setInsumos] = useState<any[]>([]);
-  const [materiales, setMateriales] = useState<any[]>([]);
+  const [categorias, setCategorias] = useState<ICategoria[]>([]);
+  const [proveedores, setProveedores] = useState<IProveedor[]>([]);
+  const [insumos, setInsumos] = useState<IInsumo[]>([]);
+  const [materiales, setMateriales] = useState<IMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -142,7 +146,7 @@ export default function InventariosPage() {
                 : { id: 0, nombre: "Sin categoría" },
             } as Producto;
           });
-          setProductos(productosConCategoria as any);
+          setProductos(productosConCategoria as unknown as Producto[]);
         }
 
         setCategorias(categoriasData || []);
@@ -486,7 +490,7 @@ export default function InventariosPage() {
               relative
               rounded-3xl
               bg-white
-              p-8
+              p-4 md:p-8
               space-y-8
               border border-black/10
               shadow-[0_30px_70px_rgba(0,0,0,0.12)]
@@ -504,22 +508,25 @@ export default function InventariosPage() {
 
             <InventoryStats productos={productos} onFilterChange={setFiltro} />
 
-            <div className="flex justify-between items-center gap-4">
-              <InventoryToolbar search={search} setSearch={setSearch} />
-              <div className="flex gap-3">
+            <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4">
+              <div className="w-full lg:w-auto">
+                <InventoryToolbar search={search} setSearch={setSearch} />
+              </div>
+              <div className="flex flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto">
                 <button
                   onClick={handleOpenCategoryModal}
                   className="
-            bg-[#B76E79]
-            text-white
-            px-5 py-2.5
-            rounded-full
-            text-sm font-medium
-            shadow-sm
-            hover:bg-[#A45F69]
-            hover:shadow-md
-            transition
-          "
+                    flex-1 lg:flex-none justify-center
+                    bg-[#B76E79]
+                    text-white
+                    px-4 py-2.5
+                    rounded-full
+                    text-xs sm:text-sm font-medium
+                    shadow-sm  
+                    hover:bg-[#A45F69]
+                    hover:shadow-md
+                    transition
+                  "
                   style={{ fontFamily: "var(--font-sans)" }}
                 >
                   + Categoría
@@ -527,38 +534,42 @@ export default function InventariosPage() {
                 <button
                   onClick={() => setLabelModalOpen(true)}
                   className="
-            bg-[#B76E79]
-            text-white
-            px-5 py-2.5
-            rounded-full
-            text-sm font-medium
-            shadow-sm
-            hover:bg-[#A45F69]
-            hover:shadow-md
-            transition
-            flex items-center gap-2
-          "
+                    flex-1 lg:flex-none justify-center
+                    bg-[#B76E79]
+                    text-white
+                    px-4 py-2.5
+                    rounded-full
+                    text-xs sm:text-sm font-medium
+                    shadow-sm
+                    hover:bg-[#A45F69]
+                    hover:shadow-md
+                    transition
+                    flex items-center gap-2
+                  "
                   style={{ fontFamily: "var(--font-sans)" }}
                 >
                   <FileText className="w-4 h-4" />
-                  Imprimir Etiquetas
+                  <span className="hidden sm:inline">Imprimir Etiquetas</span>
+                  <span className="sm:hidden">Etiquetas</span>
                 </button>
                 <button
                   onClick={() => handleOpenModal()}
                   className="
-            bg-[#B76E79]
-            text-white
-            px-5 py-2.5
-            rounded-full
-            text-sm font-medium
-            shadow-sm
-            hover:bg-[#A45F69]
-            hover:shadow-md
-            transition
-          "
+                    flex-1 lg:flex-none justify-center
+                    bg-[#B76E79]
+                    text-white
+                    px-4 py-2.5
+                    rounded-full
+                    text-xs sm:text-sm font-medium
+                    shadow-sm
+                    hover:bg-[#A45F69]
+                    hover:shadow-md
+                    transition
+                    whitespace-nowrap
+                  "
                   style={{ fontFamily: "var(--font-sans)" }}
                 >
-                  + Nuevo Producto
+                  + Producto
                 </button>
               </div>
             </div>
