@@ -12,6 +12,7 @@ export interface IDetallePedido {
   cantidad: number;
   precio_unitario: number;
   subtotal: number;
+  personalizacion?: Record<string, any>;
   created_at?: string;
   producto?: {
     id: number;
@@ -52,6 +53,7 @@ export interface CreatePedidoDTO {
     cantidad: number;
     precio_unitario: number;
     subtotal: number;
+    personalizacion?: Record<string, any>;
   }>;
 }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Package, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -12,14 +13,6 @@ interface Pedido {
   items: number;
 }
 
-const pedidos: Pedido[] = [
-  { id: "PED-0821", cliente: "María García",  monto: "$5,200",  estado: "urgente",    fecha: "Hoy 10:30",  items: 3 },
-  { id: "PED-0820", cliente: "Laura Ramírez", monto: "$8,400",  estado: "en_proceso", fecha: "Hoy 09:15",  items: 5 },
-  { id: "PED-0819", cliente: "Ana Torres",    monto: "$3,100",  estado: "pendiente",  fecha: "Ayer 17:45", items: 2 },
-  { id: "PED-0818", cliente: "Sofía Mendoza", monto: "$12,700", estado: "completado", fecha: "Ayer 14:20", items: 8 },
-  { id: "PED-0817", cliente: "Carla Vega",    monto: "$2,600",  estado: "pendiente",  fecha: "Mar 22",     items: 1 },
-];
-
 const ESTADO_CONFIG = {
   urgente:    { color: "#B76E79", bg: "#FDECEA", label: "Urgente",    Icon: AlertCircle  },
   en_proceso: { color: "#b07830", bg: "#FDF3E7", label: "En proceso", Icon: Clock        },
@@ -29,7 +22,7 @@ const ESTADO_CONFIG = {
 
 function Avatar({ name }: { name: string }) {
   const initials = name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
-  const hue      = (name.charCodeAt(0) * 17 + name.charCodeAt(1) * 7) % 360;
+  const hue      = (name.charCodeAt(0) * 17 + (name.charCodeAt(1) || 5) * 7) % 360;
   return (
     <div style={{
       width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
@@ -46,6 +39,28 @@ function Avatar({ name }: { name: string }) {
 
 export default function RecentOrders() {
   const router = useRouter();
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPedidos = async () => {
+      try {
+        const res = await fetch("/api/dashboard/recent-orders");
+        if (!res.ok) throw new Error("Error fetching orders");
+        const data = await res.json();
+        setPedidos(data.pedidos || []);
+      } catch (error) {
+        console.error("Error loading recent orders:", error);
+        setPedidos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPedidos();
+    const interval = setInterval(fetchPedidos, 60000); // Actualizar cada minuto
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div style={{
@@ -59,6 +74,11 @@ export default function RecentOrders() {
       display: "flex",
       flexDirection: "column",
     }}>
+      <style>{`
+        .recent-orders-loading { opacity: 0.6; pointer-events: none; animation: ro-pulse 2s infinite; }
+        @keyframes ro-pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.8; } }
+      `}</style>
+
       {/* Header */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -94,68 +114,99 @@ export default function RecentOrders() {
       </div>
 
       {/* Rows */}
-      <div style={{ flex: 1 }}>
-        {pedidos.map((p, idx) => {
-          const cfg    = ESTADO_CONFIG[p.estado];
-          const { Icon } = cfg;
-          const isLast = idx === pedidos.length - 1;
-
-          return (
-            <div
-              key={p.id}
-              onClick={() => router.push("/dashboard/inicio/pedidos")}
-              style={{
-                display: "flex", alignItems: "center", gap: 11,
-                padding: "10px 18px",
-                borderBottom: isLast ? "none" : "1px solid #F7F4F0",
-                transition: "background 0.12s",
-                cursor: "pointer",
-              }}
-              onMouseEnter={e  => ((e.currentTarget as HTMLElement).style.background = "#FAFAF8")}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "transparent")}
-            >
-              <Avatar name={p.cliente} />
-
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "0.79rem", fontWeight: 600,
-                  color: "#1C1C1C", margin: 0,
-                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                }}>
-                  {p.cliente}
-                </p>
-                <p style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "0.63rem", color: "#8C9796", margin: "1px 0 0",
-                }}>
-                  {p.id} · {p.items} {p.items === 1 ? "pieza" : "piezas"} · {p.fecha}
-                </p>
+      <div className={loading ? "recent-orders-loading" : ""} style={{ flex: 1 }}>
+        {loading ? (
+          /* Skeleton */
+          [1, 2, 3].map(i => (
+            <div key={i} style={{
+              display: "flex", alignItems: "center", gap: 11,
+              padding: "10px 18px",
+              borderBottom: i < 3 ? "1px solid #F7F4F0" : "none",
+            }}>
+              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#F0EDE8" }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ height: 10, width: "60%", borderRadius: 4, background: "#F0EDE8", marginBottom: 5 }} />
+                <div style={{ height: 8, width: "40%", borderRadius: 4, background: "#F0EDE8" }} />
               </div>
-
-              {/* Amount + badge */}
-              <div style={{ textAlign: "right", flexShrink: 0 }}>
-                <p style={{
-                  fontFamily: "var(--font-marcellus)",
-                  fontSize: "0.86rem", fontWeight: 400,
-                  color: "#1C1C1C", margin: 0,
-                }}>
-                  {p.monto}
-                </p>
-                <span style={{
-                  display: "inline-flex", alignItems: "center", gap: 3,
-                  background: cfg.bg, borderRadius: 20, padding: "2px 8px",
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "0.59rem", fontWeight: 700,
-                  color: cfg.color, marginTop: 2,
-                }}>
-                  <Icon size={9} />
-                  {cfg.label}
-                </span>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ height: 10, width: 50, borderRadius: 4, background: "#F0EDE8", marginBottom: 5 }} />
+                <div style={{ height: 8, width: 40, borderRadius: 4, background: "#F0EDE8" }} />
               </div>
             </div>
-          );
-        })}
+          ))
+        ) : pedidos.length === 0 ? (
+          <div style={{
+            padding: "24px 18px",
+            textAlign: "center",
+            fontFamily: "var(--font-sans)",
+            fontSize: "0.83rem",
+            color: "#8C9796",
+          }}>
+            No hay pedidos recientes
+          </div>
+        ) : (
+          pedidos.map((p, idx) => {
+            const cfg    = ESTADO_CONFIG[p.estado] || ESTADO_CONFIG.pendiente;
+            const { Icon } = cfg;
+            const isLast = idx === pedidos.length - 1;
+
+            return (
+              <div
+                key={p.id}
+                onClick={() => router.push("/dashboard/inicio/pedidos")}
+                style={{
+                  display: "flex", alignItems: "center", gap: 11,
+                  padding: "10px 18px",
+                  borderBottom: isLast ? "none" : "1px solid #F7F4F0",
+                  transition: "background 0.12s",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={e  => ((e.currentTarget as HTMLElement).style.background = "#FAFAF8")}
+                onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "transparent")}
+              >
+                <Avatar name={p.cliente} />
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "0.79rem", fontWeight: 600,
+                    color: "#1C1C1C", margin: 0,
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  }}>
+                    {p.cliente}
+                  </p>
+                  <p style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "0.63rem", color: "#8C9796", margin: "1px 0 0",
+                  }}>
+                    {p.id} · {p.items} {p.items === 1 ? "pieza" : "piezas"} · {p.fecha}
+                  </p>
+                </div>
+
+                {/* Amount + badge */}
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <p style={{
+                    fontFamily: "var(--font-marcellus)",
+                    fontSize: "0.86rem", fontWeight: 400,
+                    color: "#1C1C1C", margin: 0,
+                  }}>
+                    {p.monto}
+                  </p>
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", gap: 3,
+                    background: cfg.bg, borderRadius: 20, padding: "2px 8px",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "0.59rem", fontWeight: 700,
+                    color: cfg.color, marginTop: 2,
+                  }}>
+                    <Icon size={9} />
+                    {cfg.label}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* Footer CTA */}

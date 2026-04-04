@@ -1,6 +1,5 @@
 "use client";
 import { Package, Clock, Wrench } from "lucide-react";
-
 import { Pedido } from "../type";
 
 type Props = {
@@ -17,36 +16,20 @@ export default function PedidosStats({ pedidos }: Props) {
   ).length;
 
   const items = [
-    { label: "Total", value: pedidos.length, bgStart: "#758390", bgEnd: "#657582", icon: Package },
+    { label: "Total Proyectos", value: pedidos.length, bgStart: "#758390", bgEnd: "#657582", icon: Package },
     { label: "En producción", value: enProduccion, bgStart: "#C07E88", bgEnd: "#B76E79", icon: Wrench },
     { label: "Pendientes", value: pendientes, bgStart: "#758390", bgEnd: "#657582", icon: Clock },
   ];
 
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(3, 1fr)",
-      gap: 20,
-      width: "100%",
-      boxSizing: "border-box",
-    }} className="stella-pedidos-stats">
-      <style>{`
-        @media (max-width: 1024px) { 
-          .stella-pedidos-stats { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; } 
-        }
-        @media (max-width: 600px)  { 
-          .stella-pedidos-stats { 
-            grid-template-columns: repeat(2, 1fr) !important; 
-            gap: 12px !important; 
-          } 
-        }
-        
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+      <style jsx>{`
         .stat-card-hover {
-          transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
         }
         .stat-card-hover:hover {
-          transform: translateY(-4px) scale(1.02);
-          box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+          transform: translateY(-8px);
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
       `}</style>
 
@@ -55,73 +38,32 @@ export default function PedidosStats({ pedidos }: Props) {
         return (
           <div
             key={idx}
-            className="stat-card-hover"
+            className="stat-card-hover group relative overflow-hidden rounded-[2rem] p-8 text-white shadow-xl flex flex-col justify-between min-h-[160px]"
             style={{
-              background: `linear-gradient(to bottom right, ${item.bgStart}, ${item.bgEnd})`,
-              borderRadius: 16,
-              padding: "clamp(14px, 3.5vw, 24px)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-              display: "flex",
-              flexDirection: "column",
-              color: "#fff",
-              position: "relative",
-              overflow: "hidden",
-              gap: 16,
-              minHeight: "clamp(110px, 15vw, 130px)",
-              cursor: "default",
+              background: `linear-gradient(135deg, ${item.bgStart}, ${item.bgEnd})`,
             }}
           >
-            {/* Header: Label + Small Icon */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", zIndex: 2, position: "relative" }}>
-              <p style={{
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
-                fontSize: "clamp(0.75rem, 2.5vw, 0.9rem)",
-                fontWeight: 500,
-                color: "rgba(255, 255, 255, 0.95)",
-                margin: 0,
-                lineHeight: 1.2,
-                maxWidth: "80%",
-              }}>
-                {item.label}
-              </p>
-              <div style={{ 
-                background: "rgba(255,255,255,0.15)", 
-                padding: "clamp(4px, 1.5vw, 8px)", 
-                borderRadius: 10, 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "center",
-                flexShrink: 0
-              }}>
-                <Icon size={18} color="#FFFFFF" strokeWidth={2} />
+            {/* Header */}
+            <div className="flex justify-between items-start relative z-10">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">{item.label}</p>
+                <p className="text-4xl font-black font-mono tracking-tighter" style={{ fontFamily: "var(--font-marcellus)" }}>
+                    {item.value.toString().padStart(2, '0')}
+                </p>
+              </div>
+              <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-md border border-white/10 group-hover:rotate-12 transition-transform duration-500">
+                <Icon size={24} />
               </div>
             </div>
 
-            {/* Body: Value */}
-            <div style={{ zIndex: 2, position: "relative", marginTop: "auto" }}>
-              <p style={{
-                fontFamily: "var(--font-marcellus, serif)",
-                fontSize: "clamp(1.3rem, 4vw, 2.2rem)", 
-                fontWeight: 400,
-                margin: 0, 
-                lineHeight: 1,
-                textShadow: "0 1px 2px rgba(0,0,0,0.1)"
-              }}>
-                {item.value}
-              </p>
+            {/* Bottom Decoration */}
+            <div className="mt-4 flex items-center justify-between relative z-10">
+                <div className="w-12 h-1 bg-white/30 rounded-full group-hover:w-20 transition-all duration-700" />
             </div>
 
-            {/* Decorative Background Icon */}
-            <div style={{
-              position: "absolute",
-              right: "-10%",
-              bottom: "-15%",
-              opacity: 0.1,
-              transform: "rotate(-15deg)",
-              pointerEvents: "none",
-              zIndex: 1
-            }}>
-              <Icon size={100} color="#FFFFFF" />
+            {/* Background Icon Decoration */}
+            <div className="absolute -right-8 -bottom-8 opacity-10 group-hover:opacity-20 group-hover:scale-125 transition-all duration-700">
+                <Icon size={140} />
             </div>
           </div>
         );

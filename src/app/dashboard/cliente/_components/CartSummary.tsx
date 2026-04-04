@@ -6,6 +6,8 @@ interface CartSummaryProps {
   iva: number;
   total: number;
   onCheckout: () => void;
+  onRaiseOrder?: () => void;
+  isWholesaler?: boolean;
 }
 
 export default function CartSummary({
@@ -14,6 +16,8 @@ export default function CartSummary({
   iva,
   total,
   onCheckout,
+  onRaiseOrder,
+  isWholesaler = false,
 }: CartSummaryProps) {
   return (
     <div className="bg-white rounded-lg border border-[#d6c1b1] p-6 sticky top-20">
@@ -59,10 +63,20 @@ export default function CartSummary({
       {/* Checkout Button */}
       <button
         onClick={onCheckout}
-        className="w-full bg-[#b8696c] hover:bg-[#9d5559] text-white font-medium py-3 px-4 rounded-lg transition-colors"
+        className="w-full bg-[#b8696c] hover:bg-[#9d5559] text-white font-medium py-3 px-4 rounded-lg transition-colors mb-3"
       >
         Procesar Compra
       </button>
+
+      {/* Raise Order Button for Wholesalers */}
+      {isWholesaler && onRaiseOrder && (
+        <button
+          onClick={onRaiseOrder}
+          className="w-full bg-[#708090] hover:bg-[#4a5568] text-white font-medium py-3 px-4 rounded-lg transition-colors border border-black/10"
+        >
+          Levantar Pedido
+        </button>
+      )}
 
       {/* Info Text */}
       <p className="text-xs text-[#a89080] text-center mt-4">

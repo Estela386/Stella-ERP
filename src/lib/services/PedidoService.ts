@@ -64,6 +64,7 @@ export class PedidoService {
         cantidad: d.cantidad,
         precio_unitario: d.precio_unitario,
         subtotal: d.subtotal,
+        personalizacion: d.personalizacion || null,
       }));
 
       const { error: detallesError } = await this.repository.createDetalles(detallesFinales);

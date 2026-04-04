@@ -29,6 +29,7 @@ export type DetallePedido = {
   cantidad: number;
   precio_unitario: number;
   subtotal: number;
+  personalizacion?: Record<string, string | number | boolean>;
   producto?: {
     id: number;
     nombre: string;

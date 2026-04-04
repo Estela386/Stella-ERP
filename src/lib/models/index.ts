@@ -3,13 +3,14 @@
  * Facilita las importaciones de modelos desde otros archivos
  */
 
-import { ProductoOpcion } from "./ProductoOpcion";
+
 
 export {
   Producto,
   type IProducto,
   type CreateProductoDTO,
   type UpdateProductoDTO,
+  type OpcionDTO,
 } from "./Producto";
 export {
   Categoria,
@@ -91,3 +92,9 @@ export {
   type CreateMovimientoDTO,
   type IUsuarioMayorista,
 } from "./Consignacion";
+
+export {
+  type INotificacion,
+  type TipoNotificacion,
+  type UpdateNotificacionDTO,
+} from "./Notificacion";

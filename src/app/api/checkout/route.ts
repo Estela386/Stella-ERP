@@ -9,7 +9,7 @@ interface CheckoutItem {
   precio: number;
   cantidad: number;
   url_imagen?: string;
-  personalizacion?: Record<number, any>;
+  personalizacion?: Record<string, unknown>;
 }
 
 interface CheckoutRequest {

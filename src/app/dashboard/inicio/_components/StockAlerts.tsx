@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Package, Beaker } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface StockItem {
@@ -11,6 +11,7 @@ interface StockItem {
   stock: number;
   minimo: number;
   urgencia: "critico" | "bajo";
+  tipo: "producto" | "insumo";
 }
 
 const URGENCIA = {
@@ -23,10 +24,17 @@ const URGENCIA = {
   bajo: { color: "#b07830", bg: "#FDF3E7", bar: "#e8a855", label: "Bajo" },
 };
 
+const TIPO_CONFIG = {
+  producto: { color: "#708090", bg: "#EEF2F6", label: "Producto", Icon: Package },
+  insumo:   { color: "#5a7a6a", bg: "#EDF5F0", label: "Insumo",   Icon: Beaker  },
+};
+
 export default function StockAlerts() {
   const router = useRouter();
   const [items, setItems] = useState<StockItem[]>([]);
   const [criticos, setCriticos] = useState(0);
+  const [totalInsumos, setTotalInsumos] = useState(0);
+  const [totalProductos, setTotalProductos] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,6 +45,8 @@ export default function StockAlerts() {
         const data = await res.json();
         setItems(data.items || []);
         setCriticos(data.criticos || 0);
+        setTotalInsumos(data.totalInsumos || 0);
+        setTotalProductos(data.totalProductos || 0);
       } catch (error) {
         console.error("Error loading stock alerts:", error);
         setItems([]);
@@ -51,6 +61,8 @@ export default function StockAlerts() {
 
     return () => clearInterval(interval);
   }, []);
+
+  const totalAlertas = totalProductos + totalInsumos;
 
   return (
     <div
@@ -68,6 +80,7 @@ export default function StockAlerts() {
         .stock-alerts-loading { opacity: 0.6; pointer-events: none; animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.8; } }
       `}</style>
+
       {/* Header */}
       <div
         style={{
@@ -112,8 +125,14 @@ export default function StockAlerts() {
                 margin: 0,
               }}
             >
-              {criticos} {criticos === 1 ? "pieza" : "piezas"} bajo mínimo —
-              acción requerida
+              {loading ? "Cargando..." : (
+                <>
+                  {criticos} {criticos === 1 ? "artículo crítico" : "artículos críticos"} —{" "}
+                  {totalAlertas === 0
+                    ? "todo en orden"
+                    : `${totalProductos} producto${totalProductos !== 1 ? "s" : ""} · ${totalInsumos} insumo${totalInsumos !== 1 ? "s" : ""}`}
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -144,15 +163,17 @@ export default function StockAlerts() {
       >
         {items.length > 0 ? (
           items.map(item => {
-            const cfg = URGENCIA[item.urgencia];
+            const cfg   = URGENCIA[item.urgencia];
+            const tipoCfg = TIPO_CONFIG[item.tipo] || TIPO_CONFIG.producto;
+            const TipoIcon = tipoCfg.Icon;
             const pct = Math.min(
               100,
-              Math.round((item.stock / item.minimo) * 100)
+              item.minimo > 0 ? Math.round((item.stock / item.minimo) * 100) : 0
             );
 
             return (
               <div
-                key={item.id}
+                key={`${item.tipo}-${item.id}`}
                 onClick={() => router.push("/dashboard/inicio/inventarios")}
                 style={{
                   padding: "14px 18px",
@@ -162,12 +183,10 @@ export default function StockAlerts() {
                   transition: "background 0.12s",
                 }}
                 onMouseEnter={e =>
-                  ((e.currentTarget as HTMLElement).style.background =
-                    "#FAFAF8")
+                  ((e.currentTarget as HTMLElement).style.background = "#FAFAF8")
                 }
                 onMouseLeave={e =>
-                  ((e.currentTarget as HTMLElement).style.background =
-                    "transparent")
+                  ((e.currentTarget as HTMLElement).style.background = "transparent")
                 }
               >
                 {/* Top row */}
@@ -195,16 +214,35 @@ export default function StockAlerts() {
                     >
                       {item.nombre}
                     </p>
-                    <p
-                      style={{
+                    <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+                      {/* Categoría */}
+                      <p
+                        style={{
+                          fontFamily: "var(--font-sans)",
+                          fontSize: "0.62rem",
+                          color: "#8C9796",
+                          margin: 0,
+                        }}
+                      >
+                        {item.categoria} · mín. {item.minimo}
+                      </p>
+                      {/* Badge tipo */}
+                      <span style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 2,
+                        background: tipoCfg.bg,
+                        color: tipoCfg.color,
+                        borderRadius: 20,
+                        padding: "1px 5px",
                         fontFamily: "var(--font-sans)",
-                        fontSize: "0.62rem",
-                        color: "#8C9796",
-                        margin: "2px 0 0",
-                      }}
-                    >
-                      {item.categoria} · mín. {item.minimo}
-                    </p>
+                        fontSize: "0.55rem",
+                        fontWeight: 700,
+                      }}>
+                        <TipoIcon size={7} />
+                        {tipoCfg.label}
+                      </span>
+                    </div>
                   </div>
                   <div style={{ flexShrink: 0, textAlign: "right" }}>
                     <span
@@ -237,7 +275,7 @@ export default function StockAlerts() {
                   </div>
                 </div>
 
-                {/* Progress */}
+                {/* Progress bar */}
                 <div>
                   <div
                     style={{
@@ -296,8 +334,25 @@ export default function StockAlerts() {
         )}
       </div>
 
-      {/* Footer CTA */}
-      <div style={{ padding: "12px 20px" }}>
+      {/* Footer — leyenda + CTA */}
+      <div style={{ padding: "12px 20px", borderTop: "1px solid #F0EDE8" }}>
+        {/* Leyenda de tipos */}
+        {items.length > 0 && (
+          <div style={{ display: "flex", gap: 12, marginBottom: 8 }}>
+            {[TIPO_CONFIG.producto, TIPO_CONFIG.insumo].map(t => (
+              <span key={t.label} style={{
+                display: "inline-flex", alignItems: "center", gap: 4,
+                fontFamily: "var(--font-sans)",
+                fontSize: "0.62rem",
+                color: t.color,
+              }}>
+                <t.Icon size={10} />
+                {t.label}
+              </span>
+            ))}
+          </div>
+        )}
+
         <button
           onClick={() => router.push("/dashboard/inicio/inventarios")}
           style={{

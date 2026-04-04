@@ -100,6 +100,10 @@ export default function CartView() {
     }
   };
 
+  const handleRaiseOrder = () => {
+    router.push("/dashboard/inicio/pedidos?fromCart=true");
+  };
+
   const isEmpty = cartItems.length === 0;
 
   return (
@@ -271,6 +275,8 @@ export default function CartView() {
                   iva={calculos.iva}
                   total={calculos.total}
                   onCheckout={handleCheckout}
+                  onRaiseOrder={handleRaiseOrder}
+                  isWholesaler={usuario?.id_rol === 3}
                 />
               </div>
             </div>

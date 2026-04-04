@@ -6,6 +6,7 @@ import { X, Search, FileText, Plus, Minus } from "lucide-react";
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
 import { createClient } from "@utils/supabase/client";
+import Image from "next/image";
 
 interface LabelPrintModalProps {
   isOpen: boolean;
@@ -102,7 +103,7 @@ export default function LabelPrintModal({
 
       // Fetch materials for selected products
       const selectedIds = Object.keys(selectedItems).map(Number);
-      let materialesMap: Record<number, string> = {};
+      const materialesMap: Record<number, string> = {};
       
       if (selectedIds.length > 0) {
         const { data: rels, error: relsError } = await supabase
@@ -115,7 +116,7 @@ export default function LabelPrintModal({
         }
           
         if (rels) {
-          rels.forEach((rel: any) => {
+          rels.forEach((rel: { id_producto: number; materiales: { nombre: string } | { nombre: string }[] | null }) => {
             const mat = Array.isArray(rel.materiales) ? rel.materiales[0] : rel.materiales;
             if (mat?.nombre) {
               if (materialesMap[rel.id_producto]) {
@@ -135,13 +136,8 @@ export default function LabelPrintModal({
       const jewelryList = Object.values(selectedItems).filter(item => item.tipo === "jewelry");
 
       // Shared cursor for the PDF
-      let currentX = 0;
       let currentY = 12; // Initial top margin
-      let maxRowHeight = 0;
-      const startXMargin = 10;
-      const pageWidth = 210;
       const pageHeight = 297;
-      const gap = 2; // general gap between labels
 
       // -- PROCESS STANDARDS (50x30mm) --
       const standardWidth = 50;
@@ -166,7 +162,6 @@ export default function LabelPrintModal({
 
           // Update shared cursors for jewelry transition
           currentY = y + standardHeight + standardSpacingY;
-          maxRowHeight = 0; // reset for next group if needed
 
           // -- DRAW STANDARD LABEL --
           // (Copying current logic)
@@ -247,7 +242,6 @@ export default function LabelPrintModal({
           doc.setLineWidth(0.1);
           
           // Face 1 (Left): 20x12 rounded
-          // @ts-ignore - roundedRect exists in jsPDF but might not be in the basic type definitions used
           if (typeof doc.roundedRect === 'function') {
             doc.roundedRect(x, y, 20, jewelryHeight, 1.5, 1.5, "S");
           } else {
@@ -258,7 +252,6 @@ export default function LabelPrintModal({
           doc.rect(x + 20, y + 4.5, 20, 3);
 
           // Face 2 (Right): 20x12 rounded
-          // @ts-ignore
           if (typeof doc.roundedRect === 'function') {
             doc.roundedRect(x + 40, y, 20, jewelryHeight, 1.5, 1.5, "S");
           } else {
@@ -277,7 +270,7 @@ export default function LabelPrintModal({
           // -- Cara Posterior (RIGHT SIDE - 20mm starting at x+40) --
           // QR Code scaled
           if (!qrCache[item.producto.id]) {
-            qrCache[item.producto.id] = await QRCode.toDataURL(`${window.location.origin}/productos/${item.producto.id}`, { width: 50, margin: 0 });
+            qrCache[item.producto.id] = await QRCode.toDataURL(`https://www.stellajoyeria.online/productos/${item.producto.id}`, { width: 50, margin: 0 });
           }
           
           // QR - small (8.5x8.5mm)
@@ -368,9 +361,11 @@ export default function LabelPrintModal({
                   >
                     <div className="flex items-center gap-3 overflow-hidden flex-1">
                       {p.url_imagen ? (
-                        <img 
+                        <Image 
                           src={p.url_imagen} 
                           alt={p.nombre || "Producto"} 
+                          width={40}
+                          height={40}
                           className="w-10 h-10 object-cover rounded-md flex-shrink-0"
                         />
                       ) : (

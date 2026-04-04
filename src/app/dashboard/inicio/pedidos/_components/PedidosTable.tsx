@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pedido } from "../type";
+import type { Pedido } from "../type";
+import { X, ChevronRight, ShoppingBag, Clock, CheckCircle2 } from "lucide-react";
+import type { Usuario } from "@/lib/models";
 
 type Props = {
   pedidos: Pedido[];
-  usuario?: any;
+  usuario?: Usuario | null; 
   onStatusChange?: () => void;
 };
 
@@ -25,7 +27,7 @@ export default function PedidosTable({ pedidos, usuario, onStatusChange }: Props
         body: JSON.stringify({ id: selected.id, estado: nuevoEstado }),
       });
       if (resp.ok) {
-        setSelected({ ...selected, estado: nuevoEstado as any });
+        setSelected({ ...selected, estado: nuevoEstado as Pedido["estado"] });
         if (onStatusChange) onStatusChange();
       }
     } catch (err) {
@@ -35,53 +37,52 @@ export default function PedidosTable({ pedidos, usuario, onStatusChange }: Props
     }
   };
 
+  const idRolUsuario = usuario?.id_rol;
+
   return (
     <>
-      {/* CONTENEDOR */}
-      <div className="bg-white rounded-2xl border border-[#8C9796]/30 shadow-md shadow-[#8C9796]/20 overflow-hidden">
-
-        {/* ================= DESKTOP TABLE ================= */}
-        <div className="hidden md:block">
-          <table className="w-full table-fixed text-sm text-left border-collapse">
-            
-            {/* HEADER */}
-            <thead className="bg-[#F6F4EF] text-[#708090] border-b border-[#8C9796]/40">
+      <div className="bg-white rounded-[2rem] border border-black/5 shadow-xl overflow-hidden">
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-sm text-left border-collapse">
+            <thead className="bg-[#F8FAFC] text-[#94A3B8] border-b border-[#E2E8F0]">
               <tr>
-                <th className="py-4 px-4 w-[70px]">ID</th>
-                <th className="w-[160px]">Solicitante</th>
-                <th className="hidden lg:table-cell w-[120px]">Fecha</th>
-                <th className="w-[130px]">Monto</th>
-                <th className="w-[130px]">Estado</th>
-                <th className="w-[150px] pr-4">Acciones</th>
+                <th className="py-5 px-6 font-bold uppercase tracking-widest text-[10px]">ID</th>
+                <th className="py-5 font-bold uppercase tracking-widest text-[10px]">Solicitante</th>
+                <th className="py-5 hidden lg:table-cell font-bold uppercase tracking-widest text-[10px]">Fecha</th>
+                <th className="py-5 font-bold uppercase tracking-widest text-[10px]">Monto Est.</th>
+                <th className="py-5 font-bold uppercase tracking-widest text-[10px]">Estado</th>
+                <th className="py-5 pr-6 text-right font-bold uppercase tracking-widest text-[10px]">Acciones</th>
               </tr>
             </thead>
 
-            {/* BODY */}
-            <tbody>
+            <tbody className="divide-y divide-[#F1F5F9]">
               {pedidos.map((p) => (
-                <tr
-                  key={p.id}
-                  className="border-b border-[#8C9796]/20 text-[#708090] hover:bg-[#F6F4EF] transition"
-                >
-                  <td className="py-4 px-4 font-semibold">{p.id}</td>
-                  <td className="truncate">{p.usuario?.nombre || "N/A"}</td>
-                  <td className="hidden lg:table-cell">{new Date(p.fecha_pedido).toLocaleDateString()}</td>
-                  <td className="font-medium text-[#B76E79]">${p.total_estimado?.toFixed(2) || "0.00"}</td>
-
-                  <td>
-                    <span className={`px-3 py-1 rounded-lg text-xs font-bold tracking-wide shadow-sm ${
-                      p.estado === 'PENDIENTE' ? 'bg-[#B76E79] text-white' : 'bg-[#708090] text-white'
+                <tr key={p.id} className="group hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-5 px-6 font-mono text-xs text-[#64748B]">#{p.id}</td>
+                  <td className="py-5">
+                    <p className="font-bold text-[#1E293B]">{p.usuario?.nombre || "N/A"}</p>
+                    <p className="text-[10px] text-[#94A3B8]">Rol: {p.usuario?.id_rol === 3 ? "Mayorista" : "Cliente"}</p>
+                  </td>
+                  <td className="py-5 hidden lg:table-cell text-[#64748B]">
+                    {new Date(p.fecha_pedido).toLocaleDateString()}
+                  </td>
+                  <td className="py-5 font-black text-[#B76E79]">
+                    ${p.total_estimado?.toFixed(2) || "0.00"}
+                  </td>
+                  <td className="py-5">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest shadow-sm inline-flex items-center gap-1.5 ${
+                      p.estado === 'PENDIENTE' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
                     }`}>
+                      <div className={`w-1.5 h-1.5 rounded-full ${p.estado === 'PENDIENTE' ? 'bg-amber-600 animate-pulse' : 'bg-emerald-600'}`} />
                       {p.estado.replace("_", " ")}
                     </span>
                   </td>
-
-                  <td className="pr-4">
+                  <td className="py-5 pr-6 text-right">
                     <button
                       onClick={() => setSelected(p)}
-                      className="px-4 py-1.5 rounded-full bg-[#B76E79] text-[#F6F4EF] text-sm font-medium shadow-md shadow-[#8C9796]/40 hover:bg-[#A45F69] transition"
+                      className="px-5 py-2 rounded-xl bg-white border border-[#E2E8F0] text-[#64748B] text-xs font-bold hover:bg-[#B76E79] hover:text-white hover:border-[#B76E79] transition-all shadow-sm"
                     >
-                      Ver detalles
+                      Detalles
                     </button>
                   </td>
                 </tr>
@@ -90,41 +91,28 @@ export default function PedidosTable({ pedidos, usuario, onStatusChange }: Props
           </table>
         </div>
 
-        {/* ================= MOBILE CARDS ================= */}
-        <div className="md:hidden space-y-4 p-4">
+        <div className="md:hidden p-4 space-y-4">
           {pedidos.map((p) => (
-            <div
-              key={p.id}
-              className="bg-[#F6F4EF] rounded-xl p-4 border border-[#8C9796]/25 space-y-3"
-            >
+            <div key={p.id} className="bg-[#F8FAFC] rounded-2xl p-5 border border-black/5 space-y-4 shadow-sm">
               <div className="flex justify-between items-center">
-                <span className="font-bold text-[#708090]">{p.id}</span>
-
-                <span className={`px-3 py-1 rounded-lg text-xs font-bold tracking-wide shadow-sm ${
-                  p.estado === 'PENDIENTE' ? 'bg-[#B76E79] text-white' : 'bg-[#708090] text-white'
+                <span className="font-mono text-xs text-[#64748B]">#{p.id}</span>
+                <span className={`px-3 py-1 rounded-full text-[9px] font-black tracking-widest ${
+                  p.estado === 'PENDIENTE' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
                 }`}>
                   {p.estado.replace("_", " ")}
                 </span>
               </div>
-
-              <p className="text-[#708090] text-sm">
-                <b>Solicitante:</b> {p.usuario?.nombre || "N/A"}
-              </p>
-
-              <p className="text-[#708090] text-sm">
-                <b>Fecha:</b> {new Date(p.fecha_pedido).toLocaleDateString()}
-              </p>
-
+              <div className="space-y-1">
+                <p className="font-bold text-[#1E293B]">{p.usuario?.nombre || "N/A"}</p>
+                <p className="text-xs text-[#94A3B8]">{new Date(p.fecha_pedido).toLocaleDateString()}</p>
+              </div>
               <div className="flex justify-between items-center pt-2">
-                <span className="bg-[#B76E79] text-[#F6F4EF] px-3 py-1 rounded-lg text-xs font-bold">
-                  Total: ${p.total_estimado?.toFixed(2) || "0.00"}
-                </span>
-
+                <span className="text-sm font-black text-[#B76E79]">${p.total_estimado?.toFixed(2) || "0.00"}</span>
                 <button
                   onClick={() => setSelected(p)}
-                  className="px-4 py-1.5 rounded-full bg-[#B76E79] text-[#F6F4EF] text-sm font-medium shadow-md shadow-[#8C9796]/40 hover:bg-[#A45F69] transition"
+                  className="px-4 py-2 rounded-xl bg-[#B76E79] text-white text-[10px] font-bold shadow-lg shadow-[#B76E79]/20"
                 >
-                  Ver detalles
+                  Ver pedido
                 </button>
               </div>
             </div>
@@ -132,202 +120,140 @@ export default function PedidosTable({ pedidos, usuario, onStatusChange }: Props
         </div>
       </div>
 
-      {/* ================= MODAL ================= */}
       {selected && (
-  <div className="fixed inset-0 z-[999] bg-[#1C1C1CB3] backdrop-blur-[6px] flex items-center justify-center p-4 sm:p-6 transition-all duration-300">
-    
-    {/* CONTENEDOR */}
-    <div className="bg-[#F8FAFC] rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden shadow-[0_40px_90px_-15px_rgba(0,0,0,0.5)] border border-white/20 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="px-8 py-6 border-b border-[#F1F5F9] flex justify-between items-center bg-white">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#F8FAFC] rounded-2xl flex items-center justify-center text-[#B76E79] border border-black/5">
+                  <ShoppingBag size={24} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-[#1E293B]" style={{ fontFamily: "var(--font-marcellus)" }}>Pedido #{selected.id}</h2>
+                  <p className="text-xs text-[#94A3B8] font-medium font-sans uppercase tracking-[0.2em]">{new Date(selected.fecha_pedido).toLocaleDateString()}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelected(null)} 
+                className="w-10 h-10 rounded-2xl bg-[#F8FAFC] hover:bg-red-50 text-[#94A3B8] hover:text-red-400 transition-colors flex items-center justify-center"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-      {/* ===== HEADER ELEGANTE ===== */}
-      <div className="bg-white px-8 py-6 border-b border-[#E2E8F0] flex justify-between items-center shrink-0">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#94A3B8] mb-1 font-sans">
-            Información de la Solicitud
-          </p>
-          <h2 className="text-2xl md:text-3xl text-[#1C1C1C]" style={{ fontFamily: "var(--font-marcellus)" }}>
-            Pedido #{selected.id}
-          </h2>
-        </div>
+            <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-[#F8FAFC] p-5 rounded-2xl border border-black/5">
+                  <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest mb-1">Solicitante</p>
+                  <p className="font-bold text-[#1E293B] truncate">{selected.usuario?.nombre || "N/A"}</p>
+                </div>
+                <div className="bg-[#F8FAFC] p-5 rounded-2xl border border-black/5">
+                  <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest mb-1">Total Estimado</p>
+                  <p className="font-bold text-[#10B981] text-xl font-mono">${selected.total_estimado?.toFixed(2)}</p>
+                </div>
+                <div className="bg-[#F8FAFC] p-5 rounded-2xl border border-black/5 lg:col-span-2">
+                  <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest mb-2">Estado del Pedido</p>
+                  {idRolUsuario === 1 ? (
+                    <div className="relative group">
+                      <select 
+                        value={selected.estado} 
+                        onChange={(e) => handleUpdateStatus(e.target.value)}
+                        disabled={updating}
+                        className="w-full appearance-none bg-white border border-[#E2E8F0] p-2.5 rounded-xl text-xs font-bold text-[#1E293B] outline-none focus:border-[#B76E79] focus:ring-1 focus:ring-[#B76E79] transition-all cursor-pointer"
+                      >
+                        <option value="PENDIENTE">PENDIENTE</option>
+                        <option value="EN_PRODUCCION">EN PRODUCCIÓN</option>
+                        <option value="EN_TALLER">EN TALLER</option>
+                        <option value="ENTREGADO">ENTREGADO</option>
+                      </select>
+                      <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] group-hover:text-[#B76E79] transition-colors rotate-90" size={14} />
+                    </div>
+                  ) : (
+                    <span className={`px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest uppercase inline-block ${
+                      selected.estado === 'PENDIENTE' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                    }`}>
+                      {selected.estado.replace("_", " ")}
+                    </span>
+                  )}
+                </div>
+              </div>
 
-        <button
-          onClick={() => setSelected(null)}
-          className="w-10 h-10 rounded-full bg-[#F1F5F9] flex items-center justify-center text-[#64748B] hover:bg-[#FEE2E2] hover:text-[#EF4444] transition-colors"
-          title="Cerrar modal"
-        >
-          <span className="text-lg leading-none mt-[-2px]">✕</span>
-        </button>
-      </div>
-
-      {/* ===== CONTENIDO ===== */}
-      <div className="p-6 sm:p-8 space-y-8 overflow-y-auto custom-scrollbar">
-
-        {/* INFO CARDS GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#E2E8F0] flex flex-col justify-center">
-            <span className="text-[10px] uppercase tracking-widest font-bold text-[#94A3B8] mb-1">Solicitante</span>
-            <span className="font-semibold text-[#334155] text-sm overflow-hidden text-ellipsis whitespace-nowrap">{selected.usuario?.nombre || "N/A"}</span>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#E2E8F0] flex flex-col justify-center">
-            <span className="text-[10px] uppercase tracking-widest font-bold text-[#94A3B8] mb-1">Fecha</span>
-            <span className="font-semibold text-[#334155] text-sm">{new Date(selected.fecha_pedido).toLocaleDateString()}</span>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#E2E8F0] flex flex-col justify-center">
-            <span className="text-[10px] uppercase tracking-widest font-bold text-[#94A3B8] mb-1">Monto Estimado</span>
-            <span className="font-semibold text-[#10B981] text-lg font-mono tracking-tight">${selected.total_estimado?.toFixed(2) || "0.00"}</span>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#E2E8F0] flex flex-col justify-center items-start">
-             <span className="text-[10px] uppercase tracking-widest font-bold text-[#94A3B8] mb-2">Estado Inmediato</span>
-             {usuario?.id_rol === 1 ? (
-                <div className="w-full relative">
-                  <select 
-                    value={selected.estado} 
-                    onChange={(e) => handleUpdateStatus(e.target.value)}
-                    disabled={updating}
-                    className="w-full appearance-none bg-[#F1F5F9] border border-[#CBD5E1] text-[#0F172A] text-xs font-bold tracking-wide px-3 py-2 rounded-xl outline-none focus:border-[#B76E79] focus:ring-1 focus:ring-[#B76E79] cursor-pointer disabled:opacity-50 transition"
-                  >
-                    <option value="PENDIENTE">PENDIENTE</option>
-                    <option value="EN_PRODUCCION">EN PRODUCCIÓN</option>
-                    <option value="EN_TALLER">EN TALLER</option>
-                    <option value="ENTREGADO">ENTREGADO</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#64748B]">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+              {selected.observaciones && (
+                <div className="bg-[#FFFBEB] border border-amber-200/50 p-5 rounded-2xl flex items-start gap-4">
+                  <Clock className="text-amber-500 shrink-0" size={20} />
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest">Observaciones</p>
+                    <p className="text-sm text-amber-900 leading-relaxed">{selected.observaciones}</p>
                   </div>
                 </div>
-              ) : (
-                <span className={`px-4 py-1.5 rounded-full text-[11px] font-bold tracking-widest inline-block ${
-                  selected.estado === 'PENDIENTE' ? 'bg-[#FEE2E2] text-[#DC2626]' : 'bg-[#E0F2FE] text-[#0369A1]'
-                }`}>
-                  {selected.estado.replace("_", " ")}
-                </span>
               )}
-          </div>
-        
-        </div>
 
-        {/* OBSERVACIONES ALERT (if any) */}
-        {selected.observaciones && selected.observaciones.trim() !== "" && (
-          <div className="bg-[#FFFBEB] border border-[#FEF3C7] rounded-2xl p-5 shadow-sm">
-             <span className="text-[10px] uppercase tracking-widest font-bold text-[#D97706] mb-1 block">Notas / Observaciones</span>
-             <p className="text-sm text-[#92400E] leading-relaxed">{selected.observaciones}</p>
-          </div>
-        )}
+              <div className="bg-white border border-[#F1F5F9] rounded-3xl overflow-hidden shadow-sm">
+                <div className="px-6 py-4 bg-[#F8FAFC] border-b border-[#F1F5F9]">
+                  <h3 className="text-sm font-bold text-[#1E293B]" style={{ fontFamily: "var(--font-marcellus)" }}>Artículos en el pedido</h3>
+                </div>
+                <table className="w-full text-left">
+                  <thead className="bg-white border-b border-[#F1F5F9]">
+                    <tr>
+                      <th className="px-6 py-4 text-[10px] font-black text-[#94A3B8] uppercase tracking-widest">Item</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-[#94A3B8] uppercase tracking-widest text-center">Cant.</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-[#94A3B8] uppercase tracking-widest text-right">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#F1F5F9]">
+                    {selected.detalles?.map((det, i) => (
+                      <tr key={i} className="hover:bg-[#F8FAFC] transition-colors">
+                        <td className="px-6 py-5">
+                          <p className="text-sm font-bold text-[#1E293B]">{det.producto?.nombre || "Producto retirado"}</p>
+                          {det.personalizacion && Object.keys(det.personalizacion).length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              {Object.entries(det.personalizacion || {}).map(([key, val]) => (
+                                <span key={key} className="px-2 py-0.5 bg-white border border-black/5 rounded-lg text-[9px] font-bold text-[#64748B] italic shadow-sm">
+                                  {String(val)}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-5 text-center">
+                          <span className="inline-flex items-center justify-center bg-[#F1F5F9] text-[#475569] font-black text-xs px-3 py-1 rounded-xl">
+                            {det.cantidad}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <span className="text-sm font-black text-[#1E293B]">${det.subtotal?.toFixed(2)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-        {/* ===== TABLA PRODUCTOS ===== */}
-        <div className="bg-white border border-[#E2E8F0] shadow-sm rounded-2xl overflow-hidden">
-          
-          <div className="px-6 py-4 border-b border-[#E2E8F0] bg-[#F8FAFC]">
-            <h3 className="text-sm font-semibold text-[#334155] tracking-wide" style={{ fontFamily: "var(--font-marcellus)" }}>
-              Artículos Solicitados ({selected.detalles?.length || 0})
-            </h3>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-[#FFFFFF] border-b border-[#F1F5F9]">
-                <tr>
-                  <th className="px-6 py-3 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-widest">ID</th>
-                  <th className="px-6 py-3 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-widest">Producto</th>
-                  <th className="px-6 py-3 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-widest text-center">Cantidad</th>
-                  <th className="px-6 py-3 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-widest text-right">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#F1F5F9]">
-                {selected.detalles?.map((det, i) => (
-                  <tr key={i} className="hover:bg-[#F8FAFC] transition-colors group">
-                    <td className="px-6 py-4 text-xs font-mono text-[#64748B]">
-                      #{det.id_producto}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-[#1E293B]">
-                        {det.producto?.nombre || "Producto retirado del catálogo"}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <span className="inline-flex items-center justify-center bg-[#F1F5F9] text-[#475569] font-bold text-xs h-7 min-w-[28px] px-2 rounded-lg">
-                        {det.cantidad}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className="text-sm font-semibold text-[#0F172A]" style={{ fontFamily: "var(--font-marcellus)" }}>
-                        ${det.subtotal?.toFixed(2) || "0.00"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-
-      {/* ===== PIE DE ACCIONES ===== */}
-      <div className="bg-white px-6 py-5 border-t border-[#E2E8F0] sm:flex sm:items-center sm:justify-between shrink-0">
-        
-        {/* Acciones principales - Izquierda */}
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mb-4 sm:mb-0">
-          {usuario?.id_rol === 1 && (
-            <>
-              <button
-                onClick={() => router.push(`/dashboard/inicio/nuevaVenta?pedidoId=${selected.id}`)}
-                className="group relative px-6 py-2.5 rounded-xl bg-white border-2 border-[#B76E79] text-[#B76E79] text-sm font-bold shadow-sm hover:bg-[#B76E79] hover:text-white transition-all overflow-hidden"
+            <div className="px-8 py-6 border-t border-[#F1F5F9] bg-[#F8FAFC] flex justify-end">
+              <button 
+                onClick={() => setSelected(null)}
+                className="px-8 py-3 bg-[#1E293B] text-white rounded-2xl font-bold text-sm shadow-xl shadow-slate-200 hover:scale-105 transition-transform"
               >
-                <div className="absolute inset-0 w-0 bg-[#B76E79] transition-all duration-300 ease-out group-hover:w-full opacity-10"></div>
-                <span className="relative">Generar Venta POS</span>
+                Entendido
               </button>
-              
-              {selected.usuario?.id_rol === 3 && (
-                <button
-                  onClick={() => router.push(`/dashboard/inicio/consignaciones?pedidoId=${selected.id}`)}
-                  className="px-6 py-2.5 rounded-xl bg-[#0F172A] text-white text-sm font-bold shadow-md hover:bg-[#1E293B] transition-all transform hover:-translate-y-0.5"
-                >
-                  Mover a Consignación
-                </button>
-              )}
-            </>
-          )}
+            </div>
+          </div>
         </div>
-
-        {/* Cerrar - Derecha */}
-        <button
-          onClick={() => setSelected(null)}
-          className="px-8 py-2.5 rounded-xl border border-[#CBD5E1] bg-white text-[#475569] text-sm font-bold shadow-sm hover:bg-[#F1F5F9] transition-colors w-full sm:w-auto"
-        >
-          Cerrar Vista
-        </button>
-
-      </div>
-
-    </div>
-  </div>
-)}
-
-      {/* EMPTY STATE */}
-      {pedidos.length === 0 && (
-        <p className="text-center py-6 text-[#8C9796]">
-          No hay pedidos con este filtro
-        </p>
       )}
-    </>
-  );
-}
 
-/* INPUT COMPONENTE */
-function Input({ label, value }: { label: string; value: any }) {
-  return (
-    <div>
-      <p className="text-xs text-[#8C9796]">{label}</p>
-      <input
-        value={value}
-        readOnly
-        className="w-full bg-[#F6F4EF] border border-[#8C9796]/30 rounded-lg px-3 py-2 text-[#708090] font-medium"
-      />
-    </div>
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #F1F5F9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #B76E79;
+          border-radius: 10px;
+        }
+      `}</style>
+    </>
   );
 }

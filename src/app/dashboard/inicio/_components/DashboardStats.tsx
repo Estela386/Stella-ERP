@@ -24,50 +24,77 @@ interface StatsData {
   ticketPromedio?: { valor: number; ventasDelMes: number };
   pedidosPendientes?: number;
   stockBajo?: number;
+  roleId?: number;
 }
 
-const buildKPIs = (stats: StatsData): KPI[] => [
-  {
-    label: "Ventas Hoy",
-    value: `$${(stats.ventasHoy?.total || 0).toLocaleString("es-ES", {
-      maximumFractionDigits: 0,
-    })}`,
-    sub: `${stats.ventasHoy?.transacciones || 0} transacciones`,
-    icon: DollarSign,
-    theme: "gray",
-    badgeLabel: "↑ alto",
-    href: "/dashboard/inicio/nuevaVenta",
-  },
-  {
-    label: "Ticket Promedio",
-    value: `$${(stats.ticketPromedio?.valor || 0).toLocaleString("es-ES", {
-      maximumFractionDigits: 0,
-    })}`,
-    sub: `${stats.ticketPromedio?.ventasDelMes || 0} ventas del mes`,
-    icon: ShoppingBag,
-    theme: "rose",
-    badgeLabel: "↑ estable",
-    href: "/dashboard/inicio/reports",
-  },
-  {
-    label: "Pedidos Pendientes",
-    value: `${stats.pedidosPendientes || 0}`,
-    sub: "Requieren atención",
-    icon: Package,
-    theme: "gray",
-    badgeLabel: "! acción",
-    href: "/dashboard/inicio/pedidos",
-  },
-  {
-    label: "Stock Bajo",
-    value: `${stats.stockBajo || 0} piezas`,
-    sub: "Requieren reposición",
-    icon: AlertTriangle,
-    theme: "rose",
-    badgeLabel: "↓ revisar",
-    href: "/dashboard/inicio/inventarios",
-  },
-];
+const buildKPIs = (stats: StatsData): KPI[] => {
+  const isWholesaler = stats.roleId === 3;
+
+  const kpis: KPI[] = [
+    {
+      label: isWholesaler ? "Mis Compras Hoy" : "Ventas Hoy",
+      value: `$${(stats.ventasHoy?.total || 0).toLocaleString("es-ES", {
+        maximumFractionDigits: 0,
+      })}`,
+      sub: isWholesaler 
+        ? `${stats.ventasHoy?.transacciones || 0} pedidos hoy`
+        : `${stats.ventasHoy?.transacciones || 0} transacciones`,
+      icon: DollarSign,
+      theme: "gray",
+      badgeLabel: isWholesaler ? "↑ activo" : "↑ alto",
+      href: isWholesaler ? "/dashboard/inicio/pedidos" : "/dashboard/inicio/nuevaVenta",
+    },
+    {
+      label: isWholesaler ? "Mi Ticket Promedio" : "Ticket Promedio",
+      value: `$${(stats.ticketPromedio?.valor || 0).toLocaleString("es-ES", {
+        maximumFractionDigits: 0,
+      })}`,
+      sub: isWholesaler 
+        ? "Basado en tus compras"
+        : `${stats.ticketPromedio?.ventasDelMes || 0} ventas del mes`,
+      icon: ShoppingBag,
+      theme: "rose",
+      badgeLabel: "↑ estable",
+      href: "/dashboard/inicio/reports",
+    },
+    {
+      label: isWholesaler ? "Mis Pedidos Activos" : "Pedidos Pendientes",
+      value: `${stats.pedidosPendientes || 0}`,
+      sub: isWholesaler ? "En proceso / taller" : "Requieren atención",
+      icon: Package,
+      theme: "gray",
+      badgeLabel: "! estado",
+      href: "/dashboard/inicio/pedidos",
+    },
+  ];
+
+  if (isWholesaler) {
+    // Card adicional para Mayoristas: Descuentos o Perfil
+    kpis.push({
+      label: "Mi Nivel Stella",
+      value: "Mayorista Gold",
+      sub: "25% de descuento aplicado",
+      icon: ShoppingBag,
+      theme: "rose",
+      badgeLabel: "★ VIP",
+      href: "/dashboard/inicio/consignaciones",
+    });
+  } else {
+    // Card estándar para Admin: Stock Bajo
+    kpis.push({
+      label: "Stock Bajo",
+      value: `${stats.stockBajo || 0} artículos`,
+      sub: "Productos e insumos bajo mínimo",
+      icon: AlertTriangle,
+      theme: "rose",
+      badgeLabel: "↓ revisar",
+      href: "/dashboard/inicio/inventarios",
+    });
+  }
+
+  return kpis;
+};
+
 
 const THEME = {
   gray: {

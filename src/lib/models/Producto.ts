@@ -16,7 +16,7 @@ export interface IProducto {
   es_personalizable?: boolean | null;
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
-  producto_material?: any[];
+  producto_material?: unknown[];
 }
 
 
@@ -25,6 +25,7 @@ export interface IProducto {
  * Excluye el id ya que es autogenerado
  */
 export interface OpcionDTO {
+  id?: number;
   nombre: string;
   tipo: "select" | "multi" | "text";
   obligatorio: boolean;
@@ -72,7 +73,7 @@ export class Producto implements IProducto {
   es_personalizable?: boolean | null;
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
-  producto_material?: any[];
+  producto_material?: unknown[];
 
 
   constructor(data: IProducto) {

@@ -6,7 +6,7 @@ const SELECT_FULL = `
   *,
   usuario:usuario(id, nombre, correo, id_rol),
   detalles:pedido_detalle(
-    id, id_pedido, id_producto, cantidad, precio_unitario, subtotal,
+    id, id_pedido, id_producto, cantidad, precio_unitario, subtotal, personalizacion,
     producto:producto(id, nombre, url_imagen)
   )
 `;
