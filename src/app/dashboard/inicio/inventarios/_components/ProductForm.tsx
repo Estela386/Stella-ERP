@@ -1,11 +1,18 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import { Producto } from "../type";
-import { CreateProductoDTO, UpdateProductoDTO } from "@lib/models";
-import { IProductoOpcion } from "@lib/models";
+import { 
+  CreateProductoDTO, 
+  UpdateProductoDTO, 
+  ICategoria, 
+  IProveedor, 
+  IInsumo 
+} from "@lib/models";
 import { createClient } from "@utils/supabase/client";
 import { ProductoMaterialService } from "@lib/services";
+import { IMaterial } from "@lib/services/MaterialService";
 import { 
   Plus, 
   Trash2, 
@@ -15,12 +22,10 @@ import {
   Package, 
   Settings, 
   TrendingUp, 
-  AlertCircle,
   Truck,
   Layers,
   ChevronRight,
   PlusCircle,
-  Info,
   X as FiX,
   Palette
 } from "lucide-react";
@@ -39,19 +44,21 @@ const LUXURY_PALETTE = [
   { name: "Rojo Stella", hex: "#DB001A" },
 ];
 
+export type CustomizationType = "select" | "color" | "text" | "number" | "multi";
+
 export interface OpcionForm {
   nombre: string;
-  tipo: any; 
+  tipo: CustomizationType; 
   obligatorio: boolean;
   valores: { valor: string; stock: number }[];
 }
 
 interface ProductFormProps {
   producto?: Producto;
-  categorias: any[];
-  proveedores?: any[];
-  insumosDisponibles?: any[];
-  materialesDisponibles?: any[];
+  categorias: ICategoria[];
+  proveedores?: IProveedor[];
+  insumosDisponibles?: IInsumo[];
+  materialesDisponibles?: IMaterial[];
   onSubmit: (
     data: CreateProductoDTO | UpdateProductoDTO,
     imagenFile?: File,
@@ -110,7 +117,6 @@ export default function ProductForm({
   const [materialesSeleccionados, setMaterialesSeleccionados] = useState<number[]>([]);
   const [juegoComponents, setJuegoComponents] = useState<string[]>(["Anillo", "Collar", "Aretes"]);
   const [newComponent, setNewComponent] = useState("");
-  const [debugLog, setDebugLog] = useState<string[]>([]);
   
   const COSTO_MINUTO = 1.0; 
 
@@ -126,7 +132,7 @@ export default function ProductForm({
     setOpciones(prev => prev.filter((_, idx) => idx !== i));
   };
 
-  const updateOpcion = (i: number, field: keyof OpcionForm, value: any) => {
+  const updateOpcion = <K extends keyof OpcionForm>(i: number, field: K, value: OpcionForm[K]) => {
     setOpciones(prev =>
       prev.map((op, idx) => (idx === i ? { ...op, [field]: value } : op))
     );
@@ -140,7 +146,7 @@ export default function ProductForm({
     );
   };
 
-  const updateValor = (opIdx: number, valIdx: number, field: "valor" | "stock", value: any) => {
+  const updateValor = <K extends "valor" | "stock">(opIdx: number, valIdx: number, field: K, value: { valor: string; stock: number }[K]) => {
     setOpciones(prev =>
       prev.map((op, idx) =>
         idx === opIdx
@@ -184,7 +190,7 @@ export default function ProductForm({
       "id_categoria",
     ];
 
-    let newValue = numericFields.includes(name) ? parseFloat(value) || 0 : value;
+    const newValue = numericFields.includes(name) ? parseFloat(value) || 0 : value;
     
     setFormData(prev => {
       const updated = { ...prev, [name]: newValue };
@@ -269,7 +275,7 @@ export default function ProductForm({
         roi_porcentaje: nuevoROI
       }));
     }
-  }, [formData.costo, formData.precio, formData.isManualPrecio, formData.tipo, formData.tiempo, proveedorRelacion.precio_compra, insumosSeleccionados, insumosDisponibles]);
+  }, [formData.costo, formData.precio, formData.isManualPrecio, formData.tipo, formData.tiempo, proveedorRelacion.precio_compra, insumosSeleccionados, insumosDisponibles, formData.costo_mayorista, formData.ganancia, formData.roi_porcentaje]);
 
   // -- Inteligencia de Capacidad de Producción --
   const capacidadInfo = useMemo(() => {
@@ -301,24 +307,18 @@ export default function ProductForm({
   useEffect(() => {
     if (!formData.es_personalizable || opciones.length === 0) return;
     
-    // Solo sumamos si hay al menos una opción con valores que tengan stock
-    // Normalmente el stock se define en UNA de las opciones (ej: Talla)
-    // Buscamos la primera opción que tenga stock definido en sus valores (> 0)
-    // o simplemente sumamos la opción con más stock total para ser conservadores
-    
-    let maxStockEnOpcion = 0;
-    let tieneVariantesConStock = false;
+    // Sumamos el stock de la opción que consideramos "primaria" (usualmente Talla)
+    // Priorizamos opciones con nombres como "talla", "medida", "size"
+    const opcionPrimaria = opciones.find(op => 
+      ['talla', 'tallas', 'medida', 'size', 'dimension'].includes(op.nombre.toLowerCase())
+    ) || opciones.find(op => op.valores.some(v => (v.stock || 0) > 0)) || opciones[0];
 
-    opciones.forEach(op => {
-      if (op.tipo === 'select' || op.tipo === 'color') {
-        const totalOp = op.valores.reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
-        if (totalOp > 0) tieneVariantesConStock = true;
-        if (totalOp > maxStockEnOpcion) maxStockEnOpcion = totalOp;
+    if (opcionPrimaria) {
+      const totalStock = opcionPrimaria.valores.reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
+      
+      if (totalStock !== formData.stock_actual) {
+        setFormData(prev => ({ ...prev, stock_actual: totalStock }));
       }
-    });
-
-    if (tieneVariantesConStock && maxStockEnOpcion !== formData.stock_actual) {
-      setFormData(prev => ({ ...prev, stock_actual: maxStockEnOpcion }));
     }
   }, [opciones, formData.es_personalizable, formData.stock_actual]);
 
@@ -365,17 +365,20 @@ export default function ProductForm({
 
     // Filtrar campos que no van a la base de datos
     const { isManualPrecio, ganancia, roi_porcentaje, ...dataToSave } = formData;
+    void isManualPrecio;
+    void ganancia;
+    void roi_porcentaje;
 
     // Preparar opciones incluyendo los componentes del juego si aplica
     const esJuego = categorias.find(c => c.id === formData.id_categoria)?.nombre?.toLowerCase().includes("juego");
-    const opcionesFinales = [...opciones];
+    const opcionesFinales: OpcionForm[] = [...opciones];
     
     if (esJuego && juegoComponents.length > 0) {
       // Buscar si ya existe la opción de componentes para no duplicar
       const idx = opcionesFinales.findIndex(o => o.nombre === "Componentes del Juego");
-      const opcionJuego = {
+      const opcionJuego: OpcionForm = {
         nombre: "Componentes del Juego",
-        tipo: "multi" as any,
+        tipo: "multi",
         obligatorio: true,
         valores: juegoComponents.map(c => ({ valor: c, stock: 0 }))
       };
@@ -389,7 +392,7 @@ export default function ProductForm({
 
     try {
       await onSubmit(
-        dataToSave as any,
+        dataToSave as CreateProductoDTO | UpdateProductoDTO,
         imagenFile || undefined,
         opcionesFinales,
         formData.tipo === "revendido" ? proveedorRelacion : undefined,
@@ -413,11 +416,11 @@ export default function ProductForm({
         const resOp = await fetch(`/api/productos/${producto.id}/opciones`, { signal: controller.signal });
         const dataOp = await resOp.json();
         if (resOp.ok && dataOp.opciones) {
-          const opcionesMapeadas: OpcionForm[] = dataOp.opciones.map((op: any) => ({
+          const opcionesMapeadas: OpcionForm[] = dataOp.opciones.map((op: { nombre: string; tipo: CustomizationType; obligatorio: boolean; valores?: { valor: string; stock?: number }[] }) => ({
             nombre: op.nombre,
             tipo: op.tipo,
             obligatorio: op.obligatorio,
-            valores: op.valores?.map((v: any) => ({
+            valores: op.valores?.map((v) => ({
               valor: v.valor,
               stock: v.stock || 0
             })) ?? [],
@@ -452,7 +455,7 @@ export default function ProductForm({
           const dataIns = await resIns.json();
           if (resIns.ok && dataIns.insumos) {
             console.log("Insumos cargados:", dataIns.insumos);
-            setInsumosSeleccionados(dataIns.insumos.map((i: any) => ({
+            setInsumosSeleccionados(dataIns.insumos.map((i: { id_insumo: number; cantidad_necesaria: string | number }) => ({
               id_insumo: i.id_insumo,
               cantidad_necesaria: Number(i.cantidad_necesaria)
             })));
@@ -469,8 +472,8 @@ export default function ProductForm({
           setMaterialesSeleccionados(materialesIds);
         }
 
-      } catch (err: any) {
-        if (err.name !== 'AbortError') {
+      } catch (err) {
+        if (err instanceof Error && err.name !== 'AbortError') {
           console.error("Error cargando datos del producto:", err);
         }
       } finally {
@@ -482,7 +485,7 @@ export default function ProductForm({
   }, [producto?.id, producto?.tipo]);
 
   // -- Render Helpers --
-  const SectionHeader = ({ title, highlight, icon: Icon, children }: { title: string, highlight?: string, icon: any, children?: React.ReactNode }) => (
+  const SectionHeader = ({ title, highlight, icon: Icon, children }: { title: string, highlight?: string, icon: React.ElementType, children?: React.ReactNode }) => (
     <div className="flex items-center justify-between mb-12 group/header">
       <div className="flex items-center gap-6">
         <div 
@@ -668,7 +671,7 @@ export default function ProductForm({
                   </div>
                   <div>
                     <label className="text-[0.7rem] font-bold text-[#708090] uppercase tracking-widest block mb-1">Tipo</label>
-                    <select value={opcion.tipo} onChange={(e) => updateOpcion(index, "tipo", e.target.value as any)} className="w-full bg-[#f6f4ef]/70 border border-transparent rounded-[10px] px-3 py-2 text-sm text-[#4a5568] font-bold focus:border-[#b76e79] focus:bg-white outline-none cursor-pointer appearance-none">
+                    <select value={opcion.tipo} onChange={(e) => updateOpcion(index, "tipo", e.target.value as CustomizationType)} className="w-full bg-[#f6f4ef]/70 border border-transparent rounded-[10px] px-3 py-2 text-sm text-[#4a5568] font-bold focus:border-[#b76e79] focus:bg-white outline-none cursor-pointer appearance-none">
                       <option value="select">Lista</option>
                       <option value="color">Color</option>
                       <option value="text">Texto</option>
@@ -685,7 +688,7 @@ export default function ProductForm({
                     </label>
                   </div>
                 </div>
-                {opcion.tipo !== "text" && opcion.tipo !== "number" && (
+                {opcion.tipo !== "text" && (
                   <div className="pt-3 border-t border-[rgba(112,128,144,0.08)]">
                     {/* Paleta sugerida solo para tipo color */}
                     {opcion.tipo === "color" && (
@@ -758,18 +761,18 @@ export default function ProductForm({
                             </div>
 
                             {/* Input de Stock por Variante */}
-                            <div className="flex flex-col items-center border-l border-[rgba(112,128,144,0.15)] pl-2 ml-1">
-                              <span className="text-[0.55rem] font-bold text-[#708090] uppercase opacity-60">Stock</span>
+                            <div className="flex flex-col items-center border-l-2 border-[#b76e79]/20 pl-3 ml-1 bg-white/40 rounded-r-xl px-2">
+                              <span className="text-[0.6rem] font-black text-[#b76e79] uppercase tracking-tighter">Stock</span>
                               <input 
                                 type="number"
                                 value={val.stock}
                                 onChange={(e) => updateValor(index, vIdx, "stock", parseInt(e.target.value) || 0)}
-                                className="bg-transparent border-none p-0 text-xs font-black text-[#8c9768] w-8 text-center focus:ring-0 outline-none"
+                                className="bg-transparent border-none p-0 text-sm font-black text-[#4a5568] w-12 text-center focus:ring-0 outline-none"
                               />
                             </div>
                             
                             <button type="button" onClick={() => eliminarValor(index, vIdx)} className="text-[#708090]/30 hover:text-rose-500 transition-colors ml-1 opacity-0 group-hover/val:opacity-100">
-                              <PlusCircle size={12} className="rotate-45" />
+                              <PlusCircle size={14} className="rotate-45" />
                             </button>
                           </div>
                         );
@@ -1108,14 +1111,22 @@ export default function ProductForm({
           </div>
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end gap-1">
-              <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">Stock actual</label>
+              <div className="flex items-center gap-2">
+                {formData.es_personalizable && (
+                  <span className="bg-[#b76e79]/10 text-[#b76e79] text-[0.6rem] font-bold px-2 py-0.5 rounded-full animate-pulse border border-[#b76e79]/20">
+                    Calculado de variantes
+                  </span>
+                )}
+                <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">Stock actual</label>
+              </div>
               <input
                 type="number"
                 name="stock_actual"
                 value={formData.stock_actual}
                 onChange={handleChange}
-                className="w-32 bg-white border-2 border-transparent focus:border-[#b76e79] rounded-xl py-2 px-4 text-xl font-black text-[#4a5568] outline-none transition-all text-right shadow-sm"
-                style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
+                readOnly={formData.es_personalizable}
+                className={`w-32 bg-white border-2 border-transparent ${formData.es_personalizable ? 'opacity-70 cursor-not-allowed border-[#b76e79]/20 shadow-inner' : 'focus:border-[#b76e79]'} rounded-xl py-2 px-4 text-xl font-black text-[#4a5568] outline-none transition-all text-right shadow-sm`}
+                style={{ fontFamily: "var(--font-display, Manrope, sans-serif)", color: formData.es_personalizable ? "#b76e79" : "#4a5568" }}
               />
             </div>
             <div className="w-px h-10 bg-[rgba(112,128,144,0.2)]" />
@@ -1143,7 +1154,13 @@ export default function ProductForm({
             <p className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest">Imagen</p>
             <div className="w-full aspect-square bg-[#f6f4ef] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] overflow-hidden relative group">
               {previewUrl ? (
-                <img src={previewUrl || undefined} alt="Preview" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image 
+                  src={previewUrl} 
+                  alt="Preview" 
+                  width={160} 
+                  height={160} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#708090]/30">
                   <ImageIcon size={28} strokeWidth={1} />

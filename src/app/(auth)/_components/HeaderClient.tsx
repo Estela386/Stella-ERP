@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { logout } from "@auth/actions";
+import { IUsuario } from "@/lib/models/Usuario";
 import {
   User,
   LogOut,
@@ -138,7 +139,7 @@ function Divider() {
 }
 
 interface HeaderClientProps {
-  user?: any;
+  user?: IUsuario | null;
 }
 
 export default function HeaderClient({ user: userProp }: HeaderClientProps) {
@@ -168,23 +169,30 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [userMenu,   setUserMenu]   = useState(false);
   const [cartCount,  setCartCount]  = useState(0);
-  const [menuPos,    setMenuPos]    = useState({ top: 0, right: 0 });
 
   const userMenuRef   = useRef<HTMLDivElement>(null);
   const avatarBtnRef  = useRef<HTMLButtonElement>(null);
 
-  if (pathname === "/login" || pathname === "/register") return null;
+  const navItems = useMemo(() => {
+    const base = [
+      { label: "Inicio",               href: "/dashboard/cliente" },
+      { label: "Personalizados",       href: "/dashboard/cliente/catalogo?categoria=personalizada" },
+      { label: "Nuevos",               href: "/dashboard/cliente/catalogo?categoria=nuevos" },
+      { label: "Accesorios",           href: "/dashboard/cliente/catalogo?categoria=accesorios" },
+    ];
 
-  const navItems = [
-    { label: "Inicio",               href: "/dashboard/cliente" },
-    { label: "Personalizados",       href: "/dashboard/cliente/catalogo?categoria=personalizada" },
-    { label: "Nuevos",               href: "/dashboard/cliente/catalogo?categoria=nuevos" },
-    { label: "Accesorios",           href: "/dashboard/cliente/catalogo?categoria=accesorios" },
-    { label: id_rol === 3 ? "Panel Mayorista" : "Mayoreo", href: "/dashboard/cliente/mayoreo" },
-    { label: "Preguntas frecuentes", href: "/dashboard/cliente/faq" },
-    { label: "Nosotros",             href: "/dashboard/cliente/nosotros" },
-    { label: "Contacto",             href: "/dashboard/cliente/contacto" },
-  ];
+    if (isUserLoaded) {
+      base.push({ label: id_rol === 3 ? "Panel Mayorista" : "Mayoreo", href: "/dashboard/cliente/mayoreo" });
+    }
+
+    base.push(
+      { label: "Preguntas frecuentes", href: "/dashboard/cliente/faq" },
+      { label: "Nosotros",             href: "/dashboard/cliente/nosotros" },
+      { label: "Contacto",             href: "/dashboard/cliente/contacto" }
+    );
+
+    return base;
+  }, [id_rol, isUserLoaded]);
 
   useEffect(() => {
     const update = () => {
@@ -220,6 +228,8 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
     document.body.style.overflow = mobileMenu ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileMenu]);
+
+  if (pathname === "/login" || pathname === "/register") return null;
 
   const handleToggleMenu = () => {
     setUserMenu(v => !v);
@@ -318,8 +328,8 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               </button>
             )}
 
-            {/* Carrito */}
-            {isClientDashboard && (
+            {/* Carrito (Solo si está logueado) */}
+            {isUserLoaded && isClientDashboard && (
               <button
                 className="relative cursor-pointer border-none bg-transparent"
                 style={{ color: SLATE }}
@@ -337,130 +347,157 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               </button>
             )}
 
-            {/* Avatar */}
-            <div className="relative" ref={userMenuRef}>
-              <button
-                ref={avatarBtnRef}
-                className="flex items-center justify-center rounded-full border-none cursor-pointer font-bold transition-transform hover:scale-105 active:scale-95"
-                style={{ 
-                  width: 40, 
-                  height: 40, 
-                  background: isUserLoaded ? ROSE : "#E4E1DB", 
-                  color: WHITE, 
-                  fontSize: 16 
-                }}
-                onClick={handleToggleMenu}
-                disabled={loading}
-              >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <div className="relative">
-                    {initials}
-                    {id_rol === 3 && (
-                      <div className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-0.5 border border-white shadow-sm">
-                        <Star size={8} fill="white" color="white" />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </button>
-
-              {/* DROPDOWN MENU */}
-              <AnimatePresence>
-                {userMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                    transition={{ type: "spring", damping: 24, stiffness: 300 }}
-                    style={{
-                      position: "absolute",
-                      top: "calc(100% + 10px)",
-                      right: 0,
-                      width: 240,
-                      background: WHITE,
-                      border: `1px solid ${BORDER}`,
-                      boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-                      borderRadius: 16,
-                      overflow: "hidden",
-                      zIndex: 9999,
-                    }}
-                  >
-                    {/* Info usuario */}
-                    <div
-                      className="flex items-center gap-3 p-4"
-                      style={{ borderBottom: `1px solid ${BORDER}` }}
-                    >
-                      <div
-                        className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
-                        style={{ width: 38, height: 38, background: ROSE, color: WHITE, fontSize: 15 }}
-                      >
-                        {initials}
-                      </div>
-                      <div className="overflow-hidden">
-                        <div className="flex items-center gap-1.5 overflow-hidden">
-                          <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
-                            {usuario?.nombre || "Mi cuenta"}
-                          </p>
-                          {id_rol === 3 && (
-                            <span className="bg-yellow-100 text-yellow-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-yellow-200 uppercase tracking-wider flex-shrink-0">
-                              Socio
-                            </span>
-                          )}
+            {/* Avatar o Botones de Auth */}
+            {isUserLoaded ? (
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  ref={avatarBtnRef}
+                  className="flex items-center justify-center rounded-full border-none cursor-pointer font-bold transition-transform hover:scale-105 active:scale-95"
+                  style={{ 
+                    width: 40, 
+                    height: 40, 
+                    background: ROSE, 
+                    color: WHITE, 
+                    fontSize: 16 
+                  }}
+                  onClick={handleToggleMenu}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <div className="relative">
+                      {initials}
+                      {id_rol === 3 && (
+                        <div className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-0.5 border border-white shadow-sm">
+                          <Star size={8} fill="white" color="white" />
                         </div>
-                        <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                          {id_rol === 3 ? "Cuenta Mayorista" : (usuario?.correo || "")}
-                        </p>
-                      </div>
+                      )}
                     </div>
+                  )}
+                </button>
 
-                    {/* Opciones */}
-                    <div className="p-2">
-                      {isUserLoaded && (
+                <AnimatePresence>
+                  {userMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                      transition={{ type: "spring", damping: 24, stiffness: 300 }}
+                      style={{
+                        position: "absolute",
+                        top: "calc(100% + 10px)",
+                        right: 0,
+                        width: 240,
+                        background: WHITE,
+                        border: `1px solid ${BORDER}`,
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                        borderRadius: 16,
+                        overflow: "hidden",
+                        zIndex: 9999,
+                      }}
+                    >
+                      {/* Info usuario */}
+                      <div
+                        className="flex items-center gap-3 p-4"
+                        style={{ borderBottom: `1px solid ${BORDER}` }}
+                      >
+                        <div
+                          className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
+                          style={{ width: 38, height: 38, background: ROSE, color: WHITE, fontSize: 15 }}
+                        >
+                          {initials}
+                        </div>
+                        <div className="overflow-hidden">
+                          <div className="flex items-center gap-1.5 overflow-hidden">
+                            <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
+                              {usuario?.nombre || "Mi cuenta"}
+                            </p>
+                            {id_rol === 3 && (
+                              <span className="bg-yellow-100 text-yellow-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-yellow-200 uppercase tracking-wider flex-shrink-0">
+                                Socio
+                              </span>
+                            )}
+                          </div>
+                          <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
+                            {id_rol === 3 ? "Cuenta Mayorista" : (usuario?.correo || "")}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Opciones */}
+                      <div className="p-2">
                         <NavBtn 
                           icon={<User size={15} />} 
                           label="Mi perfil" 
                           onClick={() => { router.push("/dashboard/cliente/perfil"); setUserMenu(false); }}
                         />
-                      )}
-                      {isClientDashboard && (
-                        <>
-                          <NavBtn 
-                            icon={<Package size={15} />} 
-                            label="Mis pedidos" 
-                            onClick={() => { router.push("/dashboard/cliente/pedidos"); setUserMenu(false); }}
-                          />
-                          <NavBtn icon={<Heart size={15} />}   label="Favoritos" />
-                        </>
-                      )}
-
-                      {(id_rol === 1 || id_rol === 3) && (
-                        <NavBtn
-                          icon={<LayoutDashboard size={15} />}
-                          label="Dashboard ERP"
-                          onClick={() => { router.push("/dashboard/inicio"); setUserMenu(false); }}
+                        <NavBtn 
+                          icon={<Package size={15} />} 
+                          label="Mis pedidos" 
+                          onClick={() => { router.push("/dashboard/cliente/pedidos"); setUserMenu(false); }}
                         />
-                      )}
+                        <NavBtn icon={<Heart size={15} />} label="Favoritos" />
 
-                      <Divider />
-                      <NavBtn
-                        icon={<LogOut size={15} />}
-                        label="Cerrar sesión"
-                        danger
-                        onClick={handleLogout}
-                      />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                        {(id_rol === 1 || id_rol === 3) && (
+                          <NavBtn
+                            icon={<LayoutDashboard size={15} />}
+                            label="Dashboard ERP"
+                            onClick={() => { router.push("/dashboard/inicio"); setUserMenu(false); }}
+                          />
+                        )}
+
+                        <Divider />
+                        <NavBtn
+                          icon={<LogOut size={15} />}
+                          label="Cerrar sesión"
+                          danger
+                          onClick={handleLogout}
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  className="px-4 py-2 text-sm font-semibold rounded-full border transition-all"
+                  style={{ borderColor: ROSE, color: ROSE, background: WHITE }}
+                  onClick={() => router.push("/login")}
+                  onMouseEnter={e => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.background = "#FFFBFC";
+                  }}
+                  onMouseLeave={e => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.background = WHITE;
+                  }}
+                >
+                  Inicia Sesión
+                </button>
+                <button
+                  className="px-4 py-2 text-sm font-semibold rounded-full text-white transition-all shadow-sm"
+                  style={{ background: ROSE, border: "none" }}
+                  onClick={() => router.push("/register")}
+                  onMouseEnter={e => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.background = "#A45F69"; // Tono más oscuro de Rose
+                  }}
+                  onMouseLeave={e => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.background = ROSE;
+                  }}
+                >
+                  Registrarse
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
         {/* ── NAV DESKTOP ── */}
-        {isClientDashboard && (
-          <nav
+        <nav
             className="hidden md:flex justify-center flex-wrap gap-1 px-8 py-3"
             style={{ borderTop: `1px solid ${BORDER}` }}
           >
@@ -502,7 +539,6 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               );
             })}
           </nav>
-        )}
 
         {/* ── MOBILE MENU ── */}
         <AnimatePresence>
@@ -538,24 +574,20 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-3 py-2">
-                  {isClientDashboard && (
-                    <>
-                      <SectionLabel>Navegación</SectionLabel>
-                      {navItems.map(item => {
-                        const active = isActive(item.href);
-                        return (
-                          <NavBtn
-                            key={item.label}
-                            icon={getNavIcon(item.href)}
-                            label={item.label}
-                            active={active}
-                            onClick={() => { router.push(item.href); setMobileMenu(false); }}
-                          />
-                        );
-                      })}
-                      <Divider />
-                    </>
-                  )}
+                  <SectionLabel>Navegación</SectionLabel>
+                  {navItems.map(item => {
+                    const active = isActive(item.href);
+                    return (
+                      <NavBtn
+                        key={item.label}
+                        icon={getNavIcon(item.href)}
+                        label={item.label}
+                        active={active}
+                        onClick={() => { router.push(item.href); setMobileMenu(false); }}
+                      />
+                    );
+                  })}
+                  <Divider />
 
                   <SectionLabel>Mi cuenta</SectionLabel>
 
@@ -601,26 +633,58 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                 >
                   <div
                     className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
-                    style={{ width: 42, height: 42, background: ROSE, color: WHITE, fontSize: 17 }}
+                    style={{ width: 42, height: 42, background: isUserLoaded ? ROSE : "#E4E1DB", color: WHITE, fontSize: 17 }}
                   >
-                    {initials}
+                    {isUserLoaded ? initials : <User size={20} />}
                   </div>
-                  <div className="overflow-hidden">
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <p className="m-0 font-semibold truncate" style={{ fontSize: 15, color: DARK }}>
-                        {usuario?.nombre || "Mi cuenta"}
-                      </p>
-                      {id_rol === 3 && (
-                        <span className="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-200 uppercase tracking-wider flex-shrink-0">
-                          Socio
-                        </span>
-                      )}
-                    </div>
-                    <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                      {id_rol === 3 ? "Cuenta Mayorista" : (usuario?.correo || "")}
-                    </p>
+                  <div className="overflow-hidden flex-1">
+                    {isUserLoaded ? (
+                      <>
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <p className="m-0 font-semibold truncate" style={{ fontSize: 15, color: DARK }}>
+                            {usuario?.nombre || "Mi cuenta"}
+                          </p>
+                          {id_rol === 3 && (
+                            <span className="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-200 uppercase tracking-wider flex-shrink-0">
+                              Socio
+                            </span>
+                          )}
+                        </div>
+                        <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
+                          {id_rol === 3 ? "Cuenta Mayorista" : (usuario?.correo || "")}
+                        </p>
+                      </>
+                    ) : (
+                      <div className="flex flex-col gap-0.5">
+                        <p className="m-0 font-semibold" style={{ fontSize: 15, color: ROSE }}>
+                          ¡Hola, Bienvenida!
+                        </p>
+                        <p className="m-0" style={{ fontSize: 11, color: MUTED }}>
+                          Únete a Stella Joyería
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {!isUserLoaded && (
+                  <div className="p-4 bg-white space-y-2 border-t border-[#8C9796]/10">
+                    <button
+                      className="w-full py-3 rounded-xl font-bold text-sm transition-all"
+                      style={{ background: ROSE_BG, color: ROSE, border: `1px solid ${ROSE}30` }}
+                      onClick={() => { router.push("/login"); setMobileMenu(false); }}
+                    >
+                      Inicia Sesión
+                    </button>
+                    <button
+                      className="w-full py-3 rounded-xl font-bold text-sm text-white shadow-sm transition-all"
+                      style={{ background: ROSE, border: "none" }}
+                      onClick={() => { router.push("/register"); setMobileMenu(false); }}
+                    >
+                      Registrarse
+                    </button>
+                  </div>
+                )}
               </motion.div>
             </>
           )}

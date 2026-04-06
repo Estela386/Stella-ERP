@@ -181,7 +181,7 @@ export default function LabelPrintModal({
           const cat = item.producto.categoria?.nombre || "GENERAL";
           doc.text(`CAT: ${cat.toUpperCase()}`, x + 2.5, y + 26.5, { maxWidth: 22 });
           if (!qrCache[item.producto.id]) {
-            qrCache[item.producto.id] = await QRCode.toDataURL(`${window.location.origin}/productos/${item.producto.id}`, { width: 80, margin: 0 });
+            qrCache[item.producto.id] = await QRCode.toDataURL(`https://www.stellajoyeria.online/productos/${item.producto.id}`, { width: 80, margin: 0 });
           }
           doc.addImage(qrCache[item.producto.id], "PNG", x + 28, y + 8, 19, 19);
           

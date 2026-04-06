@@ -158,7 +158,7 @@ function PedidosPageContent() {
                     </div>
                   ) : (
                     <NuevoPedido 
-                      usuarioId={parseInt(usuario?.id || "0")} 
+                      usuarioId={usuario?.id as unknown as string | number} 
                       onSuccess={() => {
                         setActiveTab("LISTA");
                         cargarPedidos();

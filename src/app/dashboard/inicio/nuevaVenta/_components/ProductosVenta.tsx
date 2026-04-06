@@ -5,15 +5,24 @@ import { useState, useEffect, useRef } from "react";
 import { Search, X, ChevronDown, Plus, Minus, QrCode } from "lucide-react";
 import QrScannerModal from "./QrScannerModal";
 
+import { OpcionForm } from "../../inventarios/_components/ProductForm";
+
 interface ProductoDisponible {
   id: number;
   nombre: string;
   precio: number;
   stock?: number;
   categoria_nombre?: string;
-  opciones?: any[];
+  opciones?: OpcionForm[];
   es_consignado?: boolean;
   id_consignacion_detalle?: number;
+}
+
+interface IUsuarioVenta {
+  id: string | number;
+  id_rol: number;
+  nombre?: string;
+  id_usuario?: number;
 }
 
 type Props = {
@@ -24,7 +33,7 @@ type Props = {
   onDisminuir: (id: number) => void;
   onActualizar: (id: number, cambios: Partial<Producto>) => void;
   clienteSeleccionado: { id: number; nombre: string; id_usuario?: number } | null;
-  usuario: any;
+  usuario: IUsuarioVenta | null;
 };
 
 export default function ProductosVenta({
@@ -45,7 +54,6 @@ export default function ProductosVenta({
   const [qrInput, setQrInput] = useState("");
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [loadingConsignacion, setLoadingConsignacion] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -66,16 +74,15 @@ export default function ProductosVenta({
       }
 
       try {
-        setLoadingConsignacion(true);
         const response = await fetch(`/api/consignaciones?id_mayorista=${idMayoristaBusqueda}`);
         const result = await response.json();
 
         if (response.ok && result.data) {
           // Aplanar los detalles de todas las consignaciones activas
           const consignados: ProductoDisponible[] = [];
-          result.data.forEach((c: any) => {
+          result.data.forEach((c: { estado: string; detalles: { id: number; id_producto: number; cantidad: number; cantidad_vendida?: number; cantidad_devuelta?: number; producto: { nombre: string; precio: number; categoria?: { nombre: string } }; precio_venta?: number }[] }) => {
             if (c.estado === "activa") {
-              c.detalles.forEach((d: any) => {
+              c.detalles.forEach((d) => {
                 const stockPendiente = d.cantidad - (d.cantidad_vendida || 0) - (d.cantidad_devuelta || 0);
                 if (stockPendiente > 0) {
                   consignados.push({
@@ -95,8 +102,6 @@ export default function ProductosVenta({
         }
       } catch (err) {
         console.error("Error al cargar consignados:", err);
-      } finally {
-        setLoadingConsignacion(false);
       }
     };
 
@@ -265,9 +270,9 @@ export default function ProductosVenta({
                     {/* Checkboxes de partes */}
                     <div className="flex flex-wrap gap-2">
                       {(() => {
-                        const opJuego = p.opciones?.find((o: any) => o.nombre === "Componentes del Juego");
+                        const opJuego = p.opciones?.find((o: OpcionForm) => o.nombre === "Componentes del Juego");
                         const componentes = opJuego && opJuego.valores 
-                          ? opJuego.valores.map((v: any) => v.valor) 
+                          ? opJuego.valores.map((v: { valor: string }) => v.valor) 
                           : ["Anillo", "Collar", "Aretes"];
                         
                         return componentes.map((parte: string) => {

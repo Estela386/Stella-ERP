@@ -12,7 +12,7 @@ import type { IProducto, OpcionDTO } from "../../../../../lib/models/Producto";
 import Image from "next/image";
 
 interface NuevoPedidoProps {
-  usuarioId: number;
+  usuarioId: number | string;
   onSuccess: () => void;
 }
 
@@ -203,7 +203,7 @@ export default function NuevoPedido({ usuarioId, onSuccess }: NuevoPedidoProps) 
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-10 items-start">
+    <div className="flex flex-col-reverse lg:flex-row gap-8 lg:gap-10 items-start">
       
       {/* SECCIÓN IZQUIERDA: BUSCADOR Y RESULTADOS */}
       <div className="flex-1 space-y-8 w-full">
@@ -228,7 +228,7 @@ export default function NuevoPedido({ usuarioId, onSuccess }: NuevoPedidoProps) 
                 <p className="text-xs text-[#8C9796] tracking-widest uppercase font-medium">Buscando artículos...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               <AnimatePresence mode="popLayout">
                 {productosFiltrados.slice(0, 8).map((p, idx) => (
                   <motion.div 
@@ -241,7 +241,7 @@ export default function NuevoPedido({ usuarioId, onSuccess }: NuevoPedidoProps) 
                     className="group bg-white p-5 rounded-[2rem] border border-black/5 shadow-sm flex items-center justify-between hover:shadow-xl hover:border-[#B76E79]/20 transition-all cursor-default"
                   >
                     <div className="flex items-center gap-5">
-                      <div className="w-14 h-14 bg-[#F6F4EF] rounded-2xl flex items-center justify-center text-[#B76E79] group-hover:scale-110 transition-transform duration-500 overflow-hidden relative">
+                      <div className="w-14 h-14 bg-[#F6F4EF] rounded-2xl flex items-center justify-center text-[#B76E79] group-hover:scale-110 transition-transform duration-500 overflow-hidden relative shrink-0">
                         {p.url_imagen ? (
                             <Image src={p.url_imagen} alt={p.nombre || "Producto"} fill sizes="(max-width: 768px) 100vw, 56px" className="object-cover" />
                         ) : (
@@ -250,10 +250,10 @@ export default function NuevoPedido({ usuarioId, onSuccess }: NuevoPedidoProps) 
                       </div>
                       <div className="space-y-1">
                         <p className="font-bold text-[#708090] text-sm leading-tight">{p.nombre}</p>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
                             <p className="text-xs font-bold text-[#B76E79]">${p.precio} MXN</p>
                             {p.es_personalizable && (
-                                <span className="flex items-center gap-1 text-[9px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                                <span className="flex shrink-0 items-center gap-1 text-[8px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider whitespace-nowrap">
                                     <Sparkles size={8} /> Personalizable
                                 </span>
                             )}
@@ -275,8 +275,8 @@ export default function NuevoPedido({ usuarioId, onSuccess }: NuevoPedidoProps) 
       </div>
 
       {/* SECCIÓN DERECHA: RESUMEN Y ACCIÓN */}
-      <div className="w-full lg:w-[400px] shrink-0 sticky top-10">
-        <div className="bg-white rounded-[2.5rem] p-8 border border-black/5 shadow-2xl flex flex-col min-h-[500px] overflow-hidden relative">
+      <div className="w-full lg:w-[340px] xl:w-[380px] shrink-0 sticky top-10">
+        <div className="bg-white rounded-[2rem] p-6 lg:p-7 border border-black/5 shadow-xl flex flex-col min-h-[300px] lg:min-h-[500px] overflow-hidden relative">
           
           {/* Header del Carrito */}
           <div className="flex justify-between items-center mb-8">
@@ -354,11 +354,22 @@ export default function NuevoPedido({ usuarioId, onSuccess }: NuevoPedidoProps) 
 
                                 {item.personalizacion ? (
                                     <div className="mt-3 flex flex-wrap gap-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
-                                        {Object.entries(item.personalizacion).map(([key, val]) => (
-                                            <span key={key} className="bg-white/80 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-black/5 text-[9px] font-bold text-[#8C9796] italic">
-                                                {String(val)}
-                                            </span>
-                                        ))}
+                                        {Object.entries(item.personalizacion).map(([key, val]) => {
+                                            const valStr = String(val);
+                                            const hasPipe = valStr.includes('|');
+                                            const [name, colorHex] = hasPipe ? valStr.split('|') : [valStr, ''];
+                                            const isColor = hasPipe && colorHex.startsWith('#');
+                                            
+                                            return (
+                                                <span key={key} className="bg-white/80 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-black/5 text-[10px] font-bold text-[#8C9796] flex items-center gap-1.5 shadow-sm">
+                                                    <span className="text-slate-400 font-medium">{key}:</span>
+                                                    {isColor && (
+                                                        <span className="w-2.5 h-2.5 rounded-full shadow-inner border border-black/10" style={{ backgroundColor: colorHex }} />
+                                                    )}
+                                                    {name}
+                                                </span>
+                                            );
+                                        })}
                                     </div>
                                 ) : needsConfig && (
                                     <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-amber-600 bg-amber-100/50 p-2 rounded-xl border border-amber-200">
@@ -394,7 +405,7 @@ export default function NuevoPedido({ usuarioId, onSuccess }: NuevoPedidoProps) 
 
             <button
               onClick={enviarPedido}
-              disabled={carrito.length === 0 || enviando}
+              disabled={carrito.length === 0 || enviando || !usuarioId}
               className="w-full bg-[#B76E79] text-white py-5 rounded-[2rem] font-bold text-lg shadow-[0_20px_40px_rgba(183,110,121,0.3)] hover:shadow-[0_25px_50px_rgba(183,110,121,0.4)] hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:translate-y-0 transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden group"
             >
               {enviando ? (
@@ -498,25 +509,68 @@ export default function NuevoPedido({ usuarioId, onSuccess }: NuevoPedidoProps) 
                         />
                       )}
 
-                      {op.tipo === "multi" && (
-                        <div className="flex flex-wrap gap-4">
+                      {(op.tipo === "multi" || op.tipo === "color") && (
+                        <div className="flex flex-wrap gap-3">
                           {op.valores?.map((v, vIdx) => {
-                             const [name, hex] = v.valor?.includes('|') ? v.valor.split('|') : [v.valor, '#000'];
-                             const isColor = hex.startsWith('#');
+                             const hasPipe = v.valor?.includes('|');
+                             const [name, hexCode] = hasPipe ? v.valor.split('|') : [v.valor, ''];
+                             
+                             const isColorField = op.tipo === "color" || 
+                                                  op.nombre.toLowerCase().includes('color') || 
+                                                  op.nombre.toLowerCase().includes('tono') || 
+                                                  op.nombre.toLowerCase().includes('metal');
+                             
+                             const isColor = isColorField || (hasPipe && hexCode.startsWith('#'));
+                             
+                             // Fallback to recognized colors if no hex is provided
+                             const getFallbackColor = (n: string) => {
+                                 const lowered = n.toLowerCase();
+                                 if (lowered.includes('oro rosa') || lowered.includes('rose')) return '#C07C88';
+                                 if (lowered.includes('oro') || lowered.includes('dorad')) return '#D4AF37';
+                                 if (lowered.includes('plata') || lowered.includes('platead')) return '#E2E8F0';
+                                 if (lowered.includes('blanc')) return '#F8FAFC';
+                                 if (lowered.includes('negr')) return '#1E293B';
+                                 if (lowered.includes('roj')) return '#EF4444';
+                                 if (lowered.includes('azul')) return '#3B82F6';
+                                 if (lowered.includes('verd')) return '#10B981';
+                                 if (lowered.includes('amarill')) return '#F59E0B';
+                                 if (lowered.includes('rosa')) return '#F472B6';
+                                 if (lowered.includes('morad') || lowered.includes('lila')) return '#8B5CF6';
+                                 return '#E2E8F0'; // Default gray/silver
+                             };
+                             
+                             const hex = (hasPipe && hexCode.startsWith('#')) ? hexCode : getFallbackColor(name);
                              const active = configuracionActual[op.nombre] === v.valor;
-                             return (
-                               <button
-                                 key={vIdx}
-                                 onClick={() => setConfiguracionActual({...configuracionActual, [op.nombre]: v.valor})}
-                                 className={`group flex flex-col items-center gap-2 transition-all p-2 rounded-2xl ${active ? 'bg-[#F6F4EF]' : 'hover:bg-slate-50'}`}
-                               >
-                                 <div 
-                                  className={`w-10 h-10 rounded-full border-4 shadow-sm transition-all duration-300 ${active ? 'border-[#B76E79] scale-110 shadow-lg' : 'border-white hover:scale-105'}`}
-                                  style={{ backgroundColor: isColor ? hex : '#ccc' }}
-                                 />
-                                 <span className={`text-[10px] font-bold transition-colors ${active ? 'text-[#B76E79]' : 'text-slate-400'}`}>{name}</span>
-                               </button>
-                             )
+                             
+                             if (isColor) {
+                               return (
+                                 <button
+                                   key={vIdx}
+                                   onClick={() => setConfiguracionActual({...configuracionActual, [op.nombre]: v.valor})}
+                                   className={`group flex flex-col items-center gap-1 transition-all p-2 rounded-2xl ${active ? 'bg-[#F6F4EF] shadow-sm' : 'hover:bg-slate-50'}`}
+                                 >
+                                   <div 
+                                    className={`w-10 h-10 rounded-full border-[3px] transition-all duration-300 ${active ? 'border-[#B76E79] shadow-md scale-110' : 'border-gray-200 hover:scale-105 hover:border-gray-300'}`}
+                                    style={{ backgroundColor: hex }}
+                                   />
+                                   <span className={`text-[10px] font-bold mt-1 text-center max-w-[60px] leading-tight transition-colors ${active ? 'text-[#B76E79]' : 'text-slate-400'}`}>{name}</span>
+                                 </button>
+                               )
+                             } else {
+                               return (
+                                 <button
+                                   key={vIdx}
+                                   onClick={() => setConfiguracionActual({...configuracionActual, [op.nombre]: v.valor})}
+                                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                                      active 
+                                        ? 'bg-[#B76E79] text-white shadow-md' 
+                                        : 'bg-white border-2 border-slate-100 text-[#708090] hover:border-slate-200'
+                                    } whitespace-normal text-left`}
+                                 >
+                                   {name}
+                                 </button>
+                               )
+                             }
                           })}
                         </div>
                       )}

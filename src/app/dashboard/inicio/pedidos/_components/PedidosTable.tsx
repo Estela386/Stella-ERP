@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Pedido } from "../type";
-import { X, ChevronRight, ShoppingBag, Clock, CheckCircle2 } from "lucide-react";
+import { X, ChevronRight, ShoppingBag, Clock, Truck, BadgeDollarSign } from "lucide-react";
 import type { Usuario } from "@/lib/models";
 
 type Props = {
@@ -207,11 +207,22 @@ export default function PedidosTable({ pedidos, usuario, onStatusChange }: Props
                           <p className="text-sm font-bold text-[#1E293B]">{det.producto?.nombre || "Producto retirado"}</p>
                           {det.personalizacion && Object.keys(det.personalizacion).length > 0 && (
                             <div className="mt-2 flex flex-wrap gap-1.5">
-                              {Object.entries(det.personalizacion || {}).map(([key, val]) => (
-                                <span key={key} className="px-2 py-0.5 bg-white border border-black/5 rounded-lg text-[9px] font-bold text-[#64748B] italic shadow-sm">
-                                  {String(val)}
-                                </span>
-                              ))}
+                              {Object.entries(det.personalizacion || {}).map(([key, val]) => {
+                                const valStr = String(val);
+                                const hasPipe = valStr.includes('|');
+                                const [name, colorHex] = hasPipe ? valStr.split('|') : [valStr, ''];
+                                const isColor = hasPipe && colorHex.startsWith('#');
+                                
+                                return (
+                                  <span key={key} className="inline-flex items-center gap-1.5 px-2 py-1 bg-white border border-black/5 rounded-lg text-[10px] font-bold text-[#64748B] shadow-sm">
+                                    <span className="text-[#94A3B8] font-medium">{key}:</span>
+                                    {isColor && (
+                                        <span className="w-2.5 h-2.5 rounded-full shadow-inner border border-black/10" style={{ backgroundColor: colorHex }} />
+                                    )}
+                                    {name}
+                                  </span>
+                                );
+                              })}
                             </div>
                           )}
                         </td>
@@ -230,12 +241,31 @@ export default function PedidosTable({ pedidos, usuario, onStatusChange }: Props
               </div>
             </div>
 
-            <div className="px-8 py-6 border-t border-[#F1F5F9] bg-[#F8FAFC] flex justify-end">
+            <div className="px-8 py-6 border-t border-[#F1F5F9] bg-[#F8FAFC]/50 backdrop-blur-sm flex flex-wrap items-center justify-end gap-4">
+              {idRolUsuario === 1 && (
+                <>
+                  <button
+                    onClick={() => router.push(`/dashboard/inicio/nuevaVenta?pedidoId=${selected.id}`)}
+                    className="flex items-center gap-2.5 px-7 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-bold text-sm shadow-xl shadow-emerald-200/50 hover:shadow-emerald-300/60 hover:-translate-y-1 active:scale-95 transition-all duration-300 group"
+                  >
+                    <BadgeDollarSign size={18} className="group-hover:rotate-12 transition-transform" />
+                    <span>Convertir a Venta</span>
+                  </button>
+                  <button
+                    onClick={() => router.push(`/dashboard/inicio/consignaciones?pedidoId=${selected.id}`)}
+                    className="flex items-center gap-2.5 px-7 py-3.5 bg-gradient-to-r from-[#B76E79] to-[#8C525A] text-white rounded-2xl font-bold text-sm shadow-xl shadow-rose-200/50 hover:shadow-rose-300/60 hover:-translate-y-1 active:scale-95 transition-all duration-300 group"
+                  >
+                    <Truck size={18} className="group-hover:translate-x-1 transition-transform" />
+                    <span>Enviar a Consignación</span>
+                  </button>
+                </>
+              )}
+              <div className="h-8 w-px bg-slate-200 mx-2 hidden sm:block" />
               <button 
                 onClick={() => setSelected(null)}
-                className="px-8 py-3 bg-[#1E293B] text-white rounded-2xl font-bold text-sm shadow-xl shadow-slate-200 hover:scale-105 transition-transform"
+                className="px-8 py-3.5 bg-white border border-slate-200 text-[#1E293B] rounded-2xl font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm"
               >
-                Entendido
+                Cerrar
               </button>
             </div>
           </div>

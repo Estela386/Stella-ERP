@@ -5,7 +5,12 @@ import type { NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const protectedRoutes = ["/dashboard"];
+  const protectedRoutes = [
+    "/dashboard/inicio",
+    "/dashboard/cliente/perfil",
+    "/dashboard/cliente/pedidos",
+    "/dashboard/cliente/mayoreo"
+  ];
   const adminOnlyRoutes = ["/dashboard/inicio/inventarios"];
 
   const isProtectedRoute = protectedRoutes.some(route =>

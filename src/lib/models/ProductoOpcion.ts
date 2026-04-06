@@ -2,7 +2,7 @@ export interface IProductoOpcion {
   id: number;
   producto_id: number;
   nombre: string;
-  tipo: "select" | "text" | "number";
+  tipo: "select" | "text" | "number" | "color" | "multi";
   obligatorio: boolean;
   max_selecciones?: number;
   orden?: number;

@@ -406,10 +406,10 @@ export default function HomeClient() {
             <motion.button
               whileHover={{ y: -2, boxShadow: `0 8px 22px ${C.roseMid}` }}
               whileTap={{ scale: 0.96 }}
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/dashboard/cliente")}
               style={{ background: C.rose, color: "#f6f4ef", border: "none", cursor: "pointer", padding: "9px 20px", borderRadius: 6, fontSize: "0.78rem", letterSpacing: "0.04em", fontFamily: "var(--font-sans, Inter, sans-serif)", boxShadow: `0 3px 10px ${C.roseBorder}`, transition: "box-shadow 0.2s" }}
             >
-              Crear cuenta
+              Visitar Tienda
             </motion.button>
             <button className="ham-btn" onClick={() => setMobileOpen(true)} style={{ display: "none", background: "none", border: "none", cursor: "pointer", color: C.slate, padding: 4, alignItems: "center" }}>
               <Menu size={20} />
@@ -436,8 +436,11 @@ export default function HomeClient() {
                 ))}
               </div>
               <div style={{ paddingBottom: 40, display: "flex", flexDirection: "column", gap: 10 }}>
-                <button onClick={() => { router.push("/login"); setMobileOpen(false); }} style={{ background: "none", border: `1.5px solid ${C.slateMid}`, borderRadius: 6, padding: "12px 0", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", color: C.slate, cursor: "pointer" }}>Iniciar sesión</button>
-                <button onClick={() => { router.push("/register"); setMobileOpen(false); }} style={{ background: C.rose, color: "#f6f4ef", border: "none", borderRadius: 6, padding: "12px 0", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", cursor: "pointer" }}>Crear cuenta</button>
+                <button onClick={() => { router.push("/dashboard/cliente"); setMobileOpen(false); }} style={{ background: C.rose, color: "#f6f4ef", border: "none", borderRadius: 6, padding: "12px 0", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", cursor: "pointer" }}>Visitar Tienda</button>
+                <div style={{ display: "flex", gap: 10 }}>
+                   <button onClick={() => { router.push("/login"); setMobileOpen(false); }} style={{ flex: 1, background: "none", border: `1.5px solid ${C.slateMid}`, borderRadius: 6, padding: "10px 0", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.80rem", color: C.slate, cursor: "pointer" }}>Inicia sesión</button>
+                   <button onClick={() => { router.push("/register"); setMobileOpen(false); }} style={{ flex: 1, background: "none", border: `1.5px solid ${C.slateMid}`, borderRadius: 6, padding: "10px 0", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.80rem", color: C.slate, cursor: "pointer" }}>Regístrate</button>
+                </div>
               </div>
             </motion.div>
           )}
@@ -476,9 +479,9 @@ export default function HomeClient() {
               </motion.p>
 
               <motion.div variants={d(0.20)} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <motion.button whileHover={{ y: -2, boxShadow: `0 10px 26px ${C.roseMid}` }} whileTap={{ scale: 0.96 }} onClick={() => router.push("/register")}
+                <motion.button whileHover={{ y: -2, boxShadow: `0 10px 26px ${C.roseMid}` }} whileTap={{ scale: 0.96 }} onClick={() => router.push("/dashboard/cliente")}
                   style={{ background: C.rose, color: "#f6f4ef", border: "none", cursor: "pointer", padding: "13px 26px", borderRadius: 6, fontSize: "0.83rem", letterSpacing: "0.04em", fontFamily: "var(--font-sans, Inter, sans-serif)", boxShadow: `0 3px 12px ${C.roseBorder}`, display: "flex", alignItems: "center", gap: 7, transition: "box-shadow 0.2s" }}>
-                  Crear cuenta <ArrowRight size={13} />
+                  Explorar Catálogo <ArrowRight size={13} />
                 </motion.button>
                 <motion.button whileHover={{ borderColor: C.slate, color: C.slateDeep }} whileTap={{ scale: 0.96 }} onClick={() => router.push("/login")}
                   style={{ background: "transparent", color: C.slate, border: `1.5px solid ${C.slateMid}`, cursor: "pointer", padding: "13px 26px", borderRadius: 6, fontSize: "0.83rem", letterSpacing: "0.04em", fontFamily: "var(--font-sans, Inter, sans-serif)", transition: "border-color 0.2s, color 0.2s" }}>
