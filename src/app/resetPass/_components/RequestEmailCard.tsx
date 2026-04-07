@@ -23,7 +23,7 @@ export default function RequestEmailCard({ onSend }: { onSend: () => void }) {
       const supabase = createClient();
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/resetPass/nueva-contraseña`,
+        redirectTo: `${window.location.origin}/resetPass/nueva-contrasena`,
       });
 
       if (error) {
