@@ -34,6 +34,14 @@ const bodoni = Bodoni_Moda({
 export const metadata: Metadata = {
   title: "Stella ERP",
   description: "ERP orientado a venta de joyería",
+  icons: {
+    icon: [
+      { url: "/favicon/favicon.ico", sizes: "any" },
+      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/favicon/apple-touch-icon.png",
+  },
+  manifest: "/favicon/site.webmanifest",
 };
 
 export default function RootLayout({
@@ -42,16 +50,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${poppins.variable} ${lora.variable} ${marcellus.variable} ${bodoni.variable}`}>
-      <head>
-        <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
-        <link rel="manifest" href="/favicon/site.webmanifest" />
-      </head>
-      <body
-        className="antialiased bg-[#f6f4ef] text-[#708090]"
-      >
+    <html
+      lang="es"
+      className={`${poppins.variable} ${lora.variable} ${marcellus.variable} ${bodoni.variable}`}
+    >
+      <body className="antialiased bg-[#f6f4ef] text-[#708090]">
         <CartProvider>
           {children}
           <ChatbotPage />
