@@ -4,12 +4,27 @@
  */
 export interface IVenta {
   id: number;
-  total: number;
-  fecha: string; // timestamp
+  total: number | null;
+  fecha: Date | string | null;
   id_usuario: string; // usuario.id
   estado: "aprobada" | "denegada" | "pendiente" | "cancelada";
   id_pedido?: number | null; // pedidos.id (opcional)
   created_at?: string;
+  detalles?: IDetalleVenta[]; // Relación con detallesventas
+}
+
+export interface IProductoVenta {
+  id: number;
+  nombre: string | null;
+  precio: number | null;
+  url_imagen: string | null;
+}
+export interface IDetalleVenta {
+  id: number;
+  id_venta: number | null;
+  id_producto: number | null;
+  cantidad: number | null;
+  producto?: IProductoVenta; // Relación con la tabla producto
 }
 
 /**
@@ -34,15 +49,29 @@ export class Venta implements IVenta {
   estado: "aprobada" | "denegada" | "pendiente" | "cancelada";
   id_pedido?: number | null;
   created_at?: string;
+  detalles?: IDetalleVenta[];
 
   constructor(data: IVenta) {
     this.id = data.id;
-    this.total = data.total;
-    this.fecha = data.fecha;
+    this.total = data.total ?? 0;
+    this.fecha =
+      data.fecha instanceof Date
+        ? data.fecha.toISOString()
+        : (data.fecha ?? "");
     this.id_usuario = data.id_usuario;
     this.estado = data.estado;
     this.id_pedido = data.id_pedido;
     this.created_at = data.created_at;
+  }
+  toJSON(): IVenta {
+    return {
+      id: this.id,
+      total: this.total,
+      fecha: this.fecha,
+      id_usuario: this.id_usuario,
+      estado: this.estado,
+      detalles: this.detalles,
+    };
   }
 
   /**
