@@ -23,28 +23,29 @@ import {
 import { useAuth } from "@/lib/hooks/useAuth";
 import CartIcon from "@auth/_components/CartIcon";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from "@assets/LogoM.svg";
 
 // ─── tokens ───────────────────────────────────────────────
-const ROSE      = "#B76E79";
-const ROSE_BG   = "#FFF0F2";
+const ROSE = "#B76E79";
+const ROSE_BG = "#FFF0F2";
 const ROSE_DARK = "#C0404F";
-const SLATE     = "#708090";
-const MUTED     = "#9E9A95";
-const BORDER    = "#E4E1DB";
-const WHITE     = "#FFFFFF";
-const DARK      = "#1A1A1A";
+const SLATE = "#708090";
+const MUTED = "#9E9A95";
+const BORDER = "#E4E1DB";
+const WHITE = "#FFFFFF";
+const DARK = "#1A1A1A";
 
 // ─── íconos por ruta ──────────────────────────────────────
 const NAV_ICONS: Record<string, React.ReactNode> = {
-  "/dashboard/cliente":       <Home        size={18} />,
-  "categoria=personalizada":  <Sparkles    size={18} />,
-  "categoria=nuevos":         <Star        size={18} />,
-  "categoria=accesorios":     <Heart       size={18} />,
-  "categoria=mayoreo":        <ShoppingBag size={18} />, // This entry is for the old href, keeping it for now as the instruction is ambiguous
-  "/dashboard/cliente/mayoreo":       <ShoppingBag size={18} />,
-  "/dashboard/cliente/faq":           <HelpCircle  size={18} />,
-  "/dashboard/cliente/nosotros":                <MessageCircle size={18} />,
-  "/dashboard/cliente/contacto":                <MessageSquare size={18} />,
+  "/dashboard/cliente": <Home size={18} />,
+  "categoria=personalizada": <Sparkles size={18} />,
+  "categoria=nuevos": <Star size={18} />,
+  "categoria=accesorios": <Heart size={18} />,
+  "categoria=mayoreo": <ShoppingBag size={18} />, // This entry is for the old href, keeping it for now as the instruction is ambiguous
+  "/dashboard/cliente/mayoreo": <ShoppingBag size={18} />,
+  "/dashboard/cliente/faq": <HelpCircle size={18} />,
+  "/dashboard/cliente/nosotros": <MessageCircle size={18} />,
+  "/dashboard/cliente/contacto": <MessageSquare size={18} />,
 };
 
 function getNavIcon(href: string): React.ReactNode {
@@ -102,7 +103,8 @@ function NavBtn({
       }}
       onMouseLeave={e => {
         if (!active && !danger)
-          (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+          (e.currentTarget as HTMLButtonElement).style.background =
+            "transparent";
         if (danger)
           (e.currentTarget as HTMLButtonElement).style.background = ROSE_BG;
       }}
@@ -111,7 +113,11 @@ function NavBtn({
         <span
           className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{
-            background: active ? "rgba(255,255,255,0.2)" : danger ? "#FFE0E5" : "#F5F0F1",
+            background: active
+              ? "rgba(255,255,255,0.2)"
+              : danger
+                ? "#FFE0E5"
+                : "#F5F0F1",
             color: active ? WHITE : danger ? ROSE_DARK : ROSE,
           }}
         >
@@ -143,8 +149,8 @@ interface HeaderClientProps {
 }
 
 export default function HeaderClient({ user: userProp }: HeaderClientProps) {
-  const router       = useRouter();
-  const pathname     = usePathname();
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const isActive = (href: string): boolean => {
@@ -167,28 +173,37 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
   const initials = usuario?.nombre?.charAt(0)?.toUpperCase() || "U";
 
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [userMenu,   setUserMenu]   = useState(false);
-  const [cartCount,  setCartCount]  = useState(0);
+  const [userMenu, setUserMenu] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
-  const userMenuRef   = useRef<HTMLDivElement>(null);
-  const avatarBtnRef  = useRef<HTMLButtonElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const avatarBtnRef = useRef<HTMLButtonElement>(null);
 
   const navItems = useMemo(() => {
     const base = [
-      { label: "Inicio",               href: "/dashboard/cliente" },
-      { label: "Personalizados",       href: "/dashboard/cliente/catalogo?categoria=personalizada" },
-      { label: "Nuevos",               href: "/dashboard/cliente/catalogo?categoria=nuevos" },
-      { label: "Accesorios",           href: "/dashboard/cliente/catalogo?categoria=accesorios" },
+      { label: "Inicio", href: "/dashboard/cliente" },
+      {
+        label: "Personalizados",
+        href: "/dashboard/cliente/catalogo?categoria=personalizada",
+      },
+      { label: "Nuevos", href: "/dashboard/cliente/catalogo?categoria=nuevos" },
+      {
+        label: "Accesorios",
+        href: "/dashboard/cliente/catalogo?categoria=accesorios",
+      },
     ];
 
     if (isUserLoaded) {
-      base.push({ label: id_rol === 3 ? "Panel Mayorista" : "Mayoreo", href: "/dashboard/cliente/mayoreo" });
+      base.push({
+        label: id_rol === 3 ? "Panel Mayorista" : "Mayoreo",
+        href: "/dashboard/cliente/mayoreo",
+      });
     }
 
     base.push(
       { label: "Preguntas frecuentes", href: "/dashboard/cliente/faq" },
-      { label: "Nosotros",             href: "/dashboard/cliente/nosotros" },
-      { label: "Contacto",             href: "/dashboard/cliente/contacto" }
+      { label: "Nosotros", href: "/dashboard/cliente/nosotros" },
+      { label: "Contacto", href: "/dashboard/cliente/contacto" }
     );
 
     return base;
@@ -226,7 +241,9 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
   useEffect(() => {
     document.body.style.overflow = mobileMenu ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileMenu]);
 
   if (pathname === "/login" || pathname === "/register") return null;
@@ -275,12 +292,17 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
       >
         {/* ── TOP BAR ── */}
         <div className="grid grid-cols-3 items-center px-5 md:px-8 py-3">
-
           {/* Hamburger mobile */}
           <div className="flex items-center">
             <button
               className="flex md:hidden items-center justify-center rounded-xl border cursor-pointer"
-              style={{ width: 40, height: 40, borderColor: BORDER, background: WHITE, color: SLATE }}
+              style={{
+                width: 40,
+                height: 40,
+                borderColor: BORDER,
+                background: WHITE,
+                color: SLATE,
+              }}
               onClick={() => setMobileMenu(true)}
             >
               <Menu size={20} />
@@ -293,7 +315,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
             onClick={() => router.push("/dashboard/cliente")}
           >
             <Image
-              src="/LogoM.svg"
+              src={logo}
               alt="Logotipo Stella Joyería"
               width={320}
               height={90}
@@ -303,22 +325,27 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
           {/* Acciones derecha */}
           <div className="flex items-center justify-end gap-3">
-
             {/* Botón ERP (Admin y Mayoristas) */}
             {(id_rol === 1 || id_rol === 3) && (
               <button
                 className="hidden sm:flex items-center gap-2 rounded-full border cursor-pointer transition-all duration-200 font-medium"
-                style={{ padding: "8px 16px", fontSize: 14, borderColor: BORDER, background: WHITE, color: SLATE }}
+                style={{
+                  padding: "8px 16px",
+                  fontSize: 14,
+                  borderColor: BORDER,
+                  background: WHITE,
+                  color: SLATE,
+                }}
                 onMouseEnter={e => {
                   const b = e.currentTarget as HTMLButtonElement;
-                  b.style.background  = ROSE;
-                  b.style.color       = WHITE;
+                  b.style.background = ROSE;
+                  b.style.color = WHITE;
                   b.style.borderColor = ROSE;
                 }}
                 onMouseLeave={e => {
                   const b = e.currentTarget as HTMLButtonElement;
-                  b.style.background  = WHITE;
-                  b.style.color       = SLATE;
+                  b.style.background = WHITE;
+                  b.style.color = SLATE;
                   b.style.borderColor = BORDER;
                 }}
                 onClick={() => router.push("/dashboard/inicio")}
@@ -339,7 +366,12 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                 {cartCount > 0 && (
                   <span
                     className="absolute -top-1.5 -right-1.5 text-[10px] font-bold rounded-full text-center"
-                    style={{ background: ROSE, color: WHITE, padding: "1px 5px", minWidth: 18 }}
+                    style={{
+                      background: ROSE,
+                      color: WHITE,
+                      padding: "1px 5px",
+                      minWidth: 18,
+                    }}
                   >
                     {cartCount}
                   </span>
@@ -353,12 +385,12 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                 <button
                   ref={avatarBtnRef}
                   className="flex items-center justify-center rounded-full border-none cursor-pointer font-bold transition-transform hover:scale-105 active:scale-95"
-                  style={{ 
-                    width: 40, 
-                    height: 40, 
-                    background: ROSE, 
-                    color: WHITE, 
-                    fontSize: 16 
+                  style={{
+                    width: 40,
+                    height: 40,
+                    background: ROSE,
+                    color: WHITE,
+                    fontSize: 16,
                   }}
                   onClick={handleToggleMenu}
                   disabled={loading}
@@ -383,7 +415,11 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                       initial={{ opacity: 0, y: -8, scale: 0.96 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                      transition={{ type: "spring", damping: 24, stiffness: 300 }}
+                      transition={{
+                        type: "spring",
+                        damping: 24,
+                        stiffness: 300,
+                      }}
                       style={{
                         position: "absolute",
                         top: "calc(100% + 10px)",
@@ -404,13 +440,22 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                       >
                         <div
                           className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
-                          style={{ width: 38, height: 38, background: ROSE, color: WHITE, fontSize: 15 }}
+                          style={{
+                            width: 38,
+                            height: 38,
+                            background: ROSE,
+                            color: WHITE,
+                            fontSize: 15,
+                          }}
                         >
                           {initials}
                         </div>
                         <div className="overflow-hidden">
                           <div className="flex items-center gap-1.5 overflow-hidden">
-                            <p className="m-0 font-semibold truncate" style={{ fontSize: 14, color: DARK }}>
+                            <p
+                              className="m-0 font-semibold truncate"
+                              style={{ fontSize: 14, color: DARK }}
+                            >
                               {usuario?.nombre || "Mi cuenta"}
                             </p>
                             {id_rol === 3 && (
@@ -419,23 +464,34 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                               </span>
                             )}
                           </div>
-                          <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                            {id_rol === 3 ? "Cuenta Mayorista" : (usuario?.correo || "")}
+                          <p
+                            className="m-0 truncate"
+                            style={{ fontSize: 12, color: MUTED }}
+                          >
+                            {id_rol === 3
+                              ? "Cuenta Mayorista"
+                              : usuario?.correo || ""}
                           </p>
                         </div>
                       </div>
 
                       {/* Opciones */}
                       <div className="p-2">
-                        <NavBtn 
-                          icon={<User size={15} />} 
-                          label="Mi perfil" 
-                          onClick={() => { router.push("/dashboard/cliente/perfil"); setUserMenu(false); }}
+                        <NavBtn
+                          icon={<User size={15} />}
+                          label="Mi perfil"
+                          onClick={() => {
+                            router.push("/dashboard/cliente/perfil");
+                            setUserMenu(false);
+                          }}
                         />
-                        <NavBtn 
-                          icon={<Package size={15} />} 
-                          label="Mis pedidos" 
-                          onClick={() => { router.push("/dashboard/cliente/pedidos"); setUserMenu(false); }}
+                        <NavBtn
+                          icon={<Package size={15} />}
+                          label="Mis pedidos"
+                          onClick={() => {
+                            router.push("/dashboard/cliente/pedidos");
+                            setUserMenu(false);
+                          }}
                         />
                         <NavBtn icon={<Heart size={15} />} label="Favoritos" />
 
@@ -443,7 +499,10 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                           <NavBtn
                             icon={<LayoutDashboard size={15} />}
                             label="Dashboard ERP"
-                            onClick={() => { router.push("/dashboard/inicio"); setUserMenu(false); }}
+                            onClick={() => {
+                              router.push("/dashboard/inicio");
+                              setUserMenu(false);
+                            }}
                           />
                         )}
 
@@ -498,47 +557,49 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
         {/* ── NAV DESKTOP ── */}
         <nav
-            className="hidden md:flex justify-center flex-wrap gap-1 px-8 py-3"
-            style={{ borderTop: `1px solid ${BORDER}` }}
-          >
-            {navItems.map(item => {
-              const active = isActive(item.href);
-              return (
-                <motion.button
-                  key={item.label}
-                  onClick={() => router.push(item.href)}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="rounded-full cursor-pointer transition-colors duration-150 font-medium"
-                  style={{
-                    padding: "8px 20px",
-                    fontSize: 14,
-                    border: active ? `1.5px solid ${ROSE}` : "1.5px solid transparent",
-                    background: active ? ROSE : "transparent",
-                    color: active ? WHITE : SLATE,
-                  }}
-                  onMouseEnter={e => {
-                    if (!active) {
-                      const b = e.currentTarget as HTMLButtonElement;
-                      b.style.color       = ROSE;
-                      b.style.background  = "#FFF5F6";
-                      b.style.borderColor = "#F0D8DB";
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (!active) {
-                      const b = e.currentTarget as HTMLButtonElement;
-                      b.style.color       = SLATE;
-                      b.style.background  = "transparent";
-                      b.style.borderColor = "transparent";
-                    }
-                  }}
-                >
-                  {item.label}
-                </motion.button>
-              );
-            })}
-          </nav>
+          className="hidden md:flex justify-center flex-wrap gap-1 px-8 py-3"
+          style={{ borderTop: `1px solid ${BORDER}` }}
+        >
+          {navItems.map(item => {
+            const active = isActive(item.href);
+            return (
+              <motion.button
+                key={item.label}
+                onClick={() => router.push(item.href)}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                className="rounded-full cursor-pointer transition-colors duration-150 font-medium"
+                style={{
+                  padding: "8px 20px",
+                  fontSize: 14,
+                  border: active
+                    ? `1.5px solid ${ROSE}`
+                    : "1.5px solid transparent",
+                  background: active ? ROSE : "transparent",
+                  color: active ? WHITE : SLATE,
+                }}
+                onMouseEnter={e => {
+                  if (!active) {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.color = ROSE;
+                    b.style.background = "#FFF5F6";
+                    b.style.borderColor = "#F0D8DB";
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!active) {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.color = SLATE;
+                    b.style.background = "transparent";
+                    b.style.borderColor = "transparent";
+                  }
+                }}
+              >
+                {item.label}
+              </motion.button>
+            );
+          })}
+        </nav>
 
         {/* ── MOBILE MENU ── */}
         <AnimatePresence>
@@ -549,7 +610,10 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 z-40"
-                style={{ background: "rgba(30,20,20,0.6)", backdropFilter: "blur(4px)" }}
+                style={{
+                  background: "rgba(30,20,20,0.6)",
+                  backdropFilter: "blur(4px)",
+                }}
                 onClick={() => setMobileMenu(false)}
               />
               <motion.div
@@ -568,7 +632,10 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
               >
                 <div
                   className="flex items-center px-5 py-5 flex-shrink-0"
-                  style={{ borderBottom: `1.5px solid ${BORDER}`, background: WHITE }}
+                  style={{
+                    borderBottom: `1.5px solid ${BORDER}`,
+                    background: WHITE,
+                  }}
                 >
                   <Image src="/LogoM.svg" alt="logo" width={130} height={44} />
                 </div>
@@ -583,7 +650,10 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                         icon={getNavIcon(item.href)}
                         label={item.label}
                         active={active}
-                        onClick={() => { router.push(item.href); setMobileMenu(false); }}
+                        onClick={() => {
+                          router.push(item.href);
+                          setMobileMenu(false);
+                        }}
                       />
                     );
                   })}
@@ -595,26 +665,35 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                     <NavBtn
                       icon={<LayoutDashboard size={18} />}
                       label="Dashboard ERP"
-                      onClick={() => { router.push("/dashboard/inicio"); setMobileMenu(false); }}
+                      onClick={() => {
+                        router.push("/dashboard/inicio");
+                        setMobileMenu(false);
+                      }}
                     />
                   )}
 
-                   {isUserLoaded && (
-                    <NavBtn 
-                      icon={<User size={18} />} 
-                      label="Mi perfil" 
-                      onClick={() => { router.push("/dashboard/cliente/perfil"); setMobileMenu(false); }}
+                  {isUserLoaded && (
+                    <NavBtn
+                      icon={<User size={18} />}
+                      label="Mi perfil"
+                      onClick={() => {
+                        router.push("/dashboard/cliente/perfil");
+                        setMobileMenu(false);
+                      }}
                     />
                   )}
                   {isClientDashboard && (
                     <>
-                      <NavBtn 
-                        icon={<Package size={18} />} 
-                        label="Mis pedidos" 
-                        badge={cartCount} 
-                        onClick={() => { router.push("/dashboard/cliente/pedidos"); setMobileMenu(false); }}
+                      <NavBtn
+                        icon={<Package size={18} />}
+                        label="Mis pedidos"
+                        badge={cartCount}
+                        onClick={() => {
+                          router.push("/dashboard/cliente/pedidos");
+                          setMobileMenu(false);
+                        }}
                       />
-                      <NavBtn icon={<Heart size={18} />}   label="Favoritos" />
+                      <NavBtn icon={<Heart size={18} />} label="Favoritos" />
                     </>
                   )}
 
@@ -629,11 +708,20 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
 
                 <div
                   className="flex items-center gap-3 px-4 py-4 flex-shrink-0"
-                  style={{ borderTop: `1.5px solid ${BORDER}`, background: "#FAFAF8" }}
+                  style={{
+                    borderTop: `1.5px solid ${BORDER}`,
+                    background: "#FAFAF8",
+                  }}
                 >
                   <div
                     className="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
-                    style={{ width: 42, height: 42, background: isUserLoaded ? ROSE : "#E4E1DB", color: WHITE, fontSize: 17 }}
+                    style={{
+                      width: 42,
+                      height: 42,
+                      background: isUserLoaded ? ROSE : "#E4E1DB",
+                      color: WHITE,
+                      fontSize: 17,
+                    }}
                   >
                     {isUserLoaded ? initials : <User size={20} />}
                   </div>
@@ -641,7 +729,10 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                     {isUserLoaded ? (
                       <>
                         <div className="flex items-center gap-2 overflow-hidden">
-                          <p className="m-0 font-semibold truncate" style={{ fontSize: 15, color: DARK }}>
+                          <p
+                            className="m-0 font-semibold truncate"
+                            style={{ fontSize: 15, color: DARK }}
+                          >
                             {usuario?.nombre || "Mi cuenta"}
                           </p>
                           {id_rol === 3 && (
@@ -650,16 +741,27 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                             </span>
                           )}
                         </div>
-                        <p className="m-0 truncate" style={{ fontSize: 12, color: MUTED }}>
-                          {id_rol === 3 ? "Cuenta Mayorista" : (usuario?.correo || "")}
+                        <p
+                          className="m-0 truncate"
+                          style={{ fontSize: 12, color: MUTED }}
+                        >
+                          {id_rol === 3
+                            ? "Cuenta Mayorista"
+                            : usuario?.correo || ""}
                         </p>
                       </>
                     ) : (
                       <div className="flex flex-col gap-0.5">
-                        <p className="m-0 font-semibold" style={{ fontSize: 15, color: ROSE }}>
+                        <p
+                          className="m-0 font-semibold"
+                          style={{ fontSize: 15, color: ROSE }}
+                        >
                           ¡Hola, Bienvenida!
                         </p>
-                        <p className="m-0" style={{ fontSize: 11, color: MUTED }}>
+                        <p
+                          className="m-0"
+                          style={{ fontSize: 11, color: MUTED }}
+                        >
                           Únete a Stella Joyería
                         </p>
                       </div>
@@ -671,15 +773,25 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                   <div className="p-4 bg-white space-y-2 border-t border-[#8C9796]/10">
                     <button
                       className="w-full py-3 rounded-xl font-bold text-sm transition-all"
-                      style={{ background: ROSE_BG, color: ROSE, border: `1px solid ${ROSE}30` }}
-                      onClick={() => { router.push("/login"); setMobileMenu(false); }}
+                      style={{
+                        background: ROSE_BG,
+                        color: ROSE,
+                        border: `1px solid ${ROSE}30`,
+                      }}
+                      onClick={() => {
+                        router.push("/login");
+                        setMobileMenu(false);
+                      }}
                     >
                       Inicia Sesión
                     </button>
                     <button
                       className="w-full py-3 rounded-xl font-bold text-sm text-white shadow-sm transition-all"
                       style={{ background: ROSE, border: "none" }}
-                      onClick={() => { router.push("/register"); setMobileMenu(false); }}
+                      onClick={() => {
+                        router.push("/register");
+                        setMobileMenu(false);
+                      }}
                     >
                       Registrarse
                     </button>
@@ -690,7 +802,6 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
           )}
         </AnimatePresence>
       </header>
-
     </>
   );
 }
