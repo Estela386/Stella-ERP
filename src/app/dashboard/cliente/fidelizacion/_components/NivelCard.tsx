@@ -15,7 +15,8 @@ const NIVEL_GRADIENTS: Record<string, string> = {
 };
 
 export default function NivelCard({ summary, progreso }: NivelCardProps) {
-  const gradiente = NIVEL_GRADIENTS[summary.nivel_actual] ?? NIVEL_GRADIENTS.cliente;
+  const nivelKey = (summary.nivel_actual?.name ?? summary.nivel?.name ?? "cliente").toLowerCase().replace(" ", "_");
+  const gradiente = NIVEL_GRADIENTS[nivelKey] ?? NIVEL_GRADIENTS.cliente;
   const progresoGasto = progreso?.progreso_gasto ?? 100;
   const progresoScore = progreso?.progreso_score ?? 100;
 
@@ -39,7 +40,7 @@ export default function NivelCard({ summary, progreso }: NivelCardProps) {
             Nivel Actual
           </p>
           <h2 style={{ margin:"4px 0 0", fontSize:"1.8rem", fontFamily:"var(--font-serif)", fontWeight:500, letterSpacing:"-0.02em" }}>
-            {summary.nivel_icono} {summary.nivel_display}
+            {summary.nivel_icono} {summary.nivel_display ?? summary.nivel_actual?.name ?? summary.nivel?.name}
           </h2>
         </div>
         <div style={{
@@ -68,10 +69,10 @@ export default function NivelCard({ summary, progreso }: NivelCardProps) {
           Puntos disponibles
         </p>
         <p style={{ margin:"2px 0 0", fontSize:"2.2rem", fontWeight:800, fontFamily:"var(--font-display)", lineHeight:1 }}>
-          {summary.puntos_disponibles.toLocaleString()}
+          {(summary.puntos_disponibles ?? summary.points ?? 0).toLocaleString()}
         </p>
         <p style={{ margin:"2px 0 0", fontSize:"0.72rem", opacity:0.7 }}>
-          {summary.puntos_acumulados.toLocaleString()} acumulados · Gasto total: ${summary.gasto_total.toLocaleString()}
+          {(summary.puntos_acumulados ?? summary.lifetime_points ?? 0).toLocaleString()} acumulados {summary.gasto_total != null ? `· Gasto total: $${summary.gasto_total.toLocaleString()}` : ''}
         </p>
       </div>
 

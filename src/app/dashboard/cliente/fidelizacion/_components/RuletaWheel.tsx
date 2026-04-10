@@ -11,6 +11,16 @@ interface RuletaWheelProps {
   onGiro: (tipo: "diaria") => Promise<ResultadoGiro | null>;
 }
 
+const REWARD_UI: Record<string, { emoji: string; color: string }> = {
+  points:   { emoji: "⭐", color: "#4a5568" },
+  discount: { emoji: "🏷️", color: "#b76e79" },
+  product:  { emoji: "🎁", color: "#8c9768" },
+};
+
+function getRewardUI(type: string) {
+  return REWARD_UI[type] ?? { emoji: "🎁", color: "#708090" };
+}
+
 export default function RuletaWheel({
   rewards,
   disponible,
@@ -23,7 +33,10 @@ export default function RuletaWheel({
   const [mostrarResultado, setMostrarResultado] = useState(false);
   const wheelRef = useRef<HTMLDivElement>(null);
 
-  const segmentos = rewards.slice(0, 8);
+  const segmentos = rewards.slice(0, 8).map(r => ({
+    ...r,
+    ...getRewardUI(r.type)
+  }));
   const numSeg = segmentos.length || 8;
   const anguloPorSeg = 360 / numSeg;
 
@@ -55,6 +68,7 @@ export default function RuletaWheel({
 
   return (
     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:20 }}>
+      {/* (Styles omitted for brevity, but kept same in actual code structure) */}
       <style>{`
         @keyframes ruletaSpin {
           from { transform: rotate(0deg); }
@@ -196,21 +210,21 @@ export default function RuletaWheel({
         }}>
           <div style={{ fontSize:"2.5rem", marginBottom:8 }}>{resultado.emoji}</div>
           <h3 style={{ margin:0, fontFamily:"var(--font-serif)", fontSize:"1.3rem", color:"#1a1a2e" }}>
-            {resultado.premio_nombre}
+            {resultado.reward?.name ?? "Premio ganado"}
           </h3>
-          {resultado.puntos_ganados > 0 && (
+          {resultado.reward?.type === "points" && (
             <p style={{ margin:"6px 0 0", fontSize:"0.9rem", color:"#4a5568", fontFamily:"var(--font-sans)" }}>
-              +{resultado.puntos_ganados} puntos agregados
+              +{(resultado.reward as any).value ?? 0} puntos agregados
             </p>
           )}
-          {resultado.codigo_promo && (
+          {(resultado as any).codigo_promo && (
             <div style={{
               marginTop:10, background:"rgba(255,255,255,0.8)", borderRadius:10, padding:"8px 14px",
               fontFamily:"var(--font-sans)", fontSize:"0.85rem"
             }}>
               <p style={{ margin:0, fontSize:"0.65rem", color:"#708090", letterSpacing:"0.1em" }}>TU CÓDIGO</p>
               <p style={{ margin:0, fontWeight:800, color:"#b76e79", fontSize:"1.1rem", letterSpacing:"0.08em" }}>
-                {resultado.codigo_promo}
+                {(resultado as any).codigo_promo}
               </p>
             </div>
           )}
@@ -225,7 +239,7 @@ export default function RuletaWheel({
             color:"#4a5568", fontFamily:"var(--font-sans)"
           }}>
             <div style={{ width:10, height:10, borderRadius:3, background:seg.color, flexShrink:0 }} />
-            <span>{seg.nombre}</span>
+            <span>{seg.name}</span>
           </div>
         ))}
       </div>

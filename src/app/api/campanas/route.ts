@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 // GET — Retorna la campaña activa actual (pública, sin auth)
 export async function GET() {
+  const supabase = getSupabase();
   const now = new Date().toISOString();
 
   const { data, error } = await supabase
@@ -29,6 +32,7 @@ export async function GET() {
 
 // Helper para verificar si es admin
 async function isAdmin(req: NextRequest): Promise<boolean> {
+  const supabase = getSupabase();
   const authHeader = req.headers.get("authorization");
   if (!authHeader) return false;
   const token = authHeader.replace("Bearer ", "");
@@ -48,6 +52,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
+  const supabase = getSupabase();
   const body = await req.json();
   const { data, error } = await supabase
     .from("campana_banner")
@@ -65,6 +70,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
+  const supabase = getSupabase();
   const body = await req.json();
   const { id, ...rest } = body;
 
@@ -85,6 +91,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
+  const supabase = getSupabase();
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
 

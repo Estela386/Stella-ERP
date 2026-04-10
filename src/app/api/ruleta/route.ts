@@ -12,12 +12,15 @@ import {
 import { calcularScoreRuntime, getLoyaltyPoints } from "@/lib/services/FidelizacionService";
 import type { CreateRuletaRewardDTO } from "@/lib/models/RuletaSpin";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 async function getUsuarioInfo(req: NextRequest): Promise<{ id: number; rol: number } | null> {
+  const supabase = getSupabase();
   const authHeader = req.headers.get("authorization");
   if (!authHeader) return null;
   const token = authHeader.replace("Bearer ", "");

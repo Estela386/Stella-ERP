@@ -10,6 +10,44 @@ export class VentaRepository extends BaseRepository<IVenta> {
   constructor(client: SupabaseClient) {
     super(client, "ventas");
   }
+  async getVentasConDetallesByUsuarioId(
+    usuarioId: number
+  ): Promise<{ data: IVenta[] | null; error: string | null }> {
+    try {
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select(
+          `
+          *,
+          detalles:detallesventas (
+            id,
+            cantidad,
+            id_producto,
+            id_venta,
+            producto:producto (
+              id,
+              nombre,
+              precio,
+              url_imagen
+            )
+          )
+        `
+        )
+        .eq("id_usuario", usuarioId)
+        .order("fecha", { ascending: false });
+
+      if (error) {
+        console.error("Error en VentaRepository:", error);
+        return { data: null, error: error.message };
+      }
+
+      return { data: data as unknown as IVenta[], error: null };
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Error desconocido";
+      return { data: null, error: errorMessage };
+    }
+  }
 
   /**
    * Obtiene todas las ventas con información del usuario

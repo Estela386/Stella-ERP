@@ -8,12 +8,15 @@ import {
   getPromocionesDinamicas,
 } from "@/lib/services/FidelizacionService";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 async function getUsuarioId(req: NextRequest): Promise<number | null> {
+  const supabase = getSupabase();
   const authHeader = req.headers.get("authorization");
   if (!authHeader) return null;
   const token = authHeader.replace("Bearer ", "");

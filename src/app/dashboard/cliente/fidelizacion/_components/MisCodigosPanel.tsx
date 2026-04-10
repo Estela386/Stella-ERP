@@ -39,8 +39,8 @@ export default function MisCodigosPanel({ codigos, onCopiar }: MisCodigosPanelPr
       {codigos.map((upc) => {
         const code = upc.promo_code;
         if (!code) return null;
-        const vence = code.fecha_expiracion
-          ? new Date(code.fecha_expiracion)
+        const vence = code.expires_at
+          ? new Date(code.expires_at)
           : null;
         const diasRestantes = vence
           ? Math.ceil((vence.getTime() - now) / (1000 * 60 * 60 * 24))
@@ -71,7 +71,7 @@ export default function MisCodigosPanel({ codigos, onCopiar }: MisCodigosPanelPr
               display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:"1.3rem"
             }}>
-              {code.origen === "ruleta" ? "🎰" : code.origen === "referido" ? "👥" : "🏷️"}
+              {(code as any).origen === "ruleta" ? "🎰" : (code as any).origen === "referido" ? "👥" : "🏷️"}
             </div>
 
             {/* Info */}
@@ -82,7 +82,7 @@ export default function MisCodigosPanel({ codigos, onCopiar }: MisCodigosPanelPr
                   fontFamily:"var(--font-display)", color:"#b76e79",
                   letterSpacing:"0.06em"
                 }}>
-                  {code.codigo}
+                  {code.code}
                 </p>
                 {urgente && (
                   <span style={{
@@ -94,7 +94,7 @@ export default function MisCodigosPanel({ codigos, onCopiar }: MisCodigosPanelPr
                 )}
               </div>
               <p style={{ margin:0, fontSize:"0.78rem", color:"#708090", fontFamily:"var(--font-sans)" }}>
-                {code.descripcion ?? "Código promocional"}
+                {code.promotion?.name ?? "Código promocional"}
               </p>
               {diasRestantes !== null && (
                 <p style={{ margin:"2px 0 0", fontSize:"0.7rem", color: urgente ? "#dc3545" : "#8c9768", fontFamily:"var(--font-sans)" }}>
@@ -105,7 +105,7 @@ export default function MisCodigosPanel({ codigos, onCopiar }: MisCodigosPanelPr
 
             {/* Botón copiar */}
             <button
-              onClick={() => copiar(code.codigo)}
+              onClick={() => copiar(code.code)}
               title="Copiar código"
               style={{
                 background:"rgba(183,110,121,0.1)",

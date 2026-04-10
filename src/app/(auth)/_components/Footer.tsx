@@ -11,28 +11,37 @@ const NAV = [
   {
     heading: "Explorar",
     links: [
-      { label: "Aretes",      href: "/dashboard/cliente/catalogo?categoria=aretes" },
-      { label: "Anillos",     href: "/dashboard/cliente/catalogo?categoria=anillos" },
-      { label: "Collares",    href: "/dashboard/cliente/catalogo?categoria=collares" },
-      { label: "Pulseras",    href: "/dashboard/cliente/catalogo?categoria=pulseras" },
+      { label: "Aretes", href: "/dashboard/cliente/catalogo?categoria=aretes" },
+      {
+        label: "Anillos",
+        href: "/dashboard/cliente/catalogo?categoria=anillos",
+      },
+      {
+        label: "Collares",
+        href: "/dashboard/cliente/catalogo?categoria=collares",
+      },
+      {
+        label: "Pulseras",
+        href: "/dashboard/cliente/catalogo?categoria=pulseras",
+      },
       { label: "Colecciones", href: "/dashboard/cliente/catalogo" },
     ],
   },
   {
     heading: "Ayuda",
     links: [
-      { label: "Política de envío",    href: "/terminos" },
+      { label: "Política de envío", href: "/terminos" },
       { label: "Preguntas frecuentes", href: "/dashboard/cliente/faq" },
-      { label: "Contacto",            href: "/dashboard/cliente/nosotros" },
-      { label: "Carrito",             href: "/dashboard/cliente/carrito" },
+      { label: "Contacto", href: "/dashboard/cliente/nosotros" },
+      { label: "Carrito", href: "/dashboard/cliente/carrito" },
     ],
   },
   {
     heading: "Sobre Stella Joyería",
     links: [
       { label: "¿Quiénes somos?", href: "/dashboard/cliente/nosotros" },
-      { label: "Inicio",          href: "/dashboard/cliente" },
-      { label: "Catálogo",        href: "/dashboard/cliente/catalogo" },
+      { label: "Inicio", href: "/dashboard/cliente" },
+      { label: "Catálogo", href: "/dashboard/cliente/catalogo" },
     ],
   },
 ];
@@ -140,31 +149,50 @@ export default function Footer() {
         }}
       >
         {/* Blob decorativo fondo */}
-        <div style={{
-          position: "absolute", top: -100, right: -100,
-          width: 340, height: 340, borderRadius: "50%",
-          background: "rgba(183,110,121,0.05)",
-          pointerEvents: "none",
-        }} />
-        <div style={{
-          position: "absolute", bottom: -60, left: -80,
-          width: 260, height: 260, borderRadius: "50%",
-          background: "rgba(140,151,104,0.04)",
-          pointerEvents: "none",
-        }} />
+        <div
+          style={{
+            position: "absolute",
+            top: -100,
+            right: -100,
+            width: 340,
+            height: 340,
+            borderRadius: "50%",
+            background: "rgba(183,110,121,0.05)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -60,
+            left: -80,
+            width: 260,
+            height: 260,
+            borderRadius: "50%",
+            background: "rgba(140,151,104,0.04)",
+            pointerEvents: "none",
+          }}
+        />
 
         <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative" }}>
-
           {/* Grid principal */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "auto 1fr",
-            gap: "clamp(32px,5vw,80px)",
-            alignItems: "flex-start",
-          }}>
-
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "auto 1fr",
+              gap: "clamp(32px,5vw,80px)",
+              alignItems: "flex-start",
+            }}
+          >
             {/* ── Columna izquierda: Logo + redes ── */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 20, minWidth: 120 }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 20,
+                minWidth: 120,
+              }}
+            >
               <Link href="/dashboard/cliente">
                 <Image
                   src={LogoM}
@@ -180,13 +208,15 @@ export default function Footer() {
                 />
               </Link>
 
-              <p style={{
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
-                fontSize: "0.78rem",
-                color: "rgba(246,244,239,0.38)",
-                lineHeight: 1.6,
-                maxWidth: 160,
-              }}>
+              <p
+                style={{
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontSize: "0.78rem",
+                  color: "rgba(246,244,239,0.38)",
+                  lineHeight: 1.6,
+                  maxWidth: 160,
+                }}
+              >
                 Joyería artesanal hecha con amor y detalle.
               </p>
 
@@ -208,15 +238,26 @@ export default function Footer() {
             </div>
 
             {/* ── Columna derecha: Links ── */}
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-              gap: "clamp(24px,3vw,48px)",
-            }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                gap: "clamp(24px,3vw,48px)",
+              }}
+            >
               {NAV.map(col => (
                 <div key={col.heading}>
                   <h4 className="footer-col-heading">{col.heading}</h4>
-                  <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+                  <ul
+                    style={{
+                      listStyle: "none",
+                      margin: 0,
+                      padding: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 10,
+                    }}
+                  >
                     {col.links.map(link => (
                       <li key={link.label}>
                         <Link href={link.href} className="footer-link">
@@ -233,15 +274,19 @@ export default function Footer() {
           {/* ── Divider + copyright ── */}
           <hr className="footer-divider" />
 
-          <div style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-          }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center" }}>
-              <span className="footer-brand-name">Stella Joyería Artesanal</span>
+              <span className="footer-brand-name">
+                Stella Joyería Artesanal
+              </span>
               <span className="footer-rose-dot" />
               <span className="footer-copy">
                 © {new Date().getFullYear()} Todos los derechos reservados
@@ -249,15 +294,30 @@ export default function Footer() {
             </div>
 
             <div style={{ display: "flex", gap: 20 }}>
-              <Link href="/terminos" className="footer-copy" style={{ color: "rgba(246,244,239,0.28)", textDecoration: "none", fontSize: "0.72rem" }}>
+              <Link
+                href="/terminos"
+                className="footer-copy"
+                style={{
+                  color: "rgba(246,244,239,0.28)",
+                  textDecoration: "none",
+                  fontSize: "0.72rem",
+                }}
+              >
                 Términos y condiciones
               </Link>
-              <Link href="/dashboard/cliente/nosotros" className="footer-copy" style={{ color: "rgba(246,244,239,0.28)", textDecoration: "none", fontSize: "0.72rem" }}>
+              <Link
+                href="/dashboard/cliente/nosotros"
+                className="footer-copy"
+                style={{
+                  color: "rgba(246,244,239,0.28)",
+                  textDecoration: "none",
+                  fontSize: "0.72rem",
+                }}
+              >
                 Nosotros
               </Link>
             </div>
           </div>
-
         </div>
       </footer>
     </>

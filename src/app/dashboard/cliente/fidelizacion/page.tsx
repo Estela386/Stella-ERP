@@ -214,7 +214,7 @@ export default function FidelizacionPage() {
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:10 }}>
                   {[
                     { emoji:"💰", label:`${summary.descuento_base}% descuento base` },
-                    { emoji:"⭐", label:`${summary.puntos_disponibles.toLocaleString()} puntos` },
+                    { emoji:"⭐", label:`${(summary.puntos_disponibles ?? 0).toLocaleString()} puntos` },
                     summary.acceso_mayoreo && { emoji:"🏷️", label:"Precio mayoreo" },
                     { emoji:"🎰", label:"Ruleta diaria" },
                     { emoji:"👥", label:"Programa referidos" },

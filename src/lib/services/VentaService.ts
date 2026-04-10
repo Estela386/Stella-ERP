@@ -213,7 +213,8 @@ export class VentaService {
 
             if (!detailErr && detail) {
               // Incrementar cantidad vendida en consignación
-              const nuevaCantidadVendida = (detail.cantidad_vendida || 0) + prod.cantidad;
+              const nuevaCantidadVendida =
+                (detail.cantidad_vendida || 0) + prod.cantidad;
               await this.client
                 .from("consignacion_detalle")
                 .update({ cantidad_vendida: nuevaCantidadVendida })
@@ -227,7 +228,10 @@ export class VentaService {
                 .single();
 
               if (prodData) {
-                const nuevoStockConsignado = Math.max(0, (prodData.stock_consignado || 0) - prod.cantidad);
+                const nuevoStockConsignado = Math.max(
+                  0,
+                  (prodData.stock_consignado || 0) - prod.cantidad
+                );
                 await this.client
                   .from("producto")
                   .update({ stock_consignado: nuevoStockConsignado })
@@ -241,9 +245,12 @@ export class VentaService {
               .select("stock_actual")
               .eq("id", prod.id_producto)
               .single();
-              
+
             if (prodData) {
-              const nuevoStock = Math.max(0, (prodData.stock_actual || 0) - prod.cantidad);
+              const nuevoStock = Math.max(
+                0,
+                (prodData.stock_actual || 0) - prod.cantidad
+              );
               await this.client
                 .from("producto")
                 .update({ stock_actual: nuevoStock })
@@ -262,6 +269,24 @@ export class VentaService {
         err instanceof Error ? err.message : "Error desconocido";
       return { venta: null, error: errorMessage };
     }
+  }
+  async obtenerPedidosDeUsuario(usuarioId: number): Promise<{
+    ventas: Venta[] | null;
+    error: string | null;
+  }> {
+    if (!usuarioId) {
+      return { ventas: null, error: "El ID de usuario es requerido" };
+    }
+
+    const { data, error } =
+      await this.ventaRepository.getVentasConDetallesByUsuarioId(usuarioId);
+
+    if (error || !data) {
+      return { ventas: null, error };
+    }
+
+    const ventas = data.map(item => new Venta(item));
+    return { ventas, error: null };
   }
 
   /**

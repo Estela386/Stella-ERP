@@ -131,22 +131,20 @@ export async function registrarUsoCodigo(
       id_promo_code,
       used_at: new Date().toISOString(),
     }),
-    // Incrementar used_count en promo_codes
-    supabase.rpc("increment_promo_code_usage", { p_code_id: id_promo_code })
-      .catch(() => {
-        // Si no existe la función RPC, actualizar manualmente
-        return supabase
+    (async () => {
+      const { error } = await supabase.rpc("increment_promo_code_usage", { p_code_id: id_promo_code });
+      if (error) {
+        const { data } = await supabase
           .from("promo_codes")
           .select("used_count")
           .eq("id", id_promo_code)
-          .single()
-          .then(({ data }) =>
-            supabase
-              .from("promo_codes")
-              .update({ used_count: (data?.used_count ?? 0) + 1 })
-              .eq("id", id_promo_code)
-          );
-      }),
+          .single();
+        await supabase
+          .from("promo_codes")
+          .update({ used_count: (data?.used_count ?? 0) + 1 })
+          .eq("id", id_promo_code);
+      }
+    })()
   ]);
 
   return !insertRes.error;

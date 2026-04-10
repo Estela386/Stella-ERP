@@ -213,7 +213,7 @@ export default function MaterialModal({ material, onClose, onSave, onDelete }: P
             <label className="text-[0.68rem] font-medium text-[#708090] uppercase tracking-wide font-serif" style={{ fontFamily: "var(--font-marcellus)" }}>Proveedor</label>
             <select
               value={form.id_proveedor || ""}
-              onChange={e => handleChange("id_proveedor", e.target.value ? Number(e.target.value) : undefined)}
+              onChange={e => handleChange("id_proveedor", e.target.value ? Number(e.target.value) : null)}
               className="w-full border border-[rgba(112,128,144,0.25)] rounded-[6px] px-4 py-2.5 text-sm text-[#4a5568] bg-[#f6f4ef]/30 focus:outline-none focus:ring-2 focus:ring-[#b76e79]/30 focus:border-[#b76e79] transition-all font-sans appearance-none"
             >
               <option value="">Sin proveedor</option>

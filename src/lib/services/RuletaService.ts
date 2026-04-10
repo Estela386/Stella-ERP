@@ -316,8 +316,9 @@ export async function getMetricasRuleta(): Promise<{
   ]);
 
   const premiosPorTipo: Record<string, number> = {};
-  (premiosRes.data ?? []).forEach((s: { reward: { type: string } | null }) => {
-    const tipo = s.reward?.type ?? "unknown";
+  ((premiosRes.data as any[]) ?? []).forEach((s: any) => {
+    const rew = Array.isArray(s.reward) ? s.reward[0] : s.reward;
+    const tipo = rew?.type ?? "unknown";
     premiosPorTipo[tipo] = (premiosPorTipo[tipo] ?? 0) + 1;
   });
 

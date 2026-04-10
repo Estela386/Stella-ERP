@@ -150,14 +150,8 @@ export async function getProductosEnOferta(): Promise<ProductoRotacionAnalisis[]
 
   if (!data) return [];
 
-  return data.map((d: {
-    id_producto: number;
-    discount_percent: number;
-    reason: string;
-    created_at: string;
-    producto: { id: number; nombre: string | null; precio: number; costo: number | null; stock_actual: number | null; url_imagen: string | null; id_categoria: number | null } | null;
-  }) => {
-    const prod = d.producto;
+  return (data as any[]).map((d: any) => {
+    const prod = Array.isArray(d.producto) ? d.producto[0] : d.producto;
     if (!prod) return null;
 
     const precio_con_descuento = prod.precio * (1 - d.discount_percent / 100);
@@ -241,14 +235,15 @@ export async function getReporteRotacion(): Promise<{
     return { total_en_oferta: 0, valor_stock_en_oferta: 0, distribucion: [] };
   }
 
-  const valorStock = data.reduce((acc: number, d: { producto: { precio?: number; stock_actual?: number } | null }) => {
-    return acc + (d.producto?.precio ?? 0) * (d.producto?.stock_actual ?? 0);
+  const valorStock = (data as any[]).reduce((acc: number, d: any) => {
+    const prod = Array.isArray(d.producto) ? d.producto[0] : d.producto;
+    return acc + (prod?.precio ?? 0) * (prod?.stock_actual ?? 0);
   }, 0);
 
   const dist = [
-    { rango: "10% OFF (30 días)",  cantidad: data.filter((d: { discount_percent: number }) => d.discount_percent <= 10).length },
-    { rango: "20% OFF (60 días)",  cantidad: data.filter((d: { discount_percent: number }) => d.discount_percent > 10 && d.discount_percent <= 20).length },
-    { rango: "35% OFF (120 días)", cantidad: data.filter((d: { discount_percent: number }) => d.discount_percent > 20).length },
+    { rango: "10% OFF (30 días)",  cantidad: (data as any[]).filter((d: any) => d.discount_percent <= 10).length },
+    { rango: "20% OFF (60 días)",  cantidad: (data as any[]).filter((d: any) => d.discount_percent > 10 && d.discount_percent <= 20).length },
+    { rango: "35% OFF (120 días)", cantidad: (data as any[]).filter((d: any) => d.discount_percent > 20).length },
   ];
 
   return {

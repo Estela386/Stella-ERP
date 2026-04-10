@@ -12,6 +12,7 @@ export interface IUserLevel {
   discount_percent: number;
   priority: number;       // Orden (mayor = mejor nivel)
   created_at?: string;
+  nombre_display?: string;
 }
 
 // Nivel calculado en runtime (no está en BD)
@@ -35,10 +36,19 @@ export interface ILoyaltySummary {
   points: number;
   lifetime_points: number;
   nivel: IUserLevel | null;
+  nivel_actual?: IUserLevel | null;
   proximo_nivel: IUserLevel | null;
   progreso_nivel_pct: number;       // 0-100
   puntos_para_proximo: number;
   score: number;                    // 0-100 calculado en runtime
+  descuento_base?: number;
+  puntos_disponibles?: number;
+  acceso_mayoreo?: boolean;
+  codigo_referido?: string;
+  nivel_icono?: string;
+  nivel_display?: string;
+  puntos_acumulados?: number;
+  gasto_total?: number;
   updated_at?: string;
 }
 
@@ -86,4 +96,9 @@ export interface NivelProgreso {
   progreso_pct: number;
   puntos_actuales: number;
   puntos_necesarios: number;
+  falta_score?: number;
+  cumple_compras?: boolean;
+  progreso_gasto?: number;
+  progreso_score?: number;
+  falta_gasto?: number;
 }

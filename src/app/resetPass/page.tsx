@@ -1,90 +1,54 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import ResetLayout from "./_components/ResetLayout";
-import RequestEmailCard from "./_components/RequestEmailCard";
-import EmailSentModal from "./_components/EmailSentModal";
-import NewPasswordCard from "./_components/NewPasswordCard";
+import { useState } from "react";
+import { createClient } from "@utils/supabase/client";
 
-function ResetPassContent() {
-  const [showModal, setShowModal] = useState(false);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const searchParams = useSearchParams();
-  const router = useRouter();
+export default function ResetRequestPage() {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const supabase = createClient();
 
-  // Verificar si viene del email de recuperación
-  useEffect(() => {
-    const code = searchParams.get("code");
-    const errorParam = searchParams.get("error");
-    const errorDescription = searchParams.get("error_description");
-
-    if (errorParam) {
-      setError(`Error: ${errorDescription || "Link inválido o expirado"}`);
-      // Redirigir de vuelta después de 5 segundos
-      setTimeout(() => {
-        router.push("/resetPass");
-      }, 5000);
-      return;
-    }
-
-    // Si viene con código de Supabase, mostrar formulario de nueva contraseña
-    if (code) {
-      setShowPasswordForm(true);
-    }
-  }, [searchParams, router]);
-
-  const handleEmailSent = () => {
-    setShowModal(true);
+  const handleReset = async () => {
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/resetPass/nueva-contrasena`,
+    });
+    setSent(true);
   };
 
-  if (error) {
-    return (
-      <ResetLayout>
-        <div className="bg-white/80 backdrop-blur-md border border-black/10 shadow-[0_20px_60px_rgba(0,0,0,0.12)] rounded-2xl p-8 w-full max-w-md space-y-6">
-          <div className="text-center space-y-4">
-            <h2 className="text-2xl font-semibold text-[#3F3A34]">
-              Link inválido
-            </h2>
-            <p className="text-sm text-[#6B645B]">{error}</p>
-            <p className="text-xs text-[#8C8976]">
-              Serás redirigido al inicio...
-            </p>
-          </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#F6F3EF]">
+      <div className="bg-white/80 backdrop-blur-md border border-black/10 shadow-[0_20px_60px_rgba(0,0,0,0.12)] rounded-2xl p-8 w-full max-w-md space-y-6">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-semibold text-[#3F3A34]">
+            Recuperar contraseña
+          </h2>
+          <p className="text-sm text-[#6B645B]">
+            Ingresa tu correo para enviarte un enlace
+          </p>
         </div>
-      </ResetLayout>
-    );
-  }
 
-  if (showPasswordForm) {
-    return (
-      <ResetLayout>
-        <NewPasswordCard />
-      </ResetLayout>
-    );
-  }
+        {sent ? (
+          <div className="text-center text-sm text-[#6B645B]">
+            Revisa tu correo 📩
+          </div>
+        ) : (
+          <>
+            <input
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="correo@ejemplo.com"
+              className="w-full rounded-xl bg-[#F6F3EF] border border-[#D1BBAA] px-4 py-3 text-[#3F3A34] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/30"
+            />
 
-  return (
-    <ResetLayout>
-      {/* ===== PANTALLA SOLICITUD DE EMAIL ===== */}
-      <RequestEmailCard onSend={handleEmailSent} />
-
-      {/* ===== MODAL DE CONFIRMACIÓN ===== */}
-      {showModal && (
-        <EmailSentModal
-          onAccept={() => setShowModal(false)}
-          onClose={() => setShowModal(false)}
-        />
-      )}
-    </ResetLayout>
-  );
-}
-
-export default function ResetPassPageContent() {
-  return (
-    <Suspense fallback={<div>Cargando resetPass...</div>}>
-      <ResetPassContent />
-    </Suspense>
+            <button
+              onClick={handleReset}
+              className="w-full py-3 rounded-full bg-[#B76E79] text-white shadow-[0_18px_40px_rgba(0,0,0,0.22)] hover:bg-[#A45F69] transition"
+            >
+              Enviar enlace
+            </button>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
