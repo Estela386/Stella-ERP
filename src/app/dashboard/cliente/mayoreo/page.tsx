@@ -109,7 +109,7 @@ export default function WholesalePage() {
             {role === "admin"
               ? "Como administrador, puedes previsualizar ambas experiencias de usuario: la del prospecto que busca información y la del mayorista activo."
               : role === "active" 
-                ? "Bienvenido de nuevo. Accede a tus herramientas de gestión, descarga el catálogo actualizado y gestiona tus pedidos a consignación."
+                ? "Bienvenid@ de nuevo. Accede a tus herramientas de gestión, descarga el catálogo actualizado y gestiona tus pedidos a consignación."
                 : "Únete a nuestra red y obtén beneficios únicos. Diseñamos piezas que cuentan historias, perfectas para clientes que buscan lo extraordinario."}
           </p>
         </section>

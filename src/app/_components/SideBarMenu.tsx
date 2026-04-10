@@ -184,7 +184,7 @@ export default function SidebarMenu() {
       <div className="mobile-nav-bar md:hidden">
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Image
-            src={logo}
+            src={LogoM}
             alt="Stella Logo"
             width={120}
             height={40}

@@ -50,13 +50,13 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <div
-        className="relative overflow-hidden"
+        className="relative overflow-hidden countdown-box"
         style={{
           background: "rgba(255,255,255,0.12)",
           border: "1px solid rgba(255,255,255,0.2)",
           borderRadius: 12,
-          padding: "clamp(8px, 2vw, 14px) clamp(12px, 3vw, 20px)",
-          minWidth: "clamp(48px, 8vw, 68px)",
+          padding: "clamp(6px, 1.5vw, 14px) clamp(10px, 2vw, 20px)",
+          minWidth: "clamp(42px, 7vw, 68px)",
           textAlign: "center",
           backdropFilter: "blur(8px)",
         }}
@@ -128,10 +128,14 @@ export default function MothersDayBanner() {
           overflow: "hidden",
           borderRadius: "clamp(16px, 2.5vw, 28px)",
           marginBottom: "clamp(24px, 3vw, 40px)",
-          // Fondo cálido con paleta Stella
-          background: "linear-gradient(135deg, #2d3748 0%, #4a5568 40%, #b76e79 100%)",
+          // Fondo cálido con paleta Stella + Imagen opcional
+          background: campana.url_imagen 
+            ? `linear-gradient(135deg, rgba(45,55,72,0.92) 0%, rgba(74,85,104,0.85) 40%, rgba(183,110,121,0.7) 100%), url(${campana.url_imagen})`
+            : "linear-gradient(135deg, #2d3748 0%, #4a5568 40%, #b76e79 100%)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           boxShadow: "0 20px 60px rgba(183,110,121,0.25), 0 4px 16px rgba(74,85,104,0.3)",
-          minHeight: "clamp(200px, 30vw, 340px)",
+          minHeight: "clamp(240px, 30vw, 340px)",
           display: "flex",
           alignItems: "center",
         }}
@@ -276,19 +280,21 @@ export default function MothersDayBanner() {
                 color: "#b76e79",
                 border: "none",
                 borderRadius: 100,
-                padding: "clamp(10px, 1.5vw, 15px) clamp(20px, 3vw, 36px)",
+                padding: "clamp(12px, 1.5vw, 15px) clamp(24px, 3vw, 36px)",
                 fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontSize: "clamp(0.78rem, 1.5vw, 0.9rem)",
+                fontSize: "clamp(0.8rem, 1.5vw, 0.9rem)",
                 fontWeight: 700,
                 letterSpacing: "0.04em",
                 cursor: "pointer",
                 display: "inline-flex",
                 alignItems: "center",
+                justifyContent: "center",
                 gap: 8,
                 boxShadow: "0 6px 24px rgba(0,0,0,0.15)",
                 transition: "all 0.25s ease",
                 position: "relative",
                 overflow: "hidden",
+                width: "fit-content"
               }}
             >
               {/* Shimmer en botón */}
@@ -299,7 +305,9 @@ export default function MothersDayBanner() {
                 }}
               />
               <Sparkles size={15} />
-              {campana.cta_texto || "Ver regalos"}
+              <span style={{ position: "relative", zIndex: 1 }}>
+                {campana.cta_texto || "Ver regalos"}
+              </span>
               <ArrowRight size={15} />
             </motion.button>
           </div>
@@ -352,18 +360,25 @@ export default function MothersDayBanner() {
 
         {/* Responsive tweaks */}
         <style>{`
-          @media (max-width: 640px) {
+          @media (max-width: 768px) {
             .banner-grid {
               grid-template-columns: 1fr !important;
+              text-align: center;
+              justify-items: center;
+              gap: 32px !important;
             }
             .banner-countdown {
-              display: none !important;
+              transform: scale(0.9);
             }
           }
-          @media (max-width: 900px) {
-            .banner-countdown .flex {
-              gap: 6px !important;
-            }
+          @media (max-width: 480px) {
+             .countdown-box {
+                padding: 6px 10px !important;
+                min-width: 44px !important;
+             }
+             .banner-countdown {
+                transform: scale(0.85);
+             }
           }
         `}</style>
       </motion.section>

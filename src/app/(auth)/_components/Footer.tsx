@@ -12,19 +12,12 @@ const NAV = [
     heading: "Explorar",
     links: [
       { label: "Aretes", href: "/dashboard/cliente/catalogo?categoria=aretes" },
-      {
-        label: "Anillos",
-        href: "/dashboard/cliente/catalogo?categoria=anillos",
-      },
-      {
-        label: "Collares",
-        href: "/dashboard/cliente/catalogo?categoria=collares",
-      },
-      {
-        label: "Pulseras",
-        href: "/dashboard/cliente/catalogo?categoria=pulseras",
-      },
-      { label: "Colecciones", href: "/dashboard/cliente/catalogo" },
+      { label: "Anillos", href: "/dashboard/cliente/catalogo?categoria=anillos" },
+      { label: "Collares", href: "/dashboard/cliente/catalogo?categoria=collares" },
+      { label: "Pulseras", href: "/dashboard/cliente/catalogo?categoria=pulseras" },
+      { label: "Personalizados", href: "/dashboard/cliente/catalogo?categoria=personalizada" },
+      { label: "Nuevos", href: "/dashboard/cliente/catalogo?categoria=nuevos" },
+      { label: "Mayoreo", href: "/dashboard/cliente/mayoreo" },
     ],
   },
   {

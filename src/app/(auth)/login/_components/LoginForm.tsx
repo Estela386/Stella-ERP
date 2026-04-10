@@ -49,7 +49,7 @@ export default function LoginForm({ onSubmit, error: propError }: LoginFormProps
         <div className="w-8 h-8 sm:w-10 sm:h-10 border-4 border-[#B76E79] rounded-full mx-auto" />
 
         <h2 className="text-lg sm:text-xl font-semibold text-[#708090] tracking-tight">
-          Bienvenido de nuevo
+          Bienvenid@ de nuevo
         </h2>
         <p className="text-xs text-[#708090]/60">Ingresa tus datos para continuar</p>
       </div>

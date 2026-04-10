@@ -424,7 +424,7 @@ export default function HomeClient() {
             <motion.div key="mob" variants={menuV} initial="hidden" animate="show" exit="exit"
               style={{ position: "fixed", inset: 0, zIndex: 200, background: C.white, padding: "0 24px", display: "flex", flexDirection: "column" }}>
               <div style={{ height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Image src="/LogoM.svg" alt="Stella" width={96} height={30} style={{ objectFit: "contain" }} />
+                <Image src={LogoM} alt="Stella" width={96} height={30} style={{ objectFit: "contain" }} />
                 <button onClick={() => setMobileOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: C.slate }}><X size={21} /></button>
               </div>
               <div style={{ height: 1, background: C.slateBorder }} />
@@ -700,28 +700,6 @@ export default function HomeClient() {
                   Explora nuestro catálogo y encuentra esa pieza que hablará por ti más allá de una sola palabra.
                 </motion.p>
               </div>
-              {/* right: form */}
-              <motion.div variants={d(0.16)} style={{ flex: 1, minWidth: 280, maxWidth: 420 }}>
-                <div style={{ background: C.white, borderRadius: 10, padding: "clamp(18px,2.5vw,28px)", boxShadow: `0 8px 28px rgba(44,54,69,0.22)` }}>
-                  <p style={{ fontSize: "0.75rem", color: C.slate, marginBottom: 16, fontWeight: 400 }}>
-                    Regístrate y te ponemos en contacto contigo a la brevedad.
-                  </p>
-                  <div className="cta-row" style={{ display: "flex", gap: 9 }}>
-                    <input type="email" placeholder="tu@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} className="cta-input"
-                      style={{ flex: 1, minWidth: 0, padding: "10px 14px", borderRadius: 5, border: `1.5px solid ${C.slateBorder}`, background: C.bg, color: C.slateDeep, fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.82rem", transition: "border-color 0.2s, box-shadow 0.2s" }} />
-                    <motion.button whileHover={{ y: -2, boxShadow: `0 8px 20px ${C.roseMid}` }} whileTap={{ scale: 0.96 }} onClick={() => router.push("/register")}
-                      style={{ background: C.rose, color: "#f6f4ef", border: "none", cursor: "pointer", padding: "10px 20px", borderRadius: 5, fontSize: "0.80rem", letterSpacing: "0.04em", fontFamily: "var(--font-sans, Inter, sans-serif)", boxShadow: `0 3px 10px ${C.roseBorder}`, whiteSpace: "nowrap", flexShrink: 0, transition: "box-shadow 0.2s" }}>
-                      Solicitar acceso
-                    </motion.button>
-                  </div>
-                  <p style={{ marginTop: 12, fontSize: "0.76rem", color: C.slate, textAlign: "center" }}>
-                    ¿Ya tienes cuenta?{" "}
-                    <button onClick={() => router.push("/login")} style={{ background: "none", border: "none", cursor: "pointer", color: C.rose, fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.76rem", padding: 0, textDecoration: "underline" }}>
-                      Iniciar sesión
-                    </button>
-                  </p>
-                </div>
-              </motion.div>
             </div>
           </motion.div>
         </section>
@@ -729,7 +707,7 @@ export default function HomeClient() {
         {/* ══════════ FOOTER ══════════ */}
         <footer style={{ padding: "clamp(16px,2vw,22px) clamp(20px,5vw,52px)", background: "#3d4a5c", borderTop: `1px solid rgba(246,244,239,0.07)` }}>
           <div className="footer-flex" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <Image src="/LogoM.svg" alt="Stella" width={86} height={26} style={{ objectFit: "contain", opacity: 0.70, filter: "brightness(10)" }} />
+            <Image src={LogoM} alt="Stella" width={86} height={26} style={{ objectFit: "contain", opacity: 0.70, filter: "brightness(10)" }} />
             <p style={{ fontSize: "0.68rem", color: "rgba(246,244,239,0.38)", margin: 0 }}>
               © 2025 Stella Joyería Artesanal · Proyecto ERP Web
             </p>

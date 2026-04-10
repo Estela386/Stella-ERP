@@ -1,7 +1,7 @@
 "use client";
 import HeaderClient from "@auth/_components/HeaderClient";
 import Footer from "@auth/_components/Footer";
-import CartView from "../_components/CartView";
+import CartView from "../_components/carrito/CartView";
 import { useAuth } from "@/lib/hooks/useAuth";
 import ChatbotPage from "@/app/chatbot/page";
 import { Suspense } from "react";

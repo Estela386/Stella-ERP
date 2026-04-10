@@ -7,7 +7,6 @@ import TrustStrip            from "./_components/TrustStrip";             // Gar
 import CategoriesSection     from "./_components/CategoriesSection";      // Más de catálogo (Filtros)
 import ProductCenterCarousel from "./_components/ProductCenterCarousel";  // Carrusel central destacado
 import QuoteSimple           from "./_components/QuoteSimple";            // Conexión de marca (Slogan Beige)
-import StoryVideos           from "./_components/StoryVideos";            // Conexión visual/influencers (2 Videos)
 import BestSellersSection    from "./_components/BestSellersSection";     // Prueba social (Lo más vendido)
 import AlternatingCollections from "./_components/AlternatingCollections"; // Editorial + Productos
 import ReviewsSection        from "./_components/ReviewsSection";         // Confianza final
@@ -40,10 +39,7 @@ export default function ClientDashboard() {
       {/* 6. PRODUCTO ESTRELLA: Carrusel central grande */}
       <ProductCenterCarousel />
 
-      {/* 7. STORYTELLING: Los 2 videos verticales para historias del proceso/taller */}
-      <StoryVideos />
-
-      {/* 9. CATÁLOGO EDITORIAL: Muestra colecciones con fotos + productos vinculados (NUEVO) */}
+      {/* 8. CATÁLOGO EDITORIAL: Muestra colecciones con fotos + productos vinculados (NUEVO) */}
       <AlternatingCollections />
 
       {/* 10. VALIDACIÓN SOCIAL: Lo más vendido */}

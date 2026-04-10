@@ -291,11 +291,11 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
         }}
       >
         {/* ── TOP BAR ── */}
-        <div className="grid grid-cols-3 items-center px-5 md:px-8 py-3">
-          {/* Hamburger mobile */}
-          <div className="flex items-center">
+        <div className="flex items-center justify-between px-4 md:px-8 py-3 gap-2">
+          {/* Menu / Spacer fixed width to help centering */}
+          <div className="flex items-center w-[40px] md:w-[260px] md:flex-shrink-0">
             <button
-              className="flex md:hidden items-center justify-center rounded-xl border cursor-pointer"
+              className="flex md:hidden items-center justify-center rounded-xl border cursor-pointer flex-shrink-0"
               style={{
                 width: 40,
                 height: 40,
@@ -309,22 +309,22 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
             </button>
           </div>
 
-          {/* Logo */}
+          {/* Logo - Flexible and centered */}
           <div
-            className="flex justify-center items-center cursor-pointer"
+            className="flex-1 flex justify-center items-center cursor-pointer min-w-0"
             onClick={() => router.push("/dashboard/cliente")}
           >
             <Image
               src={LogoM}
               alt="Logotipo Stella Joyería"
-              width={320}
+              width={260}
               height={90}
-              className="w-full max-w-[140px] sm:max-w-[180px] md:max-w-[220px] lg:max-w-[260px] h-auto object-contain"
+              className="w-auto max-w-[120px] sm:max-w-[160px] md:max-w-[200px] lg:max-w-[260px] h-auto object-contain"
             />
           </div>
 
-          {/* Acciones derecha */}
-          <div className="flex items-center justify-end gap-3">
+          {/* Acciones derecha - Fixed width matching left on desktop for centering */}
+          <div className="flex items-center justify-end gap-2 sm:gap-3 md:w-[260px] md:flex-shrink-0">
             {/* Botón ERP (Admin y Mayoristas) */}
             {(id_rol === 1 || id_rol === 3) && (
               <button
@@ -637,7 +637,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                     background: WHITE,
                   }}
                 >
-                  <Image src="/LogoM.svg" alt="logo" width={130} height={44} />
+                  <Image src={LogoM} alt="logo" width={130} height={44} />
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-3 py-2">
@@ -657,53 +657,55 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                       />
                     );
                   })}
-                  <Divider />
-
-                  <SectionLabel>Mi cuenta</SectionLabel>
-
-                  {(id_rol === 1 || id_rol === 3) && (
-                    <NavBtn
-                      icon={<LayoutDashboard size={18} />}
-                      label="Dashboard ERP"
-                      onClick={() => {
-                        router.push("/dashboard/inicio");
-                        setMobileMenu(false);
-                      }}
-                    />
-                  )}
-
                   {isUserLoaded && (
-                    <NavBtn
-                      icon={<User size={18} />}
-                      label="Mi perfil"
-                      onClick={() => {
-                        router.push("/dashboard/cliente/perfil");
-                        setMobileMenu(false);
-                      }}
-                    />
-                  )}
-                  {isClientDashboard && (
                     <>
+                      <Divider />
+                      <SectionLabel>Mi cuenta</SectionLabel>
+
+                      {(id_rol === 1 || id_rol === 3) && (
+                        <NavBtn
+                          icon={<LayoutDashboard size={18} />}
+                          label="Dashboard ERP"
+                          onClick={() => {
+                            router.push("/dashboard/inicio");
+                            setMobileMenu(false);
+                          }}
+                        />
+                      )}
+
                       <NavBtn
-                        icon={<Package size={18} />}
-                        label="Mis pedidos"
-                        badge={cartCount}
+                        icon={<User size={18} />}
+                        label="Mi perfil"
                         onClick={() => {
-                          router.push("/dashboard/cliente/pedidos");
+                          router.push("/dashboard/cliente/perfil");
                           setMobileMenu(false);
                         }}
                       />
-                      <NavBtn icon={<Heart size={18} />} label="Favoritos" />
+
+                      {isClientDashboard && (
+                        <>
+                          <NavBtn
+                            icon={<Package size={18} />}
+                            label="Mis pedidos"
+                            badge={cartCount}
+                            onClick={() => {
+                              router.push("/dashboard/cliente/pedidos");
+                              setMobileMenu(false);
+                            }}
+                          />
+                          <NavBtn icon={<Heart size={18} />} label="Favoritos" />
+                        </>
+                      )}
+
+                      <Divider />
+                      <NavBtn
+                        icon={<LogOut size={18} />}
+                        label="Cerrar sesión"
+                        danger
+                        onClick={handleLogout}
+                      />
                     </>
                   )}
-
-                  <Divider />
-                  <NavBtn
-                    icon={<LogOut size={18} />}
-                    label="Cerrar sesión"
-                    danger
-                    onClick={handleLogout}
-                  />
                 </div>
 
                 <div
