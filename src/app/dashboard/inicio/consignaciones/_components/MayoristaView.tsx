@@ -22,7 +22,7 @@ function fmt(date: string) {
 interface MayoristaViewProps {
   consignaciones: IConsignacion[];
   loading: boolean;
-  stats: { total: number; activas: number; finalizadas: number; canceladas: number };
+  stats: { asignados: number; vendidos: number; devueltos: number; ganancia: number };
   nombre: string;
 }
 
@@ -81,9 +81,10 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
         }}
       >
         {[
-          { label: "Total Asignaciones", value: stats.total, color: "#708090" },
-          { label: "Activas", value: stats.activas, color: "#B76E79" },
-          { label: "Finalizadas", value: stats.finalizadas, color: "#8c9796" },
+          { label: "Productos Asignados", value: stats.asignados, color: "#708090" },
+          { label: "Cantidad Vendida", value: stats.vendidos, color: "#B76E79" },
+          { label: "Cantidad Devuelta", value: stats.devueltos, color: "#c0856d" },
+          { label: "Ganancia Estimada", value: `$${stats.ganancia.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`, color: "#3d8c60" },
         ].map(s => (
           <div
             key={s.label}
@@ -95,8 +96,8 @@ export default function MayoristaView({ consignaciones, loading, stats, nombre }
               boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
             }}
           >
-            <p style={{ fontSize: "1.8rem", fontWeight: 400, color: s.color, margin: 0, fontFamily: "var(--font-marcellus)" }}>{s.value}</p>
-            <p style={{ fontSize: "0.72rem", color: "#8C9796", marginTop: 2, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "var(--font-sans)" }}>{s.label}</p>
+            <p style={{ fontSize: "1.6rem", fontWeight: 400, color: s.color, margin: 0, fontFamily: "var(--font-marcellus)" }}>{s.value}</p>
+            <p style={{ fontSize: "0.72rem", color: "#8C9796", marginTop: 2, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "var(--font-sans)", lineHeight: 1.2 }}>{s.label}</p>
           </div>
         ))}
       </div>

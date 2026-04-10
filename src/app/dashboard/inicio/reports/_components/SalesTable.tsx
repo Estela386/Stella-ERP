@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Plus, Filter } from "lucide-react";
-import { Venta } from "@/lib/models/Venta";
+import { Search, Plus, Filter, Download, ChevronDown, ChevronUp, Package } from "lucide-react";
+
+import { IVenta, IDetalleVenta } from "@/lib/models";
 
 interface SalesTableProps {
-  ventas: Venta[];
+  ventas: IVenta[]; 
   loading: boolean;
 }
 
@@ -14,13 +15,25 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string>("todos");
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  
   const PAGE_SIZE = 8;
 
-  // Filter local state based on search over customer or ID
-  const filtered = ventas.filter(v => 
-    String(v.id).includes(search) || 
-    String(v.id_usuario || "").toLowerCase().includes(search.toLowerCase())
-  );
+  // Filter local state based on search over customer or ID, and status
+  const filtered = useMemo(() => {
+    return ventas.filter(v => {
+      // Search text match
+      const searchMatch = 
+        String(v.id).includes(search) || 
+        String(v.id_usuario || "").toLowerCase().includes(search.toLowerCase());
+      
+      // Status filter match
+      const statusMatch = statusFilter === "todos" || v.estado === statusFilter;
+      
+      return searchMatch && statusMatch;
+    });
+  }, [ventas, search, statusFilter]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -41,12 +54,50 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
     return status;
   }
 
+  const toggleRow = (id: number) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
+
+  const exportToCSV = () => {
+    if (filtered.length === 0) return;
+    
+    // Create CSV Header
+    const headers = ["Folio", "Cliente", "Fecha", "Monto", "Estado", "Artículos Totales"];
+    
+    // Create CSV Rows
+    const rows = filtered.map(v => {
+      const date = v.fecha ? new Date(v.fecha).toLocaleDateString("es-MX", { day: '2-digit', month: '2-digit', year: 'numeric' }) : "N/A";
+      const client = v.id_usuario === "guest" || !v.id_usuario ? "Cliente General" : v.id_usuario;
+      const amount = v.total || 0;
+      const itemsCount = (v.detalles || []).reduce<number>((acc, d) => acc + (d.cantidad || 0), 0);
+      
+      return [v.id, `"${client}"`, date, amount, getStatusName(v.estado), itemsCount].join(",");
+    });
+
+    const csvContent = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Reporte_Ventas_${new Date().getTime()}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div style={{
       background: "#fff",
       borderRadius: 16,
       padding: "24px",
-      boxShadow: "0 5px 20px rgba(0,0,0,0.03)",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.04)",
       border: "1px solid rgba(0,0,0,0.04)",
       display: "flex", flexDirection: "column",
       height: "100%",
@@ -55,48 +106,76 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
       <div style={{ marginBottom: 20 }}>
         <h3 style={{
           fontFamily: "var(--font-marcellus)",
-          fontSize: "0.8rem", fontWeight: 700, color: "#2A2E34", margin: 0,
+          fontSize: "1rem", fontWeight: 700, color: "#2A2E34", margin: 0,
         }}>
-          Registro de Ventas
+          Tabla Avanzada de Ventas
         </h3>
         <p style={{
           fontFamily: "var(--font-poppins)",
-          fontSize: "0.65rem", color: "#8A94A6", margin: "2px 0 0",
+          fontSize: "0.75rem", color: "#8A94A6", margin: "4px 0 0",
         }}>
-          Bitácora completa extraída de la base de datos
+          Vista granular de pedidos con detalles de artículos y exportación.
         </p>
       </div>
 
       {/* Toolbar */}
-      <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10, marginBottom: 20 }}>
-        <div style={{ display: "flex", gap: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 14, marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          
           <button 
             onClick={() => router.push("/dashboard/inicio/nuevaVenta")}
             style={{
               background: "#B76E79", color: "#fff", border: "none", borderRadius: 8,
-              padding: "6px 14px", display: "flex", alignItems: "center", gap: 6,
-              fontFamily: "var(--font-marcellus)", fontSize: "0.7rem", fontWeight: 600, cursor: "pointer",
+              padding: "8px 16px", display: "flex", alignItems: "center", gap: 6,
+              fontFamily: "var(--font-marcellus)", fontSize: "0.8rem", fontWeight: 600, cursor: "pointer",
+              transition: "opacity 0.2s"
           }}>
-            <Plus size={14} /> Nueva
+            <Plus size={16} /> Nueva Venta
           </button>
-          <button style={{
-             background: "#F0F2F5", border: "none", borderRadius: 8, width: 32, height: 32,
-             display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+          
+          <button 
+            onClick={exportToCSV}
+            title="Exportar a CSV"
+            style={{
+             background: "#F0F2F5", border: "1px solid #E2E8F0", borderRadius: 8, padding: "0 14px",
+             display: "flex", alignItems: "center", gap: 6, cursor: "pointer", color: "#4B5563",
+             fontFamily: "var(--font-sans)", fontSize: "0.8rem", fontWeight: 500, transition: "background 0.2s"
           }}>
-            <Filter size={14} color="#8A94A6" />
+            <Download size={16} /> Exportar
           </button>
+
+          {/* Status Filter Dropdown */}
+          <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+            <Filter size={14} color="#8A94A6" style={{ position: "absolute", left: 12 }} />
+            <select 
+              value={statusFilter}
+              onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+              style={{
+                appearance: "none",
+                background: "#F0F2F5", border: "1px solid #E2E8F0", borderRadius: 8,
+                padding: "8px 14px 8px 34px", color: "#4B5563", fontFamily: "var(--font-sans)",
+                fontSize: "0.8rem", outline: "none", cursor: "pointer", width: 140
+              }}
+            >
+              <option value="todos">Todos los estados</option>
+              <option value="aprobada">Completadas</option>
+              <option value="pendiente">Pendientes</option>
+              <option value="cancelada">Canceladas</option>
+            </select>
+          </div>
+
         </div>
 
         {/* Search */}
         <div style={{ display: "flex", gap: 8 }}>
           <div style={{
-            background: "#F0F2F5", borderRadius: 8, display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", width: 220,
+            background: "#fff", border: "1px solid #E2E8F0", borderRadius: 8, display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", width: 260,
           }}>
-            <Search size={14} color="#8A94A6" />
+            <Search size={16} color="#8A94A6" />
             <input
               value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Buscar folio o cliente..."
-              style={{ background: "transparent", border: "none", outline: "none", fontSize: "0.7rem", fontFamily: "var(--font-poppins)", color: "#2A2E34", width: "100%" }}
+              placeholder="Buscar por folio o ID cliente..."
+              style={{ background: "transparent", border: "none", outline: "none", fontSize: "0.8rem", fontFamily: "var(--font-poppins)", color: "#2A2E34", width: "100%" }}
             />
           </div>
         </div>
@@ -105,18 +184,19 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
       {/* Table */}
       <div style={{ overflowX: "auto", flex: 1, minHeight: 400 }}>
         {loading ? (
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", color: "#8A94A6", fontSize: "0.8rem", fontFamily: "Inter" }}>
-            Cargando ventas...
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", color: "#8A94A6", fontSize: "0.85rem", fontFamily: "var(--font-sans)" }}>
+            Buscando registros...
           </div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr>
-                {["FOLIO (INVOICE)", "CLIENTE", "FECHA", "MONTO", "ESTADO"].map(th => (
+              <tr style={{ background: "#F8FAFC" }}>
+                <th style={{ width: 40 }}></th>
+                {["FOLIO", "CLIENTE", "FECHA", "MONTO ($)", "ESTADO"].map(th => (
                   <th key={th} style={{
-                    textAlign: "left", padding: "12px 10px",
-                    fontFamily: "var(--font-marcellus)", fontSize: "0.6rem", fontWeight: 800, color: "#8A94A6",
-                    borderBottom: "1px solid #F0F2F5", letterSpacing: "0.05em"
+                    textAlign: "left", padding: "14px 12px",
+                    fontFamily: "var(--font-sans)", fontSize: "0.7rem", fontWeight: 600, color: "#64748B",
+                    borderBottom: "1px solid #E2E8F0", borderTop: "1px solid #E2E8F0", letterSpacing: "0.02em"
                   }}>
                     {th}
                   </th>
@@ -126,39 +206,99 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
             <tbody>
               {paged.length === 0 ? (
                 <tr>
-                  <td colSpan={5} style={{ padding: "40px 0", textAlign: "center", color: "#8A94A6", fontSize: "0.8rem", fontFamily: "Inter" }}>
-                    No hay ventas registradas
+                  <td colSpan={6} style={{ padding: "60px 0", textAlign: "center", color: "#8A94A6", fontSize: "0.85rem", fontFamily: "var(--font-poppins)" }}>
+                    No concuerdan ventas con los filtros actuales.
                   </td>
                 </tr>
               ) : (
                 paged.map((v) => {
                   const sc = statusColors[v.estado] || { color: "#8A94A6", bg: "#F0F2F5" };
-                  const fDate = new Date(v.fecha).toLocaleDateString("es-MX", { day: '2-digit', month: 'short', year: 'numeric' });
+                  const fDate = v.fecha ? new Date(v.fecha).toLocaleDateString("es-MX", { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A";
+                  const isExpanded = expandedRows.has(v.id);
+                  const hasDetails = v.detalles && v.detalles.length > 0;
                   
                   return (
-                    <tr key={v.id} style={{ borderBottom: "1px solid #F7F9FA" }}>
-                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-poppins)", fontSize: "0.75rem", fontWeight: 700, color: "#2A2E34" }}>
-                        #{v.id}
-                      </td>
-                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-poppins)", fontSize: "0.75rem", color: "#8A94A6" }}>
-                        {v.id_usuario === "guest" || !v.id_usuario ? "Cliente General" : v.id_usuario}
-                      </td>
-                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-poppins)", fontSize: "0.75rem", color: "#8A94A6" }}>
-                        {fDate}
-                      </td>
-                      <td style={{ padding: "14px 10px", fontFamily: "var(--font-poppins)", fontSize: "0.75rem", fontWeight: 700, color: "#3d8c60" }}>
-                        ${v.total.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
-                      </td>
-                      <td style={{ padding: "14px 10px" }}>
-                        <span style={{
-                          background: sc.bg, color: sc.color,
-                          padding: "4px 12px", borderRadius: 12, display: "inline-block",
-                          fontFamily: "var(--font-marcellus)", fontSize: "0.65rem", fontWeight: 700,
-                        }}>
-                          {getStatusName(v.estado)}
-                        </span>
-                      </td>
-                    </tr>
+                    <React.Fragment key={v.id}>
+                      <tr 
+                        onClick={() => hasDetails && toggleRow(v.id)}
+                        style={{ 
+                          borderBottom: "1px solid #F0F2F5", 
+                          cursor: hasDetails ? "pointer" : "default",
+                          background: isExpanded ? "rgba(183,110,121,0.02)" : "transparent",
+                          transition: "background 0.2s"
+                        }}
+                      >
+                        <td style={{ padding: "16px 12px", textAlign: "center" }}>
+                          {hasDetails ? (
+                            isExpanded ? <ChevronUp size={16} color="#8A94A6" /> : <ChevronDown size={16} color="#8A94A6" />
+                          ) : (
+                            <div style={{ width: 16, height: 16 }} />
+                          )}
+                        </td>
+                        <td style={{ padding: "16px 12px", fontFamily: "var(--font-poppins)", fontSize: "0.85rem", fontWeight: 600, color: "#2A2E34" }}>
+                          #{v.id}
+                        </td>
+                        <td style={{ padding: "16px 12px", fontFamily: "var(--font-poppins)", fontSize: "0.85rem", color: "#4B5563" }}>
+                          {v.id_usuario === "guest" || !v.id_usuario ? "Cliente Foráneo" : (v.id_usuario.length > 15 ? v.id_usuario.substring(0,15)+"..." : v.id_usuario)}
+                        </td>
+                        <td style={{ padding: "16px 12px", fontFamily: "var(--font-sans)", fontSize: "0.85rem", color: "#64748B" }}>
+                          {fDate}
+                        </td>
+                        <td style={{ padding: "16px 12px", fontFamily: "var(--font-poppins)", fontSize: "0.85rem", fontWeight: 600, color: "#2A2E34" }}>
+                          ${(v.total || 0).toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+                        </td>
+                        <td style={{ padding: "16px 12px" }}>
+                          <span style={{
+                            background: sc.bg, color: sc.color,
+                            padding: "6px 12px", borderRadius: 20, display: "inline-flex",
+                            fontFamily: "var(--font-sans)", fontSize: "0.7rem", fontWeight: 600,
+                          }}>
+                            {getStatusName(v.estado)}
+                          </span>
+                        </td>
+                      </tr>
+                      
+                      {/* Expanded Details Row */}
+                      {isExpanded && (
+                        <tr style={{ background: "#FAFAFA", borderBottom: "1px solid #E2E8F0" }}>
+                          <td colSpan={6} style={{ padding: "20px 40px" }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                              <h4 style={{ margin: 0, fontFamily: "var(--font-marcellus)", fontSize: "0.85rem", color: "#4B5563", display: "flex", alignItems: "center", gap: 6 }}>
+                                <Package size={14} /> Desglose de Artículos
+                              </h4>
+                              <div style={{ 
+                                background: "#fff", border: "1px solid #E2E8F0", borderRadius: 8, overflow: "hidden" 
+                              }}>
+                                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                                  <thead style={{ background: "#F1F5F9" }}>
+                                    <tr>
+                                      <th style={{ textAlign: "left", padding: "10px 14px", fontSize: "0.7rem", fontFamily: "var(--font-sans)", color: "#64748B", fontWeight: 600 }}>CANTIDAD</th>
+                                      <th style={{ textAlign: "left", padding: "10px 14px", fontSize: "0.7rem", fontFamily: "var(--font-sans)", color: "#64748B", fontWeight: 600 }}>PRODUCTO</th>
+                                      <th style={{ textAlign: "right", padding: "10px 14px", fontSize: "0.7rem", fontFamily: "var(--font-sans)", color: "#64748B", fontWeight: 600 }}>SUBTOTAL</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {v.detalles?.map((det, i: number) => (
+                                      <tr key={i} style={{ borderBottom: i === (v.detalles?.length ?? 0) - 1 ? "none" : "1px solid #E2E8F0" }}>
+                                        <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#2A2E34", fontFamily: "var(--font-poppins)" }}>
+                                          {det.cantidad || 0}x
+                                        </td>
+                                        <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#4B5563", fontFamily: "var(--font-sans)" }}>
+                                          {det.producto?.nombre || "Producto desconocido"}
+                                        </td>
+                                        <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#2A2E34", fontFamily: "var(--font-poppins)", textAlign: "right", fontWeight: 600 }}>
+                                          ${((det.cantidad || 0) * (det.producto?.precio || 0)).toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   )
                 })
               )}
@@ -168,24 +308,25 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
       </div>
 
       {/* Footer / Pagination */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16 }}>
-        <span style={{ fontFamily: "var(--font-poppins)", fontSize: "0.65rem", color: "#8A94A6" }}>
-          Mostrando {paged.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 0} a {Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20 }}>
+        <span style={{ fontFamily: "var(--font-poppins)", fontSize: "0.75rem", color: "#8A94A6" }}>
+          Mostrando {paged.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 0} al {Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length}
         </span>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} style={{ border: "none", background: "none", color: page === 1 ? "#E2E8F0" : "#8A94A6", fontSize: "0.65rem", cursor: page === 1 ? "default" : "pointer" }}>&lt;</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} style={{ border: "1px solid #E2E8F0", borderRadius: 6, background: "#fff", color: page === 1 ? "#cbd5e1" : "#64748B", padding: "4px 8px", cursor: page === 1 ? "not-allowed" : "pointer" }}>Anterior</button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
             <button key={p} onClick={() => setPage(p)} style={{
-              width: 20, height: 20, borderRadius: "50%", border: "none", cursor: "pointer",
-              background: p === page ? "#708090" : "transparent",
-              color: p === page ? "#fff" : "#8A94A6", fontSize: "0.65rem", fontWeight: 600,
+              minWidth: 28, height: 28, borderRadius: 6, border: "1px solid", 
+              borderColor: p === page ? "#C07E88" : "#E2E8F0", cursor: "pointer",
+              background: p === page ? "#C07E88" : "#fff",
+              color: p === page ? "#fff" : "#64748B", fontSize: "0.75rem", fontWeight: 600,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "var(--font-marcellus)"
+              fontFamily: "var(--font-sans)"
             }}>
               {p}
             </button>
           ))}
-          <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} style={{ border: "none", background: "none", color: page === totalPages ? "#E2E8F0" : "#8A94A6", fontSize: "0.65rem", cursor: page === totalPages ? "default" : "pointer" }}>&gt;</button>
+          <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} style={{ border: "1px solid #E2E8F0", borderRadius: 6, background: "#fff", color: page === totalPages ? "#cbd5e1" : "#64748B", padding: "4px 8px", cursor: page === totalPages ? "not-allowed" : "pointer" }}>Siguiente</button>
         </div>
       </div>
     </div>

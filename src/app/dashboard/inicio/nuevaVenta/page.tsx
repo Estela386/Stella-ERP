@@ -14,7 +14,7 @@ function PedidoHydrator({
   onLoaded,
   onLoading,
 }: {
-  onLoaded: (productos: any[]) => void;
+  onLoaded: (productos: Producto[]) => void;
   onLoading: () => void;
 }) {
   const searchParams = useSearchParams();
@@ -63,7 +63,7 @@ export type Producto = {
   stock?: number;
   categoria_nombre?: string;
   partes_seleccionadas?: string[];
-  opciones?: any[];
+  opciones?: { nombre: string; valores: { valor: string }[] }[];
   es_consignado?: boolean;
   id_consignacion_detalle?: number;
 };
@@ -191,22 +191,25 @@ export default function NuevaVentaPage() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F6F3EF]">
+    <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
       <SidebarMenu />
 
-      <main className="flex-1 px-4 py-8 overflow-y-auto">
-        <div className="mx-auto w-full max-w-6xl space-y-6">
+      <main className="flex-1 px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto" style={{ background: "var(--beige)" }}>
+        <div className="mx-auto max-w-[1440px] space-y-8">
           <header className="space-y-1">
             <div className="flex items-center gap-4">
-              <span className="h-px w-8 sm:w-12 bg-[#B76E79]" />
-              <span className="text-[10px] sm:text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase text-[#B76E79] font-medium">
+              <span className="h-px w-8 sm:w-12" style={{ background: "var(--rose-gold)" }} />
+              <span className="text-[10px] sm:text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase font-medium" style={{ color: "var(--rose-gold)", fontFamily: "var(--font-marcellus)" }}>
                 Gestión
               </span>
             </div>
             {cargandoPedido && (
-              <p className="text-xs text-[#708090] animate-pulse">
-                Cargando productos del pedido...
-              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: "var(--rose-gold)" }} />
+                <p className="text-xs" style={{ color: "var(--slate-light)" }}>
+                  Sincronizando productos del pedido...
+                </p>
+              </div>
             )}
             <Suspense fallback={null}>
               <PedidoHydrator 

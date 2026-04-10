@@ -6,6 +6,7 @@ import DashboardStats    from "./_components/DashboardStats";
 import RecentOrders      from "./_components/RecentOrders";
 import StockAlerts       from "./_components/StockAlerts";
 import SideWidgets       from "./_components/SideWidgets";
+import AIPredictionsWidget from "./_components/AIPredictionsWidget";
 
 import { useAuth } from "@/lib/hooks/useAuth";
 import { ShoppingBag } from "lucide-react";
@@ -27,14 +28,14 @@ export default function InicioPage() {
   }
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#F6F3EF" }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "var(--beige)" }}>
       <SidebarMenu />
 
       <main style={{
         flex: 1,
         overflowY: "auto",
         overflowX: "hidden",
-        background: "#F6F3EF",
+        background: "var(--beige)",
       }}>
         <div style={{
           padding: "clamp(14px, 2vw, 24px) clamp(14px, 2.5vw, 24px)",
@@ -72,26 +73,24 @@ export default function InicioPage() {
           )}
 
           {/* ── Main Layout ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 32, paddingBottom: 40 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 32, paddingBottom: 60 }}>
             
             {/* 1. KPI cards -> 4 columns full width */}
             <DashboardStats />
+
+            {/* AI Predictions */}
+            {isAdmin && <AIPredictionsWidget />}
 
             <style>{`
               @media (max-width: 1100px) {
                 .dash-row { grid-template-columns: 1fr !important; }
               }
             `}</style>
-
-            {/* 3. Bottom Row: Calendar & Events */}
-            <div style={{ minWidth: 0 }}>
-              <SideWidgets />
-            </div>
             
             {/* 2. Middle Row: Recent Orders & Stock Alerts (only for Admin) */}
             <div className="dash-row" style={{ 
               display: "grid", 
-              gridTemplateColumns: isAdmin ? "1fr 1fr" : "1fr", 
+              gridTemplateColumns: isAdmin ? "1.2fr 1fr" : "1fr", 
               gap: 24, 
               alignItems: "start" 
             }}>
@@ -103,6 +102,11 @@ export default function InicioPage() {
                   <StockAlerts />
                 </div>
               )}
+            </div>
+
+            {/* 3. Bottom Row: Calendar & Events */}
+            <div style={{ minWidth: 0 }}>
+              <SideWidgets />
             </div>
 
           </div>

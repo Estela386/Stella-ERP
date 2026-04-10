@@ -7,7 +7,9 @@ export type TipoNotificacion =
   | "stock_bajo_insumo"
   | "pedido_nuevo"
   | "pedido_estado"
-  | "consignacion_nueva";
+  | "consignacion_nueva"
+  | "insight_ia"
+  | "venta_alerta";
 
 export interface INotificacion {
   id: number;

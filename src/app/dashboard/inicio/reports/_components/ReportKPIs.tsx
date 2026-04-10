@@ -1,69 +1,43 @@
 "use client";
 
-import { DollarSign, Package, AlertTriangle, XOctagon } from "lucide-react";
+import { DollarSign, Package, TrendingUp, Users, ShoppingBag, ArrowUpRight, BarChart3, CreditCard } from "lucide-react";
 
-interface KPI {
+export interface KPI {
   label: string;
   value: string | number;
+  icon: string;
   bgStart: string;
   bgEnd: string;
 }
 
 interface ReportKPIsProps {
-  valorInventario: number;
-  totalPiezas: number;
-  stockBajo: number;
-  agotados: number;
+  kpis: KPI[];
 }
 
-export default function ReportKPIs({
-  valorInventario,
-  totalPiezas,
-  stockBajo,
-  agotados,
-}: ReportKPIsProps) {
-  const kpis: KPI[] = [
-    {
-      label: "Valor del Inventario",
-      value: `$${valorInventario.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`,
-      bgStart: "#758390", bgEnd: "#6b7a88" // Slate Gray variant
-    },
-    {
-      label: "Total de Piezas",
-      value: totalPiezas,
-      bgStart: "#C07E88", bgEnd: "#B76E79" // Muted Rose variant
-    },
-    {
-      label: "Stock Bajo",
-      value: stockBajo,
-      bgStart: "#758390", bgEnd: "#6b7a88" // Slate Gray
-    },
-    {
-      label: "Agotados",
-      value: agotados,
-      bgStart: "#C07E88", bgEnd: "#B76E79" // Muted Rose
-    },
-  ];
+export default function ReportKPIs({ kpis }: ReportKPIsProps) {
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case "dollar": return DollarSign;
+      case "package": return Package;
+      case "trending": return TrendingUp;
+      case "users": return Users;
+      case "shopping-bag": return ShoppingBag;
+      case "arrow-up": return ArrowUpRight;
+      case "bar-chart": return BarChart3;
+      case "credit": return CreditCard;
+      default: return Package;
+    }
+  };
 
   return (
     <div style={{
       display: "grid",
-      gridTemplateColumns: "repeat(4, 1fr)",
+      gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
       gap: 20,
       width: "100%",
       boxSizing: "border-box",
-    }} className="kpi-grid-flat">
+    }}>
       <style>{`
-        @media (max-width: 1100px) { 
-          .kpi-grid-flat { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; } 
-        }
-        @media (max-width: 600px)  { 
-          .kpi-grid-flat { 
-            grid-template-columns: repeat(2, 1fr) !important; 
-            gap: 12px !important; 
-          } 
-        }
-        
         .kpi-card-hover {
           transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
         }
@@ -73,15 +47,12 @@ export default function ReportKPIs({
         }
       `}</style>
       
-      {kpis.map(k => {
-        let Icon = Package;
-        if (k.label.includes("Valor")) Icon = DollarSign;
-        if (k.label.includes("Stock")) Icon = AlertTriangle;
-        if (k.label.includes("Agotados")) Icon = XOctagon;
+      {kpis.map((k, idx) => {
+        const Icon = getIcon(k.icon);
 
         return (
           <div
-            key={k.label}
+            key={`${k.label}-${idx}`}
             className="kpi-card-hover"
             style={{
               background: `linear-gradient(to bottom right, ${k.bgStart}, ${k.bgEnd})`,

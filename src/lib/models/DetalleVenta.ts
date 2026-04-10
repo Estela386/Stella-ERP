@@ -2,15 +2,23 @@
  * Modelo de DetalleVenta
  * Representa cada uno de los productos en una venta
  */
+export interface IProductoVenta {
+  id: number;
+  nombre: string | null;
+  precio: number | null;
+  url_imagen: string | null;
+}
+
 export interface IDetalleVenta {
   id: number;
-  cantidad: number;
-  id_producto: number; // productos.id
+  cantidad: number | null;
+  id_producto: number | null; // productos.id
   descuento_aplicado?: number | null; // descuentos.id (opcional)
-  id_venta?: number; // venta.id (para referencia)
+  id_venta?: number | null; // venta.id (para referencia)
   precio_unitario?: number; // Precio del producto en el momento de la venta
   subtotal?: number; // cantidad * precio_unitario
   id_consignacion_detalle?: number; // Link to a consignment detail if applicable
+  producto?: IProductoVenta; // Relación con la tabla producto
 }
 
 /**
@@ -39,10 +47,10 @@ export class DetalleVenta implements IDetalleVenta {
 
   constructor(data: IDetalleVenta) {
     this.id = data.id;
-    this.cantidad = data.cantidad;
-    this.id_producto = data.id_producto;
+    this.cantidad = data.cantidad ?? 0;
+    this.id_producto = data.id_producto ?? 0;
     this.descuento_aplicado = data.descuento_aplicado;
-    this.id_venta = data.id_venta;
+    this.id_venta = data.id_venta ?? undefined;
     this.precio_unitario = data.precio_unitario;
     this.subtotal = data.subtotal;
     this.id_consignacion_detalle = data.id_consignacion_detalle;

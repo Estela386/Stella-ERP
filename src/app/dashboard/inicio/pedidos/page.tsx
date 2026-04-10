@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { Loader2, Plus, ClipboardList, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Suspense } from "react";
+import Skeleton from "@/app/_components/ui/Skeleton";
 
 function PedidosPageContent() {
   const { usuario } = useAuth();
@@ -57,17 +58,17 @@ function PedidosPageContent() {
     );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F6F3EF]">
+    <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
       <SideBarMenu />
 
-      <main className="flex-1 px-4 py-8 overflow-y-auto">
-        <div className="mx-auto max-w-6xl space-y-6">
+      <main className="flex-1 px-4 sm:px-6 py-8 overflow-y-auto" style={{ background: "var(--beige)" }}>
+        <div className="mx-auto max-w-[1440px] space-y-8">
 
           {/* HEADER */}
           <header className="space-y-1">
             <div className="flex items-center gap-4">
-              <span className="h-px w-12 bg-[#B76E79]" />
-              <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium">
+              <span className="h-px w-12" style={{ background: "var(--rose-gold)" }} />
+              <span className="text-xs tracking-[0.4em] uppercase font-medium" style={{ color: "var(--rose-gold)" }}>
                 Pedidos
               </span>
             </div>
@@ -79,7 +80,12 @@ function PedidosPageContent() {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  className="absolute top-0 right-0 bg-[#B76E79]/10 border border-[#B76E79]/30 text-[#B76E79] px-6 py-3 rounded-2xl flex items-center gap-3 backdrop-blur-md shadow-xl z-50 overflow-hidden"
+                  className="absolute top-0 right-0 border px-6 py-3 rounded-2xl flex items-center gap-3 backdrop-blur-md shadow-xl z-50 overflow-hidden"
+                  style={{
+                    background: "rgba(183,110,121,0.1)",
+                    borderColor: "rgba(183,110,121,0.3)",
+                    color: "var(--rose-gold)"
+                  }}
                 >
                   <div className="absolute inset-0 bg-white/40 pointer-events-none" />
                   <div className="relative flex items-center gap-3">
@@ -94,18 +100,27 @@ function PedidosPageContent() {
             </AnimatePresence>
           </header>
 
-          {/* CARD PRINCIPAL */}
-          <div className="relative rounded-3xl bg-white p-6 sm:p-8 md:p-10 space-y-8 border border-black/10 shadow-[0_30px_70px_rgba(0,0,0,0.12)]">
+          <div 
+            className="relative rounded-3xl p-6 sm:p-8 md:p-10 space-y-8 border"
+            style={{
+              background: "var(--white)",
+              border: "1px solid var(--border-subtle)",
+              boxShadow: "var(--shadow-md)"
+            }}
+          >
             
             {/* TABS DE NAVEGACIÓN */}
-            <div className="flex bg-[#F6F4EF] p-1.5 rounded-2xl w-fit">
+            <div className="flex p-1.5 rounded-2xl w-fit" style={{ background: "var(--beige-light)" }}>
               <button
                 onClick={() => setActiveTab("LISTA")}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition duration-300 cursor-pointer ${
                   activeTab === "LISTA" 
-                    ? "bg-white text-[#B76E79] shadow-sm scale-105" 
+                    ? "bg-white shadow-sm scale-105" 
                     : "text-[#8C9796] hover:text-[#708090]"
                 }`}
+                style={{
+                  color: activeTab === "LISTA" ? "var(--rose-gold)" : "var(--slate-light)"
+                }}
               >
                 <ClipboardList size={18} />
                 {usuario?.id_rol === 1 ? "Gestión de Pedidos" : "Mis Pedidos"}
@@ -115,9 +130,12 @@ function PedidosPageContent() {
                   onClick={() => setActiveTab("NUEVO")}
                   className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition duration-300 cursor-pointer ${
                     activeTab === "NUEVO" 
-                      ? "bg-white text-[#B76E79] shadow-sm scale-105" 
+                      ? "bg-white shadow-sm scale-105" 
                       : "text-[#8C9796] hover:text-[#708090]"
                   }`}
+                  style={{
+                    color: activeTab === "NUEVO" ? "var(--rose-gold)" : "var(--slate-light)"
+                  }}
                 >
                   <Plus size={18} />
                   Levantar Pedido
@@ -126,9 +144,13 @@ function PedidosPageContent() {
             </div>
 
             {loading ? (
-              <div className="flex flex-col items-center justify-center p-20 gap-4">
-                <Loader2 className="animate-spin text-[#B76E79]" size={40} />
-                <p className="text-[#8C9796] font-medium italic">Sincronizando pedidos...</p>
+              <div className="flex flex-col gap-6">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 20 }}>
+                  <Skeleton height={100} borderRadius={16} />
+                  <Skeleton height={100} borderRadius={16} />
+                  <Skeleton height={100} borderRadius={16} />
+                </div>
+                <Skeleton height={400} borderRadius={20} />
               </div>
             ) : (
               <AnimatePresence mode="wait">
@@ -178,8 +200,11 @@ function PedidosPageContent() {
 export default function PedidosPage() {
   return (
     <Suspense fallback={
-      <div className="flex h-screen items-center justify-center bg-[#F6F3EF]">
-        <Loader2 className="animate-spin text-[#B76E79]" size={40} />
+      <div className="flex h-screen items-center justify-center" style={{ background: "var(--beige)" }}>
+        <div className="flex flex-col items-center gap-4">
+          <Skeleton width={120} height={120} borderRadius="50%" />
+          <Skeleton width={150} height={20} />
+        </div>
       </div>
     }>
       <PedidosPageContent />

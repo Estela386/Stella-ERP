@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Package, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { Package, AlertCircle, CheckCircle, Clock, Inbox } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import Skeleton from "@/app/_components/ui/Skeleton";
+import EmptyState from "@/app/_components/ui/EmptyState";
 
 interface Pedido {
   id: string;
@@ -16,7 +19,7 @@ interface Pedido {
 const ESTADO_CONFIG = {
   urgente:    { color: "#B76E79", bg: "#FDECEA", label: "Urgente",    Icon: AlertCircle  },
   en_proceso: { color: "#b07830", bg: "#FDF3E7", label: "En proceso", Icon: Clock        },
-  pendiente:  { color: "#708090", bg: "#EEF2F6", label: "Pendiente",  Icon: Package      },
+  pendiente:  { color: "var(--slate)", bg: "#EEF2F6", label: "Pendiente",  Icon: Package      },
   completado: { color: "#3d8c60", bg: "#EDF5F0", label: "Completado", Icon: CheckCircle  },
 };
 
@@ -63,182 +66,195 @@ export default function RecentOrders() {
   }, []);
 
   return (
-    <div style={{
-      background: "#fff",
-      border: "1px solid rgba(112,128,144,0.11)",
-      borderTop: "3px solid #708090",
-      borderRadius: 14,
-      overflow: "hidden",
-      boxShadow: "0 1px 6px rgba(112,128,144,0.07)",
-      boxSizing: "border-box",
-      display: "flex",
-      flexDirection: "column",
-    }}>
-      <style>{`
-        .recent-orders-loading { opacity: 0.6; pointer-events: none; animation: ro-pulse 2s infinite; }
-        @keyframes ro-pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.8; } }
-      `}</style>
-
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      style={{
+        background: "var(--white)",
+        border: "1px solid var(--border-subtle)",
+        borderTop: "3px solid var(--slate)",
+        borderRadius: 14,
+        overflow: "hidden",
+        boxShadow: "var(--shadow-sm)",
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {/* Header */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "14px 18px",
-        borderBottom: "1px solid #F0EDE8",
+        padding: "16px 20px",
+        borderBottom: "1px solid var(--beige)",
       }}>
         <div>
           <h3 style={{
             fontFamily: "var(--font-marcellus)",
-            fontSize: "0.95rem", fontWeight: 400,
-            color: "#1C1C1C", margin: 0,
+            fontSize: "1rem", fontWeight: 400,
+            color: "var(--charcoal)", margin: 0,
           }}>
             Pedidos Recientes
           </h3>
           <p style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "0.67rem", color: "#8C9796", margin: "2px 0 0",
+            fontSize: "0.72rem", color: "var(--slate-light)", margin: "2px 0 0",
           }}>
-            Últimas órdenes registradas
+            Últimas órdenes del periodo
           </p>
         </div>
         <button
           onClick={() => router.push("/dashboard/inicio/pedidos")}
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "0.72rem", fontWeight: 600,
-            color: "#708090", background: "none",
-            border: "none", cursor: "pointer", padding: 0,
+            fontSize: "0.75rem", fontWeight: 600,
+            color: "var(--slate)", background: "none",
+            border: "none", cursor: "pointer", padding: "4px 8px",
+            borderRadius: 6,
+            transition: "background 0.2s"
           }}
+          onMouseEnter={e => e.currentTarget.style.background = "var(--beige)"}
+          onMouseLeave={e => e.currentTarget.style.background = "none"}
         >
           Ver todos →
         </button>
       </div>
 
       {/* Rows */}
-      <div className={loading ? "recent-orders-loading" : ""} style={{ flex: 1 }}>
+      <div style={{ flex: 1 }}>
         {loading ? (
-          /* Skeleton */
-          [1, 2, 3].map(i => (
+          [1, 2, 3, 4].map(i => (
             <div key={i} style={{
-              display: "flex", alignItems: "center", gap: 11,
-              padding: "10px 18px",
-              borderBottom: i < 3 ? "1px solid #F7F4F0" : "none",
+              display: "flex", alignItems: "center", gap: 12,
+              padding: "14px 20px",
+              borderBottom: "1px solid var(--beige-light)",
             }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#F0EDE8" }} />
+              <Skeleton width={32} height={32} borderRadius="50%" />
               <div style={{ flex: 1 }}>
-                <div style={{ height: 10, width: "60%", borderRadius: 4, background: "#F0EDE8", marginBottom: 5 }} />
-                <div style={{ height: 8, width: "40%", borderRadius: 4, background: "#F0EDE8" }} />
+                <Skeleton width="60%" height={12} style={{ marginBottom: 6 }} />
+                <Skeleton width="40%" height={8} />
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ height: 10, width: 50, borderRadius: 4, background: "#F0EDE8", marginBottom: 5 }} />
-                <div style={{ height: 8, width: 40, borderRadius: 4, background: "#F0EDE8" }} />
+                <Skeleton width={50} height={12} style={{ marginBottom: 6 }} />
+                <Skeleton width={60} height={18} borderRadius={12} />
               </div>
             </div>
           ))
         ) : pedidos.length === 0 ? (
-          <div style={{
-            padding: "24px 18px",
-            textAlign: "center",
-            fontFamily: "var(--font-sans)",
-            fontSize: "0.83rem",
-            color: "#8C9796",
-          }}>
-            No hay pedidos recientes
-          </div>
+          <EmptyState 
+            icon={Inbox}
+            title="Sin pedidos pendientes"
+            description="No se han registrado órdenes en las últimas horas."
+          />
         ) : (
-          pedidos.map((p, idx) => {
-            const cfg    = ESTADO_CONFIG[p.estado] || ESTADO_CONFIG.pendiente;
-            const { Icon } = cfg;
-            const isLast = idx === pedidos.length - 1;
+          <motion.div
+            initial="hidden"
+            animate="show"
+            variants={{
+              show: {
+                transition: { staggerChildren: 0.05 }
+              }
+            }}
+          >
+            {pedidos.slice(0, 5).map((p, idx) => {
+              const cfg    = ESTADO_CONFIG[p.estado] || ESTADO_CONFIG.pendiente;
+              const { Icon } = cfg;
+              const isLast = idx === Math.min(pedidos.length, 5) - 1;
 
-            return (
-              <div
-                key={p.id}
-                onClick={() => router.push("/dashboard/inicio/pedidos")}
-                style={{
-                  display: "flex", alignItems: "center", gap: 11,
-                  padding: "10px 18px",
-                  borderBottom: isLast ? "none" : "1px solid #F7F4F0",
-                  transition: "background 0.12s",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={e  => ((e.currentTarget as HTMLElement).style.background = "#FAFAF8")}
-                onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "transparent")}
-              >
-                <Avatar name={p.cliente} />
+              return (
+                <motion.div
+                  key={p.id}
+                  variants={{
+                    hidden: { opacity: 0, x: -10 },
+                    show: { opacity: 1, x: 0 }
+                  }}
+                  onClick={() => router.push("/dashboard/inicio/pedidos")}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "12px 20px",
+                    borderBottom: isLast ? "none" : "1px solid var(--beige-light)",
+                    transition: "all 0.2s ease",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={e  => ((e.currentTarget as HTMLElement).style.background = "var(--beige-light)")}
+                  onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "transparent")}
+                >
+                  <Avatar name={p.cliente} />
 
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "0.79rem", fontWeight: 600,
-                    color: "#1C1C1C", margin: 0,
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                  }}>
-                    {p.cliente}
-                  </p>
-                  <p style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "0.63rem", color: "#8C9796", margin: "1px 0 0",
-                  }}>
-                    {p.id} · {p.items} {p.items === 1 ? "pieza" : "piezas"} · {p.fecha}
-                  </p>
-                </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "0.85rem", fontWeight: 600,
+                      color: "var(--charcoal)", margin: 0,
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}>
+                      {p.cliente}
+                    </p>
+                    <p style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "0.68rem", color: "var(--slate-light)", margin: "1px 0 0",
+                    }}>
+                      {p.id} · {p.items} pzs · {p.fecha}
+                    </p>
+                  </div>
 
-                {/* Amount + badge */}
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <p style={{
-                    fontFamily: "var(--font-marcellus)",
-                    fontSize: "0.86rem", fontWeight: 400,
-                    color: "#1C1C1C", margin: 0,
-                  }}>
-                    {p.monto}
-                  </p>
-                  <span style={{
-                    display: "inline-flex", alignItems: "center", gap: 3,
-                    background: cfg.bg, borderRadius: 20, padding: "2px 8px",
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "0.59rem", fontWeight: 700,
-                    color: cfg.color, marginTop: 2,
-                  }}>
-                    <Icon size={9} />
-                    {cfg.label}
-                  </span>
-                </div>
-              </div>
-            );
-          })
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <p style={{
+                      fontFamily: "var(--font-marcellus)",
+                      fontSize: "0.95rem", fontWeight: 500,
+                      color: "var(--charcoal)", margin: 0,
+                    }}>
+                      {p.monto}
+                    </p>
+                    <span style={{
+                      display: "inline-flex", alignItems: "center", gap: 4,
+                      background: cfg.bg, borderRadius: 20, padding: "3px 10px",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "0.62rem", fontWeight: 700,
+                      color: cfg.color, marginTop: 4,
+                      letterSpacing: "0.02em"
+                    }}>
+                      <Icon size={10} />
+                      {cfg.label}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         )}
       </div>
 
       {/* Footer CTA */}
       <div style={{
-        borderTop: "1px solid #F0EDE8",
-        padding: "10px 18px",
+        borderTop: "1px solid var(--beige)",
+        padding: "14px 20px",
       }}>
         <button
           onClick={() => router.push("/dashboard/inicio/pedidos")}
           style={{
             width: "100%",
-            background: "#F6F3EF",
-            border: "1px solid rgba(112,128,144,0.15)",
-            borderRadius: 9,
-            padding: "8px",
+            background: "var(--beige)",
+            border: "1px solid var(--border-subtle)",
+            borderRadius: 10,
+            padding: "10px",
             fontFamily: "var(--font-sans)",
-            fontSize: "0.75rem", fontWeight: 600,
-            color: "#708090", cursor: "pointer",
-            transition: "all 0.15s",
+            fontSize: "0.78rem", fontWeight: 600,
+            color: "var(--slate)", cursor: "pointer",
+            transition: "all 0.2s ease",
           }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.background = "#EEEBE5";
-            (e.currentTarget as HTMLElement).style.color = "#1C1C1C";
+            (e.currentTarget as HTMLElement).style.background = "var(--white)";
+            (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-sm)";
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.background = "#F6F3EF";
-            (e.currentTarget as HTMLElement).style.color = "#708090";
+            (e.currentTarget as HTMLElement).style.background = "var(--beige)";
+            (e.currentTarget as HTMLElement).style.boxShadow = "none";
           }}
         >
-          Gestionar todos los pedidos →
+          Gestionar histórico de pedidos →
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

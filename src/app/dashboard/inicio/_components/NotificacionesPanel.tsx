@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   Bell, X, Check, CheckCheck,
   Package, FlaskConical, ShoppingCart, Truck, RefreshCw,
-  BellOff, Trash2
+  BellOff, Trash2, Plus
 } from "lucide-react";
 import { INotificacion, TipoNotificacion } from "@lib/models/Notificacion";
 
@@ -28,6 +28,8 @@ const TIPO_CONFIG: Record<TipoNotificacion, { icon: React.ReactNode; color: stri
   pedido_nuevo:        { icon: <ShoppingCart size={14} />, color: "#2980B9", bg: "rgba(41,128,185,0.08)" },
   pedido_estado:       { icon: <RefreshCw size={14} />,  color: "#8E44AD", bg: "rgba(142,68,173,0.08)" },
   consignacion_nueva:  { icon: <Truck size={14} />,      color: "#27AE60", bg: "rgba(39,174,96,0.08)" },
+  insight_ia:          { icon: <Plus size={14} />,       color: "#B76E79", bg: "rgba(183,110,121,0.08)" },
+  venta_alerta:        { icon: <Bell size={14} />,      color: "#F39C12", bg: "rgba(243,156,18,0.08)" },
 };
 
 function tiempoRelativo(fechaStr: string): string {

@@ -23,7 +23,7 @@ export default function ProfitReinvestment({ ventas, productos }: ProfitReinvest
   // 2. Calculate Gross Income from completed sales
   const ingresos = ventas
     .filter(v => v.estado === "aprobada")
-    .reduce((acc, v) => acc + v.total, 0);
+    .reduce((acc, v) => acc + (v.total || 0), 0);
 
   // 3. Compute Metrics
   const estimatedCost = ingresos * (1 - averageMargin);

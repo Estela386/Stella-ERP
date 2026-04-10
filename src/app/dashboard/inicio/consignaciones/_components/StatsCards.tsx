@@ -3,37 +3,37 @@
 import { Package, CheckCircle, XCircle, Clock, TrendingUp } from "lucide-react";
 
 interface StatsCardsProps {
-  total: number;
-  activas: number;
-  finalizadas: number;
-  canceladas: number;
+  asignados: number;
+  vendidos: number;
+  devueltos: number;
+  ganancia: number;
 }
 
 export default function StatsCards(props: StatsCardsProps) {
   const stats = [
     { 
-      label: "Total Consignaciones", 
-      value: props.total, 
+      label: "Productos Asignados", 
+      value: props.asignados, 
       icon: Package,
       gradient: "from-[#C07E88] to-[#B76E79]", // Rose Gold
     },
     { 
-      label: "Consignaciones Activas", 
-      value: props.activas, 
-      icon: Clock,
-      gradient: "from-[#758390] to-[#657582]", // Charcoal/Gray
-    },
-    { 
-      label: "Ventas Finalizadas", 
-      value: props.finalizadas, 
+      label: "Cantidades Vendidas", 
+      value: props.vendidos, 
       icon: CheckCircle,
-      gradient: "from-[#C07E88] to-[#B76E79]", // Rose Gold
+      gradient: "from-[#758390] to-[#657582]", // Charcoal/Gray
     },
     { 
-      label: "Entregas Canceladas", 
-      value: props.canceladas, 
+      label: "Mermas / Devueltas", 
+      value: props.devueltos, 
       icon: XCircle,
-      gradient: "from-[#758390] to-[#657582]", // Charcoal/Gray
+      gradient: "from-[#D4A5A5] to-[#B76E79]", // Soft Rose
+    },
+    { 
+      label: "Ganancia Mayoristas", 
+      value: `$${props.ganancia.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`, 
+      icon: TrendingUp,
+      gradient: "from-[#657582] to-[#4a5568]", // Darker Gray
     },
   ];
 
@@ -66,7 +66,7 @@ export default function StatsCards(props: StatsCardsProps) {
                     {item.label}
                   </p>
                   <h3 className="text-3xl font-bold text-white font-serif tracking-tight" style={{ fontFamily: "var(--font-marcellus)" }}>
-                    {item.value.toLocaleString()}
+                    {item.value}
                   </h3>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white/10 border border-white/20 text-white shadow-inner">

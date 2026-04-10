@@ -13,19 +13,7 @@ export interface IVenta {
   detalles?: IDetalleVenta[]; // Relación con detallesventas
 }
 
-export interface IProductoVenta {
-  id: number;
-  nombre: string | null;
-  precio: number | null;
-  url_imagen: string | null;
-}
-export interface IDetalleVenta {
-  id: number;
-  id_venta: number | null;
-  id_producto: number | null;
-  cantidad: number | null;
-  producto?: IProductoVenta; // Relación con la tabla producto
-}
+import { IDetalleVenta } from "./DetalleVenta";
 
 /**
  * DTO para crear una nueva venta

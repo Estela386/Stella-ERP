@@ -19,6 +19,8 @@ import PromoverMayoristaModal from "./_components/PromoverMayoristaModal";
 import MayoristaView from "./_components/MayoristaView";
 
 import { IConsignacion, ISolicitudMayorista } from "@lib/models";
+import Skeleton from "@/app/_components/ui/Skeleton";
+import { motion } from "framer-motion";
 
 function ConsignacionHydrator({ isAdmin, onTrigger }: { isAdmin: boolean, onTrigger: (id: string) => void }) {
   const searchParams = useSearchParams();
@@ -169,10 +171,21 @@ export default function ConsignacionesPage() {
   // ─── Loading global ────────────────────────────────────────────
   if (authLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#f6f4ef]">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B76E79]" />
-          <p className="text-[#708090] font-medium tracking-widest uppercase text-xs" style={{ fontFamily: "var(--font-marcellus)" }}>Cargando Panel...</p>
+      <div className="flex h-screen items-center justify-center" style={{ background: "var(--beige)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 32, width: "100%", maxWidth: 1200, padding: 40 }}>
+           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+             <Skeleton width={150} height={40} borderRadius={12} />
+             <div className="flex-1" />
+             <Skeleton width={100} height={32} borderRadius={10} />
+             <Skeleton width={100} height={32} borderRadius={10} />
+             <Skeleton width={100} height={32} borderRadius={10} />
+           </div>
+           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
+             <Skeleton height={140} borderRadius={24} />
+             <Skeleton height={140} borderRadius={24} />
+             <Skeleton height={140} borderRadius={24} />
+           </div>
+           <Skeleton height={500} borderRadius={24} />
         </div>
       </div>
     );
@@ -181,10 +194,10 @@ export default function ConsignacionesPage() {
   // ─── Vista Mayorista ───────────────────────────────────────────
   if (isMayorista) {
     return (
-      <div className="flex h-screen overflow-hidden bg-[#f6f4ef]">
+      <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
         <SidebarMenu />
-        <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto">
-          <div className="mx-auto max-w-7xl">
+        <main className="flex-1 px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto" style={{ background: "var(--beige)" }}>
+          <div className="mx-auto max-w-[1440px]">
             <MayoristaView
               consignaciones={mayoristaHook.consignaciones}
               loading={mayoristaHook.loading}
@@ -200,11 +213,11 @@ export default function ConsignacionesPage() {
   // ─── Vista Admin ───────────────────────────────────────────────
   if (isAdmin) {
     return (
-      <div className="flex h-screen overflow-hidden bg-[#f6f4ef]">
+      <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
         <SidebarMenu />
 
-        <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto">
-          <div className="mx-auto max-w-7xl space-y-8">
+        <main className="flex-1 px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto" style={{ background: "var(--beige)" }}>
+          <div className="mx-auto max-w-[1440px] space-y-8">
 
             <Suspense fallback={null}>
               <ConsignacionHydrator 
@@ -220,10 +233,10 @@ export default function ConsignacionesPage() {
             <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <div className="space-y-1">
                 <div className="flex items-center gap-4">
-                  <span className="h-px w-12 bg-[#B76E79]" />
+                  <span className="h-px w-12" style={{ background: "var(--rose-gold)" }} />
                   <span 
-                    className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium"
-                    style={{ fontFamily: "var(--font-marcellus)" }}
+                    className="text-xs tracking-[0.4em] uppercase font-medium"
+                    style={{ fontFamily: "var(--font-marcellus)", color: "var(--rose-gold)" }}
                   >
                     Gestión de Consignaciones
                   </span>
@@ -246,7 +259,13 @@ export default function ConsignacionesPage() {
 
             {/* Card principal */}
             <div
-              className={`rounded-3xl bg-white p-5 md:p-10 shadow-lg border border-[#8c8976]/30 min-h-[500px] transition-all duration-500 ${activeTab !== 'consignaciones' ? 'mt-4' : ''}`}
+              className={`rounded-3xl p-5 md:p-10 border transition-all duration-500 ${activeTab !== 'consignaciones' ? 'mt-4' : ''}`}
+              style={{
+                background: "var(--white)",
+                border: "1px solid var(--border-subtle)",
+                boxShadow: "var(--shadow-md)",
+                minHeight: 500
+              }}
             >
               {activeTab === "consignaciones" && (
                 <ConsignacionesTable
@@ -318,7 +337,11 @@ export default function ConsignacionesPage() {
             className={`fixed bottom-8 right-8 z-[2000] px-6 py-4 rounded-2xl shadow-xl animate-in slide-in-from-right-10 duration-300 ${
               toast.tipo === "ok" ? "bg-[#1C1C1C] text-white" : "bg-red-600 text-white"
             }`}
-            style={{ fontFamily: "var(--font-marcellus)" }}
+            style={{ 
+              fontFamily: "var(--font-sans)", 
+              borderRadius: "var(--radius-lg)",
+              border: toast.tipo === "ok" ? "1px solid rgba(255,255,255,0.1)" : "none"
+            }}
           >
             <div className="flex items-center gap-3">
               <span>{toast.tipo === 'ok' ? '✓' : '✕'}</span>
@@ -332,13 +355,22 @@ export default function ConsignacionesPage() {
 
   // ─── Acceso no autorizado ──────────────────────────────────────
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f6f4ef]">
+    <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
       <SidebarMenu />
-      <main className="flex-1 flex flex-col items-center justify-center gap-6 p-10 text-center">
-        <div className="text-6xl bg-white p-10 rounded-full shadow-sm border border-[#8c8976]/20">🔒</div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-[#1C1C1C]" style={{ fontFamily: "var(--font-marcellus)" }}>Acceso restringido</h2>
-          <p className="text-[#8c8976]">No tienes permisos para ver esta sección administrativa.</p>
+      <main className="flex-1 flex flex-col items-center justify-center gap-8 p-10 text-center" style={{ background: "var(--beige)" }}>
+        <div 
+          className="text-6xl p-10 rounded-full border"
+          style={{
+            background: "var(--white)",
+            borderColor: "var(--border-subtle)",
+            boxShadow: "var(--shadow-sm)"
+          }}
+        >
+          🔒
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-2xl font-bold" style={{ fontFamily: "var(--font-marcellus)", color: "var(--charcoal)" }}>Acceso restringido</h2>
+          <p style={{ color: "var(--slate-light)" }}>No tienes permisos para ver esta sección administrativa.</p>
         </div>
       </main>
     </div>

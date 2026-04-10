@@ -270,7 +270,7 @@ export default function ProductosVenta({
                     {/* Checkboxes de partes */}
                     <div className="flex flex-wrap gap-2">
                       {(() => {
-                        const opJuego = p.opciones?.find((o: OpcionForm) => o.nombre === "Componentes del Juego");
+                        const opJuego = p.opciones?.find((o: any) => o.nombre === "Componentes del Juego");
                         const componentes = opJuego && opJuego.valores 
                           ? opJuego.valores.map((v: { valor: string }) => v.valor) 
                           : ["Anillo", "Collar", "Aretes"];

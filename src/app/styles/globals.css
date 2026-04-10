@@ -26,6 +26,23 @@
   --font-sans: var(--font-poppins), sans-serif;
   --font-title: var(--font-marcellus), serif;
   --font-subtitle: var(--font-marcellus), serif;
+
+  /* Brand Palette */
+  --rose-gold: #B76E79;
+  --rose-gold-light: #D4A5A5;
+  --slate: #708090;
+  --slate-light: #8C9796;
+  --charcoal: #2A2E34;
+  --beige: #F6F4EF;
+  --beige-light: #F8F6F2;
+  --white: #FFFFFF;
+  
+  /* UI Helpers */
+  --border-subtle: rgba(112, 128, 144, 0.15);
+  --shadow-sm: 0 2px 8px rgba(112, 128, 144, 0.08);
+  --shadow-md: 0 10px 25px rgba(112, 128, 144, 0.12);
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
 /* Base Styles */

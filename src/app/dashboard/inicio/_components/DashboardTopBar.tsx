@@ -32,10 +32,10 @@ export default function DashboardTopBar() {
       justifyContent: "space-between",
       gap: 16, flexWrap: "wrap",
       padding: "14px 20px",
-      background: "#fff",
-      border: "1px solid rgba(112,128,144,0.15)",
-      borderRadius: 16,
-      boxShadow: "0 2px 8px rgba(112,128,144,0.08)",
+      background: "var(--white)",
+      border: "1px solid var(--border-subtle)",
+      borderRadius: "var(--radius-lg)",
+      boxShadow: "var(--shadow-sm)",
     }}>
       {/* Greeting */}
       <div>
@@ -43,7 +43,7 @@ export default function DashboardTopBar() {
           fontFamily: "var(--font-marcellus)",
           fontSize: "clamp(1rem, 2vw, 1.35rem)",
           fontWeight: 400,
-          color: "#708090",
+          color: "var(--slate)",
           margin: 0, lineHeight: 1.2,
           letterSpacing: "-0.01em",
         }}>
@@ -52,7 +52,7 @@ export default function DashboardTopBar() {
         <p style={{
           fontFamily: "var(--font-sans)",
           fontSize: "0.72rem",
-          color: "#8C9796",
+          color: "var(--slate-light)",
           margin: "3px 0 0",
           textTransform: "capitalize",
         }}>
@@ -65,13 +65,14 @@ export default function DashboardTopBar() {
         {/* Search */}
         <div style={{
           display: "flex", alignItems: "center", gap: 8,
-          background: focused ? "#fff" : "#F6F3EF",
-          border: `1px solid ${focused ? "#708090" : "rgba(112,128,144,0.2)"}`,
+          background: focused ? "var(--white)" : "var(--beige)",
+          border: `1px solid ${focused ? "var(--slate)" : "var(--border-subtle)"}`,
           borderRadius: 10, padding: "7px 12px",
-          transition: "all 0.18s ease",
-          width: focused ? 200 : 150,
+          transition: "all 0.25s ease",
+          width: focused ? 220 : 160,
+          boxShadow: focused ? "0 4px 12px rgba(112,128,144,0.1)" : "none",
         }}>
-          <Search size={13} style={{ color: "#8C9796", flexShrink: 0 }} />
+          <Search size={13} style={{ color: "var(--slate-light)", flexShrink: 0 }} />
           <input
             placeholder="Buscar..."
             onFocus={() => setFocused(true)}
@@ -80,7 +81,7 @@ export default function DashboardTopBar() {
               background: "none", border: "none", outline: "none",
               fontFamily: "var(--font-sans)",
               fontSize: "0.78rem",
-              color: "#1C1C1C", width: "100%",
+              color: "var(--charcoal)", width: "100%",
             }}
           />
         </div>
@@ -91,30 +92,31 @@ export default function DashboardTopBar() {
             id="btn-notificaciones"
             onClick={() => setPanelOpen((p) => !p)}
             style={{
-              width: 36, height: 36, borderRadius: 10,
-              background: panelOpen ? "#F0E8EA" : "#F6F3EF",
-              border: `1px solid ${panelOpen ? "rgba(183,110,121,0.35)" : "rgba(112,128,144,0.18)"}`,
+              width: 38, height: 38, borderRadius: 12,
+              background: panelOpen ? "var(--beige)" : "var(--beige)",
+              border: `1px solid ${panelOpen ? "var(--rose-gold-light)" : "var(--border-subtle)"}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               cursor: "pointer", position: "relative",
-              transition: "all 0.18s ease",
+              transition: "all 0.2s ease",
             }}
           >
-            <Bell size={15} style={{ color: panelOpen ? "#B76E79" : "#708090" }} />
+            <Bell size={16} style={{ color: panelOpen ? "var(--rose-gold)" : "var(--slate)" }} />
 
             {/* Badge número de no leídas */}
             {noLeidas > 0 ? (
               <div style={{
-                position: "absolute", top: -5, right: -5,
-                minWidth: 16, height: 16,
-                borderRadius: 8,
-                background: "#B76E79",
-                border: "2px solid #fff",
+                position: "absolute", top: -4, right: -4,
+                minWidth: 18, height: 18,
+                borderRadius: 9,
+                background: "var(--rose-gold)",
+                border: "2px solid var(--white)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 padding: "0 3px",
+                boxShadow: "0 2px 4px rgba(183,110,121,0.3)",
               }}>
                 <span style={{
-                  color: "#fff",
-                  fontSize: "0.55rem",
+                  color: "var(--white)",
+                  fontSize: "0.58rem",
                   fontFamily: "var(--font-sans)",
                   fontWeight: 700,
                   lineHeight: 1,
@@ -150,15 +152,15 @@ export default function DashboardTopBar() {
         <button
           onClick={() => router.push("/dashboard/inicio/nuevaVenta")}
           style={{
-            display: "flex", alignItems: "center", gap: 6,
-            background: "#B76E79",
-            border: "none", borderRadius: 10,
-            padding: "8px 16px", cursor: "pointer",
-            boxShadow: "0 3px 10px rgba(183,110,121,0.3)",
-            transition: "all 0.18s ease",
+            display: "flex", alignItems: "center", gap: 8,
+            background: "var(--rose-gold)",
+            border: "none", borderRadius: 12,
+            padding: "9px 18px", cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(183,110,121,0.25)",
+            transition: "all 0.2s ease",
           }}
-          onMouseEnter={e => (e.currentTarget.style.background = "#A45F69")}
-          onMouseLeave={e => (e.currentTarget.style.background = "#B76E79")}
+          onMouseEnter={e => (e.currentTarget.style.background = "var(--rose-gold-light)", e.currentTarget.style.transform = "translateY(-1px)")}
+          onMouseLeave={e => (e.currentTarget.style.background = "var(--rose-gold)", e.currentTarget.style.transform = "translateY(0)")}
         >
           <Plus size={13} style={{ color: "#fff" }} />
           <span style={{

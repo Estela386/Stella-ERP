@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Edit3, Trash2, ToggleLeft, ToggleRight, Calendar, Tag, Clock } from "lucide-react";
+import { Plus, Edit3, Trash2, ToggleLeft, ToggleRight, Calendar, Tag } from "lucide-react";
 import SidebarMenu from "@/app/_components/SideBarMenu";
 import { useAuth } from "@lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { createClient } from "@utils/supabase/client";
 import EditCampaignModal from "./_components/EditCampaignModal";
+import Skeleton from "@/app/_components/ui/Skeleton";
 
 interface Campana {
   id: number;
@@ -50,7 +51,12 @@ export default function CampanasPage() {
   };
 
   useEffect(() => {
-    if (!loadingUser && usuario?.esAdmin()) cargarCampanas();
+    const init = async () => {
+      if (!loadingUser && usuario?.esAdmin()) {
+        await cargarCampanas();
+      }
+    };
+    init();
   }, [loadingUser, usuario]);
 
   const toggleActivo = async (campana: Campana) => {
@@ -78,107 +84,87 @@ export default function CampanasPage() {
   if (!usuario?.esAdmin()) return null;
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#f6f4ef" }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
       <SidebarMenu />
 
-      <main style={{ flex: 1, overflowY: "auto" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "clamp(24px,4vw,48px) clamp(16px,3vw,40px)" }}>
+      <main className="flex-1 px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto" style={{ background: "var(--beige)" }}>
+        <div className="mx-auto max-w-[1440px] space-y-10">
 
           {/* ── Header ── */}
-          <header style={{ marginBottom: 40, borderBottom: "1px solid rgba(112,128,144,0.12)", paddingBottom: 24 }}>
-            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                  <span style={{ height: 1, width: 32, background: "#b76e79", display: "block" }} />
-                  <span style={{
-                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                    fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.25em",
-                    textTransform: "uppercase", color: "#8c9768",
-                  }}>
-                    Marketing · ERP
-                  </span>
-                </div>
-                <h1 style={{
-                  fontFamily: "var(--font-marcellus), 'Marcellus', serif",
-                  fontSize: "clamp(1.8rem, 4vw, 3rem)", fontWeight: 400,
-                  color: "#4a5568", margin: 0, lineHeight: 1.1,
-                }}>
-                  Campañas <span style={{ color: "#b76e79", fontStyle: "italic" }}>Especiales</span>
-                </h1>
+          <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b" style={{ borderColor: "var(--border-subtle)" }}>
+            <div className="space-y-3">
+              <div className="flex items-center gap-4">
+                <span className="h-px w-12" style={{ background: "var(--rose-gold)" }} />
+                <span className="text-xs tracking-[0.4em] uppercase font-medium" style={{ color: "var(--rose-gold)", fontFamily: "var(--font-marcellus)" }}>
+                  Marketing · ERP
+                </span>
               </div>
-
-              <motion.button
-                whileHover={{ y: -2, boxShadow: "0 12px 28px rgba(183,110,121,0.3)" }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => { setSelected(null); setShowModal(true); }}
-                style={{
-                  background: "#b76e79", color: "#f6f4ef", border: "none",
-                  borderRadius: 14, padding: "12px 24px",
-                  fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                  fontSize: "0.82rem", fontWeight: 700, letterSpacing: "0.06em",
-                  cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
-                  boxShadow: "0 4px 14px rgba(183,110,121,0.25)",
-                  transition: "all 0.25s ease",
-                }}
-              >
-                <Plus size={16} />
-                Nueva Campaña
-              </motion.button>
+              <h1 className="text-4xl sm:text-5xl" style={{
+                fontFamily: "var(--font-marcellus)",
+                fontWeight: 400,
+                color: "var(--charcoal)",
+                margin: 0,
+                lineHeight: 1.1,
+              }}>
+                Campañas <span style={{ color: "var(--rose-gold)", fontStyle: "italic" }}>Especiales</span>
+              </h1>
             </div>
+
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => { setSelected(null); setShowModal(true); }}
+              className="px-8 py-4 rounded-2xl flex items-center gap-3 font-bold transition duration-300 shadow-sm hover:shadow-lg"
+              style={{
+                background: "var(--rose-gold)",
+                color: "var(--beige)",
+                fontSize: "0.85rem",
+                letterSpacing: "0.05em",
+              }}
+            >
+              <Plus size={16} />
+              Nueva Campaña
+            </motion.button>
           </header>
 
-          {/* ── Lista de campañas ── */}
           {loading ? (
-            <div style={{ display: "flex", justifyContent: "center", padding: "60px 0" }}>
-              <div style={{ width: 40, height: 40, border: "3px solid rgba(183,110,121,0.2)", borderTopColor: "#b76e79", borderRadius: "50%" }}
-                className="animate-spin" />
+            <div className="flex flex-col gap-6">
+              <Skeleton height={140} borderRadius={24} />
+              <Skeleton height={140} borderRadius={24} />
+              <Skeleton height={140} borderRadius={24} />
             </div>
           ) : campanas.length === 0 ? (
-            <div style={{
-              textAlign: "center", padding: "80px 24px",
-              background: "white", borderRadius: 24,
-              border: "2px dashed rgba(112,128,144,0.15)",
+            <div className="text-center p-20 border-2 border-dashed rounded-3xl" style={{
+              borderColor: "var(--border-subtle)",
+              background: "var(--white)"
             }}>
-              <Tag size={40} style={{ color: "rgba(183,110,121,0.3)", marginBottom: 16 }} />
+              <Tag size={48} style={{ color: "var(--rose-gold)", opacity: 0.2, marginBottom: 20 }} />
               <p style={{
-                fontFamily: "var(--font-marcellus), 'Marcellus', serif",
-                fontSize: "1.3rem", color: "#4a5568", margin: "0 0 8px",
+                fontFamily: "var(--font-marcellus)",
+                fontSize: "1.5rem", color: "var(--charcoal)", margin: "0 0 8px",
               }}>No hay campañas creadas</p>
-              <p style={{ fontFamily: "var(--font-poppins), sans-serif", fontSize: "0.85rem", color: "#708090" }}>
-                Crea tu primera campaña de Día de las Madres
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.9rem", color: "var(--slate-light)" }}>
+                Crea tu primera campaña de visualización para la tienda.
               </p>
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div className="flex flex-col gap-6">
               <AnimatePresence>
-                {campanas.map((c, i) => {
+                {campanas.map((c) => {
                   const live = isLive(c);
                   const pasada = new Date(c.fecha_fin) < now;
                   return (
-                    <motion.div
-                      key={c.id}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ delay: i * 0.06 }}
-                      style={{
-                        background: "white",
-                        borderRadius: 20,
-                        border: live
-                          ? "1.5px solid rgba(183,110,121,0.3)"
-                          : "1.5px solid rgba(112,128,144,0.12)",
-                        padding: "clamp(16px, 2.5vw, 24px) clamp(20px, 3vw, 32px)",
-                        display: "grid",
-                        gridTemplateColumns: "1fr auto",
-                        gap: 20,
-                        alignItems: "center",
-                        boxShadow: live
-                          ? "0 8px 28px rgba(183,110,121,0.1)"
-                          : "0 2px 12px rgba(140,151,104,0.06)",
-                        position: "relative",
-                        overflow: "hidden",
-                      }}
-                    >
+                      <motion.div
+                        key={c.id}
+                        variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+                        className="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border relative overflow-hidden"
+                        style={{
+                          background: "var(--white)",
+                          borderRadius: 24,
+                          borderColor: live ? "rgba(183,110,121,0.3)" : "var(--border-subtle)",
+                          boxShadow: live ? "0 8px 32px rgba(183,110,121,0.08)" : "var(--shadow-sm)"
+                        }}
+                      >
                       {/* Live glow */}
                       {live && (
                         <div style={{

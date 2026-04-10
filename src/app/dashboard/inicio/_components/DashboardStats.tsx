@@ -8,6 +8,8 @@ import {
   DollarSign,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import Skeleton from "@/app/_components/ui/Skeleton";
 
 interface KPI {
   label: string;
@@ -98,10 +100,10 @@ const buildKPIs = (stats: StatsData): KPI[] => {
 
 const THEME = {
   gray: {
-    bg: "#708090",
+    bg: "var(--slate)",
   },
   rose: {
-    bg: "#B76E79",
+    bg: "var(--rose-gold)",
   },
 };
 
@@ -137,136 +139,167 @@ export default function DashboardStats() {
 
   const kpis = buildKPIs(stats);
 
-    return (
-      <>
-        <style>{`
+  const statsRow = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemAnim = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0 }
+  };
+
+  return (
+    <>
+      <style>{`
+        .stats-grid { 
+          display: grid;
+          grid-template-columns: repeat(4, 1fr); 
+          gap: 24px; 
+          width: 100%;
+        }
+        @media (max-width: 1200px) { 
+          .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } 
+        }
+        @media (max-width: 600px) { 
           .stats-grid { 
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 24px; 
-            width: 100%;
-          }
-          @media (max-width: 1200px) { 
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } 
-          }
-          @media (max-width: 600px) { 
-            .stats-grid { 
-              grid-template-columns: repeat(2, 1fr); 
-              gap: 12px; 
-              padding: 0 4px; /* Un poco de margen en móviles muy pequeños */
-            } 
-          }
-          .stats-loading { opacity: 0.6; pointer-events: none; animation: pulse 2s infinite; }
-          @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.8; } }
-          
-          .stat-card-hover {
-            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-          }
-          .stat-card-hover:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
-          }
-        `}</style>
-        <div
-          className={`stats-grid ${loading ? "stats-loading" : ""}`}
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+            padding: 0 4px;
+          } 
+        }
+        
+        .stat-card-hover {
+          transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+        }
+        .stat-card-hover:hover {
+          transform: translateY(-4px) scale(1.01);
+          box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+        }
+      `}</style>
+
+      {loading ? (
+        <div className="stats-grid">
+          {[1, 2, 3, 4].map(i => (
+            <Skeleton key={i} height="clamp(110px, 15vw, 150px)" borderRadius="var(--radius-lg)" />
+          ))}
+        </div>
+      ) : (
+        <motion.div
+          variants={statsRow}
+          initial="hidden"
+          animate="show"
+          className="stats-grid"
         >
-        {kpis.map(k => {
-          const Icon = k.icon;
-          const theme = THEME[k.theme];
+          {kpis.map(k => {
+            const Icon = k.icon;
+            const theme = THEME[k.theme];
 
-          return (
-            <div
-              key={k.label}
-              className="stat-card-hover"
-              onClick={() => router.push(k.href)}
-              title={`Ir a ${k.label}`}
-              style={{
-                background: theme.bg,
-                borderRadius: 16,
-                padding: "clamp(14px, 3.5vw, 24px)",
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-                overflow: "hidden",
-                gap: 16,
-                cursor: "pointer",
-                boxSizing: "border-box",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-              }}
-            >
-              {/* Header: Label + Small Icon */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", zIndex: 2, position: "relative" }}>
-                <p
-                  style={{
-                    fontFamily: "var(--font-sans, Inter, sans-serif)",
-                    fontSize: "clamp(0.75rem, 2.5vw, 0.9rem)",
-                    fontWeight: 500,
-                    color: "rgba(255, 255, 255, 0.95)",
-                    margin: 0,
-                    lineHeight: 1.2,
-                    maxWidth: "80%", // Prevenir que colisione con el ícono
-                  }}
-                >
-                  {k.label}
-                </p>
-                <div style={{ 
-                  background: "rgba(255,255,255,0.15)", 
-                  padding: "clamp(4px, 1.5vw, 8px)", 
-                  borderRadius: 10, 
-                  display: "flex", 
-                  alignItems: "center", 
-                  justifyContent: "center",
-                  flexShrink: 0
-                }}>
-                  <Icon size={18} color="#FFFFFF" strokeWidth={2} />
-                </div>
-              </div>
-
-              {/* Body: Value + Sub */}
-              <div style={{ zIndex: 2, position: "relative", marginTop: "auto" }}>
-                <p
-                  style={{
-                    fontFamily: "var(--font-marcellus, serif)",
-                    fontSize: "clamp(1.3rem, 4vw, 2.2rem)",
-                    fontWeight: 400,
-                    color: "#FFFFFF",
-                    margin: 0,
-                    lineHeight: 1,
-                  }}
-                >
-                  {k.value}
-                </p>
-                {k.sub && (
+            return (
+              <motion.div
+                key={k.label}
+                variants={itemAnim}
+                className="stat-card-hover"
+                onClick={() => router.push(k.href)}
+                title={`Ir a ${k.label}`}
+                style={{
+                  background: theme.bg,
+                  borderRadius: "var(--radius-lg)",
+                  padding: "clamp(16px, 3.5vw, 24px)",
+                  display: "flex",
+                  flexDirection: "column",
+                  position: "relative",
+                  overflow: "hidden",
+                  gap: 16,
+                  cursor: "pointer",
+                  boxSizing: "border-box",
+                  boxShadow: "var(--shadow-sm)",
+                  minHeight: "clamp(110px, 15vw, 150px)",
+                }}
+              >
+                {/* Header: Label + Small Icon */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", zIndex: 2, position: "relative" }}>
                   <p
                     style={{
                       fontFamily: "var(--font-sans, Inter, sans-serif)",
-                      fontSize: "clamp(0.65rem, 2vw, 0.8rem)",
-                      fontWeight: 400,
-                      color: "rgba(255, 255, 255, 0.75)",
-                      margin: "6px 0 0 0",
+                      fontSize: "clamp(0.75rem, 2.5vw, 0.85rem)",
+                      fontWeight: 600,
+                      color: "rgba(255, 255, 255, 0.9)",
+                      margin: 0,
+                      lineHeight: 1.2,
+                      maxWidth: "80%",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.03em"
                     }}
                   >
-                    {k.sub}
+                    {k.label}
                   </p>
-                )}
-              </div>
+                  <div style={{ 
+                    background: "rgba(255,255,255,0.15)", 
+                    padding: "clamp(6px, 1.5vw, 8px)", 
+                    borderRadius: 10, 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}>
+                    <Icon size={16} color="#FFFFFF" strokeWidth={2.5} />
+                  </div>
+                </div>
 
-              {/* Decorative Background Icon */}
-              <div style={{
-                position: "absolute",
-                right: "-10%",
-                bottom: "-15%",
-                opacity: 0.08,
-                transform: "rotate(-15deg)",
-                pointerEvents: "none",
-                zIndex: 1
-              }}>
-                <Icon size={120} color="#FFFFFF" />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                {/* Body: Value + Sub */}
+                <div style={{ zIndex: 2, position: "relative", marginTop: "auto" }}>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-marcellus, serif)",
+                      fontSize: "clamp(1.5rem, 4vw, 2.4rem)",
+                      fontWeight: 400,
+                      color: "var(--white)",
+                      margin: 0,
+                      lineHeight: 1,
+                      textShadow: "0 1px 2px rgba(0,0,0,0.1)"
+                    }}
+                  >
+                    {k.value}
+                  </p>
+                  {k.sub && (
+                    <p
+                      style={{
+                        fontFamily: "var(--font-sans, Inter, sans-serif)",
+                        fontSize: "clamp(0.68rem, 2vw, 0.78rem)",
+                        fontWeight: 400,
+                        color: "rgba(255, 255, 255, 0.8)",
+                        margin: "8px 0 0 0",
+                        letterSpacing: "0.01em"
+                      }}
+                    >
+                      {k.sub}
+                    </p>
+                  )}
+                </div>
+
+                {/* Decorative Background Icon */}
+                <div style={{
+                  position: "absolute",
+                  right: "-5%",
+                  bottom: "-10%",
+                  opacity: 0.1,
+                  transform: "rotate(-10deg)",
+                  pointerEvents: "none",
+                  zIndex: 1
+                }}>
+                  <Icon size={110} color="#FFFFFF" strokeWidth={1} />
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      )}
     </>
   );
 }

@@ -13,6 +13,8 @@ import ConfirmationModal from "../_components/ConfirmationModal";
 import { Producto } from "./type";
 import { type OpcionForm } from "./_components/ProductForm";
 import { FileText } from "lucide-react";
+import Skeleton from "@/app/_components/ui/Skeleton";
+import { motion } from "framer-motion";
 
 import {
   ProductoService,
@@ -462,10 +464,18 @@ export default function InventariosPage() {
   // Mostrar carga mientras se verifica el usuario
   if (loadingUser || loading) {
     return (
-      <section className="min-h-screen bg-[#F8F6F2] px-8 py-14 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B76E79] mx-auto mb-4" />
-          <p className="text-gray-600" style={{ fontFamily: "var(--font-sans)" }}>Cargando inventario...</p>
+      <section className="min-h-screen flex items-center justify-center" style={{ background: "var(--beige)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 32, width: "100%", maxWidth: 1200, padding: 40 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <Skeleton width={120} height={40} borderRadius={12} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
+            <Skeleton height={140} borderRadius={24} />
+            <Skeleton height={140} borderRadius={24} />
+            <Skeleton height={140} borderRadius={24} />
+            <Skeleton height={140} borderRadius={24} />
+          </div>
+          <Skeleton height={500} borderRadius={24} />
         </div>
       </section>
     );
@@ -477,17 +487,17 @@ export default function InventariosPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F6F3EF]">
+    <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
       <SidebarMenu />
 
-      <main className="flex-1 px-4 py-8 overflow-y-auto">
-        <div className="mx-auto max-w-7xl space-y-10">
+      <main className="flex-1 px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto" style={{ background: "var(--beige)" }}>
+        <div className="mx-auto max-w-[1440px] space-y-8">
           {/* Header */}
           <header className="space-y-6">
             {/* Línea editorial */}
             <div className="flex items-center gap-4">
-              <span className="h-px w-12 bg-[#B76E79]" />
-              <span className="text-xs tracking-[0.4em] uppercase text-[#B76E79] font-medium" style={{ fontFamily: "var(--font-marcellus)" }}>
+              <span className="h-px w-12" style={{ background: "var(--rose-gold)" }} />
+              <span className="text-xs tracking-[0.4em] uppercase font-medium" style={{ color: "var(--rose-gold)", fontFamily: "var(--font-marcellus)" }}>
                 Inventarios
               </span>
             </div>
@@ -497,18 +507,15 @@ export default function InventariosPage() {
 
           {/* Card principal */}
           <div
-            className="
-              relative
-              rounded-3xl
-              bg-white
-              p-4 md:p-8
-              space-y-8
-              border border-black/10
-              shadow-[0_30px_70px_rgba(0,0,0,0.12)]
-            "
+            className="relative rounded-3xl p-6 md:p-10 space-y-10 border"
+            style={{
+              background: "var(--white)",
+              border: "1px solid var(--border-subtle)",
+              boxShadow: "var(--shadow-md)"
+            }}
           >
             {/* Accent line */}
-            <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-[#b76e79]" />
+            <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl" style={{ background: "var(--rose-gold)" }} />
 
             {/* Error message */}
             {error && (
@@ -519,7 +526,7 @@ export default function InventariosPage() {
 
             <InventoryStats productos={productos} onFilterChange={setFiltro} />
 
-            <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4">
+            <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-6">
               <div className="w-full lg:w-auto">
                 <InventoryToolbar search={search} setSearch={setSearch} />
               </div>
@@ -528,17 +535,15 @@ export default function InventariosPage() {
                   onClick={handleOpenCategoryModal}
                   className="
                     flex-1 lg:flex-none justify-center
-                    bg-[#B76E79]
                     text-white
-                    px-4 py-2.5
-                    rounded-full
-                    text-xs sm:text-sm font-medium
+                    px-6 py-3
+                    rounded-xl
+                    text-xs sm:text-sm font-bold
                     shadow-sm  
-                    hover:bg-[#A45F69]
-                    hover:shadow-md
-                    transition
+                    transition duration-300
+                    hover:scale-[1.02]
                   "
-                  style={{ fontFamily: "var(--font-sans)" }}
+                  style={{ background: "var(--rose-gold)", fontFamily: "var(--font-sans)" }}
                 >
                   + Categoría
                 </button>
@@ -546,20 +551,18 @@ export default function InventariosPage() {
                   onClick={() => setLabelModalOpen(true)}
                   className="
                     flex-1 lg:flex-none justify-center
-                    bg-[#B76E79]
                     text-white
-                    px-4 py-2.5
-                    rounded-full
-                    text-xs sm:text-sm font-medium
+                    px-6 py-3
+                    rounded-xl
+                    text-xs sm:text-sm font-bold
                     shadow-sm
-                    hover:bg-[#A45F69]
-                    hover:shadow-md
-                    transition
+                    transition duration-300
+                    hover:scale-[1.02]
                     flex items-center gap-2
                   "
-                  style={{ fontFamily: "var(--font-sans)" }}
+                  style={{ background: "var(--rose-gold)", fontFamily: "var(--font-sans)" }}
                 >
-                  <FileText className="w-4 h-4" />
+                  <FileText size={18} />
                   <span className="hidden sm:inline">Imprimir Etiquetas</span>
                   <span className="sm:hidden">Etiquetas</span>
                 </button>
@@ -567,18 +570,16 @@ export default function InventariosPage() {
                   onClick={() => handleOpenModal()}
                   className="
                     flex-1 lg:flex-none justify-center
-                    bg-[#B76E79]
                     text-white
-                    px-4 py-2.5
-                    rounded-full
-                    text-xs sm:text-sm font-medium
+                    px-6 py-3
+                    rounded-xl
+                    text-xs sm:text-sm font-bold
                     shadow-sm
-                    hover:bg-[#A45F69]
-                    hover:shadow-md
-                    transition
+                    transition duration-300
+                    hover:scale-[1.02]
                     whitespace-nowrap
                   "
-                  style={{ fontFamily: "var(--font-sans)" }}
+                  style={{ background: "var(--rose-gold)", fontFamily: "var(--font-sans)" }}
                 >
                   + Producto
                 </button>

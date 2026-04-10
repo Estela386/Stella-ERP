@@ -27,9 +27,9 @@ import { Usuario } from "@/lib/models";
 import LogoM from "@assets/logo.png";
 
 // ─── Design tokens Stella ─────────────────────────────────
-const ROSE  = "#b76e79";
-const DEEP  = "#4a5568";
-const BG    = "#f6f4ef";
+const ROSE  = "var(--rose-gold)";
+const DEEP  = "var(--charcoal)";
+const BG    = "var(--beige)";
 
 // ─── Menú con roles permitidos ────────────────────────────
 const menuItems = [
@@ -84,10 +84,10 @@ export default function SidebarMenu() {
           width: 260,
           position: "fixed", top: 0, left: 0,
           minHeight: "100vh",
-          background: `linear-gradient(165deg, #4a5568 0%, #3d4a5c 100%)`,
+          background: `linear-gradient(165deg, var(--charcoal) 0%, #3d4a5c 100%)`,
           display: "flex", flexDirection: "column",
           borderRadius: "0 24px 24px 0",
-          boxShadow: "6px 0 32px rgba(140,151,104,0.18)",
+          boxShadow: "var(--shadow-lg)",
           padding: "24px 12px",
           gap: 12,
         }}>
@@ -240,7 +240,7 @@ export default function SidebarMenu() {
             style={{
               width: 280,
               height: "100vh",
-              background: `linear-gradient(165deg, ${DEEP} 0%, #3d4a5c 60%, #2d3748 100%)`,
+              background: `linear-gradient(165deg, var(--charcoal) 0%, #3d4a5c 60%, #2d3748 100%)`,
               display: "flex", flexDirection: "column",
               borderRadius: "0 24px 24px 0",
               boxShadow: "6px 0 32px rgba(74,85,104,0.3)",
@@ -266,10 +266,10 @@ export default function SidebarMenu() {
         style={{
           width: 260,
           minHeight: "100vh",
-          background: `linear-gradient(165deg, ${DEEP} 0%, #3d4a5c 60%, #2d3748 100%)`,
+          background: `linear-gradient(165deg, var(--charcoal) 0%, #3d4a5c 60%, #2d3748 100%)`,
           display: "flex", flexDirection: "column",
           borderRadius: "0 24px 24px 0",
-          boxShadow: "6px 0 32px rgba(74,85,104,0.25), 2px 0 8px rgba(140,151,104,0.1)",
+          boxShadow: "6px 0 32px rgba(0,0,0,0.15)",
           fontFamily: "var(--font-sans, Inter, sans-serif)",
           position: "relative",
           overflow: "hidden",

@@ -11,10 +11,10 @@ interface UseConsignacionesResult {
   loading: boolean;
   error: string | null;
   stats: {
-    total: number;
-    activas: number;
-    finalizadas: number;
-    canceladas: number;
+    asignados: number;
+    vendidos: number;
+    devueltos: number;
+    ganancia: number;
   };
   reload: () => void;
 }
@@ -55,12 +55,21 @@ export function useConsignaciones(): UseConsignacionesResult {
     fetch();
   }, [rev]);
 
-  const stats = {
-    total: consignaciones.length,
-    activas: consignaciones.filter(c => c.estado === "activa").length,
-    finalizadas: consignaciones.filter(c => c.estado === "finalizada").length,
-    canceladas: consignaciones.filter(c => c.estado === "cancelada").length,
-  };
+  let asignados = 0;
+  let vendidos = 0;
+  let devueltos = 0;
+  let ganancia = 0;
+
+  consignaciones.forEach((c) => {
+    c.detalles?.forEach((d) => {
+      asignados += d.cantidad || 0;
+      vendidos += d.cantidad_vendida || 0;
+      devueltos += d.cantidad_devuelta || 0;
+      ganancia += (d.precio_venta - d.precio_mayorista) * (d.cantidad_vendida || 0);
+    });
+  });
+
+  const stats = { asignados, vendidos, devueltos, ganancia };
 
   return { consignaciones, mayoristas, loading, error, stats, reload };
 }
@@ -95,12 +104,21 @@ export function useConsignacionesMayorista(idMayorista: number | null) {
     fetch();
   }, [idMayorista, rev]);
 
-  const stats = {
-    total: consignaciones.length,
-    activas: consignaciones.filter(c => c.estado === "activa").length,
-    finalizadas: consignaciones.filter(c => c.estado === "finalizada").length,
-    canceladas: consignaciones.filter(c => c.estado === "cancelada").length,
-  };
+  let asignados = 0;
+  let vendidos = 0;
+  let devueltos = 0;
+  let ganancia = 0;
+
+  consignaciones.forEach((c) => {
+    c.detalles?.forEach((d) => {
+      asignados += d.cantidad || 0;
+      vendidos += d.cantidad_vendida || 0;
+      devueltos += d.cantidad_devuelta || 0;
+      ganancia += (d.precio_venta - d.precio_mayorista) * (d.cantidad_vendida || 0);
+    });
+  });
+
+  const stats = { asignados, vendidos, devueltos, ganancia };
 
   return { consignaciones, loading, error, stats, reload };
 }
