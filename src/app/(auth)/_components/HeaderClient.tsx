@@ -23,6 +23,7 @@ import {
 import { useAuth } from "@/lib/hooks/useAuth";
 import CartIcon from "@auth/_components/CartIcon";
 import { motion, AnimatePresence } from "framer-motion";
+import LogoM from "@assets/LogoM.svg";
 
 // ─── tokens ───────────────────────────────────────────────
 const ROSE      = "#B76E79";
@@ -293,7 +294,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
             onClick={() => router.push("/dashboard/cliente")}
           >
             <Image
-              src="/LogoM.svg"
+              src={LogoM}
               alt="Logotipo Stella Joyería"
               width={320}
               height={90}

@@ -1,129 +1,124 @@
+"use client";
+
 import { Insumo } from "@lib/models";
-import { Package, AlertTriangle, XOctagon } from "lucide-react";
+import { Package, AlertTriangle, XOctagon, Layers, TrendingUp } from "lucide-react";
 
 type Filtro = "TODOS" | "BAJO" | "AGOTADO";
 
-type Props = {
+interface Props {
   materiales: Insumo[];
   onFilter: (filtro: Filtro) => void;
-};
+  activeFilter: Filtro;
+}
 
-export default function MaterialsStats({ materiales, onFilter }: Props) {
+export default function MaterialsStats({ materiales, onFilter, activeFilter }: Props) {
   const total = materiales.length;
   const stockBajo = materiales.filter(
     m => m.cantidad > 0 && m.cantidad < (m.stock_minimo || 5)
   ).length;
   const agotados = materiales.filter(m => m.cantidad === 0).length;
+  
+  // 4ta Estadística: Variedad de Categorías
+  const categorias = Array.from(new Set(materiales.map(m => m.tipo).filter(Boolean))).length;
 
   const stats = [
-    { label: "Total de Materiales", value: total, onClick: () => onFilter("TODOS"), bgStart: "#758390", bgEnd: "#657582", icon: Package },
-    { label: "Stock Bajo", value: stockBajo, onClick: () => onFilter("BAJO"), bgStart: "#758390", bgEnd: "#657582", icon: AlertTriangle },
-    { label: "Agotados", value: agotados, onClick: () => onFilter("AGOTADO"), bgStart: "#C07E88", bgEnd: "#B76E79", icon: XOctagon },
+    { 
+      label: "Total de Insumos", 
+      value: total, 
+      type: "TODOS" as Filtro,
+      icon: Package,
+      gradient: "from-[#C07E88] to-[#B76E79]", // Rose Gold
+      isActionButton: true
+    },
+    { 
+      label: "Próximos a Agotarse", 
+      value: stockBajo, 
+      type: "BAJO" as Filtro,
+      icon: AlertTriangle,
+      gradient: "from-[#758390] to-[#657582]", // Charcoal
+      isActionButton: true
+    },
+    { 
+      label: "Sin Existencias", 
+      value: agotados, 
+      type: "AGOTADO" as Filtro,
+      icon: XOctagon,
+      gradient: "from-[#C07E88] to-[#B76E79]", // Rose Gold
+      isActionButton: true
+    },
+    { 
+      label: "Categorías Activas", 
+      value: categorias, 
+      type: null,
+      icon: Layers,
+      gradient: "from-[#758390] to-[#657582]", // Charcoal
+      isActionButton: false
+    },
   ];
 
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(3, 1fr)",
-      gap: 20,
-      width: "100%",
-      boxSizing: "border-box",
-    }} className="stella-material-stats">
-      <style>{`
-        @media (max-width: 1024px) { 
-          .stella-material-stats { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; } 
-        }
-        @media (max-width: 600px)  { 
-          .stella-material-stats { 
-            grid-template-columns: repeat(2, 1fr) !important; 
-            gap: 12px !important; 
-          } 
-        }
-        
-        .stat-card-hover {
-          transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-        }
-        .stat-card-hover:hover {
-          transform: translateY(-4px) scale(1.02);
-          box-shadow: 0 12px 24px rgba(0,0,0,0.12);
-        }
-      `}</style>
-
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
       {stats.map((item, idx) => {
         const Icon = item.icon;
+        const isActive = item.type && activeFilter === item.type;
+        const CardWrapper = item.isActionButton ? 'button' : 'div';
+
         return (
-          <div
+          <CardWrapper
             key={idx}
-            onClick={item.onClick}
-            className="stat-card-hover"
-            style={{
-              background: `linear-gradient(to bottom right, ${item.bgStart}, ${item.bgEnd})`,
-              borderRadius: 16,
-              padding: "clamp(14px, 3.5vw, 24px)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-              display: "flex",
-              flexDirection: "column",
-              color: "#fff",
-              position: "relative",
-              overflow: "hidden",
-              gap: 16,
-              minHeight: "clamp(110px, 15vw, 130px)",
-              cursor: "pointer",
-            }}
+            onClick={() => item.type && onFilter(item.type)}
+            className={`relative group overflow-hidden rounded-[24px] p-6 text-left transition-all duration-500 ${
+              item.isActionButton ? 'hover:-translate-y-1 cursor-pointer' : 'cursor-default'
+            } ${
+              isActive 
+                ? 'shadow-2xl' 
+                : 'shadow-lg hover:shadow-xl'
+            }`}
           >
-            {/* Header: Label + Small Icon */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", zIndex: 2, position: "relative" }}>
-              <p style={{
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
-                fontSize: "clamp(0.75rem, 2.5vw, 0.9rem)",
-                fontWeight: 500,
-                color: "rgba(255, 255, 255, 0.95)",
-                margin: 0,
-                lineHeight: 1.2,
-                maxWidth: "80%",
-              }}>
-                {item.label}
-              </p>
-              <div style={{ 
-                background: "rgba(255,255,255,0.15)", 
-                padding: "clamp(4px, 1.5vw, 8px)", 
-                borderRadius: 10, 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "center",
-                flexShrink: 0
-              }}>
-                <Icon size={18} color="#FFFFFF" strokeWidth={2} />
+            {/* Background Gradient */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} transition-opacity duration-500`} />
+
+            {/* Decorative Elements */}
+            <div 
+              className="absolute -right-4 -bottom-4 opacity-10 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-12"
+              style={{ color: 'white' }}
+            >
+              <Icon size={120} strokeWidth={1} />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 flex flex-col h-full justify-between gap-4">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <p className="text-[0.65rem] font-bold text-white/70 uppercase tracking-[0.2em] font-sans">
+                    {item.label}
+                  </p>
+                  <h3 className="text-3xl font-bold text-white font-serif tracking-tight" style={{ fontFamily: "var(--font-marcellus)" }}>
+                    {item.value}
+                  </h3>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white/10 border border-white/20 text-white shadow-inner">
+                  <Icon size={20} />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2 text-white/50 text-[0.7rem] font-medium">
+                {item.isActionButton ? (
+                  <>
+                    <TrendingUp size={14} className="text-white/80" />
+                    <span className="font-sans uppercase tracking-wider">Ver detalles</span>
+                  </>
+                ) : (
+                  <span className="font-sans uppercase tracking-wider opacity-60">Variedad de Materiales</span>
+                )}
               </div>
             </div>
 
-            {/* Body: Value */}
-            <div style={{ zIndex: 2, position: "relative", marginTop: "auto" }}>
-              <p style={{
-                fontFamily: "var(--font-marcellus, serif)",
-                fontSize: "clamp(1.3rem, 4vw, 2.2rem)", 
-                fontWeight: 400,
-                margin: 0, 
-                lineHeight: 1,
-                textShadow: "0 1px 2px rgba(0,0,0,0.1)"
-              }}>
-                {item.value}
-              </p>
-            </div>
-
-            {/* Decorative Background Icon */}
-            <div style={{
-              position: "absolute",
-              right: "-10%",
-              bottom: "-15%",
-              opacity: 0.1,
-              transform: "rotate(-15deg)",
-              pointerEvents: "none",
-              zIndex: 1
-            }}>
-              <Icon size={100} color="#FFFFFF" />
-            </div>
-          </div>
+            {/* Selection Indicator */}
+            {isActive && (
+              <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white] animate-pulse" />
+            )}
+          </CardWrapper>
         );
       })}
     </div>

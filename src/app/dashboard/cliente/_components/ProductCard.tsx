@@ -85,6 +85,13 @@ export default function ProductCard({
               transition: "opacity 0.22s ease",
             }}
           />
+
+          {/* Sparkle icon at bottom right matching the spec */}
+          <div style={{ position: "absolute", bottom: 12, right: 12, zIndex: 10, opacity: 0.8 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white" />
+            </svg>
+          </div>
         </div>
 
         {/* Info */}
@@ -92,68 +99,73 @@ export default function ProductCard({
           {category && (
             <p
               style={{
-                fontFamily: "var(--font-subtitle)",
-                fontSize: "0.62rem",
-                fontWeight: 500,
+                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                fontSize: "0.58rem",
+                fontWeight: 700,
                 textTransform: "uppercase",
-                letterSpacing: "0.16em",
+                letterSpacing: "0.18em",
                 color: "#8c9768",
-                marginBottom: 4,
+                marginBottom: 8,
               }}
             >
               {category}
             </p>
           )}
 
-          <h3
-            style={{
-              fontFamily: "var(--font-subtitle)",
-              fontSize: "1.05rem",
-              fontWeight: 600,
-              color: hovered ? "#4a5568" : "#708090",
-              marginBottom: 6,
-              lineHeight: 1.2,
-              transition: "color 0.18s ease",
-            }}
-          >
-            {name}
-          </h3>
-
-          {/* Stars */}
-          {rating && (
-            <div
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+            <h3
               style={{
-                display: "flex",
-                gap: 2,
-                marginBottom: 8,
+                fontFamily: "var(--font-marcellus), 'Marcellus', serif",
+                fontSize: "1.3rem",
+                fontWeight: 400,
+                color: hovered ? "#4a5568" : "#2d3748",
+                margin: 0,
+                lineHeight: 1,
+                transition: "color 0.18s ease",
+                maxWidth: "65%",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
-              {[...Array(5)].map((_, i) => (
-                <span
-                  key={i}
-                  style={{
-                    fontSize: "0.7rem",
-                    color: i < rating ? "#b76e79" : "rgba(112,128,144,0.25)",
-                  }}
-                >
-                  ★
-                </span>
-              ))}
-            </div>
-          )}
+              {name}
+            </h3>
 
-          {/* Price */}
-          <p
-            style={{
-              fontFamily: "var(--font-serif)",
-              fontSize: "1.2rem",
-              fontWeight: 500,
-              color: "#4a5568",
-              fontStyle: "italic",
-            }}
-          >
-            ${price.toLocaleString()}
-          </p>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+              {/* Stars */}
+              {rating && (
+                <div style={{ display: "flex", gap: 1 }}>
+                  {[...Array(5)].map((_, i) => (
+                    <span
+                      key={i}
+                      style={{
+                        fontSize: "0.55rem",
+                        color: i < rating ? "#b76e79" : "rgba(112,128,144,0.25)",
+                        lineHeight: 1
+                      }}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Price */}
+              <p
+                style={{
+                  fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  color: "#4a5568",
+                  margin: 0,
+                  lineHeight: 1,
+                  letterSpacing: "0.02em"
+                }}
+              >
+                ${price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </>

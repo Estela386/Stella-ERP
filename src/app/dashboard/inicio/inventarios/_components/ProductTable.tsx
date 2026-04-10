@@ -1,14 +1,14 @@
 import { Producto } from "../type";
 import ProductRow from "./ProductRow";
 import StockBadge from "./StockBadge";
-import { Package, Pencil, Trash2, Tag, Layers } from "lucide-react";
+import { Package, Pencil, Trash2, Tag } from "lucide-react";
 
 interface Props {
   productos: Producto[];
   search: string;
   filtro: "todos" | "bajo" | "agotados";
   onEdit?: (producto: Producto) => void;
-  onDelete?: (id: number) => void;
+  onDelete?: (id: number, nombre?: string) => void;
 }
 
 export default function ProductTable({
@@ -159,7 +159,7 @@ export default function ProductTable({
               </button>
               <button
                 className="flex-none px-5 flex justify-center items-center rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition border border-red-200/50 shadow-sm"
-                onClick={() => onDelete?.(p.id)}
+                onClick={() => onDelete?.(p.id, p.nombre || undefined)}
               >
                 <Trash2 size={16} />
               </button>

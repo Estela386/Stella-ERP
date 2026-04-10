@@ -710,6 +710,64 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                         </div>
                       )}
 
+                      {op.tipo === "bubbles" && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 12 }}>
+                          {op.valores?.map((v: any) => {
+                            const isSelected = configuracion[op.id] === v.valor;
+                            const isOutOfStock = (v.stock ?? 0) === 0 && op.valores.some((val: any) => (val.stock ?? 0) > 0);
+                            
+                            return (
+                              <button
+                                key={v.id}
+                                type="button"
+                                disabled={isOutOfStock}
+                                onClick={() => {
+                                  setConfiguracion(prev => ({ ...prev, [op.id]: v.valor }));
+                                  if (erroresPersonalizacion[op.id]) {
+                                    setErroresPersonalizacion(prev => {
+                                      const next = { ...prev };
+                                      delete next[op.id];
+                                      return next;
+                                    });
+                                  }
+                                }}
+                                style={{
+                                  padding: "10px 20px",
+                                  background: isSelected ? "#b76e79" : "#ffffff",
+                                  color: isSelected ? "#ffffff" : "#4a5568",
+                                  border: isSelected ? "1px solid #b76e79" : "1px solid rgba(112,128,144,0.2)",
+                                  borderRadius: 14,
+                                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                                  fontSize: "0.85rem",
+                                  fontWeight: isSelected ? 700 : 500,
+                                  cursor: isOutOfStock ? "not-allowed" : "pointer",
+                                  opacity: isOutOfStock ? 0.4 : 1,
+                                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                  boxShadow: isSelected 
+                                    ? "0 8px 16px rgba(183,110,121,0.25)" 
+                                    : "0 2px 4px rgba(0,0,0,0.02)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 8,
+                                  position: "relative",
+                                  overflow: "hidden"
+                                }}
+                              >
+                                {v.valor}
+                                {isSelected && (
+                                  <div style={{ 
+                                    width: 4, 
+                                    height: 4, 
+                                    borderRadius: "50%", 
+                                    background: "white" 
+                                  }} />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
                       {op.tipo === "text" && (
                         <input
                           type="text"

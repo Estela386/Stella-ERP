@@ -133,6 +133,7 @@ export class ProductoService {
       es_personalizable: data.es_personalizable,
       tipo: data.tipo,
       producto_material: [],
+      activo: true,
     });
 
     const validacion = productoTemp.validar();
@@ -200,8 +201,8 @@ export class ProductoService {
       return { success: false, error: "Producto no encontrado" };
     }
 
-    const { success, error } = await this.repository.delete(id);
-    return { success, error };
+    const { data: success, error } = await this.repository.update(id, { activo: false });
+    return { success: !!success, error };
   }
 
   /**
@@ -247,7 +248,7 @@ export class ProductoService {
       return { estadisticas: null, error };
     }
 
-    const { productos: productosStockBajo, error: errorStockBajo } =
+    const { productos: productosStockBajo } =
       await this.obtenerProductosStockBajo();
 
     const totalProductos = productos.length;

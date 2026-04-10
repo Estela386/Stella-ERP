@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import HeroStella from "@assets/HomePagePicture.webp"
 
 interface HeroConfig {
   imageUrl: string;
@@ -38,7 +39,7 @@ function ProductPill({ product }: { product: ProductoBasic }) {
     <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 12, background: "rgba(246,244,239,0.92)", backdropFilter: "blur(8px)", border: "1px solid rgba(183,110,121,0.22)", boxShadow: "0 2px 12px rgba(140,151,104,0.15)" }}>
       {product.url_imagen && (
         <div style={{ width: 32, height: 32, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
-          <Image src={product.url_imagen} alt={product.nombre} width={32} height={32} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+          <Image src={HeroStella} alt={product.nombre} width={32} height={32} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
         </div>
       )}
       <div>
@@ -176,7 +177,7 @@ export default function HeroSection({ idRol }: HeroSectionProps) {
         {/* Imagen de fondo */}
         <div className="absolute inset-0">
           <Image
-            src={imagePreview || config.imageUrl}
+            src={HeroStella}
             alt="Hero Stella"
             fill
             className="object-cover object-top"

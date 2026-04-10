@@ -6,9 +6,10 @@ import { Insumo } from "@lib/models";
 type Props = {
   materiales: Insumo[];
   onUpdate: (material: Insumo) => void;
+  onDelete: (id: number) => void;
 };
 
-export default function MaterialsGrid({ materiales, onUpdate }: Props) {
+export default function MaterialsGrid({ materiales, onUpdate, onDelete }: Props) {
   const [selected, setSelected] = useState<Insumo | null>(null);
 
   return (
@@ -30,6 +31,7 @@ export default function MaterialsGrid({ materiales, onUpdate }: Props) {
           material={selected}
           onClose={() => setSelected(null)}
           onSave={onUpdate}
+          onDelete={onDelete}
         />
       )}
     </>

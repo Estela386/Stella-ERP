@@ -50,6 +50,7 @@ export class InsumoService {
   }
 
   async eliminar(id: number) {
-    return await this.repository.delete(id);
+    const { data, error } = await this.repository.update(id, { activo: false });
+    return { success: !!data, error };
   }
 }

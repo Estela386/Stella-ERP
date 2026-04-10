@@ -44,7 +44,7 @@ const LUXURY_PALETTE = [
   { name: "Rojo Stella", hex: "#DB001A" },
 ];
 
-export type CustomizationType = "select" | "color" | "text" | "number" | "multi";
+export type CustomizationType = "select" | "color" | "text" | "number" | "multi" | "bubbles";
 
 export interface OpcionForm {
   nombre: string;
@@ -673,6 +673,7 @@ export default function ProductForm({
                     <label className="text-[0.7rem] font-bold text-[#708090] uppercase tracking-widest block mb-1">Tipo</label>
                     <select value={opcion.tipo} onChange={(e) => updateOpcion(index, "tipo", e.target.value as CustomizationType)} className="w-full bg-[#f6f4ef]/70 border border-transparent rounded-[10px] px-3 py-2 text-sm text-[#4a5568] font-bold focus:border-[#b76e79] focus:bg-white outline-none cursor-pointer appearance-none">
                       <option value="select">Lista</option>
+                      <option value="bubbles">Burbujas</option>
                       <option value="color">Color</option>
                       <option value="text">Texto</option>
                       <option value="number">Número</option>
@@ -688,7 +689,7 @@ export default function ProductForm({
                     </label>
                   </div>
                 </div>
-                {opcion.tipo !== "text" && (
+                {(opcion.tipo === "select" || opcion.tipo === "color" || opcion.tipo === "bubbles" || opcion.tipo === "multi") && (
                   <div className="pt-3 border-t border-[rgba(112,128,144,0.08)]">
                     {/* Paleta sugerida solo para tipo color */}
                     {opcion.tipo === "color" && (

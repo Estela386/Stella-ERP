@@ -15,6 +15,7 @@ import {
   ArrowRight, Menu, X, ChevronRight,
   LayoutGrid, Database, CircleDollarSign, ShoppingCart, TrendingUp, Handshake, Gem, Check,
 } from "lucide-react";
+import LogoM from "@assets/LogoM.svg";
 
 // ─── Paleta exacta de la imagen ───────────────────────────────────────────────
 // #f6f4ef  → fondo general (crema cálido)
@@ -382,7 +383,7 @@ export default function HomeClient() {
         >
           {/* Logo */}
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => router.push("/")} style={{ cursor: "pointer" }}>
-            <Image src="/LogoM.svg" alt="Stella" width={110} height={34} priority style={{ objectFit: "contain", display: "block" }} />
+            <Image src={LogoM} alt="Stella" width={150} height={80} priority style={{ objectFit: "contain", display: "block" }} />
           </motion.div>
 
           {/* Desktop links */}

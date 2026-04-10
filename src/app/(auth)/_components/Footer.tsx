@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaInstagram, FaYoutube, FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import LogoM from "@assets/LogoM.svg";
 
 const NAV = [
   {
@@ -166,10 +167,10 @@ export default function Footer() {
             <div style={{ display: "flex", flexDirection: "column", gap: 20, minWidth: 120 }}>
               <Link href="/dashboard/cliente">
                 <Image
-                  src="/logo.png"
+                  src={LogoM}
                   alt="Stella Joyería"
-                  width={96}
-                  height={96}
+                  width={150}
+                  height={150}
                   style={{
                     filter: "brightness(0) invert(1)",
                     opacity: 0.65,

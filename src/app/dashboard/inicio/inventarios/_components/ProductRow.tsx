@@ -2,12 +2,12 @@
 
 import { Producto } from "../type";
 import StockBadge from "./StockBadge";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface ProductRowProps {
   producto: Producto;
   onEdit?: (producto: Producto) => void;
-  onDelete?: (id: number) => void;
+  onDelete?: (id: number, nombre?: string) => void;
 }
 
 export default function ProductRow({
@@ -71,7 +71,7 @@ export default function ProductRow({
 
         <button
           className="text-[#708090] hover:text-red-600 transition"
-          onClick={() => onDelete?.(producto.id)}
+          onClick={() => onDelete?.(producto.id, producto.nombre || undefined)}
         >
           <Trash2 size={18} />
         </button>

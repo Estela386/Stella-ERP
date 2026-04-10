@@ -16,6 +16,7 @@ import {
   ShoppingBag,
   Menu,
   X,
+  Megaphone,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -23,6 +24,7 @@ import { BiMoney } from "react-icons/bi";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { logout } from "@/app/(auth)/actions";
 import { Usuario } from "@/lib/models";
+import LogoM from "@assets/logo.png";
 
 // ─── Design tokens Stella ─────────────────────────────────
 const ROSE  = "#b76e79";
@@ -36,6 +38,7 @@ const menuItems = [
   { label: "Consignación", href: "/dashboard/inicio/consignaciones",icon: ShoppingCart,    roles: [1, 3] },
   { label: "Pedidos",      href: "/dashboard/inicio/pedidos",       icon: PackageIcon,     roles: [1, 3] },
   { label: "Materiales",   href: "/dashboard/inicio/materials",     icon: LayoutListIcon,  roles: [1] },
+  { label: "Campañas",     href: "/dashboard/inicio/campanas",      icon: Megaphone,       roles: [1] },
   { label: "Cuentas",      href: "/accounts",                       icon: BiMoney,         roles: [1, 3] },
   { label: "Reportes",     href: "/dashboard/inicio/reports",       icon: BarChart3,       roles: [1, 3] },
 ];
@@ -322,7 +325,7 @@ function SidebarContent({
       }}>
         <div style={{ textAlign: "center", flex: 1 }}>
           <Image
-            src={logo}
+            src={LogoM}
             alt="Stella Logo"
             width={onClose ? 140 : 130}
             height={onClose ? 50 : 130}

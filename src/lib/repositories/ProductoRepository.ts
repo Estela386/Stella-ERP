@@ -32,7 +32,8 @@ export class ProductoRepository extends BaseRepository<IProducto> {
           producto_material(materiales(nombre)),
           opciones:producto_opciones(*, valores:producto_opcion_valores(*))
         `
-      );
+      )
+      .eq("activo", true);
 
       if (error) {
         return { data: null, error: error.message };
@@ -95,7 +96,8 @@ export class ProductoRepository extends BaseRepository<IProducto> {
           categoria:id_categoria(id, nombre),
           producto_material(materiales(nombre))
         `)
-        .eq("id_categoria", idCategoria);
+        .eq("id_categoria", idCategoria)
+        .eq("activo", true);
 
       if (error) {
         return { data: null, error: error.message };
@@ -124,6 +126,7 @@ export class ProductoRepository extends BaseRepository<IProducto> {
           categoria:id_categoria(id, nombre),
           producto_material(materiales(nombre))
         `)
+        .eq("activo", true)
         .lt("stock_actual", "stock_min");
 
       if (error) {
@@ -153,6 +156,7 @@ export class ProductoRepository extends BaseRepository<IProducto> {
           categoria:id_categoria(id, nombre),
           producto_material(materiales(nombre))
         `)
+        .eq("activo", true)
         .ilike("nombre", `%${nombre}%`);
 
       if (error) {

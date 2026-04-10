@@ -2,6 +2,7 @@ import { ProductoService } from "@lib/services";
 import { createClient } from "@utils/supabase/server";
 import Link from "next/link";
 import Image from "next/image";
+import MothersDayBanner from "@/app/_components/MothersDayBanner";
 
 export default async function ProductosPage() {
   try {
@@ -39,6 +40,9 @@ export default async function ProductosPage() {
 
         {/* Products Grid */}
         <main className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+          {/* 🌸 Campaña especial — se auto-oculta si no hay campaña activa */}
+          <MothersDayBanner />
+
           {productos.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {productos.map(product => (

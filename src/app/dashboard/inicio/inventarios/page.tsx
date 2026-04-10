@@ -9,6 +9,7 @@ import ProductTable from "./_components/ProductTable";
 import ProductModalForm from "./_components/ProductModalForm";
 import CategoryModal from "./_components/CategoryModal";
 import LabelPrintModal from "./_components/LabelPrintModal";
+import ConfirmationModal from "../_components/ConfirmationModal";
 import { Producto } from "./type";
 import { type OpcionForm } from "./_components/ProductForm";
 import { FileText } from "lucide-react";
@@ -56,6 +57,13 @@ export default function InventariosPage() {
   >();
   const [formLoading, setFormLoading] = useState(false);
   const [filtro, setFiltro] = useState<"todos" | "bajo" | "agotados">("todos");
+
+  // Estado para el modal de confirmación de eliminación
+  const [deleteModal, setDeleteModal] = useState({ 
+    open: false, 
+    id: 0, 
+    nombre: "" 
+  });
 
   // Verificar rol en cliente
   useEffect(() => {
@@ -393,10 +401,13 @@ export default function InventariosPage() {
       setFormLoading(false);
     }
   };
-  const handleDeleteProducto = async (id: number) => {
-    if (!confirm("¿Estás seguro de que deseas eliminar este producto?")) {
-      return;
-    }
+  const handleDeleteProducto = (id: number, nombre?: string) => {
+    setDeleteModal({ open: true, id, nombre: nombre || "este producto" });
+  };
+
+  const confirmDeleteProducto = async () => {
+    const id = deleteModal.id;
+    setDeleteModal(prev => ({ ...prev, open: false }));
 
     try {
       setFormLoading(true);
@@ -610,6 +621,18 @@ export default function InventariosPage() {
         isOpen={labelModalOpen}
         onClose={() => setLabelModalOpen(false)}
         productos={productos}
+      />
+
+      {/* Modal de Confirmación de Eliminación */}
+      <ConfirmationModal
+        isOpen={deleteModal.open}
+        title="Eliminar Producto"
+        message={`¿Estás seguro de que deseas eliminar "${deleteModal.nombre}"? Esta acción marcará el producto como inactivo.`}
+        confirmLabel="Eliminar"
+        cancelLabel="Volver"
+        onConfirm={confirmDeleteProducto}
+        onCancel={() => setDeleteModal({ open: false, id: 0, nombre: "" })}
+        variant="danger"
       />
     </div>
   );

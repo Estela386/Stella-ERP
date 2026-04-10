@@ -5,7 +5,8 @@ import { Insumo, Proveedor } from "@lib/models";
 import { createClient } from "@utils/supabase/client";
 import { ProveedorService } from "@lib/services/ProveedorService";
 import { ProductoInsumoService } from "@lib/services/ProductoInsumoService";
-import { FiX, FiPackage } from "react-icons/fi";
+import { FiX, FiPackage, FiTrash2 } from "react-icons/fi";
+import ConfirmationModal from "../../_components/ConfirmationModal";
 
 
 const CATEGORIAS = [
@@ -21,9 +22,10 @@ type Props = {
   material: Insumo;
   onClose: () => void;
   onSave: (material: Insumo) => void;
+  onDelete?: (id: number) => void;
 };
 
-export default function MaterialModal({ material, onClose, onSave }: Props) {
+export default function MaterialModal({ material, onClose, onSave, onDelete }: Props) {
   const [form, setForm] = useState({
     id: material.id,
     nombre: material.nombre,
@@ -32,12 +34,18 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
     cantidad: material.cantidad,
     unidad_medida: material.unidad_medida || "",
     stock_minimo: material.stock_minimo || 0,
-    id_proveedor: material.id_proveedor || undefined,
-    activo: material.activo,
+    id_proveedor: material.id_proveedor || 0,
+    activo: material.activo ?? true,
   });
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-  const [productosRelacionados, setProductosRelacionados] = useState<any[]>([]);
+  const [productosRelacionados, setProductosRelacionados] = useState<{
+    cantidad_necesaria: number;
+    producto: { id: number; nombre: string | null };
+    opcion_valor?: { valor: string; opcion: { nombre: string } } | null;
+  }[]>([]);
   const [loadingProductos, setLoadingProductos] = useState(false);
   useEffect(() => {
     const cargarDatos = async () => {
@@ -53,8 +61,8 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
       if (material.id) {
         setLoadingProductos(true);
         const relService = new ProductoInsumoService(supabase);
-        const { productos, error } = await relService.obtenerProductosPorInsumo(material.id);
-        if (productos) setProductosRelacionados(productos);
+        const { productos } = await relService.obtenerProductosPorInsumo(material.id);
+        if (productos) setProductosRelacionados(productos as any[]); // Casting to any[] temporarily to match previous state if needed, but the type above is more correct. Actually let's just cast data to the correct type.
         setLoadingProductos(false);
       }
     };
@@ -62,7 +70,7 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
   }, [material.id]);
 
 
-  const handleChange = (field: keyof typeof form, value: any) => {
+  const handleChange = (field: keyof typeof form, value: string | number | boolean | null) => {
     setForm(prev => ({
       ...prev,
       [field]: value,
@@ -73,6 +81,20 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
     const actualizado = new Insumo(form);
     onSave(actualizado);
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (onDelete && material.id) {
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDelete = () => {
+    if (onDelete && material.id) {
+      onDelete(material.id);
+      setIsDeleteModalOpen(false);
+      onClose();
+    }
   };
 
   return (
@@ -250,22 +272,47 @@ export default function MaterialModal({ material, onClose, onSave }: Props) {
         </section>
 
 
-        <div className="flex justify-end gap-4 pt-4 border-t border-[rgba(112,128,144,0.12)]">
-          <button
-            onClick={onClose}
-            className="px-6 py-2.5 rounded-[6px] border-[1.5px] border-[rgba(112,128,144,0.25)] text-[#708090] text-[0.8rem] font-sans tracking-[0.04em] hover:border-[#708090] hover:text-[#4a5568] hover:bg-[rgba(112,128,144,0.08)] transition-all duration-220"
-          >
-            Cancelar
-          </button>
+        <div className="flex justify-between items-center pt-4 border-t border-[rgba(112,128,144,0.12)]">
+          <div>
+            {onDelete && (
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-[6px] text-red-500 text-[0.8rem] font-medium hover:bg-red-50 transition-all"
+              >
+                <FiTrash2 size={16} />
+                <span>Eliminar Material</span>
+              </button>
+            )}
+          </div>
 
-          <button
-            onClick={handleSave}
-            className="bg-[#b76e79] text-[#f6f4ef] px-8 py-2.5 rounded-[6px] text-[0.8rem] font-sans tracking-[0.04em] hover:shadow-[0_10px_26px_rgba(183,110,121,0.32)] hover:-translate-y-0.5 active:scale-95 transition-all duration-220 shadow-[0_3px_12px_rgba(183,110,121,0.22)]"
-          >
-            Guardar cambios
-          </button>
+          <div className="flex gap-4">
+            <button
+              onClick={onClose}
+              className="px-6 py-2.5 rounded-[6px] border-[1.5px] border-[rgba(112,128,144,0.25)] text-[#708090] text-[0.8rem] font-sans tracking-[0.04em] hover:border-[#708090] hover:text-[#4a5568] hover:bg-[rgba(112,128,144,0.08)] transition-all duration-220"
+            >
+              Cancelar
+            </button>
+
+            <button
+              onClick={handleSave}
+              className="bg-[#b76e79] text-[#f6f4ef] px-8 py-2.5 rounded-[6px] text-[0.8rem] font-sans tracking-[0.04em] hover:shadow-[0_10px_26px_rgba(183,110,121,0.32)] hover:-translate-y-0.5 active:scale-95 transition-all duration-220 shadow-[0_3px_12px_rgba(183,110,121,0.22)]"
+            >
+              Guardar cambios
+            </button>
+          </div>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        title="Eliminar Material"
+        message={`¿Estás seguro de que deseas eliminar "${material.nombre}"? Esta acción marcará el material como inactivo.`}
+        confirmLabel="Eliminar"
+        cancelLabel="Volver"
+        onConfirm={confirmDelete}
+        onCancel={() => setIsDeleteModalOpen(false)}
+        variant="danger"
+      />
     </div>
   );
 }

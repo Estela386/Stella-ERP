@@ -17,6 +17,7 @@ export interface IProducto {
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
   producto_material?: unknown[];
+  activo: boolean;
 }
 
 
@@ -27,7 +28,7 @@ export interface IProducto {
 export interface OpcionDTO {
   id?: number;
   nombre: string;
-  tipo: "select" | "multi" | "text" | "color";
+  tipo: "select" | "multi" | "text" | "color" | "bubbles";
   obligatorio: boolean;
   valores: { valor: string; precio_extra?: number; stock?: number }[];
 }
@@ -74,6 +75,7 @@ export class Producto implements IProducto {
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
   producto_material?: unknown[];
+  activo: boolean;
 
 
   constructor(data: IProducto) {
@@ -91,6 +93,7 @@ export class Producto implements IProducto {
     this.descripcion = data.descripcion;
     this.tipo = data.tipo || "fabricado";
     this.producto_material = data.producto_material;
+    this.activo = data.activo ?? true;
   }
 
 
@@ -164,6 +167,7 @@ export class Producto implements IProducto {
       es_personalizable: this.es_personalizable,
       descripcion: this.descripcion,
       tipo: this.tipo,
+      activo: this.activo,
     };
   }
 

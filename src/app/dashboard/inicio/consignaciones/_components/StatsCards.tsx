@@ -1,6 +1,6 @@
 "use client";
 
-import { Package, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Package, CheckCircle, XCircle, Clock, TrendingUp } from "lucide-react";
 
 interface StatsCardsProps {
   total: number;
@@ -10,113 +10,74 @@ interface StatsCardsProps {
 }
 
 export default function StatsCards(props: StatsCardsProps) {
-  const items = [
-    { label: "Total Consignaciones", value: props.total, bgStart: "#C07E88", bgEnd: "#B76E79", icon: Package },
-    { label: "Consignaciones Activas", value: props.activas, bgStart: "#758390", bgEnd: "#657582", icon: Clock },
-    { label: "Ventas Finalizadas", value: props.finalizadas, bgStart: "#C07E88", bgEnd: "#B76E79", icon: CheckCircle },
-    { label: "Entregas Canceladas", value: props.canceladas, bgStart: "#758390", bgEnd: "#657582", icon: XCircle },
+  const stats = [
+    { 
+      label: "Total Consignaciones", 
+      value: props.total, 
+      icon: Package,
+      gradient: "from-[#C07E88] to-[#B76E79]", // Rose Gold
+    },
+    { 
+      label: "Consignaciones Activas", 
+      value: props.activas, 
+      icon: Clock,
+      gradient: "from-[#758390] to-[#657582]", // Charcoal/Gray
+    },
+    { 
+      label: "Ventas Finalizadas", 
+      value: props.finalizadas, 
+      icon: CheckCircle,
+      gradient: "from-[#C07E88] to-[#B76E79]", // Rose Gold
+    },
+    { 
+      label: "Entregas Canceladas", 
+      value: props.canceladas, 
+      icon: XCircle,
+      gradient: "from-[#758390] to-[#657582]", // Charcoal/Gray
+    },
   ];
 
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(4, 1fr)",
-      gap: 20,
-      width: "100%",
-      boxSizing: "border-box",
-    }} className="stella-consignaciones-stats">
-      <style>{`
-        @media (max-width: 1024px) { 
-          .stella-consignaciones-stats { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; } 
-        }
-        @media (max-width: 600px)  { 
-          .stella-consignaciones-stats { 
-            grid-template-columns: repeat(2, 1fr) !important; 
-            gap: 12px !important; 
-          } 
-        }
-        
-        .stat-card-hover {
-          transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-        }
-        .stat-card-hover:hover {
-          transform: translateY(-4px) scale(1.02);
-          box-shadow: 0 12px 24px rgba(0,0,0,0.12);
-        }
-      `}</style>
-      
-      {items.map((item, index) => {
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-8">
+      {stats.map((item, idx) => {
         const Icon = item.icon;
+
         return (
           <div
-            key={index}
-            className="stat-card-hover"
-            style={{
-              background: `linear-gradient(to bottom right, ${item.bgStart}, ${item.bgEnd})`,
-              borderRadius: 16,
-              padding: "clamp(14px, 3.5vw, 24px)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-              display: "flex",
-              flexDirection: "column",
-              color: "#fff",
-              position: "relative",
-              overflow: "hidden",
-              gap: 16,
-              minHeight: "clamp(110px, 15vw, 130px)",
-              cursor: "default",
-            }}
+            key={idx}
+            className="relative group overflow-hidden rounded-[24px] p-6 text-left transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-2xl"
           >
-            {/* Header: Label + Small Icon */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", zIndex: 2, position: "relative" }}>
-              <p style={{
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
-                fontSize: "clamp(0.75rem, 2.5vw, 0.9rem)",
-                fontWeight: 500,
-                color: "rgba(255, 255, 255, 0.95)",
-                margin: 0,
-                lineHeight: 1.2,
-                maxWidth: "80%",
-              }}>
-                {item.label}
-              </p>
-              <div style={{ 
-                background: "rgba(255,255,255,0.15)", 
-                padding: "clamp(4px, 1.5vw, 8px)", 
-                borderRadius: 10, 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "center",
-                flexShrink: 0
-              }}>
-                <Icon size={18} color="#FFFFFF" strokeWidth={2} />
+            {/* Background Gradient */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} transition-opacity duration-500`} />
+
+            {/* Decorative Elements */}
+            <div 
+              className="absolute -right-4 -bottom-4 opacity-10 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-12"
+              style={{ color: 'white' }}
+            >
+              <Icon size={120} strokeWidth={1} />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 flex flex-col h-full justify-between gap-4">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <p className="text-[0.65rem] font-bold text-white/70 uppercase tracking-[0.2em] font-sans">
+                    {item.label}
+                  </p>
+                  <h3 className="text-3xl font-bold text-white font-serif tracking-tight" style={{ fontFamily: "var(--font-marcellus)" }}>
+                    {item.value.toLocaleString()}
+                  </h3>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white/10 border border-white/20 text-white shadow-inner">
+                  <Icon size={20} />
+                </div>
               </div>
-            </div>
 
-            {/* Body: Value */}
-            <div style={{ zIndex: 2, position: "relative", marginTop: "auto" }}>
-              <p style={{
-                fontFamily: "var(--font-marcellus, serif)",
-                fontSize: "clamp(1.3rem, 4vw, 2.2rem)", 
-                fontWeight: 400,
-                margin: 0, 
-                lineHeight: 1,
-                textShadow: "0 1px 2px rgba(0,0,0,0.1)"
-              }}>
-                {item.value.toLocaleString()}
-              </p>
-            </div>
-
-            {/* Decorative Background Icon */}
-            <div style={{
-              position: "absolute",
-              right: "-10%",
-              bottom: "-15%",
-              opacity: 0.1,
-              transform: "rotate(-15deg)",
-              pointerEvents: "none",
-              zIndex: 1
-            }}>
-              <Icon size={100} color="#FFFFFF" />
+              <div className="flex items-center gap-2 pt-2 text-white/50 text-[0.7rem] font-medium">
+                <TrendingUp size={14} className="text-white/80" />
+                <span className="font-sans uppercase tracking-wider">Historial Detallado</span>
+              </div>
             </div>
           </div>
         );
