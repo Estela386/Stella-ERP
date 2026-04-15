@@ -10,6 +10,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
 import SimilarProducts from "./_components/SimilarProducts";
+import AlsoBoughtProducts from "./_components/AlsoBoughtProducts"; // Añade esta importación
 
 interface ProductoClientProps {
   id: string;
@@ -69,6 +70,20 @@ export default function ProductoClient({ id }: ProductoClientProps) {
         }
 
         setProducto(productoData);
+        if (usuario?.id) {
+          // Insertamos silenciosamente sin bloquear la carga visual
+          supabase
+            .from("historial_vistas")
+            .insert([
+              {
+                id_usuario: usuario.id,
+                id_producto: parseInt(id),
+              },
+            ])
+            .then(({ error }) => {
+              if (error) console.error("Error registrando vista:", error);
+            });
+        }
       } catch (err) {
         console.error(err);
         setError("Error al cargar el producto");
@@ -207,15 +222,16 @@ export default function ProductoClient({ id }: ProductoClientProps) {
   }
 
   // --- Parse materiales ---
-  const materialesArray: string[] = producto?.producto_material
-    ?.map((pm: any) => pm.materiales?.nombre)
-    .filter(Boolean) || [];
+  const materialesArray: string[] =
+    producto?.producto_material
+      ?.map((pm: any) => pm.materiales?.nombre)
+      .filter(Boolean) || [];
 
   // --- Lógica de cuidados dinámicos ---
   const sugerenciasCuidado = new Set<string>();
-  materialesArray.forEach((m) => {
+  materialesArray.forEach(m => {
     const mat = m.toLowerCase();
-    
+
     if (mat.includes("chapa")) {
       sugerenciasCuidado.add("Evita perfumes y cremas");
       sugerenciasCuidado.add("Retirar antes de bañarte o nadar");
@@ -236,7 +252,11 @@ export default function ProductoClient({ id }: ProductoClientProps) {
       sugerenciasCuidado.add("Evita la humedad constante");
       sugerenciasCuidado.add("Solo lavado superficial suave a mano");
     }
-    if (mat.includes("cristal") || mat.includes("piedra") || mat.includes("perla")) {
+    if (
+      mat.includes("cristal") ||
+      mat.includes("piedra") ||
+      mat.includes("perla")
+    ) {
       sugerenciasCuidado.add("Evita caídas y golpes bruscos");
       sugerenciasCuidado.add("Limpia con paño de microfibra en seco");
     }
@@ -337,7 +357,8 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   <div style={{ textAlign: "center" }}>
                     <p
                       style={{
-                        fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
+                        fontFamily:
+                          "var(--font-serif, 'Cormorant Garamond', serif)",
                         fontSize: "1.2rem",
                         fontStyle: "italic",
                       }}
@@ -450,13 +471,18 @@ export default function ProductoClient({ id }: ProductoClientProps) {
               >
                 <span
                   style={{
-                    fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
+                    fontFamily:
+                      "var(--font-serif, 'Cormorant Garamond', serif)",
                     fontSize: "2.2rem",
                     fontWeight: 600,
                     color: "#b76e79",
                   }}
                 >
-                  ${producto.precio.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  $
+                  {producto.precio.toLocaleString("es-MX", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
                 <span
                   style={{
@@ -471,9 +497,16 @@ export default function ProductoClient({ id }: ProductoClientProps) {
 
               {/* Badges de Materiales */}
               {materialesArray.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 8,
+                    marginTop: 16,
+                  }}
+                >
                   {materialesArray.map((mat, idx) => (
-                    <span 
+                    <span
                       key={idx}
                       style={{
                         padding: "5px 12px",
@@ -486,7 +519,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                         color: "#b76e79",
                         display: "flex",
                         alignItems: "center",
-                        gap: 4
+                        gap: 4,
                       }}
                     >
                       <Sparkles size={11} /> {mat}
@@ -642,18 +675,30 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                       )}
 
                       {op.tipo === "color" && (
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 12 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 16,
+                            marginTop: 12,
+                          }}
+                        >
                           {op.valores?.map((v: any) => {
                             const val = v.valor || "";
-                            const [colorName, colorHex] = val.includes('|') ? val.split('|') : [val, val];
+                            const [colorName, colorHex] = val.includes("|")
+                              ? val.split("|")
+                              : [val, val];
                             const isSelected = configuracion[op.id] === val;
-                            
+
                             return (
                               <button
                                 key={v.id}
                                 type="button"
                                 onClick={() => {
-                                  setConfiguracion(prev => ({ ...prev, [op.id]: val }));
+                                  setConfiguracion(prev => ({
+                                    ...prev,
+                                    [op.id]: val,
+                                  }));
                                   if (erroresPersonalizacion[op.id]) {
                                     setErroresPersonalizacion(prev => {
                                       const next = { ...prev };
@@ -670,36 +715,55 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                                   background: "none",
                                   border: "none",
                                   cursor: "pointer",
-                                  transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                                  padding: 0
+                                  transition:
+                                    "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                                  padding: 0,
                                 }}
                               >
-                                <div 
-                                  style={{ 
-                                    width: 36, 
-                                    height: 36, 
-                                    borderRadius: "50%", 
-                                    backgroundColor: colorHex.startsWith('#') ? colorHex : '#ffffff',
-                                    border: isSelected ? "2.5px solid #b76e79" : "1.5px solid rgba(112,128,144,0.1)",
-                                    boxShadow: isSelected ? "0 4px 12px rgba(183,110,121,0.25)" : "0 2px 6px rgba(0,0,0,0.03)",
-                                    transform: isSelected ? "scale(1.15)" : "scale(1)",
+                                <div
+                                  style={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: "50%",
+                                    backgroundColor: colorHex.startsWith("#")
+                                      ? colorHex
+                                      : "#ffffff",
+                                    border: isSelected
+                                      ? "2.5px solid #b76e79"
+                                      : "1.5px solid rgba(112,128,144,0.1)",
+                                    boxShadow: isSelected
+                                      ? "0 4px 12px rgba(183,110,121,0.25)"
+                                      : "0 2px 6px rgba(0,0,0,0.03)",
+                                    transform: isSelected
+                                      ? "scale(1.15)"
+                                      : "scale(1)",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    transition: "all 0.3s ease"
+                                    transition: "all 0.3s ease",
                                   }}
                                 >
-                                  {isSelected && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "white", boxShadow: "0 1px 2px rgba(0,0,0,0.2)" }} />}
+                                  {isSelected && (
+                                    <div
+                                      style={{
+                                        width: 6,
+                                        height: 6,
+                                        borderRadius: "50%",
+                                        background: "white",
+                                        boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                                      }}
+                                    />
+                                  )}
                                 </div>
-                                <span 
-                                  style={{ 
-                                    fontSize: "0.6rem", 
-                                    fontWeight: 700, 
-                                    textTransform: "uppercase", 
+                                <span
+                                  style={{
+                                    fontSize: "0.6rem",
+                                    fontWeight: 700,
+                                    textTransform: "uppercase",
                                     letterSpacing: "0.08em",
                                     color: isSelected ? "#b76e79" : "#708090",
                                     opacity: isSelected ? 1 : 0.6,
-                                    transition: "all 0.2s ease"
+                                    transition: "all 0.2s ease",
                                   }}
                                 >
                                   {colorName}
@@ -711,18 +775,32 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                       )}
 
                       {op.tipo === "bubbles" && (
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 12 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 12,
+                            marginTop: 12,
+                          }}
+                        >
                           {op.valores?.map((v: any) => {
                             const isSelected = configuracion[op.id] === v.valor;
-                            const isOutOfStock = (v.stock ?? 0) === 0 && op.valores.some((val: any) => (val.stock ?? 0) > 0);
-                            
+                            const isOutOfStock =
+                              (v.stock ?? 0) === 0 &&
+                              op.valores.some(
+                                (val: any) => (val.stock ?? 0) > 0
+                              );
+
                             return (
                               <button
                                 key={v.id}
                                 type="button"
                                 disabled={isOutOfStock}
                                 onClick={() => {
-                                  setConfiguracion(prev => ({ ...prev, [op.id]: v.valor }));
+                                  setConfiguracion(prev => ({
+                                    ...prev,
+                                    [op.id]: v.valor,
+                                  }));
                                   if (erroresPersonalizacion[op.id]) {
                                     setErroresPersonalizacion(prev => {
                                       const next = { ...prev };
@@ -733,34 +811,44 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                                 }}
                                 style={{
                                   padding: "10px 20px",
-                                  background: isSelected ? "#b76e79" : "#ffffff",
+                                  background: isSelected
+                                    ? "#b76e79"
+                                    : "#ffffff",
                                   color: isSelected ? "#ffffff" : "#4a5568",
-                                  border: isSelected ? "1px solid #b76e79" : "1px solid rgba(112,128,144,0.2)",
+                                  border: isSelected
+                                    ? "1px solid #b76e79"
+                                    : "1px solid rgba(112,128,144,0.2)",
                                   borderRadius: 14,
-                                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                                  fontFamily:
+                                    "var(--font-sans, Inter, sans-serif)",
                                   fontSize: "0.85rem",
                                   fontWeight: isSelected ? 700 : 500,
-                                  cursor: isOutOfStock ? "not-allowed" : "pointer",
+                                  cursor: isOutOfStock
+                                    ? "not-allowed"
+                                    : "pointer",
                                   opacity: isOutOfStock ? 0.4 : 1,
-                                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                  boxShadow: isSelected 
-                                    ? "0 8px 16px rgba(183,110,121,0.25)" 
+                                  transition:
+                                    "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                  boxShadow: isSelected
+                                    ? "0 8px 16px rgba(183,110,121,0.25)"
                                     : "0 2px 4px rgba(0,0,0,0.02)",
                                   display: "flex",
                                   alignItems: "center",
                                   gap: 8,
                                   position: "relative",
-                                  overflow: "hidden"
+                                  overflow: "hidden",
                                 }}
                               >
                                 {v.valor}
                                 {isSelected && (
-                                  <div style={{ 
-                                    width: 4, 
-                                    height: 4, 
-                                    borderRadius: "50%", 
-                                    background: "white" 
-                                  }} />
+                                  <div
+                                    style={{
+                                      width: 4,
+                                      height: 4,
+                                      borderRadius: "50%",
+                                      background: "white",
+                                    }}
+                                  />
                                 )}
                               </button>
                             );
@@ -957,7 +1045,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                       display: "flex",
                       alignItems: "start",
                       gap: 8,
-                      lineHeight: 1.4
+                      lineHeight: 1.4,
                     }}
                   >
                     <span style={{ color: "#b76e79", marginTop: 2 }}>✧</span>{" "}
@@ -977,10 +1065,12 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                     fontWeight: 500,
                     background: "rgba(140,151,104,0.08)",
                     padding: "8px 12px",
-                    borderRadius: 8
+                    borderRadius: 8,
                   }}
                 >
-                  * <strong>Nota para chapa de oro:</strong> El ph de tu piel y la exposición a humedad pueden afectar la duración del baño. Sigue estos cuidados para prolongar su vida útil.
+                  * <strong>Nota para chapa de oro:</strong> El ph de tu piel y
+                  la exposición a humedad pueden afectar la duración del baño.
+                  Sigue estos cuidados para prolongar su vida útil.
                 </p>
               )}
             </section>
@@ -1167,12 +1257,15 @@ export default function ProductoClient({ id }: ProductoClientProps) {
       {/* CARRUSEL DE PRODUCTOS SIMILARES */}
       {producto?.id_categoria && (
         <div className="pb-20">
-          <SimilarProducts 
-            id_categoria={producto.id_categoria} 
-            currentProductId={id} 
+          <SimilarProducts
+            id_categoria={producto.id_categoria}
+            currentProductId={id}
           />
         </div>
       )}
+      <div className="pb-20">
+        <AlsoBoughtProducts currentProductId={id} />
+      </div>
 
       <Footer />
     </div>
