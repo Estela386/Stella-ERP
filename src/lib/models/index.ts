@@ -3,8 +3,6 @@
  * Facilita las importaciones de modelos desde otros archivos
  */
 
-
-
 export {
   Producto,
   type IProducto,
@@ -52,7 +50,10 @@ export {
 } from "./Review";
 export { ProductoOpcion, type IProductoOpcion } from "./ProductoOpcion";
 
-export { ProductoOpcionValor, type IProductoOpcionValor } from "./ProductoOpcionValor";
+export {
+  ProductoOpcionValor,
+  type IProductoOpcionValor,
+} from "./ProductoOpcionValor";
 
 export {
   Insumo,
@@ -98,3 +99,8 @@ export {
   type TipoNotificacion,
   type UpdateNotificacionDTO,
 } from "./Notificacion";
+
+export {
+  AnalisisInventario,
+  type IAnalisisInventario,
+} from "./AnalisisInventario";

@@ -27,25 +27,66 @@ import { Usuario } from "@/lib/models";
 import LogoM from "@assets/LogoM.svg";
 
 // ─── Design tokens Stella ─────────────────────────────────
-const ROSE  = "var(--rose-gold)";
-const DEEP  = "var(--charcoal)";
-const BG    = "var(--beige)";
+const ROSE = "var(--rose-gold)";
+const DEEP = "var(--charcoal)";
+const BG = "var(--beige)";
 
 // ─── Menú con roles permitidos ────────────────────────────
 const menuItems = [
-  { label: "Inicio",       href: "/dashboard/inicio",                icon: LayoutDashboard, roles: [1, 3] },
-  { label: "Inventario",   href: "/dashboard/inicio/inventarios",   icon: Boxes,           roles: [1] },
-  { label: "Consignación", href: "/dashboard/inicio/consignaciones",icon: ShoppingCart,    roles: [1, 3] },
-  { label: "Pedidos",      href: "/dashboard/inicio/pedidos",       icon: PackageIcon,     roles: [1, 3] },
-  { label: "Materiales",   href: "/dashboard/inicio/materials",     icon: LayoutListIcon,  roles: [1] },
-  { label: "Campañas",     href: "/dashboard/inicio/campanas",      icon: Megaphone,       roles: [1] },
-  { label: "Cuentas",      href: "/accounts",                       icon: BiMoney,         roles: [1, 3] },
-  { label: "Reportes",     href: "/dashboard/inicio/reports",       icon: BarChart3,       roles: [1, 3] },
+  {
+    label: "Inicio",
+    href: "/dashboard/inicio",
+    icon: LayoutDashboard,
+    roles: [1, 3],
+  },
+  {
+    label: "Inventario",
+    href: "/dashboard/inicio/inventarios",
+    icon: Boxes,
+    roles: [1],
+  },
+  {
+    label: "Consignación",
+    href: "/dashboard/inicio/consignaciones",
+    icon: ShoppingCart,
+    roles: [1, 3],
+  },
+  {
+    label: "Pedidos",
+    href: "/dashboard/inicio/pedidos",
+    icon: PackageIcon,
+    roles: [1, 3],
+  },
+  {
+    label: "Materiales",
+    href: "/dashboard/inicio/materials",
+    icon: LayoutListIcon,
+    roles: [1],
+  },
+  {
+    label: "Campañas",
+    href: "/dashboard/inicio/campanas",
+    icon: Megaphone,
+    roles: [1],
+  },
+  { label: "Cuentas", href: "/accounts", icon: BiMoney, roles: [1, 3] },
+  {
+    label: "Reportes",
+    href: "/dashboard/inicio/reports",
+    icon: BarChart3,
+    roles: [1, 3],
+  },
+  {
+    label: "Promociones",
+    href: "/dashboard/inicio/inventarios/promociones",
+    icon: BarChart3,
+    roles: [1],
+  },
 ];
 
 export default function SidebarMenu() {
   const pathname = usePathname();
-  const router   = useRouter();
+  const router = useRouter();
   const { usuario, loading } = useAuth();
   const [hoveredHref, setHoveredHref] = useState<string | null>(null);
   const [shopHovered, setShopHovered] = useState(false);
@@ -64,11 +105,12 @@ export default function SidebarMenu() {
     // router.push("/login");
   }
 
-  const filteredMenu = menuItems.filter(item => item.roles.includes(Number(userType)));
+  const filteredMenu = menuItems.filter(item =>
+    item.roles.includes(Number(userType))
+  );
 
   const roleLabel =
-    userType === 1 ? "Administrador" :
-    userType === 3 ? "Mayorista" : "Cliente";
+    userType === 1 ? "Administrador" : userType === 3 ? "Mayorista" : "Cliente";
 
   // ── Loading ──
   if (loading) {
@@ -78,19 +120,23 @@ export default function SidebarMenu() {
           @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
           .sk { animation: pulse 1.6s ease-in-out infinite; background: rgba(246,244,239,0.15); border-radius: 8px; }
         `}</style>
-        <aside 
+        <aside
           className="flex"
           style={{
-          width: 260,
-          position: "fixed", top: 0, left: 0,
-          minHeight: "100vh",
-          background: `linear-gradient(165deg, var(--charcoal) 0%, #3d4a5c 100%)`,
-          display: "flex", flexDirection: "column",
-          borderRadius: "0 24px 24px 0",
-          boxShadow: "var(--shadow-lg)",
-          padding: "24px 12px",
-          gap: 12,
-        }}>
+            width: 260,
+            position: "fixed",
+            top: 0,
+            left: 0,
+            minHeight: "100vh",
+            background: `linear-gradient(165deg, var(--charcoal) 0%, #3d4a5c 100%)`,
+            display: "flex",
+            flexDirection: "column",
+            borderRadius: "0 24px 24px 0",
+            boxShadow: "var(--shadow-lg)",
+            padding: "24px 12px",
+            gap: 12,
+          }}
+        >
           {[...Array(5)].map((_, i) => (
             <div key={i} className="sk" style={{ height: 44 }} />
           ))}
@@ -191,7 +237,7 @@ export default function SidebarMenu() {
             style={{ objectFit: "contain", filter: "brightness(0)" }}
           />
         </div>
-        
+
         <button
           onClick={() => setIsOpen(true)}
           style={{
@@ -241,19 +287,28 @@ export default function SidebarMenu() {
               width: 280,
               height: "100vh",
               background: `linear-gradient(165deg, var(--charcoal) 0%, #3d4a5c 60%, #2d3748 100%)`,
-              display: "flex", flexDirection: "column",
+              display: "flex",
+              flexDirection: "column",
               borderRadius: "0 24px 24px 0",
               boxShadow: "6px 0 32px rgba(74,85,104,0.3)",
               fontFamily: "var(--font-sans, Inter, sans-serif)",
-              position: "fixed", top: 0, left: 0,
+              position: "fixed",
+              top: 0,
+              left: 0,
               zIndex: 1000,
               overflow: "hidden",
             }}
           >
-            <SidebarContent 
-              usuario={usuario} roleLabel={roleLabel} pathname={pathname} 
-              router={router} filteredMenu={filteredMenu} hoveredHref={hoveredHref} 
-              setHoveredHref={setHoveredHref} shopHovered={shopHovered} setShopHovered={setShopHovered}
+            <SidebarContent
+              usuario={usuario}
+              roleLabel={roleLabel}
+              pathname={pathname}
+              router={router}
+              filteredMenu={filteredMenu}
+              hoveredHref={hoveredHref}
+              setHoveredHref={setHoveredHref}
+              shopHovered={shopHovered}
+              setShopHovered={setShopHovered}
               onClose={() => setIsOpen(false)}
             />
           </motion.aside>
@@ -267,7 +322,8 @@ export default function SidebarMenu() {
           width: 260,
           minHeight: "100vh",
           background: `linear-gradient(165deg, var(--charcoal) 0%, #3d4a5c 60%, #2d3748 100%)`,
-          display: "flex", flexDirection: "column",
+          display: "flex",
+          flexDirection: "column",
           borderRadius: "0 24px 24px 0",
           boxShadow: "6px 0 32px rgba(0,0,0,0.15)",
           fontFamily: "var(--font-sans, Inter, sans-serif)",
@@ -275,10 +331,16 @@ export default function SidebarMenu() {
           overflow: "hidden",
         }}
       >
-        <SidebarContent 
-          usuario={usuario} roleLabel={roleLabel} pathname={pathname} 
-          router={router} filteredMenu={filteredMenu} hoveredHref={hoveredHref} 
-          setHoveredHref={setHoveredHref} shopHovered={shopHovered} setShopHovered={setShopHovered}
+        <SidebarContent
+          usuario={usuario}
+          roleLabel={roleLabel}
+          pathname={pathname}
+          router={router}
+          filteredMenu={filteredMenu}
+          hoveredHref={hoveredHref}
+          setHoveredHref={setHoveredHref}
+          shopHovered={shopHovered}
+          setShopHovered={setShopHovered}
         />
       </aside>
     </>
@@ -302,38 +364,83 @@ interface SidebarContentProps {
   hoveredHref: string | null;
   setHoveredHref: (href: string | null) => void;
   shopHovered: boolean;
-  setShopHovered: (hovered: boolean) => void; 
+  setShopHovered: (hovered: boolean) => void;
   onClose?: () => void;
 }
 
 // ─── Sub-componente para evitar duplicar código ──────────────────────────────
 function SidebarContent({
-  usuario, roleLabel, pathname, router, filteredMenu, hoveredHref,
-  setHoveredHref, shopHovered, setShopHovered, onClose
+  usuario,
+  roleLabel,
+  pathname,
+  router,
+  filteredMenu,
+  hoveredHref,
+  setHoveredHref,
+  shopHovered,
+  setShopHovered,
+  onClose,
 }: SidebarContentProps) {
+  const activeMenuItem = filteredMenu.reduce(
+    (best, current) => {
+      if (pathname.startsWith(current.href)) {
+        if (!best || current.href.length > best.href.length) {
+          return current;
+        }
+      }
+      return best;
+    },
+    null as MenuItem | null
+  );
   return (
     <>
-      <div style={{ position: "absolute", top: -60, right: -60, width: 200, height: 200, borderRadius: "50%", background: "rgba(183,110,121,0.08)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: 40, left: -40, width: 160, height: 160, borderRadius: "50%", background: "rgba(140,151,104,0.06)", pointerEvents: "none" }} />
+      <div
+        style={{
+          position: "absolute",
+          top: -60,
+          right: -60,
+          width: 200,
+          height: 200,
+          borderRadius: "50%",
+          background: "rgba(183,110,121,0.08)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: 40,
+          left: -40,
+          width: 160,
+          height: 160,
+          borderRadius: "50%",
+          background: "rgba(140,151,104,0.06)",
+          pointerEvents: "none",
+        }}
+      />
 
       {/* ── Logo ── */}
-      <div style={{
-        padding: "clamp(16px,2vw,28px) clamp(12px,1.5vw,20px)",
-        borderBottom: "1px solid rgba(246,244,239,0.1)",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        gap: 8,
-      }}>
+      <div
+        style={{
+          padding: "clamp(16px,2vw,28px) clamp(12px,1.5vw,20px)",
+          borderBottom: "1px solid rgba(246,244,239,0.1)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+        }}
+      >
         <div style={{ textAlign: "center", flex: 1 }}>
           <Image
             src={LogoM}
             alt="Stella Logo"
             width={onClose ? 140 : 130}
             height={onClose ? 50 : 130}
-            style={{ 
-              filter: "brightness(0) invert(1)", 
-              opacity: onClose ? 0.9 : 0.85, 
+            style={{
+              filter: "brightness(0) invert(1)",
+              opacity: onClose ? 0.9 : 0.85,
               margin: "0 auto",
-              objectFit: "contain"
+              objectFit: "contain",
             }}
           />
         </div>
@@ -342,8 +449,11 @@ function SidebarContent({
             onClick={onClose}
             className="flex md:hidden"
             style={{
-              background: "none", border: "none", color: "rgba(246,244,239,0.5)",
-              cursor: "pointer", padding: 8
+              background: "none",
+              border: "none",
+              color: "rgba(246,244,239,0.5)",
+              cursor: "pointer",
+              padding: 8,
             }}
           >
             <X size={24} />
@@ -352,22 +462,37 @@ function SidebarContent({
       </div>
 
       {/* ── Navegación ── */}
-      <nav 
+      <nav
         className="sidebar-nav"
-        style={{ flex: 1, padding: "clamp(10px,1.5vw,16px) clamp(8px,1.2vw,14px)", display: "flex", flexDirection: "column", gap: 4, overflowY: "auto", overflowX: "hidden" }}
+        style={{
+          flex: 1,
+          padding: "clamp(10px,1.5vw,16px) clamp(8px,1.2vw,14px)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+          overflowY: "auto",
+          overflowX: "hidden",
+        }}
       >
-        <p className="hidden md:block" style={{
-          fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.58rem", fontWeight: 500, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(246,244,239,0.35)", margin: "4px 8px 10px",
-        }}>
+        <p
+          className="hidden md:block"
+          style={{
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontSize: "0.58rem",
+            fontWeight: 500,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "rgba(246,244,239,0.35)",
+            margin: "4px 8px 10px",
+          }}
+        >
           Menú principal
         </p>
 
         {filteredMenu.map((item: MenuItem, i: number) => {
           const Icon = item.icon;
           // Active if matches exactly or if it's a subroute (except for Inicio)
-          const active = item.href === "/dashboard/inicio" 
-            ? pathname === item.href 
-            : pathname.startsWith(item.href);
+          const active = activeMenuItem?.href === item.href;
           const hovered = hoveredHref === item.href;
 
           return (
@@ -380,83 +505,251 @@ function SidebarContent({
               onMouseLeave={() => setHoveredHref(null)}
               onClick={onClose}
             >
-              <div style={{
-                position: "relative", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 12,
-                padding: "clamp(10px,1.1vw,13px) 14px", borderRadius: 12,
-                background: active ? ROSE : hovered ? "rgba(246,244,239,0.08)" : "transparent",
-                boxShadow: active ? "0 4px 14px rgba(183,110,121,0.35)" : "none",
-                transition: "all 0.18s cubic-bezier(.22,1,.36,1)",
-              }}>
-                {active && <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: 20, borderRadius: "0 3px 3px 0", background: "rgba(246,244,239,0.8)" }} />}
-                
-                <div style={{
-                  width: 32, height: 32, borderRadius: 8,
-                  background: active ? "rgba(255,255,255,0.18)" : hovered ? "rgba(183,110,121,0.15)" : "rgba(246,244,239,0.08)",
-                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                }}>
-                  <Icon size={16} style={{ color: active ? BG : hovered ? ROSE : "rgba(246,244,239,0.65)" }} />
+              <div
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                  gap: 12,
+                  padding: "clamp(10px,1.1vw,13px) 14px",
+                  borderRadius: 12,
+                  background: active
+                    ? ROSE
+                    : hovered
+                      ? "rgba(246,244,239,0.08)"
+                      : "transparent",
+                  boxShadow: active
+                    ? "0 4px 14px rgba(183,110,121,0.35)"
+                    : "none",
+                  transition: "all 0.18s cubic-bezier(.22,1,.36,1)",
+                }}
+              >
+                {active && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: 3,
+                      height: 20,
+                      borderRadius: "0 3px 3px 0",
+                      background: "rgba(246,244,239,0.8)",
+                    }}
+                  />
+                )}
+
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    background: active
+                      ? "rgba(255,255,255,0.18)"
+                      : hovered
+                        ? "rgba(183,110,121,0.15)"
+                        : "rgba(246,244,239,0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon
+                    size={16}
+                    style={{
+                      color: active
+                        ? BG
+                        : hovered
+                          ? ROSE
+                          : "rgba(246,244,239,0.65)",
+                    }}
+                  />
                 </div>
 
-                <span 
-                  className="stella-nav-label" 
+                <span
+                  className="stella-nav-label"
                   style={{
-                  flex: 1, 
-                  fontSize: "0.88rem", 
-                  fontWeight: active ? 600 : 400,
-                  color: active ? BG : "#f6f4ef", 
-                  transition: "all 0.2s ease", 
-                  whiteSpace: "nowrap",
-                  display: "inline-block",
-                  opacity: 1,
-                }}>
+                    flex: 1,
+                    fontSize: "0.88rem",
+                    fontWeight: active ? 600 : 400,
+                    color: active ? BG : "#f6f4ef",
+                    transition: "all 0.2s ease",
+                    whiteSpace: "nowrap",
+                    display: "inline-block",
+                    opacity: 1,
+                  }}
+                >
                   {item.label}
                 </span>
 
-                <ChevronRight size={13} className="hidden md:block" style={{
-                  display: active ? "none" : "block", color: "rgba(246,244,239,0.3)", opacity: hovered ? 1 : 0, transform: hovered ? "translateX(0)" : "translateX(-4px)", transition: "all 0.18s ease",
-                }} />
+                <ChevronRight
+                  size={13}
+                  className="hidden md:block"
+                  style={{
+                    display: active ? "none" : "block",
+                    color: "rgba(246,244,239,0.3)",
+                    opacity: hovered ? 1 : 0,
+                    transform: hovered ? "translateX(0)" : "translateX(-4px)",
+                    transition: "all 0.18s ease",
+                  }}
+                />
               </div>
             </Link>
           );
         })}
 
-        <div style={{ height: 1, background: "rgba(246,244,239,0.08)", margin: "8px 4px" }} />
+        <div
+          style={{
+            height: 1,
+            background: "rgba(246,244,239,0.08)",
+            margin: "8px 4px",
+          }}
+        />
 
         <button
           onClick={() => router.push("/dashboard/cliente")}
           onMouseEnter={() => setShopHovered(true)}
           onMouseLeave={() => setShopHovered(false)}
           style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "clamp(10px,1.1vw,13px) 14px", borderRadius: 12,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            padding: "clamp(10px,1.1vw,13px) 14px",
+            borderRadius: 12,
             border: `1px solid ${shopHovered ? "rgba(183,110,121,0.4)" : "rgba(246,244,239,0.1)"}`,
-            background: shopHovered ? "rgba(183,110,121,0.12)" : "rgba(246,244,239,0.04)",
-            cursor: "pointer", transition: "all 0.18s ease", width: "100%",
+            background: shopHovered
+              ? "rgba(183,110,121,0.12)"
+              : "rgba(246,244,239,0.04)",
+            cursor: "pointer",
+            transition: "all 0.18s ease",
+            width: "100%",
           }}
         >
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: shopHovered ? "rgba(183,110,121,0.2)" : "rgba(246,244,239,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <ShoppingBag size={16} style={{ color: shopHovered ? ROSE : "rgba(246,244,239,0.5)" }} />
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              background: shopHovered
+                ? "rgba(183,110,121,0.2)"
+                : "rgba(246,244,239,0.08)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <ShoppingBag
+              size={16}
+              style={{ color: shopHovered ? ROSE : "rgba(246,244,239,0.5)" }}
+            />
           </div>
-          <span className="stella-nav-label" style={{ flex: 1, fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", fontWeight: 400, color: shopHovered ? ROSE : "rgba(246,244,239,0.45)", whiteSpace: "nowrap", textAlign: "left" }}>
+          <span
+            className="stella-nav-label"
+            style={{
+              flex: 1,
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
+              fontSize: "0.88rem",
+              fontWeight: 400,
+              color: shopHovered ? ROSE : "rgba(246,244,239,0.45)",
+              whiteSpace: "nowrap",
+              textAlign: "left",
+            }}
+          >
             Ir a la tienda
           </span>
         </button>
       </nav>
 
       {/* ── Footer usuario ── */}
-      <div style={{ padding: "clamp(12px,1.5vw,18px) clamp(8px,1.2vw,14px)", borderTop: "1px solid rgba(246,244,239,0.08)" }}>
-        <div className="flex" style={{ alignItems: "center", gap: 12, marginBottom: 14 }}>
-          <div style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0, background: "rgba(183,110,121,0.2)", border: "1px solid rgba(183,110,121,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", fontSize: "1.1rem", fontWeight: 600, color: ROSE, fontStyle: "italic" }}>
+      <div
+        style={{
+          padding: "clamp(12px,1.5vw,18px) clamp(8px,1.2vw,14px)",
+          borderTop: "1px solid rgba(246,244,239,0.08)",
+        }}
+      >
+        <div
+          className="flex"
+          style={{ alignItems: "center", gap: 12, marginBottom: 14 }}
+        >
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: "50%",
+              flexShrink: 0,
+              background: "rgba(183,110,121,0.2)",
+              border: "1px solid rgba(183,110,121,0.35)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)",
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                color: ROSE,
+                fontStyle: "italic",
+              }}
+            >
               {usuario?.nombre?.charAt(0)?.toUpperCase() || "U"}
             </span>
           </div>
-          <div style={{ overflow: "hidden", flex: 1 }} className="stella-nav-label">
-            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", fontWeight: 500, color: "rgba(246,244,239,0.85)", margin: 0, textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{usuario?.nombre || roleLabel}</p>
-            <p style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.68rem", color: "rgba(246,244,239,0.38)", margin: 0 }}>{roleLabel}</p>
+          <div
+            style={{ overflow: "hidden", flex: 1 }}
+            className="stella-nav-label"
+          >
+            <p
+              style={{
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
+                fontSize: "0.88rem",
+                fontWeight: 500,
+                color: "rgba(246,244,239,0.85)",
+                margin: 0,
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {usuario?.nombre || roleLabel}
+            </p>
+            <p
+              style={{
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
+                fontSize: "0.68rem",
+                color: "rgba(246,244,239,0.38)",
+                margin: 0,
+              }}
+            >
+              {roleLabel}
+            </p>
           </div>
         </div>
 
-        <button onClick={logout} className="logout-btn" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(246,244,239,0.1)", background: "rgba(246,244,239,0.04)", color: "rgba(246,244,239,0.45)", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.85rem", cursor: "pointer", transition: "all 0.18s ease" }}>
+        <button
+          onClick={logout}
+          className="logout-btn"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            width: "100%",
+            padding: "10px",
+            borderRadius: 10,
+            border: "1px solid rgba(246,244,239,0.1)",
+            background: "rgba(246,244,239,0.04)",
+            color: "rgba(246,244,239,0.45)",
+            fontFamily: "var(--font-sans, Inter, sans-serif)",
+            fontSize: "0.85rem",
+            cursor: "pointer",
+            transition: "all 0.18s ease",
+          }}
+        >
           <LogOut size={16} className="logout-icon" />
           <span className="stella-nav-label">Cerrar sesión</span>
         </button>
