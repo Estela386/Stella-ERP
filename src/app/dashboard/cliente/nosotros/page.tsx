@@ -17,6 +17,7 @@ import ReviewCard, { Review } from "./_components/ReviewCard";
 import WholesaleSection from "./_components/WholesaleSection";
 import ChatbotPage from "@/app/chatbot/page";
 import Footer from "@/app/(auth)/_components/Footer";
+import MothersDayBanner from "@/app/_components/MothersDayBanner";
 
 const REVIEWS: Review[] = [
   {
@@ -66,6 +67,7 @@ export default function NosotrosPage() {
       <ChatbotPage />
       {/* ABOUT US CONTENT */}
       <div className="flex-1 max-w-6xl mx-auto px-4 py-8 md:py-16">
+        <MothersDayBanner />
         {/* Hero Section */}
         <div className="text-center mb-20 mt-10">
           <h2 className="text-3xl md:text-5xl font-extrabold text-[#708090] mb-6">

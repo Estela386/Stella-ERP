@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 interface ConfirmarVentaRequest {
   idUsuario: string;
   clienteId: number;
+  telefonoExpress?: string;
   productos: Array<{
     id_producto: number;
     cantidad: number;
@@ -20,8 +21,34 @@ interface ConfirmarVentaRequest {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as ConfirmarVentaRequest;
-    const { idUsuario, clienteId, productos, fecha, totalConIva, montoPagado } =
-      body;
+    let { idUsuario, clienteId, telefonoExpress, productos, fecha, totalConIva, montoPagado } = body;
+
+    const supabase = await createClient();
+
+    // --- LÓGICA DE CLIENTE INTELIGENTE ---
+    if (clienteId === -2 || clienteId === -1) {
+      if (clienteId === -2) {
+        // Público General
+        const { data: publicoData } = await supabase.from('cliente').select('id').ilike('nombre', 'Público General').limit(1).single();
+        if (publicoData) {
+          clienteId = publicoData.id;
+        } else {
+          const { data: newPublico, error: errPub } = await supabase.from('cliente').insert({ nombre: 'Público General', telefono: 'Sin Registro' }).select('id').single();
+          if (errPub) throw new Error("Error creando Público General: " + errPub.message);
+          clienteId = newPublico.id;
+        }
+      } else if (clienteId === -1 && telefonoExpress) {
+        // Venta por Teléfono
+        const { data: expressData } = await supabase.from('cliente').select('id').eq('telefono', telefonoExpress).limit(1).single();
+        if (expressData && expressData.id) {
+          clienteId = expressData.id;
+        } else {
+          const { data: newExpress, error: errExp } = await supabase.from('cliente').insert({ nombre: `Cliente ${telefonoExpress}`, telefono: telefonoExpress }).select('id').single();
+          if (errExp) throw new Error("Error creando cliente por teléfono: " + errExp.message);
+          clienteId = newExpress.id;
+        }
+      }
+    }
 
     // Validaciones
     if (!idUsuario || !clienteId || !productos || !fecha) {
@@ -39,7 +66,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear venta
-    const supabase = await createClient();
     const ventaService = new VentaService(supabase);
 
     const { venta, ventaId, error } = await ventaService.crear(
@@ -53,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     if (error || !venta) {
       return NextResponse.json(
-        { error: error || "Error al crear la venta" },
+        { error: error || "Error al crear la venta desde el servicio", details: error },
         { status: 500 }
       );
     }
@@ -68,10 +94,10 @@ export async function POST(request: NextRequest) {
       ventaId,
       success: true,
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error creating venta:", err);
     return NextResponse.json(
-      { error: "Error al crear la venta" },
+      { error: err.message || "Error al procesar la solicitud", details: err.stack },
       { status: 500 }
     );
   }

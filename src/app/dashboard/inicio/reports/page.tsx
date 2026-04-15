@@ -85,15 +85,15 @@ export default function ReportsPage() {
           usuario:id_usuario(*),
           detalles:detallesventas(
             cantidad,
-            subtotal,
-            producto:id_producto(nombre, id_categoria)
+            id_producto,
+            producto:id_producto(nombre, id_categoria, precio)
           )
         `)
         .order("fecha", { ascending: false });
 
       // Apply role filtering
       if (isMayorista && !isAdmin) {
-        query = query.eq('id_usuario', usuario.id_auth);
+        query = query.eq('id_usuario', usuario.id);
       }
 
       // Fetch Cuentas por cobrar
@@ -133,6 +133,12 @@ export default function ReportsPage() {
         prodQuery
       ]);
       
+      if (resVentas.error) console.error("Error fetching ventas:", resVentas.error);
+      if (resCuentas.error) console.error("Error fetching cuentas:", resCuentas.error);
+      if (resConsig.error) console.error("Error fetching consignaciones:", resConsig.error);
+      if (resCat.error) console.error("Error fetching categorias:", resCat.error);
+      if (resProd.error) console.error("Error fetching productos:", resProd.error);
+
       if (!resVentas.error && resVentas.data) setVentas(resVentas.data as IVenta[]);
       if (!resCuentas.error && resCuentas.data) setCuentasPorCobrar(resCuentas.data as ICuentasPorCobrar[]);
       if (!resConsig.error && resConsig.data) setConsignaciones(resConsig.data as IConsignacion[]);

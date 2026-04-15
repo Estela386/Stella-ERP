@@ -23,10 +23,14 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
   // Filter local state based on search over customer or ID, and status
   const filtered = useMemo(() => {
     return ventas.filter(v => {
+      // Get customer name for searching
+      const customerObj = (v as any).usuario;
+      const customerName = customerObj?.nombre || String(v.id_usuario || "");
+      
       // Search text match
       const searchMatch = 
         String(v.id).includes(search) || 
-        String(v.id_usuario || "").toLowerCase().includes(search.toLowerCase());
+        customerName.toLowerCase().includes(search.toLowerCase());
       
       // Status filter match
       const statusMatch = statusFilter === "todos" || v.estado === statusFilter;
@@ -215,7 +219,12 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
                   const sc = statusColors[v.estado] || { color: "#8A94A6", bg: "#F0F2F5" };
                   const fDate = v.fecha ? new Date(v.fecha).toLocaleDateString("es-MX", { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A";
                   const isExpanded = expandedRows.has(v.id);
-                  const hasDetails = v.detalles && v.detalles.length > 0;
+                  // Compatibilidad con ambos nombres de propiedad
+                  const items = v.detalles || (v as any).detallesventas;
+                  const hasDetails = items && items.length > 0;
+                  
+                  const customerObj = (v as any).usuario;
+                  const customerDisplay = customerObj?.nombre || (v.id_usuario === "guest" || !v.id_usuario ? "Cliente Foráneo" : `ID: ${v.id_usuario}`);
                   
                   return (
                     <React.Fragment key={v.id}>
@@ -239,7 +248,7 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
                           #{v.id}
                         </td>
                         <td style={{ padding: "16px 12px", fontFamily: "var(--font-poppins)", fontSize: "0.85rem", color: "#4B5563" }}>
-                          {v.id_usuario === "guest" || !v.id_usuario ? "Cliente Foráneo" : (v.id_usuario.length > 15 ? v.id_usuario.substring(0,15)+"..." : v.id_usuario)}
+                          {customerDisplay.length > 20 ? customerDisplay.substring(0,20)+"..." : customerDisplay}
                         </td>
                         <td style={{ padding: "16px 12px", fontFamily: "var(--font-sans)", fontSize: "0.85rem", color: "#64748B" }}>
                           {fDate}
@@ -278,8 +287,8 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {v.detalles?.map((det, i: number) => (
-                                      <tr key={i} style={{ borderBottom: i === (v.detalles?.length ?? 0) - 1 ? "none" : "1px solid #E2E8F0" }}>
+                                    {items?.map((det: any, i: number) => (
+                                      <tr key={i} style={{ borderBottom: i === (items?.length ?? 0) - 1 ? "none" : "1px solid #E2E8F0" }}>
                                         <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#2A2E34", fontFamily: "var(--font-poppins)" }}>
                                           {det.cantidad || 0}x
                                         </td>
@@ -287,7 +296,7 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
                                           {det.producto?.nombre || "Producto desconocido"}
                                         </td>
                                         <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#2A2E34", fontFamily: "var(--font-poppins)", textAlign: "right", fontWeight: 600 }}>
-                                          ${((det.cantidad || 0) * (det.producto?.precio || 0)).toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+                                          ${((Number(det.cantidad) || 0) * (Number(det.producto?.precio) || 0)).toLocaleString("es-MX", { minimumFractionDigits: 2 })}
                                         </td>
                                       </tr>
                                     ))}

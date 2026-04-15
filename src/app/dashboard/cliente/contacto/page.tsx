@@ -5,6 +5,7 @@ import HeaderClient from "@/app/(auth)/_components/HeaderClient";
 import Footer from "@/app/(auth)/_components/Footer";
 import ChatbotPage from "@/app/chatbot/page";
 import { useAuth } from "@/lib/hooks/useAuth";
+import MothersDayBanner from "@/app/_components/MothersDayBanner";
 import {
   MapPin,
   Clock,
@@ -105,11 +106,12 @@ export default function ContactoPage() {
       <main
         style={{
           flex: 1,
-          paddingTop: "clamp(40px, 8vw, 80px)",
+          paddingTop: "clamp(20px, 4vw, 40px)",
           paddingBottom: 80,
         }}
       >
         <div className="mx-auto" style={{ maxWidth: 1100, padding: "0 24px" }}>
+          <MothersDayBanner />
           {/* Hero Section */}
           <div
             className="text-center animate-fade-up"

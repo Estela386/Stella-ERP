@@ -13,6 +13,7 @@ import { createClient } from "@utils/supabase/client";
 import ChatbotPage from "@/app/chatbot/page";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Suspense } from "react";
+import MothersDayBanner from "@/app/_components/MothersDayBanner";
 
 // ─── Design tokens ────────────────────────────────────────
 const ROSE   = "#b76e79";
@@ -37,7 +38,28 @@ interface PriceRange {
 }
 
 // Colores fijos disponibles
-const COLORES = ["Blanco", "Rosa", "Dorado", "Plateado", "Negro", "Natural", "Multicolor"];
+const COLORES = [
+  "Blanco", "Rosa", "Dorado", "Plateado", "Negro", "Natural", "Multicolor",
+  "Rojo", "Azul", "Verde", "Morado", "Turquesa", "Esmeralda", "Rubí", "Ámbar"
+];
+
+const COLOR_UI_MAP: Record<string, string> = {
+  "Blanco": "#ffffff",
+  "Rosa": "#fbcfe8",
+  "Dorado": "#fde047",
+  "Plateado": "#e5e7eb",
+  "Negro": "#333333",
+  "Natural": "#fef3c7",
+  "Multicolor": "linear-gradient(45deg, #ff0000, #00ff00, #0000ff)",
+  "Rojo": "#fca5a5",
+  "Azul": "#93c5fd",
+  "Verde": "#86efac",
+  "Morado": "#d8b4fe",
+  "Turquesa": "#5eead4",
+  "Esmeralda": "#10b981",
+  "Rubí": "#e11d48",
+  "Ámbar": "#f59e0b"
+};
 
 // ─── Componente precio slider ──────────────────────────────
 function PriceRangeSlider({
@@ -195,27 +217,38 @@ function SidebarFilters({
       {filterConfigs.map(({ cat, opts }) => (
         <FilterSection key={cat} title={cat}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {opts.map((opt: string) => {
-              const sel = !!activeFilters.find(f => f.category === cat && f.value === opt);
-              return (
-                <button
-                  key={opt}
-                  onClick={() => toggleFilter(cat as FilterCategory, opt)}
-                  style={{ 
-                    padding: "6px 12px", borderRadius: 14, 
-                    background: sel ? "rgba(183,110,121,0.08)" : "transparent",
-                    border: sel ? `1.2px solid ${ROSE}` : "1.2px solid rgba(112,128,144,0.15)",
-                    color: sel ? ROSE : SLATE,
-                    fontFamily: "var(--font-sans)", fontSize: "0.78rem", 
-                    fontWeight: sel ? 600 : 400,
-                    cursor: "pointer", transition: "all 0.2s",
-                    whiteSpace: "nowrap"
-                  }}
-                >
-                  {opt}
-                </button>
-              );
-            })}
+                {opts.map((opt: string) => {
+                  const sel = !!activeFilters.find(f => f.category === cat && f.value === opt);
+                  const isColor = cat === "Color";
+                  const colorBg = isColor ? COLOR_UI_MAP[opt] : null;
+
+                  return (
+                    <button
+                      key={opt}
+                      onClick={() => toggleFilter(cat as FilterCategory, opt)}
+                      style={{ 
+                        display: "flex", alignItems: "center", gap: 6,
+                        padding: "6px 12px", borderRadius: 14, 
+                        background: sel ? "rgba(183,110,121,0.08)" : "transparent",
+                        border: sel ? `1.2px solid ${ROSE}` : "1.2px solid rgba(112,128,144,0.15)",
+                        color: sel ? ROSE : SLATE,
+                        fontFamily: "var(--font-sans)", fontSize: "0.78rem", 
+                        fontWeight: sel ? 600 : 400,
+                        cursor: "pointer", transition: "all 0.2s",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      {isColor && colorBg && (
+                        <span style={{ 
+                          width: 10, height: 10, borderRadius: "50%", 
+                          background: colorBg,
+                          border: opt === "Blanco" ? "1px solid rgba(0,0,0,0.1)" : "none"
+                        }} />
+                      )}
+                      {opt}
+                    </button>
+                  );
+                })}
           </div>
         </FilterSection>
       ))}
@@ -494,11 +527,43 @@ function CatalogContent() {
   const [priceRange, setPriceRange]   = useState<PriceRange>({ min: 0, max: 5000 });
   const [priceFilter, setPriceFilter] = useState<PriceRange | null>(null);
 
+  // Sincronizar parámetros de búsqueda especiales (Personalizada, Nuevos)
   useEffect(() => {
     const cat = searchParams.get("categoria");
     if (cat === "personalizada") setSortBy("Personalizables");
     else if (cat === "nuevos") setSortBy("Novedades");
   }, [searchParams]);
+
+  // Sincronizar filtros de categoría y material desde la URL
+  useEffect(() => {
+    if (categorias.length === 0 && materiales.length === 0) return;
+
+    const catParam = searchParams.get("categoria");
+    const matParam = searchParams.get("material");
+
+    let newFilters = [...activeFilters];
+    let changed = false;
+
+    if (catParam && !["personalizada", "nuevos"].includes(catParam)) {
+      const match = categorias.find(c => c.toLowerCase() === catParam.toLowerCase());
+      if (match && !newFilters.some(f => f.category === "Categoría" && f.value === match)) {
+        newFilters.push({ label: match, value: match, category: "Categoría" });
+        changed = true;
+      }
+    }
+
+    if (matParam) {
+      const match = materiales.find(m => m.toLowerCase() === matParam.toLowerCase());
+      if (match && !newFilters.some(f => f.category === "Material" && f.value === match)) {
+        newFilters.push({ label: match, value: match, category: "Material" });
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      setActiveFilters(newFilters);
+    }
+  }, [searchParams, categorias, materiales]);
 
   useEffect(() => {
     const load = async () => {
@@ -510,11 +575,19 @@ function CatalogContent() {
         setProductos(prods);
 
         if (prods.length > 0) {
+          // Precios
           const prices = prods.map(p => p.price || 0);
           const minP = Math.floor(Math.min(...prices) / 50) * 50;
           const maxP = Math.ceil(Math.max(...prices) / 50) * 50;
           setPriceRange({ min: minP, max: maxP });
           setPriceFilter({ min: minP, max: maxP });
+
+          // Derivar Categorías y Materiales de los productos REALES
+          const derivedCats = Array.from(new Set(prods.map(p => p.category).filter(Boolean))) as string[];
+          setCategorias(derivedCats.sort());
+
+          const derivedMats = Array.from(new Set(prods.flatMap(p => p.materiales || []).filter(Boolean))) as string[];
+          setMateriales(derivedMats.sort());
         }
       } catch {
         setError("Error al cargar productos");
@@ -525,51 +598,67 @@ function CatalogContent() {
     load();
   }, []);
 
-  useEffect(() => {
-    const loadFilters = async () => {
-      try {
-        const supabase = createClient();
-        const { data: cats } = await supabase.from("categoria").select("nombre").order("nombre");
-        if (cats) setCategorias(cats.map(c => c.nombre).filter(Boolean) as string[]);
-        const { data: mats } = await supabase.from("materiales").select("nombre").order("nombre");
-        if (mats) setMateriales(mats.map(m => m.nombre).filter(Boolean) as string[]);
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    loadFilters();
-  }, []);
-
   const filtered = useMemo(() => {
-    let r = [...productos];
-    if (searchTerm.trim()) {
-      const t = searchTerm.toLowerCase();
-      r = r.filter(p =>
-        p.name?.toLowerCase().includes(t) ||
-        (p as any).category?.toLowerCase().includes(t) ||
-        (p as any).descripcion?.toLowerCase().includes(t)
-      );
-    }
-    // Filtrado por categorías: OR dentro de la misma categoría, AND entre distintas
-    const groupedFilters = activeFilters.reduce((acc, f) => {
-      if (!acc[f.category]) acc[f.category] = [];
-      acc[f.category].push(f.value.toLowerCase());
-      return acc;
-    }, {} as Record<string, string[]>);
+    // 1. Calcular Puntuaciones de Similitud
+    const scored = productos.map(p => {
+      let score = 0;
+      const lowerName = p.name?.toLowerCase() || "";
+      const lowerDesc = (p as any).descripcion?.toLowerCase() || "";
+      const lowerCat  = (p as any).category?.toLowerCase() || "";
+      const lowerMats = (p.materiales || []).map(m => m.toLowerCase());
+      
+      // Filtro de texto (Search Term)
+      if (searchTerm.trim()) {
+        const t = searchTerm.trim().toLowerCase();
+        if (lowerName.includes(t)) score += 50;
+        if (lowerCat.includes(t)) score += 30;
+        if (lowerDesc.includes(t)) score += 10;
+      }
 
-    Object.entries(groupedFilters).forEach(([category, values]) => {
-      r = r.filter(p => {
-        if (category === "Categoría") return values.includes((p as any).category?.toLowerCase());
-        if (category === "Material") return p.materiales?.some(m => values.includes(m.toLowerCase()));
-        if (category === "Color") return values.some(v => p.name?.toLowerCase().includes(v) || (p as any).descripcion?.toLowerCase().includes(v));
-        return true;
+      // Filtros activos (OR inclusivo con Scoring)
+      activeFilters.forEach(f => {
+        const val = f.value.toLowerCase();
+        if (f.category === "Categoría" && lowerCat === val) score += 40;
+        if (f.category === "Material" && lowerMats.includes(val)) score += 40;
+        if (f.category === "Color") {
+          const textMatches = lowerName.includes(val) || lowerDesc.includes(val);
+          const optMatches = p.opciones?.some(opt => 
+            (opt.tipo === "color" || opt.tipo === "bubbles") && 
+            opt.valores.some(v => v.valor.toLowerCase().includes(val))
+          );
+          if (textMatches || optMatches) score += 40;
+        }
       });
+
+      // Filtro de Precio (Actúa como multiplicador negativo si está fuera de rango para ocultar)
+      if (priceFilter) {
+        const pPrice = p.price || 0;
+        if (pPrice < priceFilter.min || pPrice > priceFilter.max) score = -1;
+      }
+
+      return { ...p, _score: score };
     });
-    if (priceFilter) r = r.filter(p => (p.price || 0) >= priceFilter.min && (p.price || 0) <= priceFilter.max);
-    if (sortBy === "Precio: Menor a Mayor") r.sort((a, b) => (a.price || 0) - (b.price || 0));
-    else if (sortBy === "Precio: Mayor a Menor") r.sort((a, b) => (b.price || 0) - (a.price || 0));
-    else if (sortBy === "Personalizables") r = r.filter(p => p.es_personalizable);
-    else if (sortBy === "Novedades") r.sort((a, b) => b.id - a.id);
+
+    // 2. Filtrar y Ordenar por Relevancia
+    let r = activeFilters.length > 0 || searchTerm.trim() 
+      ? scored.filter(p => p._score > 0)
+      : scored.filter(p => p._score >= 0);
+
+    // 3. Aplicar Ordenamientos adicionales
+    r.sort((a, b) => {
+      // Primero por score (similitud)
+      if (b._score !== a._score) return b._score - a._score;
+      
+      // Luego por el criterio del usuario
+      if (sortBy === "Precio: Menor a Mayor") return (a.price || 0) - (b.price || 0);
+      if (sortBy === "Precio: Mayor a Menor") return (b.price || 0) - (a.price || 0);
+      if (sortBy === "Novedades") return b.id - a.id;
+      return 0;
+    });
+
+    // Filtro especial fuera del scoring para consistencia
+    if (sortBy === "Personalizables") r = r.filter(p => p.es_personalizable);
+
     return r;
   }, [productos, searchTerm, activeFilters, priceFilter, sortBy]);
 
@@ -632,6 +721,9 @@ function CatalogContent() {
 
             {/* 2. AREA DE PRODUCTOS */}
             <div className="flex-1 min-w-0">
+              
+              {/* BANNER DE CAMPAÑA */}
+              <MothersDayBanner />
               
               {/* BARRA SUPERIOR SIMPLIFICADA */}
               <div 

@@ -11,6 +11,7 @@ import FaqCategories from "./_components/FaqCategories";
 import FaqAccordion from "./_components/FaqAccordion";
 import FaqLocation from "./_components/FaqLocation";
 import FaqWholesale from "./_components/FaqWholesale";
+import MothersDayBanner from "@/app/_components/MothersDayBanner";
 
 import {
   Package,
@@ -1004,6 +1005,8 @@ export default function FaqPage() {
         <HeaderClient user={usuario} />
       </Suspense>
       <ChatbotPage />
+
+      <MothersDayBanner />
 
       {/* Hero */}
       <FaqHero />

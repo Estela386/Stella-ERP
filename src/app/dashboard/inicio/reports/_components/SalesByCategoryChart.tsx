@@ -15,14 +15,17 @@ export default function SalesByCategoryChart({ ventas, categorias, title, subtit
     const categoryMap: Record<string, number> = {};
 
     ventas.forEach((v) => {
-      if (v.detalles && Array.isArray(v.detalles)) {
-        v.detalles.forEach((det: any) => {
+      // Intentar obtener detalles tanto de 'detalles' como de 'detallesventas' por si acaso
+      const items = v.detalles || (v as any).detallesventas;
+      if (items && Array.isArray(items)) {
+        items.forEach((det: any) => {
           const catId = det.producto?.id_categoria;
-          const qty = det.cantidad || 0;
+          const qty = Number(det.cantidad) || 0;
           
           let catName = "Sin Categoría";
-          if (catId) {
-            const found = categorias.find(c => c.id === catId);
+          if (catId !== undefined && catId !== null) {
+            // Comparación robusta por si vienen como string/number mezclados
+            const found = categorias.find(c => String(c.id) === String(catId));
             if (found && found.nombre) catName = found.nombre;
           }
           

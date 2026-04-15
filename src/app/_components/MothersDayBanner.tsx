@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Clock, Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, Clock, ArrowRight, Gem } from "lucide-react";
 
 interface Campana {
   id: number;
@@ -48,34 +48,29 @@ function useCountdown(fechaFin: string): TimeLeft {
 
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-0.5">
       <div
-        className="relative overflow-hidden countdown-box"
+        className="relative overflow-hidden group"
         style={{
-          background: "rgba(255,255,255,0.12)",
-          border: "1px solid rgba(255,255,255,0.2)",
+          background: "rgba(255, 255, 255, 0.45)",
+          border: "1px solid rgba(255, 255, 255, 0.6)",
           borderRadius: 12,
-          padding: "clamp(6px, 1.5vw, 14px) clamp(10px, 2vw, 20px)",
-          minWidth: "clamp(42px, 7vw, 68px)",
+          padding: "clamp(6px, 1vw, 10px) clamp(10px, 1.5vw, 15px)",
+          minWidth: "clamp(44px, 6vw, 65px)",
           textAlign: "center",
-          backdropFilter: "blur(8px)",
+          backdropFilter: "blur(10px)",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
         }}
       >
-        {/* shimmer */}
-        <div
-          className="shimmer-line"
-          style={{
-            position: "absolute", inset: 0, borderRadius: 12, pointerEvents: "none",
-          }}
-        />
         <span
           style={{
             fontFamily: "var(--font-marcellus), 'Marcellus', serif",
-            fontSize: "clamp(1.4rem, 4vw, 2.2rem)",
+            fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
             fontWeight: 400,
-            color: "#fff",
+            color: "#4a5568", 
             lineHeight: 1,
             display: "block",
+            letterSpacing: "-0.01em"
           }}
         >
           {String(value).padStart(2, "0")}
@@ -84,11 +79,11 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
       <span
         style={{
           fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-          fontSize: "clamp(0.55rem, 1.5vw, 0.65rem)",
+          fontSize: "0.55rem",
           fontWeight: 600,
-          letterSpacing: "0.18em",
+          letterSpacing: "0.15em",
           textTransform: "uppercase",
-          color: "rgba(255,255,255,0.65)",
+          color: "rgba(74, 85, 104, 0.6)",
         }}
       >
         {label}
@@ -115,270 +110,213 @@ export default function MothersDayBanner() {
 
   if (!mounted || !campana || isExpired) return null;
 
+  // Design Tokens
+  const ROSE = "#b76e79";
+  const BEIGE = "#f6f4ef";
+
   return (
     <AnimatePresence>
       <motion.section
-        key="mothers-day-banner"
-        initial={{ opacity: 0, y: -20, scale: 0.98 }}
+        key="compact-striking-banner"
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        exit={{ opacity: 0, y: -20, scale: 0.98 }}
+        whileHover={{ y: -4, boxShadow: "0 30px 60px rgba(183, 110, 121, 0.15)" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         style={{
           position: "relative",
           overflow: "hidden",
-          borderRadius: "clamp(16px, 2.5vw, 28px)",
-          marginBottom: "clamp(24px, 3vw, 40px)",
-          // Fondo cálido con paleta Stella + Imagen opcional
-          background: campana.url_imagen 
-            ? `linear-gradient(135deg, rgba(45,55,72,0.92) 0%, rgba(74,85,104,0.85) 40%, rgba(183,110,121,0.7) 100%), url(${campana.url_imagen})`
-            : "linear-gradient(135deg, #2d3748 0%, #4a5568 40%, #b76e79 100%)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          boxShadow: "0 20px 60px rgba(183,110,121,0.25), 0 4px 16px rgba(74,85,104,0.3)",
-          minHeight: "clamp(240px, 30vw, 340px)",
+          borderRadius: "clamp(20px, 3vw, 32px)",
+          marginBottom: "clamp(20px, 4vw, 32px)",
+          // Altura compacta
+          minHeight: "clamp(180px, 22vw, 240px)",
+          background: BEIGE,
           display: "flex",
           alignItems: "center",
+          cursor: "pointer",
+          border: "1px solid rgba(183, 110, 121, 0.12)",
+          boxShadow: "0 15px 40px rgba(112, 128, 144, 0.06)",
         }}
+        onClick={() => router.push(campana.cta_href || "/productos")}
       >
-        {/* ── Background decorations ── */}
-        {/* Left blot */}
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: "radial-gradient(ellipse 60% 80% at 10% 50%, rgba(246,244,239,0.06) 0%, transparent 70%)",
-        }} />
-        {/* Right rose glow */}
-        <div style={{
-          position: "absolute", top: -60, right: -60, width: 320, height: 320,
-          borderRadius: "50%", background: "rgba(183,110,121,0.22)", pointerEvents: "none",
-          filter: "blur(40px)",
-        }} />
-        {/* Bottom sage tint */}
-        <div style={{
-          position: "absolute", bottom: -40, left: "20%", width: 280, height: 200,
-          borderRadius: "50%", background: "rgba(140,151,104,0.12)", pointerEvents: "none",
-          filter: "blur(50px)",
-        }} />
-        {/* Dot pattern overlay */}
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          backgroundImage: "radial-gradient(circle, rgba(246,244,239,0.07) 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }} />
+        {/* ── 1. Animated Mesh Background ── */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none" }}>
+          {/* Layer 1: Base Linear Gradient */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, #f6f4ef 0%, #fff 50%, #fdfbf7 100%)" }} />
 
-        {/* ── Floating hearts ── */}
-        {["10%", "30%", "55%", "75%", "90%"].map((left, i) => (
-          <motion.div
-            key={i}
+          {/* Layer 2: Moving Radial Blurs */}
+          <motion.div 
+            animate={{ 
+              x: [0, 100, 0, -100, 0], 
+              y: [0, -50, 50, -50, 0],
+              scale: [1, 1.2, 0.9, 1.1, 1]
+            }} 
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
             style={{
-              position: "absolute",
-              left,
-              top: `${15 + (i % 3) * 20}%`,
-              pointerEvents: "none",
-              opacity: 0.12 + i * 0.03,
+              position: "absolute", top: "10%", left: "20%", width: "60%", height: "80%",
+              background: "radial-gradient(circle, rgba(183, 110, 121, 0.1) 0%, transparent 60%)",
+              filter: "blur(60px)",
             }}
-            animate={{ y: [0, -12, 0], rotate: [0, 8, -8, 0] }}
-            transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }}
-          >
-            <Heart size={14 + i * 4} fill="rgba(246,244,239,0.8)" color="rgba(246,244,239,0.8)" />
-          </motion.div>
-        ))}
+          />
+          <motion.div 
+            animate={{ 
+              x: [0, -80, 80, -40, 0], 
+              y: [0, 60, -60, 40, 0],
+              scale: [1, 0.8, 1.3, 0.9, 1]
+            }} 
+            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            style={{
+              position: "absolute", bottom: "10%", right: "10%", width: "50%", height: "70%",
+              background: "radial-gradient(circle, rgba(140, 151, 104, 0.08) 0%, transparent 60%)",
+              filter: "blur(60px)",
+            }}
+          />
 
-        {/* ── Content ── */}
+          {/* Layer 3: Noise Texture Overlay */}
+          <div style={{
+            position: "absolute", inset: 0, opacity: 0.04, mixBlendMode: "multiply", pointerEvents: "none",
+            backgroundImage: `url("https://www.transparenttextures.com/patterns/felt.png")`, // Sutil textura de grano
+          }} />
+
+          {/* Layer 4: Shimmer Sweep Animation */}
+          <motion.div
+            initial={{ x: "-150%" }}
+            animate={{ x: "250%" }}
+            transition={{ duration: 3, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
+            style={{
+              position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 5,
+              background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)",
+              transform: "skewX(-25deg)",
+              pointerEvents: "none"
+            }}
+          />
+        </div>
+
+        {/* ── 2. Decorative Image (If exists) ── */}
+        {campana.url_imagen && (
+          <div style={{
+            position: "absolute", right: 0, top: 0, bottom: 0, width: "45%",
+            zIndex: 1, pointerEvents: "none",
+            maskImage: "linear-gradient(to left, black 60%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to left, black 60%, transparent 100%)",
+          }}>
+            <img 
+              src={campana.url_imagen} 
+              alt="" 
+              style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+            />
+          </div>
+        )}
+
+        {/* ── 3. Content ── */}
         <div style={{
-          position: "relative", zIndex: 10,
-          width: "100%",
-          padding: "clamp(24px, 4vw, 48px) clamp(16px, 5vw, 56px)",
+          position: "relative", zIndex: 10, width: "100%",
+          padding: "clamp(20px, 3vw, 32px) clamp(24px, 5vw, 64px)",
           display: "grid",
           gridTemplateColumns: "1fr auto",
-          gap: "clamp(20px, 4vw, 48px)",
+          gap: "24px",
           alignItems: "center",
-        }}
-          className="banner-grid"
-        >
-          {/* Left — Text */}
-          <div>
-            {/* "Tiempo limitado" badge */}
+        }} className="banner-compact-grid">
+          
+          {/* Left Side: Info */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                background: "rgba(255,255,255,0.12)",
-                border: "1px solid rgba(255,255,255,0.22)",
-                borderRadius: 100,
-                padding: "4px 14px 4px 10px",
-                marginBottom: "clamp(10px, 2vw, 18px)",
-              }}
+              initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+              style={{ display: "flex", alignItems: "center", gap: 6 }}
             >
-              <Clock size={12} color="rgba(246,244,239,0.9)" />
+              <div style={{ width: 12, height: 1.5, background: ROSE }} />
               <span style={{
                 fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontSize: "0.62rem",
-                fontWeight: 600,
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                color: "rgba(246,244,239,0.9)",
+                fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.25em",
+                textTransform: "uppercase", color: ROSE
               }}>
-                Tiempo limitado
+                {campana.tipo_promocion || "Solo por hoy"}
               </span>
             </motion.div>
 
-            {/* Título principal */}
             <motion.h2
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               style={{
                 fontFamily: "var(--font-marcellus), 'Marcellus', serif",
-                fontSize: "clamp(1.6rem, 4.5vw, 3.4rem)",
-                fontWeight: 400,
-                color: "#ffffff",
-                lineHeight: 1.12,
-                marginBottom: "clamp(8px, 1.5vw, 14px)",
-                letterSpacing: "-0.01em",
+                fontSize: "clamp(1.5rem, 3.5vw, 2.8rem)",
+                fontWeight: 400, color: "#4a5568", lineHeight: 1.1, margin: 0,
+                letterSpacing: "-0.02em"
               }}
             >
-              {campana.titulo.includes("💖")
-                ? <>
-                    {campana.titulo.replace("💖", "").trim()}{" "}
-                    <span style={{ color: "#f6c5cb", fontStyle: "italic" }}>💖</span>
-                  </>
-                : campana.titulo
-              }
+              {campana.titulo}
             </motion.h2>
 
-            {/* Subtítulo */}
             <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.55 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
               style={{
                 fontFamily: "var(--font-lora), 'Lora', serif",
-                fontStyle: "italic",
-                fontSize: "clamp(0.88rem, 2vw, 1.1rem)",
-                color: "rgba(246,244,239,0.75)",
-                marginBottom: "clamp(16px, 3vw, 28px)",
-                lineHeight: 1.5,
+                fontStyle: "italic", fontSize: "clamp(0.85rem, 1.5vw, 1.05rem)",
+                color: "#708090", margin: 0, opacity: 0.9, maxWidth: "400px"
               }}
             >
               {campana.subtitulo}
             </motion.p>
-
-            {/* CTA Button */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, duration: 0.4 }}
-              whileHover={{ scale: 1.04, boxShadow: "0 12px 32px rgba(246,244,239,0.25), 0 0 0 4px rgba(246,244,239,0.1)" }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => router.push(campana.cta_href || "/productos")}
-              style={{
-                background: "#f6f4ef",
-                color: "#b76e79",
-                border: "none",
-                borderRadius: 100,
-                padding: "clamp(12px, 1.5vw, 15px) clamp(24px, 3vw, 36px)",
+            
+            <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{
                 fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontSize: "clamp(0.8rem, 1.5vw, 0.9rem)",
-                fontWeight: 700,
-                letterSpacing: "0.04em",
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                boxShadow: "0 6px 24px rgba(0,0,0,0.15)",
-                transition: "all 0.25s ease",
-                position: "relative",
-                overflow: "hidden",
-                width: "fit-content"
-              }}
-            >
-              {/* Shimmer en botón */}
-              <span
-                className="shimmer-line"
-                style={{
-                  position: "absolute", inset: 0, borderRadius: 100, pointerEvents: "none",
-                }}
-              />
-              <Sparkles size={15} />
-              <span style={{ position: "relative", zIndex: 1 }}>
-                {campana.cta_texto || "Ver regalos"}
+                fontSize: "0.8rem", fontWeight: 700, color: ROSE,
+                letterSpacing: "0.05em", borderBottom: `1.5px solid ${ROSE}`,
+                paddingBottom: 2, display: "flex", alignItems: "center", gap: 8
+              }}>
+                {campana.cta_texto || "Ver más"}
+                <ArrowRight size={14} />
               </span>
-              <ArrowRight size={15} />
-            </motion.button>
+            </div>
           </div>
 
-          {/* Right — Countdown */}
+          {/* Right Side: Simple Countdown */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.45, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="banner-countdown"
+            initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
             style={{
+              background: "rgba(255, 255, 255, 0.4)",
+              border: "1px solid rgba(255, 255, 255, 0.7)",
+              borderRadius: 24,
+              padding: "clamp(12px, 2vw, 20px) clamp(16px, 2.5vw, 24px)",
+              backdropFilter: "blur(12px)",
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
-              gap: "clamp(8px, 1.5vw, 14px)",
+              gap: 12,
+              alignItems: "center"
             }}
+            className="compact-countdown"
           >
-            {/* Heart icon */}
-            <motion.div
-              animate={{ scale: [1, 1.15, 1] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Heart size={28} fill="#f6c5cb" color="#f6c5cb" />
-            </motion.div>
-
-            {/* Timer grid */}
-            <div style={{ display: "flex", gap: "clamp(6px, 1.5vw, 10px)", alignItems: "flex-start" }}>
-              <CountdownUnit value={timeLeft.dias}     label="Días" />
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "1.5rem", marginTop: "clamp(4px, 1vw, 8px)", lineHeight: 1 }}>:</span>
-              <CountdownUnit value={timeLeft.horas}    label="Horas" />
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "1.5rem", marginTop: "clamp(4px, 1vw, 8px)", lineHeight: 1 }}>:</span>
-              <CountdownUnit value={timeLeft.minutos}  label="Min" />
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "1.5rem", marginTop: "clamp(4px, 1vw, 8px)", lineHeight: 1 }}>:</span>
-              <CountdownUnit value={timeLeft.segundos} label="Seg" />
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Clock size={12} color="#708090" />
+              <span style={{
+                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                fontSize: "0.6rem", fontWeight: 600, letterSpacing: "0.1em",
+                textTransform: "uppercase", color: "#708090"
+              }}>
+                Termina en:
+              </span>
             </div>
 
-            <p style={{
-              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-              fontSize: "0.6rem",
-              fontWeight: 500,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "rgba(246,244,239,0.45)",
-              textAlign: "center",
-            }}>
-              La oferta termina el 10 de mayo
-            </p>
+            <div style={{ display: "flex", gap: 8 }}>
+              <CountdownUnit value={timeLeft.dias}     label="D" />
+              <CountdownUnit value={timeLeft.horas}    label="H" />
+              <CountdownUnit value={timeLeft.minutos}  label="M" />
+              <CountdownUnit value={timeLeft.segundos} label="S" />
+            </div>
           </motion.div>
         </div>
 
-        {/* Responsive tweaks */}
+        {/* CSS TWEAKS */}
         <style>{`
           @media (max-width: 768px) {
-            .banner-grid {
+            .banner-compact-grid {
               grid-template-columns: 1fr !important;
               text-align: center;
               justify-items: center;
-              gap: 32px !important;
             }
-            .banner-countdown {
+            .compact-countdown {
               transform: scale(0.9);
             }
-          }
-          @media (max-width: 480px) {
-             .countdown-box {
-                padding: 6px 10px !important;
-                min-width: 44px !important;
-             }
-             .banner-countdown {
-                transform: scale(0.85);
-             }
           }
         `}</style>
       </motion.section>

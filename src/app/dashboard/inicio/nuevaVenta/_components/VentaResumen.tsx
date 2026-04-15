@@ -39,24 +39,24 @@ export default function VentaResumen({
   const iva = subtotalNeto * 0.16;
   const total = subtotalNeto + iva;
 
+  const esVentaRapida = !cliente || cliente.id === -1 || cliente.id === -2;
+
   const generarTicketYConfirmar = async () => {
     if (productos.length === 0) return;
-    if (!cliente) {
-      setError("Selecciona un cliente");
-      return;
-    }
 
     // Validar monto a pagar
-    const montoAlPagar = montoPagado ? parseFloat(montoPagado) : 0;
-    if (montoAlPagar < 0) {
-      setError("El monto a pagar no puede ser negativo");
-      return;
-    }
-    if (montoAlPagar > total) {
-      setError(
-        `El monto a pagar no puede ser mayor al total ($${total.toFixed(2)})`
-      );
-      return;
+    const montoAlPagar = esVentaRapida ? total : (montoPagado ? parseFloat(montoPagado) : 0);
+    if (!esVentaRapida) {
+      if (montoAlPagar < 0) {
+        setError("El monto a pagar no puede ser negativo");
+        return;
+      }
+      if (montoAlPagar > total) {
+        setError(
+          `El monto a pagar no puede ser mayor al total ($${total.toFixed(2)})`
+        );
+        return;
+      }
     }
 
     setLoading(true);
@@ -66,7 +66,8 @@ export default function VentaResumen({
       // 1. Confirmar venta en BD
       const ventaData = {
         idUsuario,
-        clienteId: cliente.id,
+        clienteId: cliente?.id ?? -2,
+        telefonoExpress: cliente?.id === -1 ? cliente.telefono : undefined,
         productos: productos.map(p => ({
           id_producto: p.id,
           cantidad: p.cantidad,
@@ -91,7 +92,7 @@ export default function VentaResumen({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Error al confirmar la venta");
+        throw new Error(result.error || result.details || "Error al confirmar la venta");
       }
 
       const ventaId = result.ventaId;
@@ -204,7 +205,7 @@ export default function VentaResumen({
         y += 5;
 
         doc.setFont("helvetica", "normal");
-        const montoAlPagar = montoPagado ? parseFloat(montoPagado) : 0;
+        // Asegurarse de usar montoAlPagar real
         const deudaPendiente = total - montoAlPagar;
 
         doc.text("Monto Pagado:", 8, y);
@@ -303,7 +304,7 @@ export default function VentaResumen({
       {/* Input de monto a pagar */}
       <div className="border-t-2 border-[#8C9796]/20 pt-4">
         <label className="block text-sm font-medium text-[#708090] mb-2">
-          Monto a Pagar (Opcional)
+          Monto a Pagar {esVentaRapida ? "(Exhibición única)" : "(Opcional)"}
         </label>
         <div className="relative">
           <span className="absolute left-3 top-3 text-[#708090] font-semibold">
@@ -311,19 +312,25 @@ export default function VentaResumen({
           </span>
           <input
             type="number"
-            value={montoPagado}
+            value={esVentaRapida ? total.toFixed(2) : montoPagado}
+            disabled={esVentaRapida}
             onChange={e => {
+              if (esVentaRapida) return;
               const value = e.target.value;
               const numValue = value ? parseFloat(value) : 0;
               if (numValue <= total || value === "") {
                 setMontoPagado(value);
               }
             }}
-            placeholder="0.00"
+            placeholder={total.toFixed(2)}
             max={total}
             min="0"
             step="0.01"
-            className="w-full pl-8 pr-4 py-2 border-2 border-[#8C9796]/30 rounded-lg focusing:border-[#B76E79] focus:outline-none text-[#708090] cursor-pointer"
+            className={`w-full pl-8 pr-4 py-2 border-2 rounded-lg focus:outline-none transition-colors ${
+              esVentaRapida 
+                ? "border-[#EAE7E1] bg-[#F6F4EF] text-[#8C9796] cursor-not-allowed font-semibold" 
+                : "border-[#8C9796]/30 bg-white text-[#708090] focusing:border-[#B76E79] cursor-pointer"
+            }`}
           />
         </div>
         {montoPagado && parseFloat(montoPagado) > 0 && (

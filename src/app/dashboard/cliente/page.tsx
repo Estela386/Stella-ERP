@@ -14,6 +14,7 @@ import NewsletterSection     from "./_components/NewsletterSection";      // Lea
 import Footer                from "@auth/_components/Footer";
 import { useAuth }           from "@/lib/hooks/useAuth";
 
+
 export default function ClientDashboard() {
   const { usuario } = useAuth();
 
@@ -23,6 +24,8 @@ export default function ClientDashboard() {
       <Suspense fallback={<div style={{ height: 60 }} />}>
         <HeaderClient user={usuario} />
       </Suspense>
+
+
 
       {/* 2. ATRACCIÓN: El Hero inmersivo que más te gustaba */}
       <HeroSection />

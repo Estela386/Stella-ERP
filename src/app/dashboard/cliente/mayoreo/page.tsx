@@ -4,18 +4,16 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import HeaderClient from "@/app/(auth)/_components/HeaderClient";
 import Footer from "@/app/(auth)/_components/Footer";
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import { 
-  Users, 
   FileText, 
   Package, 
   BadgePercent, 
   Download, 
   Send, 
-  ChevronRight,
   Sparkles,
   ShoppingBag,
-  Clock,
-  MapPin,
   CheckCircle2
 } from "lucide-react";
 import WholesaleCatalogModal from "./_components/WholesaleCatalogModal";
@@ -119,7 +117,7 @@ export default function WholesalePage() {
             <div style={adminSectionLabelStyle}>
               <span style={adminBadgeStyle}>VISTA DE PROSPECTO (CLIENTE)</span>
             </div>
-            <ProspectLanding />
+            <ProspectLanding onCatalogClick={() => setIsCatalogModalOpen(true)} />
             
             <div style={{ ...adminSectionLabelStyle, borderTop: `1px dashed ${STYLES.rose}`, paddingTop: 100 }}>
               <span style={adminBadgeStyle}>VISTA DE SOCIO ACTIVO (MAYORISTA)</span>
@@ -127,7 +125,7 @@ export default function WholesalePage() {
             <WholesalerDashboard onDownloadClick={() => setIsCatalogModalOpen(true)} />
           </div>
         ) : (
-          role === "active" ? <WholesalerDashboard onDownloadClick={() => setIsCatalogModalOpen(true)} /> : <ProspectLanding />
+          role === "active" ? <WholesalerDashboard onDownloadClick={() => setIsCatalogModalOpen(true)} /> : <ProspectLanding onCatalogClick={() => setIsCatalogModalOpen(true)} />
         )}
 
         <WholesaleCatalogModal 
@@ -206,7 +204,7 @@ function WholesalerDashboard({ onDownloadClick }: { onDownloadClick: () => void 
 }
 
 // ── COMPONENTE PARA PROSPECTO (ROL 2) ─────────────────────────
-function ProspectLanding() {
+function ProspectLanding({ onCatalogClick }: { onCatalogClick: () => void }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 80 }}>
       {/* Beneficios Grid */}
@@ -251,24 +249,99 @@ function ProspectLanding() {
           lineHeight: 1.6
         }}>Déjanos tus datos y un asesor de Stella se pondrá en contacto contigo para explicarte el programa de socios.</p>
         
-        <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
-          <button style={{
-            ...primaryButtonStyle,
-            padding: "18px 40px",
-            fontSize: "0.9rem",
-          }}>
-            Quiero más información <Send size={16} />
-          </button>
-          <button style={{
-            ...secondaryButtonStyle,
-            padding: "18px 40px",
-            fontSize: "0.9rem",
-          }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", marginBottom: 60 }}>
+          <Link href="/dashboard/cliente/faq#mayoreo" style={{ textDecoration: "none" }}>
+            <button style={{
+              ...primaryButtonStyle,
+              padding: "18px 40px",
+              fontSize: "0.9rem",
+            }}>
+              Quiero más información <Send size={16} />
+            </button>
+          </Link>
+          <button 
+            onClick={onCatalogClick}
+            style={{
+              ...secondaryButtonStyle,
+              padding: "18px 40px",
+              fontSize: "0.9rem",
+            }}
+          >
             Ver catálogo actual
           </button>
         </div>
+
+        {/* --- ANUNCIO ANIMADO DE REGISTRO --- */}
+        <Link href="/dashboard/cliente/nosotros#unete-como-mayorista" style={{ textDecoration: "none" }}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            style={{
+              background: "linear-gradient(135deg, #708090 0%, #4a5568 100%)",
+              borderRadius: 24,
+              padding: "40px",
+              position: "relative",
+              overflow: "hidden",
+              boxShadow: "0 25px 50px -12px rgba(140, 151, 104, 0.4)",
+              cursor: "pointer"
+            }}
+          >
+          {/* Brillo animado (Sweep effect) */}
+          <motion.div
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "40%",
+              height: "100%",
+              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
+              transform: "skewX(-25deg)"
+            }}
+          />
+
+          <div style={{ position: "relative", zIndex: 1, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
+            <div>
+              <h3 style={{ 
+                fontFamily: "var(--font-serif, 'Cormorant Garamond', serif)", 
+                fontSize: "2rem", 
+                color: "#f6f4ef",
+                marginBottom: 8,
+                fontStyle: "italic"
+              }}>
+                ¿Lista para ser socia comercial?
+              </h3>
+              <p style={{ color: "rgba(246, 244, 239, 0.8)", fontSize: "0.95rem" }}>
+                Forma parte de la familia Stella y accede a precios exclusivos y consignación.
+              </p>
+            </div>
+
+            <motion.button
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              style={{
+                background: STYLES.rose,
+                color: "#fff",
+                border: "none",
+                padding: "16px 32px",
+                borderRadius: 40,
+                fontWeight: 700,
+                fontSize: "1rem",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                boxShadow: "0 10px 20px rgba(183, 110, 121, 0.3)"
+              }}
+            >
+              ÚNETE COMO MAYORISTA <Sparkles size={18} />
+            </motion.button>
+          </div>
+        </motion.div>
+      </Link>
       </div>
-    </div>
+      </div>
   );
 }
 

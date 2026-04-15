@@ -73,7 +73,7 @@ export default function WholesaleSection({ usuarioId }: WholesaleSectionProps = 
   };
 
   return (
-    <div className="mt-24 mb-16">
+    <div id="unete-como-mayorista" className="mt-24 mb-16">
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-5xl font-extrabold text-[#708090] mb-4">
           Únete como <span className="text-[#b76e79]">Mayorista</span>

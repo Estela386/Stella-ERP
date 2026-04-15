@@ -32,10 +32,16 @@ export async function obtenerProductosCatalogo(): Promise<{
       name: p.nombre || "Producto",
       price: p.precio || 0,
       image: p.url_imagen || p.nombre || "Producto",
-      category: p.nombre?.split(" ")[0] || undefined,
+      category: (p as any).categoria?.nombre || undefined,
       rating: 5,
       materiales: p.producto_material?.map((pm: any) => pm.materiales?.nombre).filter(Boolean) || [],
       es_personalizable: !!(p as any).es_personalizable,
+      opciones: (p as any).opciones?.map((o: any) => ({
+        id: o.id,
+        nombre: o.nombre,
+        tipo: o.tipo,
+        valores: (o.valores || []).map((v: any) => ({ valor: v.valor })),
+      })) || [],
       created_at: (p as any).created_at as string,
     }));
 
@@ -80,11 +86,11 @@ export async function buscarProductosCatalogo(termino: string): Promise<{
       name: p.nombre || "Producto",
       price: p.precio || 0,
       image: p.url_imagen || p.nombre || "Producto",
-      category: p.nombre?.split(" ")[0] || undefined,
+      category: (p as any).categoria?.nombre || undefined,
       rating: 5,
       materiales: p.producto_material?.map((pm: any) => pm.materiales?.nombre).filter(Boolean) || [],
-      es_personalizable: (p as any).es_personalizable ?? false,
-      created_at: (p as any).created_at,
+      es_personalizable: !!(p as any).es_personalizable,
+      created_at: (p as any).created_at as string,
     }));
 
     return { productos: productosFormatted, error: null };
@@ -171,9 +177,19 @@ export async function obtenerProductosMayoreo(): Promise<{
       costo_mayorista: p.costo_mayorista || (p.precio ? p.precio * 0.7 : 0),
       descripcion: p.descripcion || "",
       image: p.url_imagen || "",
-      category: p.nombre?.split(" ")[0] || undefined,
-      materiales: p.producto_material?.map((pm: any) => pm.materiales?.nombre).filter(Boolean) || [],
+      category: (p as any).categoria?.nombre || undefined,
+      materiales: (p as any).producto_material
+        ?.map((pm: any) => pm.materiales?.nombre)
+        .filter(Boolean) || [],
       es_personalizable: p.es_personalizable ?? false,
+      opciones: (p as any).opciones?.map((o: any) => ({
+        id: o.id,
+        nombre: o.nombre,
+        tipo: o.tipo,
+        valores: (o.valores || []).map((v: any) => ({ valor: v.valor })),
+      })) || [],
+      stock_actual: p.stock_actual ?? undefined,
+      stock_min: p.stock_min ?? undefined,
       created_at: (p as any).created_at,
     }));
 
@@ -186,4 +202,5 @@ export async function obtenerProductosMayoreo(): Promise<{
     };
   }
 }
+
 

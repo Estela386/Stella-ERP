@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import HeroStella from "@assets/HomePagePicture.webp"
+import HeroStella from "@assets/HomePagePicture.jpeg"
 
 interface HeroConfig {
   imageUrl: string;

@@ -13,11 +13,13 @@ export interface IProducto {
   stock_min: number | null;
   url_imagen: string | null;
   id_categoria: number | null;
+  categoria?: { id: number; nombre: string | null };
   es_personalizable?: boolean | null;
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
-  producto_material?: unknown[];
+  producto_material?: { materiales?: { nombre: string } }[];
   activo: boolean;
+  opciones?: any[];
 }
 
 
@@ -71,11 +73,13 @@ export class Producto implements IProducto {
   stock_min: number | null;
   url_imagen: string | null;
   id_categoria: number | null;
+  categoria?: { id: number; nombre: string | null };
   es_personalizable?: boolean | null;
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
-  producto_material?: unknown[];
+  producto_material?: { materiales?: { nombre: string } }[];
   activo: boolean;
+  opciones?: any[];
 
 
   constructor(data: IProducto) {
@@ -89,11 +93,13 @@ export class Producto implements IProducto {
     this.stock_min = data.stock_min;
     this.url_imagen = data.url_imagen;
     this.id_categoria = data.id_categoria;
+    this.categoria = data.categoria;
     this.es_personalizable = data.es_personalizable;
     this.descripcion = data.descripcion;
     this.tipo = data.tipo || "fabricado";
     this.producto_material = data.producto_material;
     this.activo = data.activo ?? true;
+    this.opciones = data.opciones;
   }
 
 
@@ -135,12 +141,7 @@ export class Producto implements IProducto {
     }
 
     if (this.stock_actual !== null && this.stock_actual < 0) {
-
       errors.push("El stock actual no puede ser negativo");
-    }
-
-    if (this.stock_min !== null && this.stock_min < 0) {
-      errors.push("El stock mínimo no puede ser negativo");
     }
 
     return {
@@ -150,7 +151,7 @@ export class Producto implements IProducto {
   }
 
   /**
-   * Convierte el objeto Producto a un formato JSON
+   * Genera una representación JSON del producto
    */
   toJSON(): IProducto {
     return {
@@ -164,11 +165,13 @@ export class Producto implements IProducto {
       stock_min: this.stock_min,
       url_imagen: this.url_imagen,
       id_categoria: this.id_categoria,
+      categoria: this.categoria,
       es_personalizable: this.es_personalizable,
       descripcion: this.descripcion,
       tipo: this.tipo,
+      producto_material: this.producto_material,
       activo: this.activo,
+      opciones: this.opciones,
     };
   }
-
 }

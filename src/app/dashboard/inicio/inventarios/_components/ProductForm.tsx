@@ -44,6 +44,12 @@ const LUXURY_PALETTE = [
   { name: "Rojo Stella", hex: "#DB001A" },
 ];
 
+const METAL_PALETTE = [
+  { name: "Oro", hex: "#D4AF37" },
+  { name: "Oro Rosa", hex: "#B76E79" },
+  { name: "Plateado", hex: "#C0C0C0" }
+];
+
 export type CustomizationType = "select" | "color" | "text" | "number" | "multi" | "bubbles";
 
 export interface OpcionForm {
@@ -130,6 +136,22 @@ export default function ProductForm({
 
   const eliminarOpcion = (i: number) => {
     setOpciones(prev => prev.filter((_, idx) => idx !== i));
+  };
+
+  const agregarOpcionMetal = () => {
+    setOpciones(prev => [
+      ...prev,
+      { 
+        nombre: "Metal", 
+        tipo: "bubbles", 
+        obligatorio: true, 
+        valores: [
+          { valor: "Oro", stock: 0 },
+          { valor: "Oro Rosa", stock: 0 },
+          { valor: "Plateado", stock: 0 }
+        ] 
+      },
+    ]);
   };
 
   const updateOpcion = <K extends keyof OpcionForm>(i: number, field: K, value: OpcionForm[K]) => {
@@ -253,7 +275,7 @@ export default function ProductForm({
       nuevoPrecio = Number((costo / 0.4).toFixed(2));
     }
 
-    // 2. Mayoreo siempre es 25% descuento del venta actual
+    // 2. Mayoreo siempre es 30% descuento del venta actual (Standard Stella)
     const nuevoMayoreo = Number((nuevoPrecio * 0.7).toFixed(2));
 
     // 3. Métricas
@@ -799,8 +821,30 @@ export default function ProductForm({
                 )}
               </div>
             ))}
+            <div className="flex gap-2 mb-2">
+              <button 
+                type="button" 
+                onClick={agregarOpcionMetal}
+                className="flex-1 py-2.5 rounded-xl bg-white border border-[#b76e79]/30 text-[#b76e79] hover:bg-[#b76e79]/5 transition-all flex items-center justify-center gap-2 text-[0.7rem] font-black uppercase tracking-widest"
+              >
+                <Palette size={14} /> + Metal (Oro, Rosa, Plata)
+              </button>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setOpciones(prev => [
+                    ...prev,
+                    { nombre: "Talla", tipo: "bubbles", obligatorio: true, valores: [{ valor: "7", stock: 0 }, { valor: "8", stock: 0 }, { valor: "9", stock: 0 }] }
+                  ]);
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-white border border-[#708090]/30 text-[#708090] hover:bg-[#708090]/5 transition-all flex items-center justify-center gap-2 text-[0.7rem] font-black uppercase tracking-widest"
+              >
+                <Plus size={14} /> + Tallas (7, 8, 9)
+              </button>
+            </div>
+            
             <button type="button" onClick={agregarOpcion} className="w-full py-3 rounded-[14px] border-2 border-dashed border-[rgba(112,128,144,0.2)] text-[#708090] hover:border-[#b76e79] hover:text-[#b76e79] hover:bg-white transition-all flex items-center justify-center gap-2 text-sm font-bold">
-              <PlusCircle size={15} strokeWidth={1.5} /> Agregar opción
+              <PlusCircle size={15} strokeWidth={1.5} /> Agregar otra opción
             </button>
           </div>
         )}
@@ -992,114 +1036,112 @@ export default function ProductForm({
       </div>
 
       {/* SECCIÓN 4: PRECIOS Y RENTABILIDAD */}
-      <div className="p-5 bg-[#ffffff] rounded-[20px] border-2 border-[rgba(243, 239, 239, 0.12)] shadow-sm">
-        {/* Header compacto */}
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-lg bg-[#f6f4ef] flex items-center justify-center text-[#708090]">
-            <TrendingUp size={14} strokeWidth={1.5} />
-          </div>
-          <span className="text-sm font-bold text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
-            Precios <span className="text-[#b76e79]">y</span> Rentabilidad
-          </span>
-        </div>
-
-        {/* Bloque oscuro: inputs en una fila */}
-        <div className="bg-[#2d3748] rounded-[16px] p-4 mb-3">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {/* Costo */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[0.7rem] font-bold text-white uppercase tracking-widest">Costo</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b76e79] font-bold text-xs">$</span>
-                <input
-                  type="number" name="costo" value={formData.costo} onChange={handleChange}
-                  readOnly={formData.tipo === "revendido"}
-                  className={`w-full bg-white/10 border border-white rounded-lg py-2 pl-6 pr-2 text-sm font-black text-white focus:outline-none focus:border-[#b76e79] transition-all ${
-                    formData.tipo === "revendido" ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                  style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
-                />
-              </div>
-              <p className="text-[0.65rem] text-white italic">{formData.tipo === "revendido" ? "Del proveedor" : "(min × $1) + mat."}</p>
+      {((formData.tipo === "fabricado" && insumosSeleccionados.length > 0) || 
+        (formData.tipo === "revendido" && proveedorRelacion.id_proveedor !== 0) ||
+        producto?.id) ? (
+        <div className="p-5 bg-[#ffffff] rounded-[20px] border-2 border-[rgba(243, 239, 239, 0.12)] shadow-sm animate-in fade-in zoom-in duration-500">
+          {/* Header compacto */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-lg bg-[#f6f4ef] flex items-center justify-center text-[#708090]">
+              <TrendingUp size={14} strokeWidth={1.5} />
             </div>
+            <span className="text-sm font-bold text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
+              Precios <span className="text-[#b76e79]">y</span> Rentabilidad
+            </span>
+          </div>
 
-            {/* Tiempo — solo fabricado */}
-            {formData.tipo === "fabricado" ? (
-              <div className="flex flex-col gap-1">
-                <label className="text-[0.7rem] font-bold text-white uppercase tracking-widest">Minutos</label>
-                <div className="relative">
-                  <Clock size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
-                  <input
-                    type="number" name="tiempo" value={formData.tiempo} onChange={handleChange}
-                    className="w-full bg-white/10 border border-white/10 rounded-lg py-2 pl-6 pr-2 text-sm font-black text-white focus:outline-none focus:border-[#b76e79] transition-all"
-                    style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
-                  />
-                </div>
-                <p className="text-[0.65rem] text-white italic">min fabricación</p>
-              </div>
-            ) : <div />}
-
-            {/* Precio público */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[0.7rem] font-bold text-white uppercase tracking-widest">Precio público</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b76e79] font-bold text-xs">$</span>
-                <input
-                  type="number" name="precio" value={formData.precio} onChange={handleChange}
-                  className="w-full bg-white/10 border border-white/10 rounded-lg py-2 pl-6 pr-2 text-sm font-black text-white focus:outline-none focus:border-[#b76e79] transition-all"
-                  style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
-                />
+          {/* Bloque de Entradas de Precio */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {/* Precio Público */}
+            <div className="bg-[#2d3748] rounded-[22px] p-5 shadow-lg border-b-4 border-[#b76e79]">
+              <div className="flex justify-between items-start mb-4">
+                <label className="text-[0.7rem] font-bold text-white/60 uppercase tracking-widest">Precio al Público</label>
                 {!formData.isManualPrecio && formData.costo > 0 && (
-                  <span className="absolute -top-2 right-1 bg-[#8c9768] text-white text-[0.6rem] px-1.5 py-0.5 rounded-full font-bold">Auto 60%</span>
+                  <span className="bg-[#8c9768] text-white text-[0.6rem] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter shadow-sm animate-pulse">Auto 60%</span>
                 )}
               </div>
-              <p className="text-[0.65rem] text-white italic">60% margen</p>
-            </div>
-
-            {/* Precio mayoreo */}
-            <div className="flex flex-col gap-1 opacity-60">
-              <label className="text-[0.7rem] font-bold text-white uppercase tracking-widest">Mayoreo</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 font-bold text-xs">$</span>
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 text-[#b76e79] font-black text-2xl">$</span>
                 <input
-                  type="number" readOnly value={formData.costo_mayorista}
-                  className="w-full bg-white/5 border border-transparent rounded-lg py-2 pl-6 pr-2 text-sm font-bold text-white cursor-not-allowed"
+                  type="number" name="precio" value={formData.precio} onChange={handleChange}
+                  className="w-full bg-transparent border-none p-0 pl-6 text-3xl font-black text-white focus:ring-0 outline-none"
                   style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
                 />
               </div>
-              <p className="text-[0.65rem] text-white italic">−25% del público</p>
+              <p className="text-[0.65rem] text-white/40 mt-1 italic">Precio sugerido con 60% de margen</p>
+            </div>
+
+            {/* Precio Mayoreo */}
+            <div className="bg-[#f6f4ef] rounded-[22px] p-5 border-2 border-[rgba(112,128,144,0.1)]">
+              <div className="flex justify-between items-start mb-4">
+                <label className="text-[0.7rem] font-bold text-[#708090] uppercase tracking-widest">Precio Mayoreo</label>
+                <span className="bg-[#b76e79]/10 text-[#b76e79] text-[0.6rem] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter border border-[#b76e79]/20">−30% Off</span>
+              </div>
+              <div className="relative">
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 text-[#708090] font-black text-2xl">$</span>
+                <input
+                  type="number" readOnly value={formData.costo_mayorista}
+                  className="w-full bg-transparent border-none p-0 pl-6 text-3xl font-black text-[#4a5568] focus:ring-0 outline-none cursor-not-allowed"
+                  style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}
+                />
+              </div>
+              <p className="text-[0.65rem] text-[#708090]/50 mt-1 italic">Calculado automáticamente para mayoristas</p>
+            </div>
+          </div>
+
+          {/* Inputs Secundarios: Costo y Tiempo */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-white rounded-xl p-3 border border-[rgba(112,128,144,0.1)] shadow-sm">
+              <label className="text-[0.65rem] font-black text-[#708090] uppercase block mb-1">Costo Unitario</label>
+              <div className="flex items-center gap-2">
+                <span className="text-[#b76e79] font-bold">$</span>
+                <input 
+                  type="number" name="costo" value={formData.costo} onChange={handleChange}
+                  readOnly={formData.tipo === "revendido"}
+                  className="w-full bg-transparent border-none p-0 text-lg font-black text-[#4a5568] focus:ring-0 outline-none"
+                />
+              </div>
+            </div>
+            {formData.tipo === "fabricado" && (
+              <div className="bg-white rounded-xl p-3 border border-[rgba(112,128,144,0.1)] shadow-sm">
+                <label className="text-[0.65rem] font-black text-[#708090] uppercase block mb-1">Min. Fabricación</label>
+                <div className="flex items-center gap-2">
+                  <Clock size={16} className="text-[#b76e79]" />
+                  <input 
+                    type="number" name="tiempo" value={formData.tiempo} onChange={handleChange}
+                    className="w-full bg-transparent border-none p-0 text-lg font-black text-[#4a5568] focus:ring-0 outline-none"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Métricas de Rentabilidad */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="px-5 py-4 rounded-[18px] bg-[#8c9768]/5 border border-[#8c9768]/20 flex flex-col items-center">
+              <span className="text-[0.6rem] font-black text-[#8c9768] uppercase tracking-[0.2em] mb-1">Ganancia Neta</span>
+              <p className="text-2xl font-black text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
+                <span className="text-sm text-[#8c9768] mr-0.5">$</span>{formData.ganancia}
+              </p>
+            </div>
+            <div className="px-5 py-4 rounded-[18px] bg-[#b76e79]/5 border border-[#b76e79]/20 flex flex-col items-center">
+               <span className="text-[0.6rem] font-black text-[#b76e79] uppercase tracking-[0.2em] mb-1">ROI Proyectado</span>
+               <p className="text-2xl font-black text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
+                 {formData.roi_porcentaje}<span className="text-sm text-[#b76e79] ml-0.5">%</span>
+               </p>
             </div>
           </div>
         </div>
-
-        {/* Métricas: fila de 4 pills delgadas */}
-        <div className="grid grid-cols-4 gap-2">
-          <div className="bg-[#f6f4ef] rounded-[12px] px-3 py-2 text-center">
-            <p className="text-[0.65rem] text-[#708090] font-bold uppercase mb-0.5">Costo</p>
-            <p className="text-sm font-black text-[#4a5568]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
-              <span className="text-[0.75rem] text-[#b76e79]">$</span>{formData.costo}
-            </p>
-          </div>
-          <div className="bg-[#f6f4ef] rounded-[12px] px-3 py-2 text-center">
-            <p className="text-[0.65rem] text-[#708090] font-bold uppercase mb-0.5">Ganancia</p>
-            <p className={`text-sm font-black ${formData.ganancia >= 0 ? 'text-[#8c9768]' : 'text-rose-500'}`} style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
-              <span className="text-[0.75rem] opacity-40">$</span>{formData.ganancia}
-            </p>
-          </div>
-          <div className="bg-[#f6f4ef] rounded-[12px] px-3 py-2 text-center">
-            <p className="text-[0.65rem] text-[#708090] font-bold uppercase mb-0.5">ROI</p>
-            <p className={`text-sm font-black ${formData.roi_porcentaje >= 60 ? 'text-[#8c9768]' : 'text-amber-500'}`} style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
-              {formData.roi_porcentaje}<span className="text-[0.75rem] opacity-40">%</span>
-            </p>
-          </div>
-          <div className="bg-[#f6f4ef] rounded-[12px] px-3 py-2 text-center">
-            <p className="text-[0.65rem] text-[#708090] font-bold uppercase mb-0.5">Precio</p>
-            <p className="text-sm font-black text-[#b76e79]" style={{ fontFamily: "var(--font-display, Manrope, sans-serif)" }}>
-              <span className="text-[0.75rem] opacity-40">$</span>{formData.precio}
-            </p>
-          </div>
+      ) : (
+        <div className="p-8 border-2 border-dashed border-[rgba(112,128,144,0.15)] rounded-[20px] bg-[#f6f4ef]/30 flex flex-col items-center justify-center gap-3 text-[#708090]">
+          <TrendingUp size={32} strokeWidth={1} className="opacity-20" />
+          <p className="text-sm font-bold text-center">
+            {formData.tipo === "fabricado" 
+              ? "Agrega insumos arriba para calcular la rentabilidad" 
+              : "Selecciona un proveedor para ver costos y precios"}
+          </p>
         </div>
-      </div>
+      )}
 
       {/* SECCIÓN 5: STOCK */}
       <div className="p-6 bg-[#ede9e3] rounded-[24px] border-2 border-[rgba(112,128,144,0.12)] shadow-md">
