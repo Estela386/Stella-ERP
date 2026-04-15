@@ -23,6 +23,9 @@ const BG     = "#f6f4ef";
 const BGALT  = "#ede9e3";
 const SAGE   = "#8c9768";
 
+// Umbral de stock bajo para filtrado visual
+const LOW_STOCK_THRESHOLD = 1;
+
 // ─── Tipos ────────────────────────────────────────────────
 type FilterCategory = "Material" | "Categoría" | "Color" | "Precio";
 
@@ -326,10 +329,23 @@ function FilterDropdown({
   );
 }
 
+// ─── Helper: determinar si un producto tiene stock bajo ────
+function isLowStock(product: ProductoCard): boolean {
+  const stock = (product as any).stock_actual;
+  return stock !== undefined && stock >= 0 && stock <= LOW_STOCK_THRESHOLD;
+}
+
+function isOutOfStock(product: ProductoCard): boolean {
+  const stock = (product as any).stock_actual;
+  return stock !== undefined && stock === 0;
+}
+
 // ─── Tarjeta en vista lista ────────────────────────────────
 function ProductListCard({ product, onClick }: { product: ProductoCard; onClick: () => void }) {
   const [hovered, setHovered] = useState(false);
   const price = product.price;
+  const lowStock = isLowStock(product);
+  const noStock = isOutOfStock(product);
 
   return (
     <motion.div
@@ -350,6 +366,8 @@ function ProductListCard({ product, onClick }: { product: ProductoCard; onClick:
         cursor: "pointer",
         transition: "all 0.4s cubic-bezier(0.25, 1, 0.5, 1)",
         transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        filter: lowStock ? "grayscale(70%)" : "none",
+        opacity: noStock ? 0.55 : lowStock ? 0.7 : 1,
       }}
     >
       {/* Imagen */}
@@ -406,11 +424,11 @@ function ProductListCard({ product, onClick }: { product: ProductoCard; onClick:
             <span style={{
               fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.72rem", fontWeight: 500,
               padding: "4px 10px", borderRadius: 20,
-              background: (product as any).stock_actual > 0 ? "rgba(140,151,104,0.1)" : "rgba(183,110,121,0.08)",
-              color: (product as any).stock_actual > 0 ? SAGE : ROSE,
-              border: `1px solid ${(product as any).stock_actual > 0 ? "rgba(140,151,104,0.25)" : "rgba(183,110,121,0.2)"}`,
+              background: noStock ? "rgba(183,110,121,0.08)" : lowStock ? "rgba(112,128,144,0.08)" : "rgba(140,151,104,0.1)",
+              color: noStock ? ROSE : lowStock ? SLATE : SAGE,
+              border: `1px solid ${noStock ? "rgba(183,110,121,0.2)" : lowStock ? "rgba(112,128,144,0.2)" : "rgba(140,151,104,0.25)"}`,
             }}>
-              {(product as any).stock_actual > 0 ? `${(product as any).stock_actual} disponibles` : "Sin stock"}
+              {noStock ? "Sin stock" : lowStock ? `¡Últimas ${(product as any).stock_actual}!` : `${(product as any).stock_actual} disponibles`}
             </span>
           )}
         </div>
@@ -423,6 +441,8 @@ function ProductListCard({ product, onClick }: { product: ProductoCard; onClick:
 function ProductGridCard({ product, onClick }: { product: ProductoCard; onClick: () => void }) {
   const [hovered, setHovered] = useState(false);
   const price = product.price;
+  const lowStock = isLowStock(product);
+  const noStock = isOutOfStock(product);
 
   return (
     <motion.div
@@ -434,7 +454,12 @@ function ProductGridCard({ product, onClick }: { product: ProductoCard; onClick:
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ cursor: "pointer" }}
+      style={{
+        cursor: "pointer",
+        filter: lowStock ? "grayscale(70%)" : "none",
+        opacity: noStock ? 0.55 : lowStock ? 0.7 : 1,
+        transition: "filter 0.3s ease, opacity 0.3s ease",
+      }}
     >
       <div style={{
         position: "relative",
@@ -457,7 +482,8 @@ function ProductGridCard({ product, onClick }: { product: ProductoCard; onClick:
           style={{ objectFit: "cover", transform: hovered ? "scale(1.05)" : "scale(1)", transition: "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)" }}
         />
 
-        {(product as any).stock_actual === 0 && (
+        {/* Overlay para sin stock */}
+        {noStock && (
           <div style={{
             position: "absolute", inset: 0, zIndex: 3,
             background: "rgba(246,244,239,0.6)",
@@ -465,6 +491,23 @@ function ProductGridCard({ product, onClick }: { product: ProductoCard; onClick:
           }}>
             <span style={{ fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.72rem", fontWeight: 600, color: SLATE, background: "white", padding: "4px 12px", borderRadius: 20, border: "1px solid rgba(112,128,144,0.2)" }}>
               Sin stock
+            </span>
+          </div>
+        )}
+
+        {/* Badge para stock bajo (no cero) */}
+        {lowStock && !noStock && (
+          <div style={{
+            position: "absolute", top: 10, left: 10, zIndex: 3,
+          }}>
+            <span style={{
+              fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.62rem", fontWeight: 700,
+              color: SLATE, background: "rgba(255,255,255,0.92)", padding: "3px 10px", borderRadius: 16,
+              border: "1px solid rgba(112,128,144,0.2)",
+              backdropFilter: "blur(4px)",
+              letterSpacing: "0.02em",
+            }}>
+              ¡Últimas {(product as any).stock_actual}!
             </span>
           </div>
         )}
@@ -646,7 +689,22 @@ function CatalogContent() {
 
     // 3. Aplicar Ordenamientos adicionales
     r.sort((a, b) => {
-      // Primero por score (similitud)
+      // Primero: productos con stock bajo y sin stock van al final
+      const aStock = (a as any).stock_actual;
+      const bStock = (b as any).stock_actual;
+      const aIsLow = aStock !== undefined && aStock >= 0 && aStock <= LOW_STOCK_THRESHOLD;
+      const bIsLow = bStock !== undefined && bStock >= 0 && bStock <= LOW_STOCK_THRESHOLD;
+      
+      if (aIsLow !== bIsLow) return aIsLow ? 1 : -1;
+      
+      // Dentro de los de stock bajo, sin stock va al final absoluto
+      if (aIsLow && bIsLow) {
+        const aOut = aStock === 0;
+        const bOut = bStock === 0;
+        if (aOut !== bOut) return aOut ? 1 : -1;
+      }
+      
+      // Luego por score (similitud)
       if (b._score !== a._score) return b._score - a._score;
       
       // Luego por el criterio del usuario

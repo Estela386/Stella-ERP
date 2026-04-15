@@ -24,7 +24,7 @@ import { BiMoney } from "react-icons/bi";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { logout } from "@/app/(auth)/actions";
 import { Usuario } from "@/lib/models";
-import LogoM from "@assets/logo.png";
+import LogoM from "@assets/LogoM.svg";
 
 // ─── Design tokens Stella ─────────────────────────────────
 const ROSE  = "var(--rose-gold)";
