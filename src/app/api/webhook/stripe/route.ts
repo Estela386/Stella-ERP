@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/utils/supabase/server";
 import { VentaService } from "@/lib/services";
+import { LoyaltyService } from "@/lib/services/LoyaltyService";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -40,11 +41,13 @@ export async function POST(request: NextRequest) {
         }>;
 
         const supabase = await createClient();
+
+        const loyaltyService = new LoyaltyService(supabase);
         const ventaService = new VentaService(supabase);
 
         const totalConIva = (session.amount_total || 0) / 100;
 
-        await ventaService.crear(
+        const venta = await ventaService.crear(
           parseInt(clienteId),
           idUsuario,
           items.map(i => ({
@@ -55,6 +58,11 @@ export async function POST(request: NextRequest) {
           new Date().toISOString(),
           totalConIva,
           session.payment_status === "paid" ? totalConIva : 0
+        );
+        loyaltyService.otorgarPuntosPorCompra(
+          idUsuario as unknown as number,
+          totalConIva,
+          venta.ventaId || 0
         );
 
         console.log("Venta creada desde webhook:", session.id);
