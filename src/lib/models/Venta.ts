@@ -6,7 +6,7 @@ export interface IVenta {
   id: number;
   total: number | null;
   fecha: Date | string | null;
-  id_usuario: string; // usuario.id
+  id_usuario: number | string | null; // usuario.id
   estado: "aprobada" | "denegada" | "pendiente" | "cancelada";
   id_pedido?: number | null; // pedidos.id (opcional)
   created_at?: string;
@@ -33,7 +33,7 @@ export class Venta implements IVenta {
   id: number;
   total: number;
   fecha: string;
-  id_usuario: string;
+  id_usuario: string | number | null;
   estado: "aprobada" | "denegada" | "pendiente" | "cancelada";
   id_pedido?: number | null;
   created_at?: string;

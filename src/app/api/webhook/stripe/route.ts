@@ -56,10 +56,10 @@ export async function POST(request: NextRequest) {
 
         const { idUsuario, clienteId, items: itemsJson } = session.metadata;
         console.log(
-          `👤 [Webhook] Datos recibidos - idUsuario: ${idUsuario}, clienteId: ${clienteId}`
+          `👤 [Webhook] Datos recibidos - UUID Usuario: ${idUsuario}, clienteId: ${clienteId}`
         );
 
-        // 1. Parseo seguro y protegido de items
+        // 1. Parseo de items
         let items;
         try {
           items = JSON.parse(itemsJson) as Array<{
@@ -67,41 +67,48 @@ export async function POST(request: NextRequest) {
             cantidad: number;
             personalizacion?: Record<number, any> | null;
           }>;
-          console.log(
-            `📦 [Webhook] JSON de items parseado correctamente. Cantidad: ${items.length}`
-          );
         } catch (parseErr) {
           throw new Error(`Error parseando el JSON de items: ${itemsJson}`);
         }
 
-        // 2. Parseo REAL a números para evitar errores de base de datos
         const clienteIdNum = parseInt(clienteId, 10);
-        const idUsuarioNum = parseInt(idUsuario, 10);
-
-        if (isNaN(clienteIdNum) || isNaN(idUsuarioNum)) {
-          throw new Error(
-            `IDs inválidos tras parseo. clienteIdNum: ${clienteIdNum}, idUsuarioNum: ${idUsuarioNum}`
-          );
+        if (isNaN(clienteIdNum)) {
+          throw new Error(`ID de cliente inválido: ${clienteId}`);
         }
 
-        console.log("🔌 [Webhook] Inicializando cliente de Supabase...");
-
-        // ⚠️ ADVERTENCIA DE SEGURIDAD RLS ⚠️
-        // Si este cliente falla por permisos, deberás instanciar un cliente de "Service Role"
-        // import { createClient } from "@supabase/supabase-js";
-        // const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
         const supabase = await createClient();
+
+        // 🔥 NUEVO: Buscar el ID entero del usuario usando su UUID de auth
+        let internalUserId = 0;
+
+        if (idUsuario && idUsuario !== "0" && idUsuario !== "undefined") {
+          const { data: usuarioDb, error: errUsuario } = await supabase
+            .from("usuario")
+            .select("id")
+            .eq("id_auth", idUsuario)
+            .single();
+
+          if (usuarioDb) {
+            internalUserId = usuarioDb.id;
+            console.log(
+              `✅ [Webhook] UUID resuelto al ID interno: ${internalUserId}`
+            );
+          } else {
+            console.log(
+              `⚠️ [Webhook] No se encontró un usuario interno para el UUID: ${idUsuario}`
+            );
+          }
+        }
 
         const ventaService = new VentaService(supabase);
         const loyaltyService = new LoyaltyService(supabase);
 
         const totalConIva = (session.amount_total || 0) / 100;
-        console.log(`💰 [Webhook] Total calculado: $${totalConIva}`);
 
-        console.log("📝 [Webhook] Intentando ejecutar ventaService.crear()...");
+        console.log("📝 [Webhook] Creando la venta...");
         const venta = await ventaService.crear(
           clienteIdNum,
-          idUsuarioNum as unknown as string,
+          internalUserId > 0 ? internalUserId : null, // ID interno o nulo si es invitado
           items.map(i => ({
             id_producto: i.id_producto,
             cantidad: i.cantidad,
@@ -112,19 +119,15 @@ export async function POST(request: NextRequest) {
           session.payment_status === "paid" ? totalConIva : 0
         );
 
-        console.log(
-          `✅ [Webhook] Venta insertada en BD exitosamente. ID devuelto:`,
-          venta?.ventaId
-        );
-
-        console.log("🎁 [Webhook] Intentando otorgar puntos de lealtad...");
-
-        // 3. Se añade el AWAIT faltante para evitar que el proceso muera prematuramente
-        await loyaltyService.otorgarPuntosPorCompra(
-          idUsuarioNum,
-          totalConIva,
-          venta.ventaId || 0
-        );
+        // 🔥 Otorgar puntos solo si tenemos un ID de usuario interno válido
+        if (internalUserId > 0) {
+          console.log("🎁 [Webhook] Intentando otorgar puntos de lealtad...");
+          await loyaltyService.otorgarPuntosPorCompra(
+            internalUserId,
+            totalConIva,
+            venta.ventaId || 0
+          );
+        }
         console.log("✅ [Webhook] Puntos otorgados y guardados exitosamente.");
       } catch (err: any) {
         // Log detallado del error real

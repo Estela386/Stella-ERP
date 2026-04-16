@@ -88,7 +88,7 @@ export class VentaService {
    */
   async crear(
     clienteId: number,
-    idUsuario: string,
+    idUsuario: number | string | null,
     productos: ProductoEnVenta[],
     fecha: string,
     totalConIva?: number,
