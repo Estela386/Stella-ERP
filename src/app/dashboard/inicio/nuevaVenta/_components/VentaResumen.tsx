@@ -3,6 +3,7 @@
 import jsPDF from "jspdf";
 import { Producto } from "../page";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface Cliente {
   id: number;
@@ -18,6 +19,7 @@ type Props = {
   fecha?: string;
   esVentaMayorista?: boolean;
   onConfirmed?: () => void;
+  emailTicket?: string;
 };
 
 export default function VentaResumen({
@@ -28,12 +30,16 @@ export default function VentaResumen({
   fecha = new Date().toISOString().split("T")[0],
   esVentaMayorista = false,
   onConfirmed,
+  emailTicket = "",
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [montoPagado, setMontoPagado] = useState<string>("");
 
-  const subtotalBase = productos.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+  const subtotalBase = productos.reduce(
+    (acc, p) => acc + p.precio * p.cantidad,
+    0
+  );
   const descuentoGlobal = esVentaMayorista ? subtotalBase * 0.25 : 0;
   const subtotalNeto = subtotalBase - descuentoGlobal;
   const iva = subtotalNeto * 0.16;
@@ -45,7 +51,11 @@ export default function VentaResumen({
     if (productos.length === 0) return;
 
     // Validar monto a pagar
-    const montoAlPagar = esVentaRapida ? total : (montoPagado ? parseFloat(montoPagado) : 0);
+    const montoAlPagar = esVentaRapida
+      ? total
+      : montoPagado
+        ? parseFloat(montoPagado)
+        : 0;
     if (!esVentaRapida) {
       if (montoAlPagar < 0) {
         setError("El monto a pagar no puede ser negativo");
@@ -92,12 +102,47 @@ export default function VentaResumen({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || result.details || "Error al confirmar la venta");
+        throw new Error(
+          result.error || result.details || "Error al confirmar la venta"
+        );
       }
 
       const ventaId = result.ventaId;
+      const folio = ventaId || Math.floor(Math.random() * 900000 + 100000);
 
-      // 2. Generar PDF
+      // 🔥 2. ENVÍO DE CORREO POR RESEND (NUEVO BLOQUE)
+      if (emailTicket && emailTicket.includes("@")) {
+        try {
+          const resendResponse = await fetch("/api/emails/enviar-ticket", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: emailTicket,
+              folio: folio,
+              cliente: cliente?.nombre || "Mostrador",
+              total: total,
+              productos: productos.map(p => ({
+                nombre: p.nombre,
+                cantidad: p.cantidad,
+                precio: p.precio,
+              })),
+            }),
+          });
+
+          if (!resendResponse.ok) {
+            console.error("Error al enviar el correo con Resend");
+            toast.error(
+              "Venta guardada, pero hubo un error enviando el correo."
+            );
+          } else {
+            toast.success(`Ticket enviado exitosamente a ${emailTicket}`);
+          }
+        } catch (emailErr) {
+          console.error("Excepción enviando correo:", emailErr);
+        }
+      }
+
+      // 3. Generar PDF
       const doc = new jsPDF({
         orientation: "portrait",
         unit: "mm",
@@ -105,7 +150,6 @@ export default function VentaResumen({
       });
 
       let y = 8;
-      const folio = ventaId || Math.floor(Math.random() * 900000 + 100000);
 
       const continuar = () => {
         y += 8;
@@ -175,7 +219,9 @@ export default function VentaResumen({
         if (esVentaMayorista && descuentoGlobal > 0) {
           doc.setFont("helvetica", "normal");
           doc.text("Desc. May (25%):", 8, y);
-          doc.text(`-$${descuentoGlobal.toFixed(2)}`, 72, y, { align: "right" });
+          doc.text(`-$${descuentoGlobal.toFixed(2)}`, 72, y, {
+            align: "right",
+          });
           y += 4;
         }
 
@@ -277,7 +323,7 @@ export default function VentaResumen({
             ${subtotalBase.toFixed(2)}
           </p>
         </div>
-        
+
         {esVentaMayorista && (
           <div>
             <p className="text-sm text-[#8C9796]">Desc. Mayorista</p>
@@ -327,8 +373,8 @@ export default function VentaResumen({
             min="0"
             step="0.01"
             className={`w-full pl-8 pr-4 py-2 border-2 rounded-lg focus:outline-none transition-colors ${
-              esVentaRapida 
-                ? "border-[#EAE7E1] bg-[#F6F4EF] text-[#8C9796] cursor-not-allowed font-semibold" 
+              esVentaRapida
+                ? "border-[#EAE7E1] bg-[#F6F4EF] text-[#8C9796] cursor-not-allowed font-semibold"
                 : "border-[#8C9796]/30 bg-white text-[#708090] focusing:border-[#B76E79] cursor-pointer"
             }`}
           />
