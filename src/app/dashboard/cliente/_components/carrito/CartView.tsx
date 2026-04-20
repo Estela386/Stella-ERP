@@ -134,7 +134,7 @@ export default function CartView() {
             boxShadow: "0 1px 12px rgba(140,151,104,0.08)",
             position: "sticky",
             top: 0,
-            zIndex: 50,
+            zIndex: 10,
           }}
         >
           <div
