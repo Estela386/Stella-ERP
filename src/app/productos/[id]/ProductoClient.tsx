@@ -8,9 +8,9 @@ import { useAuth } from "@lib/hooks/useAuth";
 import { useCart } from "@lib/hooks/useCart";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ScanFace } from "lucide-react";
 import SimilarProducts from "./_components/SimilarProducts";
-import AlsoBoughtProducts from "./_components/AlsoBoughtProducts"; // Añade esta importación
+import AlsoBoughtProducts from "./_components/AlsoBoughtProducts";
 
 interface ProductoClientProps {
   id: string;
@@ -70,6 +70,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
         }
 
         setProducto(productoData);
+        console.log("Producto cargado:", productoData);
         if (usuario?.id) {
           // Insertamos silenciosamente sin bloquear la carga visual
           supabase
@@ -998,6 +999,43 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   ? "Añadir al carrito"
                   : "Sin existencias"}
             </button>
+            {producto.url_filtro_tiktok && (
+              <a
+                href={producto.url_filtro_tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  width: "100%",
+                  padding: "16px",
+                  background: "transparent",
+                  color: "#4a5568",
+                  border: "2px solid #4a5568",
+                  borderRadius: 16,
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 10,
+                  textDecoration: "none",
+                  marginTop: "12px",
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.background = "#4a5568";
+                  e.currentTarget.style.color = "#ffffff";
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "#4a5568";
+                }}
+              >
+                <ScanFace size={20} />
+                Pruébatelo con TikTok
+              </a>
+            )}
 
             {/* Cuidados de la Pieza */}
             <section

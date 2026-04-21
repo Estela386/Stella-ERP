@@ -20,8 +20,8 @@ export interface IProducto {
   producto_material?: { materiales?: { nombre: string } }[];
   activo: boolean;
   opciones?: any[];
+  url_filtro_tiktok?: string | null; // <-- Nueva propiedad
 }
-
 
 /**
  * DTO para crear un nuevo producto
@@ -49,7 +49,7 @@ export interface CreateProductoDTO {
   es_personalizable: boolean;
   tipo: "fabricado" | "revendido";
   opciones?: OpcionDTO[];
-
+  url_filtro_tiktok?: string; // <-- Nueva propiedad
 }
 
 /**
@@ -80,7 +80,7 @@ export class Producto implements IProducto {
   producto_material?: { materiales?: { nombre: string } }[];
   activo: boolean;
   opciones?: any[];
-
+  url_filtro_tiktok?: string | null;
 
   constructor(data: IProducto) {
     this.id = data.id;
@@ -100,8 +100,8 @@ export class Producto implements IProducto {
     this.producto_material = data.producto_material;
     this.activo = data.activo ?? true;
     this.opciones = data.opciones;
+    this.url_filtro_tiktok = data.url_filtro_tiktok ?? null;
   }
-
 
   /**
    * Calcula el margen de ganancia del producto

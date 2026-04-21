@@ -18,6 +18,10 @@ export type Producto = {
   es_personalizable?: boolean | null;
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
+  opciones?: any[];
+  ganancia?: number;
+  roi_porcentaje?: number;
+  url_filtro_tiktok?: string;
 };
 
 export type HistorialProducto = {
