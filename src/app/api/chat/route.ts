@@ -9,6 +9,7 @@ let storeSummaryCache: string | null = null;
 let storeSummaryCacheAt = 0;
 const STORE_SUMMARY_TTL = 30_000; // cache 30 segundos
 
+// 1. Resumen General de la Tienda (Se mantiene igual)
 async function buildStoreSummary(
   supabase: Awaited<ReturnType<typeof createClient>>
 ) {
@@ -20,55 +21,26 @@ async function buildStoreSummary(
   }
 
   try {
-    const {
-      data: totalCount,
-      error: totalError,
-      count: total,
-    } = await supabase
+    const { count: totalCount } = await supabase
       .from("producto")
       .select("id", { count: "exact", head: true });
-
-    const { data: products, error: productsError } = await supabase
+    const { data: products } = await supabase
       .from("producto")
       .select("nombre, stock_actual, stock_min, precio")
       .order("stock_actual", { ascending: true })
       .limit(20);
-
-    const {
-      data: outOfStock,
-      error: outOfStockError,
-      count: outOfStockCount,
-    } = await supabase
+    const { count: outOfStockCount } = await supabase
       .from("producto")
       .select("id", { count: "exact", head: true })
       .eq("stock_actual", 0);
-
-    const { data: lowStock, error: lowStockError } = await supabase
-      .from("producto")
-      .select("nombre, stock_actual, stock_min, precio")
-      .lt("stock_actual", "stock_min")
-      .order("stock_actual", { ascending: true })
-      .limit(5);
-
     const { data: categories } = await supabase
       .from("categoria")
       .select("id, nombre")
       .limit(20);
 
-    const timeout = 10000;
-
-    const safeTotal =
-      typeof total === "number" ? total : (totalCount?.length ?? 0);
+    const safeTotal = typeof totalCount === "number" ? totalCount : 0;
     const safeOutOfStock =
       typeof outOfStockCount === "number" ? outOfStockCount : 0;
-    const lowStockItems = Array.isArray(lowStock) ? lowStock : [];
-
-    const lowStockList = lowStockItems
-      .map(
-        p =>
-          `- ${p.nombre ?? "N/A"}: stock ${p.stock_actual ?? "?"} (mínimo ${p.stock_min ?? "?"})`
-      )
-      .join("\n");
 
     const categoryList = Array.isArray(categories)
       ? categories
@@ -78,14 +50,11 @@ async function buildStoreSummary(
       : "sin categorías";
 
     const summary =
-      `Resumen de tienda (actualizado automáticamente):\n` +
+      `Resumen de catálogo público:\n` +
       `- Total productos: ${safeTotal}\n` +
       `- Productos sin stock: ${safeOutOfStock}\n` +
-      `- Productos con stock bajo (hacia reabastecer): ${lowStockItems.length}\n` +
       `- Categorías presentes: ${categoryList}\n` +
-      `- 5 productos con stock más bajo:\n${lowStockList || "  (no hay productos con stock bajo actualmente)."}
-      \n\nNota: este resumen se actualiza cada ${STORE_SUMMARY_TTL / 1000} segundos para optimizar rendimiento.` +
-      `\n\n Productos destacados (hasta 20, ordenados por menor stock):\n` +
+      `\n\n Productos destacados:\n` +
       (Array.isArray(products)
         ? products
             .map(
@@ -93,14 +62,88 @@ async function buildStoreSummary(
                 `- ${p.nombre ?? "N/A"}: stock ${p.stock_actual ?? "?"}, precio $${p.precio ?? "?"}`
             )
             .join("\n")
-        : "No se pudieron obtener los productos destacados.");
+        : "Catálogo no disponible.");
 
     storeSummaryCache = summary;
     storeSummaryCacheAt = Date.now();
     return summary;
   } catch (error) {
     console.warn("No se pudo obtener resumen de la DB:", error);
-    return "No se pudo generar el resumen de la base de datos en esta consulta.";
+    return "Catálogo general no disponible.";
+  }
+}
+
+// 🔥 2. NUEVA FUNCIÓN: Resumen Privado del Usuario Logueado
+async function buildUserSummary(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  usuarioIdAuth: string
+) {
+  try {
+    // 2.1 Buscar el ID interno del usuario
+    const { data: usuario } = await supabase
+      .from("usuario")
+      .select("id, nombre, correo")
+      .eq("id_auth", usuarioIdAuth)
+      .single();
+
+    if (!usuario) return "Usuario anónimo.";
+
+    // 2.2 Buscar sus últimos pedidos (ventas)
+    const { data: pedidos } = await supabase
+      .from("ventas")
+      .select("id, fecha, total, estado")
+      .eq("id_usuario", usuario.id)
+      .order("fecha", { ascending: false })
+      .limit(3);
+
+    // 2.3 Buscar sus saldos / cuentas por cobrar (Relación con cliente)
+    // Primero encontramos si este usuario es un cliente en la tabla cliente
+    const { data: cliente } = await supabase
+      .from("cliente")
+      .select("id")
+      .eq("id_usuario", usuario.id)
+      .single();
+
+    let saldosPendientes = "";
+    if (cliente) {
+      const { data: cuentas } = await supabase
+        .from("cuentasporcobrar")
+        .select("id, concepto, monto_pendiente, estado")
+        .eq("id_cliente", cliente.id)
+        .eq("estado", "pendiente");
+
+      if (cuentas && cuentas.length > 0) {
+        saldosPendientes = cuentas
+          .map(c => `- ${c.concepto}: Deuda de $${c.monto_pendiente}`)
+          .join("\n");
+      } else {
+        saldosPendientes = "No tiene saldos pendientes.";
+      }
+    }
+
+    // 2.4 Armar el contexto privado
+    let userContext = `\n--- DATOS PRIVADOS DEL CLIENTE ACTUAL ---\n`;
+    userContext += `El cliente con el que estás hablando se llama: ${usuario.nombre} (${usuario.correo}).\n\n`;
+
+    userContext += `ÚLTIMOS PEDIDOS:\n`;
+    if (pedidos && pedidos.length > 0) {
+      userContext += pedidos
+        .map(
+          p =>
+            `- Pedido #${p.id} (${new Date(p.fecha).toLocaleDateString()}): $${p.total} - Estado: ${p.estado}`
+        )
+        .join("\n");
+    } else {
+      userContext += "El cliente aún no tiene pedidos realizados.\n";
+    }
+
+    userContext += `\n\nSALDOS PENDIENTES:\n${saldosPendientes || "No tiene deudas ni apartados pendientes."}\n`;
+    userContext += `-----------------------------------------\n`;
+
+    return userContext;
+  } catch (error) {
+    console.error("Error cargando info del usuario:", error);
+    return "Error cargando datos del cliente.";
   }
 }
 
@@ -143,12 +186,22 @@ export async function POST(req: Request) {
     );
   }
 
+  // 1. Autenticación y Cliente de Base de Datos
   const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+  const userId = authData?.user?.id;
+
+  // 2. Construcción del conocimiento del Bot
   const storeSummary = await buildStoreSummary(supabase);
+
+  // 🔥 Si el usuario está logueado, traemos su información secreta. Si no, le avisamos a Luna que es anónimo.
+  const userSummary = userId
+    ? await buildUserSummary(supabase, userId)
+    : "\nEl cliente NO ha iniciado sesión. Si te pregunta por sus pedidos o saldos, indícale amablemente que debe iniciar sesión primero.";
 
   const systemMessage = {
     role: "system",
-    content: `Eres Luna, asistente de Stella ERP, una tienda de joyería artesanal. Atiendes con tono amable, claro y experto.\n\n${storeSummary}\n\nNormas: responde en español; si no sabes un dato exacto, indica que debes verificar; prioriza la información de inventario y tiempos de envío; evita respuestas genéricas; si el usuario pregunta algo fuera de tu ámbito, indícalo amablemente; no hables explícitamente sobre actualizacion de stock o limmites de peticiones, pero maneja internamente para evitar sobrecarga.`,
+    content: `Eres Luna, asistente de Stella ERP, una tienda de joyería artesanal. Atiendes con tono amable, claro y experto.\n\n${storeSummary}\n\n${userSummary}\n\nNormas: responde en español; si no sabes un dato exacto, indica que debes verificar; solo responde sobre información de pedidos y saldos del cliente actual, si pregunta por la cuenta de otro, niégate por privacidad.`,
   };
 
   const maxHistory = 8;
@@ -166,8 +219,6 @@ export async function POST(req: Request) {
       messages: payloadMessages,
     }),
   });
-
-  console.log("OpenRouter response status:", res.status);
 
   const data = await res.json();
   return NextResponse.json(data);
