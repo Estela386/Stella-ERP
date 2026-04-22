@@ -22,4 +22,20 @@ export class MaterialService {
       return { materiales: null, error: errorMessage };
     }
   }
+
+  async crear(nombre: string): Promise<{ material: IMaterial | null; error: string | null }> {
+    try {
+      const { data, error } = await this.client
+        .from("materiales")
+        .insert([{ nombre }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { material: data as IMaterial, error: null };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Error creando material";
+      return { material: null, error: errorMessage };
+    }
+  }
 }

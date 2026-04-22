@@ -12,7 +12,7 @@ import {
 } from "@lib/models";
 import { createClient } from "@utils/supabase/client";
 import { ProductoMaterialService } from "@lib/services";
-import { IMaterial } from "@lib/services/MaterialService";
+import { IMaterial, MaterialService } from "@lib/services/MaterialService";
 import {
   Plus,
   Trash2,
@@ -29,7 +29,9 @@ import {
   X as FiX,
   Palette,
   ScanFace,
+  Crop,
 } from "lucide-react";
+import ImageCropper from "./ImageCropper";
 
 const LUXURY_PALETTE = [
   { name: "Verde Bandera", hex: "#006847" },
@@ -116,6 +118,7 @@ export default function ProductForm({
     ganancia: 0,
     roi_porcentaje: 0,
     url_filtro_tiktok: producto?.url_filtro_tiktok || "",
+    iva: producto?.iva || 16,
   });
 
   const [proveedorRelacion, setProveedorRelacion] = useState({
@@ -131,6 +134,7 @@ export default function ProductForm({
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loadingOpciones, setLoadingOpciones] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [insumosSeleccionados, setInsumosSeleccionados] = useState<
     { id_insumo: number; cantidad_necesaria: number }[]
   >([]);
@@ -143,6 +147,39 @@ export default function ProductForm({
     "Aretes",
   ]);
   const [newComponent, setNewComponent] = useState("");
+  const [localMateriales, setLocalMateriales] = useState<IMaterial[]>(
+    materialesDisponibles || []
+  );
+  const [newMaterialName, setNewMaterialName] = useState("");
+  const [isCreatingMaterial, setIsCreatingMaterial] = useState(false);
+
+  // Sincronizar materiales si cambian las props
+  useEffect(() => {
+    if (materialesDisponibles) {
+      setLocalMateriales(materialesDisponibles);
+    }
+  }, [materialesDisponibles]);
+
+  const handleAddMaterial = async () => {
+    if (!newMaterialName.trim()) return;
+    setIsCreatingMaterial(true);
+    try {
+      const supabase = createClient();
+      const materialService = new MaterialService(supabase);
+      const { material, error } = await materialService.crear(newMaterialName);
+      if (error) throw new Error(error);
+      if (material) {
+        setLocalMateriales(prev => [...prev, material]);
+        setMaterialesSeleccionados(prev => [...prev, material.id]);
+        setNewMaterialName("");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error al crear material: " + (err instanceof Error ? err.message : "Error desconocido"));
+    } finally {
+      setIsCreatingMaterial(false);
+    }
+  };
 
   const COSTO_MINUTO = 1.0;
 
@@ -245,6 +282,7 @@ export default function ProductForm({
       "stock_min",
       "tiempo",
       "id_categoria",
+      "iva",
     ];
 
     const newValue = numericFields.includes(name)
@@ -310,21 +348,23 @@ export default function ProductForm({
         setFormData(prev => ({ ...prev, costo: costoTotalCalculado }));
       }
     }
-
     const costo = Number(formData.costo) || 0;
     const isManual = formData.isManualPrecio;
+    const ivaFactor = 1 + (Number(formData.iva) || 0) / 100;
 
     // 1. Calcular Precio (Margen 60%) si no es manual
     let nuevoPrecio = formData.precio;
     if (!isManual && costo > 0) {
-      nuevoPrecio = Number((costo / 0.4).toFixed(2));
+      const basePrecio = costo / 0.4;
+      nuevoPrecio = Number((basePrecio * ivaFactor).toFixed(2));
     }
 
     // 2. Mayoreo siempre es 30% descuento del venta actual (Standard Stella)
     const nuevoMayoreo = Number((nuevoPrecio * 0.7).toFixed(2));
 
-    // 3. Métricas
-    const nuevaGanancia = Number((nuevoPrecio - costo).toFixed(2));
+    // 3. Métricas (Ganancia se calcula sobre precio sin IVA)
+    const precioSinIva = nuevoPrecio / ivaFactor;
+    const nuevaGanancia = Number((precioSinIva - costo).toFixed(2));
     const nuevoROI =
       costo > 0 ? Number(((nuevaGanancia / costo) * 100).toFixed(2)) : 0;
 
@@ -347,6 +387,7 @@ export default function ProductForm({
     formData.costo,
     formData.precio,
     formData.isManualPrecio,
+    formData.iva,
     formData.tipo,
     formData.tiempo,
     proveedorRelacion.precio_compra,
@@ -420,14 +461,30 @@ export default function ProductForm({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setErrors(prev => ({ ...prev, imagen: "Máximo 5MB" }));
+    if (file.size > 10 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, imagen: "Máximo 10MB" }));
       return;
     }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      setImageToCrop(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+    // Limpiar input para permitir seleccionar la misma imagen
+    e.target.value = "";
+  };
+
+  const handleCropComplete = (croppedBlob: Blob) => {
+    const file = new File([croppedBlob], "product_image.jpg", {
+      type: "image/jpeg",
+    });
     setImagenFile(file);
+
     const reader = new FileReader();
     reader.onload = e => setPreviewUrl(e.target?.result as string);
     reader.readAsDataURL(file);
+    setImageToCrop(null);
   };
 
   const handleProveedorChange = (
@@ -455,9 +512,10 @@ export default function ProductForm({
     if (!validateForm()) return;
 
     // Filtrar campos que no van a la base de datos
-    const { isManualPrecio, ganancia, roi_porcentaje, ...dataToSave } =
+    const { isManualPrecio, ganancia, roi_porcentaje, iva, ...dataToSave } =
       formData;
     void isManualPrecio;
+    void iva;
     void ganancia;
     void roi_porcentaje;
 
@@ -657,111 +715,202 @@ export default function ProductForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 animate-in fade-in duration-500 pb-8"
+      className="flex flex-col lg:flex-row gap-8 animate-in fade-in duration-500 pb-8"
     >
-      {/* SECCIÓN 1: IDENTIDAD DEL PRODUCTO */}
-      <div className="p-5 bg-[#ffffff] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] shadow-sm">
-        {/* Tipo — toggles compactos en una sola fila */}
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest flex-shrink-0">
-            Tipo
-          </span>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() =>
-                setFormData(prev => ({ ...prev, tipo: "fabricado" }))
-              }
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                formData.tipo === "fabricado"
-                  ? "border-[#b76e79] bg-[#b76e79]/5 text-[#b76e79]"
-                  : "border-[rgba(112,128,144,0.15)] text-[#708090] hover:border-[#708090]/30"
-              }`}
-            >
-              <Layers size={14} strokeWidth={2} /> Fabricado
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                setFormData(prev => ({ ...prev, tipo: "revendido" }))
-              }
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                formData.tipo === "revendido"
-                  ? "border-[#b76e79] bg-[#b76e79]/5 text-[#b76e79]"
-                  : "border-[rgba(112,128,144,0.15)] text-[#708090] hover:border-[#708090]/30"
-              }`}
-            >
-              <Truck size={14} strokeWidth={2} /> Revendido
-            </button>
+      {/* COLUMNA IZQUIERDA (Fija) */}
+      <div className="w-full lg:w-[320px] xl:w-[380px] flex-shrink-0 flex flex-col gap-6 lg:sticky lg:top-8 self-start">
+        <div className="p-6 bg-[#ffffff] rounded-[24px] border-2 border-[rgba(112,128,144,0.12)] shadow-md flex flex-col gap-6">
+          
+          {/* Tipo — toggles compactos en una sola fila */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest flex-shrink-0">
+              Tipo
+            </span>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData(prev => ({ ...prev, tipo: "fabricado" }))
+                }
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                  formData.tipo === "fabricado"
+                    ? "border-[#b76e79] bg-[#b76e79]/5 text-[#b76e79]"
+                    : "border-[rgba(112,128,144,0.15)] text-[#708090] hover:border-[#708090]/30"
+                }`}
+              >
+                <Layers size={14} strokeWidth={2} /> Fabricado
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData(prev => ({ ...prev, tipo: "revendido" }))
+                }
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                  formData.tipo === "revendido"
+                    ? "border-[#b76e79] bg-[#b76e79]/5 text-[#b76e79]"
+                    : "border-[rgba(112,128,144,0.15)] text-[#708090] hover:border-[#708090]/30"
+                }`}
+              >
+                <Truck size={14} strokeWidth={2} /> Revendido
+              </button>
+            </div>
           </div>
-        </div>
-        {/* Nombre + Categoría en la misma fila */}
-        <div className="flex gap-3">
-          <div className="flex-1 flex flex-col gap-1">
-            <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest px-1">
-              Nombre
-            </label>
-            <input
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              placeholder="Ej: Collar Luna Plata"
-              className={`w-full bg-[#f6f4ef]/50 border-2 ${errors.nombre ? "border-red-400" : "border-transparent"} rounded-[14px] px-4 py-3 text-base text-[#4a5568] placeholder-[#708090]/30 focus:outline-none focus:border-[#b76e79] focus:bg-white transition-all`}
-              style={{
-                fontFamily: "var(--font-display, Manrope, sans-serif)",
-                fontWeight: 600,
-              }}
-            />
+          
+          {/* Nombre + Categoría en columna para el sidebar */}
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest px-1">
+                Nombre
+              </label>
+              <input
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                placeholder="Ej: Collar Luna Plata"
+                className={`w-full bg-[#f6f4ef]/50 border-2 ${errors.nombre ? "border-red-400" : "border-transparent"} rounded-[14px] px-4 py-3 text-base text-[#4a5568] placeholder-[#708090]/30 focus:outline-none focus:border-[#b76e79] focus:bg-white transition-all`}
+                style={{
+                  fontFamily: "var(--font-display, Manrope, sans-serif)",
+                  fontWeight: 600,
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest px-1">
+                Categoría
+              </label>
+              <div className="relative">
+                <select
+                  name="id_categoria"
+                  value={formData.id_categoria}
+                  onChange={handleChange}
+                  className="w-full bg-[#f6f4ef]/50 border-2 border-transparent rounded-[14px] px-4 py-3 text-sm text-[#4a5568] font-bold focus:outline-none focus:border-[#b76e79] focus:bg-white appearance-none cursor-pointer transition-all pr-8"
+                >
+                  {categorias.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.nombre}
+                    </option>
+                  ))}
+                </select>
+                <ChevronRight
+                  size={15}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-[#b76e79] pointer-events-none"
+                />
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col gap-1" style={{ minWidth: "160px" }}>
-            <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest px-1">
-              Categoría
+          
+          <div className="flex flex-col gap-1">
+            <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest px-1 flex items-center gap-2">
+              Filtro de TikTok AR{" "}
+              <span className="text-[0.65rem] opacity-50 lowercase tracking-normal">
+                (Opcional)
+              </span>
             </label>
             <div className="relative">
-              <select
-                name="id_categoria"
-                value={formData.id_categoria}
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b76e79]">
+                <ScanFace size={16} strokeWidth={2} />
+              </span>
+              <input
+                type="url"
+                name="url_filtro_tiktok"
+                value={formData.url_filtro_tiktok}
                 onChange={handleChange}
-                className="w-full bg-[#f6f4ef]/50 border-2 border-transparent rounded-[14px] px-4 py-3 text-sm text-[#4a5568] font-bold focus:outline-none focus:border-[#b76e79] focus:bg-white appearance-none cursor-pointer transition-all pr-8"
-              >
-                {categorias.map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.nombre}
-                  </option>
-                ))}
-              </select>
-              <ChevronRight
-                size={15}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-[#b76e79] pointer-events-none"
+                placeholder="https://vm.tiktok.com/..."
+                className="w-full bg-[#f6f4ef]/50 border-2 border-transparent rounded-[14px] pl-11 pr-4 py-3 text-sm text-[#4a5568] placeholder-[#708090]/40 focus:outline-none focus:border-[#b76e79] focus:bg-white transition-all"
+                style={{
+                  fontFamily: "var(--font-sans, Inter, sans-serif)",
+                  fontWeight: 500,
+                }}
               />
             </div>
           </div>
-        </div>
-        <div className="mt-4 flex flex-col gap-1">
-          <label className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest px-1 flex items-center gap-2">
-            Filtro de TikTok AR{" "}
-            <span className="text-[0.65rem] opacity-50 lowercase tracking-normal">
-              (Opcional)
-            </span>
-          </label>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b76e79]">
-              <ScanFace size={16} strokeWidth={2} />
-            </span>
-            <input
-              type="url"
-              name="url_filtro_tiktok"
-              value={formData.url_filtro_tiktok}
+
+          <div className="h-px w-full bg-[rgba(112,128,144,0.1)]" />
+
+          {/* IMAGEN PREVIEW + UPLOAD */}
+          <div className="flex flex-col gap-3 w-full mx-auto" style={{ maxWidth: "220px" }}>
+            <p className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest text-center">
+              Imagen Principal
+            </p>
+            <div className="w-full aspect-[3/4] bg-[#f6f4ef] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] overflow-hidden relative group shadow-inner">
+              {previewUrl ? (
+                <Image
+                  src={previewUrl}
+                  alt="Preview"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#708090]/30">
+                  <ImageIcon size={32} strokeWidth={1} />
+                  <p className="text-[0.7rem] font-bold uppercase tracking-widest text-center px-4">
+                    Subir foto
+                  </p>
+                </div>
+              )}
+              {previewUrl && (
+                <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPreviewUrl(null);
+                      setImagenFile(null);
+                    }}
+                    className="w-8 h-8 rounded-full bg-white/90 text-rose-500 shadow flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImageToCrop(previewUrl)}
+                    className="w-8 h-8 rounded-full bg-white/90 text-[#b76e79] shadow flex items-center justify-center hover:bg-[#b76e79] hover:text-white transition-all"
+                    title="Ajustar recorte"
+                  >
+                    <Crop size={14} />
+                  </button>
+                </div>
+              )}
+            </div>
+            <label className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#f6f4ef]/50 border-2 border-dashed border-[rgba(112,128,144,0.2)] rounded-[14px] cursor-pointer hover:bg-[#b76e79]/5 hover:border-[#b76e79]/30 transition-all text-[#708090] hover:text-[#b76e79]">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <Plus size={14} />
+              <span className="text-[0.75rem] font-bold uppercase tracking-widest">
+                {previewUrl ? "Cambiar" : "Seleccionar"}
+              </span>
+            </label>
+          </div>
+
+          <div className="h-px w-full bg-[rgba(112,128,144,0.1)]" />
+
+          {/* DESCRIPCIÓN */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <p className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">
+                Descripción
+              </p>
+              <span className="text-[0.65rem] text-[#708090]/50 italic">Opcional</span>
+            </div>
+            <textarea
+              name="descripcion"
+              value={formData.descripcion}
               onChange={handleChange}
-              placeholder="https://vm.tiktok.com/..."
-              className="w-full bg-[#f6f4ef]/50 border-2 border-transparent rounded-[14px] pl-11 pr-4 py-3 text-sm text-[#4a5568] placeholder-[#708090]/40 focus:outline-none focus:border-[#b76e79] focus:bg-white transition-all"
-              style={{
-                fontFamily: "var(--font-sans, Inter, sans-serif)",
-                fontWeight: 500,
-              }}
+              rows={4}
+              placeholder="Describe el producto..."
+              className="w-full bg-[#f6f4ef]/30 border-2 border-transparent rounded-[16px] p-4 text-sm text-[#4a5568] focus:border-[#b76e79] focus:bg-white outline-none transition-all resize-none shadow-inner"
+              style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}
             />
           </div>
+
         </div>
+      </div>
+      
+      {/* COLUMNA DERECHA (Scrollable) */}
+      <div className="flex-1 flex flex-col gap-6 w-full">
 
         {/* COMPONENTES DEL JUEGO (Solo si la categoría es Juego) */}
         {categorias
@@ -838,8 +987,6 @@ export default function ProductForm({
             </p>
           </div>
         )}
-      </div>
-
       {/* SECCIÓN 2: PERSONALIZACIÓN */}
       <div className="p-5 bg-[#ede9e3] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] shadow-sm">
         <div className="flex items-center justify-between mb-3">
@@ -1283,7 +1430,7 @@ export default function ProductForm({
             </span>
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
-            {materialesDisponibles.map(mat => (
+            {localMateriales.map(mat => (
               <button
                 key={mat.id}
                 type="button"
@@ -1300,6 +1447,31 @@ export default function ProductForm({
                 {mat.nombre}
               </button>
             ))}
+            
+            {/* Input para nuevo material */}
+            <div className="flex items-center gap-1 ml-1">
+              <input
+                type="text"
+                placeholder="Nuevo material..."
+                value={newMaterialName}
+                onChange={(e) => setNewMaterialName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddMaterial();
+                  }
+                }}
+                className="px-3 py-1.5 rounded-full border border-dashed border-[#b76e79]/30 text-xs bg-transparent focus:outline-none focus:border-[#b76e79] w-32"
+              />
+              <button
+                type="button"
+                onClick={handleAddMaterial}
+                disabled={isCreatingMaterial || !newMaterialName.trim()}
+                className="w-8 h-8 rounded-full bg-[#b76e79] text-white flex items-center justify-center hover:opacity-90 disabled:opacity-30 transition-all shadow-sm"
+              >
+                <Plus size={16} strokeWidth={3} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1322,7 +1494,7 @@ export default function ProductForm({
                     fontFamily: "var(--font-display, Manrope, sans-serif)",
                   }}
                 >
-                  Insumos <span className="text-[#b76e79]">Configuración</span>
+                  Lista de Materiales <span className="text-[#b76e79]">(BOM)</span>
                 </span>
               </div>
 
@@ -1444,8 +1616,8 @@ export default function ProductForm({
                 })}
                 <div className="flex justify-end pt-2">
                   <div className="bg-[#2d3748] px-5 py-2.5 rounded-xl flex items-center gap-3">
-                    <p className="text-[0.75rem] font-bold text-[#b76e79] uppercase tracking-widest">
-                      Total
+                    <p className="text-[0.65rem] font-bold text-[#b76e79] uppercase tracking-[0.15em]">
+                      Subtotal Materiales
                     </p>
                     <p
                       className="text-lg font-black text-white"
@@ -1555,8 +1727,8 @@ export default function ProductForm({
             </div>
           </div>
 
-          {/* Inputs Secundarios: Costo y Tiempo */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          {/* Inputs Secundarios: Costo, IVA y Tiempo */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div className="bg-white rounded-xl p-3 border border-[rgba(112,128,144,0.1)] shadow-sm">
               <label className="text-[0.65rem] font-black text-[#708090] uppercase block mb-1">
                 Costo Unitario
@@ -1573,6 +1745,23 @@ export default function ProductForm({
                 />
               </div>
             </div>
+
+            <div className="bg-white rounded-xl p-3 border border-[rgba(112,128,144,0.1)] shadow-sm">
+              <label className="text-[0.65rem] font-black text-[#708090] uppercase block mb-1">
+                IVA (%)
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-[#b76e79] font-bold">%</span>
+                <input
+                  type="number"
+                  name="iva"
+                  value={formData.iva}
+                  onChange={handleChange}
+                  className="w-full bg-transparent border-none p-0 text-lg font-black text-[#4a5568] focus:ring-0 outline-none"
+                />
+              </div>
+            </div>
+
             {formData.tipo === "fabricado" && (
               <div className="bg-white rounded-xl p-3 border border-[rgba(112,128,144,0.1)] shadow-sm">
                 <label className="text-[0.65rem] font-black text-[#708090] uppercase block mb-1">
@@ -1637,7 +1826,7 @@ export default function ProductForm({
 
       {/* SECCIÓN 5: STOCK */}
       <div className="p-6 bg-[#ede9e3] rounded-[24px] border-2 border-[rgba(112,128,144,0.12)] shadow-md">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-[#708090] border border-[rgba(112,128,144,0.12)] shadow-sm">
               <Package size={18} strokeWidth={1.5} />
@@ -1649,8 +1838,8 @@ export default function ProductForm({
               Control de Stock
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto">
+            <div className="flex flex-col items-start sm:items-end gap-1 flex-1 sm:flex-none">
               <div className="flex items-center gap-2">
                 {formData.es_personalizable && (
                   <span className="bg-[#b76e79]/10 text-[#b76e79] text-[0.6rem] font-bold px-2 py-0.5 rounded-full animate-pulse border border-[#b76e79]/20">
@@ -1674,8 +1863,8 @@ export default function ProductForm({
                 }}
               />
             </div>
-            <div className="w-px h-10 bg-[rgba(112,128,144,0.2)]" />
-            <div className="flex flex-col items-end gap-1">
+            <div className="hidden sm:block w-px h-10 bg-[rgba(112,128,144,0.2)]" />
+            <div className="flex flex-col items-start sm:items-end gap-1 flex-1 sm:flex-none">
               <label className="text-[0.75rem] font-bold text-[#b76e79] uppercase tracking-widest">
                 Stock mínimo
               </label>
@@ -1693,89 +1882,12 @@ export default function ProductForm({
           </div>
         </div>
       </div>
-
-      {/* SECCIÓN 6: IMAGEN Y DESCRIPCIÓN */}
-      <div className="p-6 bg-[#ffffff] rounded-[24px] border-2 border-[rgba(112,128,144,0.12)] shadow-md">
-        <div className="flex items-start gap-6">
-          {/* Imagen preview + upload — columna izquierda fija */}
-          <div
-            className="flex-shrink-0 flex flex-col gap-3"
-            style={{ width: "160px" }}
-          >
-            <p className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest">
-              Imagen
-            </p>
-            <div className="w-full aspect-square bg-[#f6f4ef] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] overflow-hidden relative group">
-              {previewUrl ? (
-                <Image
-                  src={previewUrl}
-                  alt="Preview"
-                  width={160}
-                  height={160}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#708090]/30">
-                  <ImageIcon size={28} strokeWidth={1} />
-                  <p className="text-[0.7rem] font-bold uppercase tracking-widest">
-                    Sin imagen
-                  </p>
-                </div>
-              )}
-              {previewUrl && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPreviewUrl(null);
-                    setImagenFile(null);
-                  }}
-                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 text-rose-500 shadow flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"
-                >
-                  <Trash2 size={14} />
-                </button>
-              )}
-            </div>
-            <label className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-dashed border-[rgba(112,128,144,0.2)] rounded-[14px] cursor-pointer hover:bg-[#b76e79]/5 hover:border-[#b76e79]/30 transition-all">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <Plus size={14} className="text-[#b76e79]" />
-              <span className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">
-                Subir
-              </span>
-            </label>
-          </div>
-
-          {/* Descripción — columna derecha */}
-          <div className="flex-1 flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <p className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">
-                Descripción
-              </p>
-              <span className="text-[0.7rem] text-[#708090]/50">Opcional</span>
-            </div>
-            <textarea
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleChange}
-              rows={6}
-              placeholder="Describe el producto..."
-              className="w-full h-full bg-[#f6f4ef]/30 border-2 border-transparent rounded-[16px] p-4 text-sm text-[#4a5568] focus:border-[#b76e79] focus:bg-white outline-none transition-all resize-none shadow-inner"
-              style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* FOOTER */}
-      <div className="flex items-center justify-end gap-6 pt-6 border-t-2 border-[rgba(112,128,144,0.08)]">
+      <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-4 sm:gap-6 pt-6 border-t-2 border-[rgba(112,128,144,0.08)]">
         <button
           type="button"
           onClick={onCancel}
-          className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-[0.25em] hover:text-[#b76e79] transition-all px-4 py-2"
+          className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-[0.25em] hover:text-[#b76e79] transition-all px-4 py-3 sm:py-2 w-full sm:w-auto text-center border-2 border-[rgba(112,128,144,0.1)] sm:border-transparent rounded-xl sm:rounded-none"
           style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}
         >
           Cancelar
@@ -1783,7 +1895,7 @@ export default function ProductForm({
         <button
           type="submit"
           disabled={loading}
-          className="bg-[#2d3748] text-white px-20 py-6 rounded-full text-[0.8rem] font-black uppercase tracking-[0.3em] shadow-2xl hover:bg-black hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(45,55,72,0.3)] transition-all active:scale-95 disabled:opacity-50 disabled:translate-y-0"
+          className="bg-[#2d3748] text-white px-8 sm:px-20 py-4 sm:py-6 rounded-2xl sm:rounded-full text-[0.8rem] font-black uppercase tracking-[0.3em] shadow-xl sm:shadow-2xl hover:bg-black hover:-translate-y-1 sm:hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(45,55,72,0.3)] transition-all active:scale-95 disabled:opacity-50 disabled:translate-y-0 w-full sm:w-auto"
           style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}
         >
           {loading
@@ -1793,6 +1905,16 @@ export default function ProductForm({
               : "Crear producto"}
         </button>
       </div>
+      
+      </div> {/* END COLUMNA DERECHA */}
+      {imageToCrop && (
+        <ImageCropper
+          image={imageToCrop}
+          onCropComplete={handleCropComplete}
+          onCancel={() => setImageToCrop(null)}
+          aspectRatio={3 / 4}
+        />
+      )}
     </form>
   );
 }

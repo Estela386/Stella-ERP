@@ -17,7 +17,7 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
     costo: producto.costo,
     stock_actual: producto.stock_actual,
     stock_min: producto.stock_min,
-    categoria: producto.categoria.nombre,
+    categoria: producto.categoria?.nombre || "",
     es_personalizable: producto.es_personalizable || false,
   });
 
@@ -101,7 +101,7 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
               <input
                 name="costo"
-                value={form.costo}
+                value={form.costo || ""}
                 onChange={handleChange}
                 className="w-full bg-[#f6f4ef]/50 border border-[rgba(112,128,144,0.15)] rounded-xl pl-8 pr-4 py-3 text-sm text-[#4a5568] focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all"
               />
@@ -111,7 +111,7 @@ export default function ProductModal({ producto, onClose, onSave }: Props) {
           <InputGroup label="Stock Actual">
             <input
               name="stock_actual"
-              value={form.stock_actual}
+              value={form.stock_actual || ""}
               onChange={handleChange}
               className="w-full bg-[#f6f4ef]/50 border border-[rgba(112,128,144,0.15)] rounded-xl px-4 py-3 text-sm text-[#4a5568] focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all"
             />

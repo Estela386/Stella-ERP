@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   motion,
   useScroll,
@@ -317,6 +317,7 @@ export default function HomeClient() {
   const router = useRouter();
   const [email, setEmail]           = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
   const heroRef             = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -329,6 +330,36 @@ export default function HomeClient() {
     { label: "Tecnología",  href: "#tecnologia" },
     { label: "Mayoristas",  href: "#contacto" },
   ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = navLinks.map(link => link.href.substring(1)).filter(id => id);
+      
+      let current = "";
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          // Adjust offset to detect section earlier
+          if (rect.top <= 150) {
+            current = section;
+          }
+        }
+      }
+      
+      if (window.scrollY < 100) {
+        setActiveSection(""); // Inicio
+      } else {
+        setActiveSection(current);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    // Initial check
+    handleScroll();
+    
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
@@ -387,14 +418,42 @@ export default function HomeClient() {
           </motion.div>
 
           {/* Desktop links */}
-          <ul className="nav-links-desk" style={{ display: "flex", gap: 32, listStyle: "none", margin: 0, padding: 0 }}>
-            {navLinks.map(({ label, href }) => (
-              <li key={label}>
-                <a href={href} className="nav-link" style={{ textDecoration: "none", color: C.slate, fontSize: "0.84rem", letterSpacing: "0.04em" }}>
-                  {label}
-                </a>
-              </li>
-            ))}
+          <ul className="nav-links-desk" style={{ display: "flex", gap: 14, listStyle: "none", margin: 0, padding: 0 }}>
+            {navLinks.map(({ label, href }) => {
+              const isActive = activeSection === href.substring(1) || (activeSection === "" && href === "#");
+              return (
+                <li key={label} style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  {isActive && (
+                    <motion.div 
+                      layoutId="active-pill-nav"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "rgba(183,110,121,0.12)",
+                        borderRadius: 999,
+                        zIndex: 0
+                      }}
+                    />
+                  )}
+                  <a href={href} className="nav-link" style={{ 
+                    position: "relative",
+                    zIndex: 1,
+                    padding: "10px 24px",
+                    textDecoration: "none", 
+                    color: isActive ? C.rose : C.slate, 
+                    fontWeight: 500,
+                    textShadow: isActive ? `0 0 0.5px ${C.rose}` : "none",
+                    fontSize: "0.95rem", 
+                    letterSpacing: "0.04em",
+                    transition: "color 0.25s ease, text-shadow 0.25s ease",
+                    borderRadius: 999,
+                  }}>
+                    {label}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
 
           {/* Actions */}
@@ -428,13 +487,32 @@ export default function HomeClient() {
                 <button onClick={() => setMobileOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: C.slate }}><X size={21} /></button>
               </div>
               <div style={{ height: 1, background: C.slateBorder }} />
-              <div style={{ flex: 1, paddingTop: 24 }}>
-                {navLinks.map(({ label, href }) => (
-                  <a key={label} href={href} onClick={() => setMobileOpen(false)}
-                    style={{ display: "block", textDecoration: "none", color: C.slateDeep, fontSize: "1.4rem", fontFamily: "var(--font-serif, 'Celestial', serif)", fontWeight: 300, padding: "13px 0", borderBottom: `1px solid ${C.slateBorder}` }}>
-                    {label}
-                  </a>
-                ))}
+              <div style={{ flex: 1, paddingTop: 24, paddingLeft: 24, paddingRight: 24, margin: "0 -24px" }}>
+                {navLinks.map(({ label, href }) => {
+                  const isActive = activeSection === href.substring(1) || (activeSection === "" && href === "#");
+                  return (
+                    <a key={label} href={href} onClick={() => setMobileOpen(false)}
+                      style={{ 
+                        display: "flex", 
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        textDecoration: "none", 
+                        color: isActive ? C.rose : C.slateDeep, 
+                        fontSize: "1.35rem", 
+                        fontFamily: "var(--font-serif, 'Celestial', serif)", 
+                        fontWeight: 300, 
+                        textShadow: isActive ? `0 0 0.5px ${C.rose}` : "none",
+                        padding: "16px 24px", 
+                        background: isActive ? "linear-gradient(90deg, rgba(183,110,121,0.06) 0%, transparent 100%)" : "transparent",
+                        borderLeft: isActive ? `3px solid ${C.rose}` : "3px solid transparent",
+                        borderBottom: `1px solid ${C.slateBorder}`,
+                        transition: "all 0.25s ease"
+                      }}>
+                      {label}
+                      {isActive && <motion.span initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ fontSize: "1rem", color: C.rose }}>✦</motion.span>}
+                    </a>
+                  );
+                })}
               </div>
               <div style={{ paddingBottom: 40, display: "flex", flexDirection: "column", gap: 10 }}>
                 <button onClick={() => { router.push("/dashboard/cliente"); setMobileOpen(false); }} style={{ background: C.rose, color: "#f6f4ef", border: "none", borderRadius: 6, padding: "12px 0", fontFamily: "var(--font-sans, Inter, sans-serif)", fontSize: "0.88rem", cursor: "pointer" }}>Visitar Tienda</button>

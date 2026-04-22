@@ -20,7 +20,8 @@ export interface IProducto {
   producto_material?: { materiales?: { nombre: string } }[];
   activo: boolean;
   opciones?: any[];
-  url_filtro_tiktok?: string | null; // <-- Nueva propiedad
+  url_filtro_tiktok?: string | null;
+  iva?: number | null;
 }
 
 /**
@@ -49,7 +50,8 @@ export interface CreateProductoDTO {
   es_personalizable: boolean;
   tipo: "fabricado" | "revendido";
   opciones?: OpcionDTO[];
-  url_filtro_tiktok?: string; // <-- Nueva propiedad
+  url_filtro_tiktok?: string;
+  iva?: number;
 }
 
 /**
@@ -81,6 +83,7 @@ export class Producto implements IProducto {
   activo: boolean;
   opciones?: any[];
   url_filtro_tiktok?: string | null;
+  iva?: number | null;
 
   constructor(data: IProducto) {
     this.id = data.id;
@@ -101,6 +104,7 @@ export class Producto implements IProducto {
     this.activo = data.activo ?? true;
     this.opciones = data.opciones;
     this.url_filtro_tiktok = data.url_filtro_tiktok ?? null;
+    this.iva = data.iva ?? 0;
   }
 
   /**
@@ -172,6 +176,7 @@ export class Producto implements IProducto {
       producto_material: this.producto_material,
       activo: this.activo,
       opciones: this.opciones,
+      iva: this.iva,
     };
   }
 }

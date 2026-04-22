@@ -8,10 +8,10 @@ export default function InventoryStats({
   productos: Producto[];
   onFilterChange: (f: "todos" | "bajo" | "agotados") => void;
 }) {
-  const totalPiezas = productos.reduce((acc, p) => acc + p.stock_actual, 0);
+  const totalPiezas = productos.reduce((acc, p) => acc + (p.stock_actual || 0), 0);
 
   const valorInventario = productos.reduce(
-    (acc, p) => acc + p.stock_actual * p.costo,
+    (acc, p) => acc + (p.stock_actual || 0) * (p.costo || 0),
     0
   );
 
@@ -21,10 +21,10 @@ export default function InventoryStats({
   });
 
   const bajo = productos.filter(
-    p => p.stock_actual <= p.stock_min && p.stock_actual > 0
+    p => (p.stock_actual || 0) <= (p.stock_min || 0) && (p.stock_actual || 0) > 0
   ).length;
 
-  const agotados = productos.filter(p => p.stock_actual === 0).length;
+  const agotados = productos.filter(p => (p.stock_actual || 0) === 0).length;
 
   const stats = [
     { label: "Valor del Inventario", value: valorFormateado, onClick: undefined, bgStart: "#758390", bgEnd: "#657582", icon: DollarSign, color: "bg-[#708090]" },

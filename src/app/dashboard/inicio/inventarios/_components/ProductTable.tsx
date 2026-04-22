@@ -21,9 +21,9 @@ export default function ProductTable({
   // FILTRO POR ESTADO
   let productosFiltrados = productos.filter(p => {
     if (filtro === "bajo")
-      return p.stock_actual <= p.stock_min && p.stock_actual > 0;
+      return (p.stock_actual || 0) <= (p.stock_min || 0) && (p.stock_actual || 0) > 0;
 
-    if (filtro === "agotados") return p.stock_actual === 0;
+    if (filtro === "agotados") return (p.stock_actual || 0) === 0;
 
     return true;
   });
@@ -32,7 +32,7 @@ export default function ProductTable({
   productosFiltrados = productosFiltrados.filter(p => {
     const term = search.toLowerCase();
     const nombre = p.nombre?.toLowerCase() || "";
-    const categoria = p.categoria.nombre.toLowerCase();
+    const categoria = p.categoria?.nombre?.toLowerCase() || "";
 
     return (
       nombre.includes(term) ||
@@ -42,14 +42,13 @@ export default function ProductTable({
   });
 
   return (
-    <div className="bg-white rounded-2xl border border-[#8C9796]/30 overflow-hidden shadow-sm">
+    <div className="bg-white rounded-[24px] border border-[rgba(112,128,144,0.12)] overflow-hidden shadow-sm">
       {/* ── DESKTOP VIEW ── */}
       <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full text-sm text-[#111111]">
-          <thead className="bg-[#D1BBAA]/35">
+          <thead className="bg-[#f6f4ef]">
             <tr>
-              <th className="px-4 py-4 text-left font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Código</th>
-              <th className="px-4 py-4 text-left font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Nombre</th>
+              <th className="px-4 py-4 text-left font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Producto</th>
               <th className="px-4 py-4 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Categoría</th>
               <th className="px-4 py-4 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Tipo</th>
               <th className="px-4 py-4 font-medium text-[#708090]" style={{ fontFamily: "var(--font-sans)", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", fontWeight: 700 }}>Stock</th>
@@ -97,17 +96,21 @@ export default function ProductTable({
             {/* Margen decorativo superior */}
             <div className={`absolute top-0 inset-x-0 h-1.5 transition-colors ${p.tipo === 'fabricado' ? 'bg-[#8c9768]' : 'bg-[#b76e79]'}`} />
             
-            {/* Header: Nombre & Badge */}
-            <div className="flex justify-between items-start z-10 gap-2 pt-1">
-              <div className="flex flex-col">
-                <span className="text-[10px] text-[#8C9796] font-bold uppercase tracking-widest font-sans mb-1">
-                  JOY-{p.id}
-                </span>
+            {/* Header: Imagen, Nombre & Badge */}
+            <div className="flex items-start z-10 gap-3 pt-1">
+              <div className="w-16 h-[85px] rounded-xl overflow-hidden bg-[#F6F4EF] flex-shrink-0 border border-black/5 flex items-center justify-center text-[#708090]/40">
+                {p.url_imagen ? (
+                  <img src={p.url_imagen} alt={p.nombre || "Producto"} className="w-full h-full object-cover" />
+                ) : (
+                  <Package size={24} strokeWidth={1.5} />
+                )}
+              </div>
+              <div className="flex flex-col flex-1">
                 <span className="font-bold text-[#1C1C1C] text-lg leading-tight" style={{ fontFamily: "var(--font-marcellus)" }}>
                   {p.nombre}
                 </span>
                 <div className="flex items-center gap-1.5 mt-2 text-xs font-bold text-[#708090]" style={{ fontFamily: "var(--font-sans)" }}>
-                  <Tag size={12} className="opacity-60 text-[#b76e79]" /> {p.categoria.nombre}
+                  <Tag size={12} className="opacity-60 text-[#b76e79]" /> {p.categoria?.nombre}
                 </div>
               </div>
             </div>
@@ -124,7 +127,7 @@ export default function ProductTable({
               <div className="flex flex-col bg-[#F8F6F4] p-3.5 rounded-xl border border-black/5">
                 <span className="text-[9px] text-[#8C9796] uppercase font-bold tracking-widest mb-1.5">Stock</span>
                 <div className="flex items-center mt-auto">
-                  <StockBadge actual={p.stock_actual} minimo={p.stock_min} />
+                  <StockBadge actual={p.stock_actual || 0} minimo={p.stock_min || 0} />
                 </div>
               </div>
             </div>
@@ -139,7 +142,7 @@ export default function ProductTable({
                 {p.tipo === "fabricado" ? "Fabricado" : "Revendido"}
               </span>
               {p.es_personalizable && (
-                <span className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-[#1C1C1C] text-white" style={{ fontFamily: "var(--font-sans)" }}>
+                <span className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-[#b76e79]/15 text-[#b76e79] border border-[#b76e79]/20" style={{ fontFamily: "var(--font-sans)" }}>
                   Personalizable
                 </span>
               )}

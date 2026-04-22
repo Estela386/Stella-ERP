@@ -219,9 +219,11 @@ export default function MothersDayBanner() {
         }} className="banner-compact-grid">
           
           {/* Left Side: Info */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {/* Left Side: Info */}
+          <div className="banner-info-container" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <motion.div
               initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+              className="banner-badge"
               style={{ display: "flex", alignItems: "center", gap: 6 }}
             >
               <div style={{ width: 12, height: 1.5, background: ROSE }} />
@@ -257,7 +259,7 @@ export default function MothersDayBanner() {
               {campana.subtitulo}
             </motion.p>
             
-            <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="banner-cta" style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{
                 fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                 fontSize: "0.8rem", fontWeight: 700, color: ROSE,
@@ -297,7 +299,7 @@ export default function MothersDayBanner() {
               </span>
             </div>
 
-            <div style={{ display: "flex", gap: 8 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
               <CountdownUnit value={timeLeft.dias}     label="D" />
               <CountdownUnit value={timeLeft.horas}    label="H" />
               <CountdownUnit value={timeLeft.minutos}  label="M" />
@@ -308,14 +310,28 @@ export default function MothersDayBanner() {
 
         {/* CSS TWEAKS */}
         <style>{`
-          @media (max-width: 768px) {
+          @media (max-width: 860px) {
             .banner-compact-grid {
               grid-template-columns: 1fr !important;
               text-align: center;
               justify-items: center;
+              padding: 24px 16px !important;
+              gap: 20px !important;
             }
+            .banner-info-container {
+              align-items: center !important;
+            }
+            .banner-badge {
+              justify-content: center !important;
+            }
+            .banner-cta {
+              justify-content: center !important;
+            }
+          }
+          @media (max-width: 480px) {
             .compact-countdown {
-              transform: scale(0.9);
+              width: 100%;
+              transform: scale(0.95);
             }
           }
         `}</style>

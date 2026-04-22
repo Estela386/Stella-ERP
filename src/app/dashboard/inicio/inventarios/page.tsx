@@ -6,15 +6,14 @@ import SidebarMenu from "@/app/_components/SideBarMenu";
 import InventoryStats from "./_components/InventoryStats";
 import InventoryToolbar from "./_components/InventoryToolbar";
 import ProductTable from "./_components/ProductTable";
-import ProductModalForm from "./_components/ProductModalForm";
 import CategoryModal from "./_components/CategoryModal";
 import LabelPrintModal from "./_components/LabelPrintModal";
 import ConfirmationModal from "../_components/ConfirmationModal";
 import { Producto } from "./type";
-import { type OpcionForm } from "./_components/ProductForm";
 import { FileText } from "lucide-react";
 import Skeleton from "@/app/_components/ui/Skeleton";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 import {
   ProductoService,
@@ -51,12 +50,8 @@ export default function InventariosPage() {
   const [materiales, setMateriales] = useState<IMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [labelModalOpen, setLabelModalOpen] = useState(false);
-  const [selectedProducto, setSelectedProducto] = useState<
-    Producto | undefined
-  >();
   const [formLoading, setFormLoading] = useState(false);
   const [filtro, setFiltro] = useState<"todos" | "bajo" | "agotados">("todos");
 
@@ -177,231 +172,12 @@ export default function InventariosPage() {
     }
   }, [usuario, loadingUser]);
 
-  const handleOpenModal = (producto?: Producto) => {
-    setSelectedProducto(producto);
-    setModalOpen(true);
-  };
-
   const handleOpenCategoryModal = () => {
     setCategoryModalOpen(true);
   };
 
   const handleCloseCategoryModal = () => {
     setCategoryModalOpen(false);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setSelectedProducto(undefined);
-  };
-  // Helper para convertir OpcionForm al formato del servicio
-  const mapOpcionesParaServicio = (opciones: OpcionForm[]) =>
-    opciones.map(({ nombre, tipo, obligatorio, valores }) => ({
-      opcion: { nombre, tipo, obligatorio },
-      valores,
-    }));
-  const handleSubmitForm = async (
-    data: CreateProductoDTO | UpdateProductoDTO,
-    imagenFile?: File,
-    opciones?: OpcionForm[],
-    relacionProveedor?: { id_proveedor: number; precio_compra: number; tiempo_entrega: number },
-    insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[],
-    materialesSeleccionados?: number[],
-    id_actualizar?: number
-  ) => {
-    try {
-      setFormLoading(true);
-      const supabase = createClient();
-      const productoService = new ProductoService(supabase);
-      const categoriaService = new CategoriaService(supabase);
-      const imageUploadService = new ImageUploadService(supabase);
-      const personalizacionService = new ProductoPersonalizacionService(supabase);
-      const productoProveedorService = new ProductoProveedorService(supabase);
-      const productoInsumoService = new ProductoInsumoService(supabase);
-      const productoMaterialService = new ProductoMaterialService(supabase);
-
-      let urlImagen: string | undefined = undefined;
-
-      if (imagenFile) {
-        const { url, error: uploadError } =
-          await imageUploadService.uploadImage(
-            imagenFile,
-            selectedProducto?.id
-          );
-        if (uploadError) {
-          setError(uploadError);
-          return;
-        }
-        urlImagen = url || undefined;
-      }
-
-      const dataConImagen = urlImagen
-        ? { ...data, url_imagen: urlImagen }
-        : data;
-
-      const targetId = id_actualizar || selectedProducto?.id;
-
-      if (targetId) {
-        // ── Actualizar ──────────────────────────────────────────────
-        const { producto: productoActualizado, error } =
-          await productoService.actualizar(
-            targetId,
-            dataConImagen as UpdateProductoDTO
-          );
-
-        if (error) {
-          setError(error);
-          return;
-        } // ← verificar error ANTES de guardar opciones
-
-        // Luego en ambos bloques (actualizar y crear):
-        // Sincronizar Opciones de Personalización (Elimina anteriores y guarda nuevas)
-        // Se llama siempre que sea personalizable, o si deja de serlo para limpiar
-        if (data.es_personalizable) {
-          await personalizacionService.guardarOpcionesProducto(
-            targetId,
-            mapOpcionesParaServicio(opciones || [])
-          );
-        } else {
-          const personalizacionSvc = new ProductoPersonalizacionService(supabase);
-          await personalizacionSvc.eliminarOpcionesDeProducto(targetId);
-        }
-
-        // Guardar relación proveedor si es revendido
-        if (data.tipo === "revendido" && relacionProveedor) {
-          const provResult = await productoProveedorService.guardarRelacion({
-            id_producto: targetId,
-            id_proveedor: relacionProveedor.id_proveedor,
-            precio_compra: relacionProveedor.precio_compra,
-            tiempo_entrega: relacionProveedor.tiempo_entrega,
-          });
-          if (provResult?.error) console.error("Error guardando proveedor:", provResult.error);
-        } else if (data.tipo === "fabricado") {
-          // Si cambia de revendido a fabricado, eliminar relación proveedor
-          await productoProveedorService.eliminarPorProducto(targetId);
-        }
-
-        // Guardar insumos: siempre, ya sea lista llena o vacía (para borrar al cambiar tipo)
-        const insumosParaGuardar = data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
-        const insumoResult = await productoInsumoService.guardarInsumosProducto(targetId, insumosParaGuardar);
-        if (insumoResult && !insumoResult.success) console.error("Error guardando insumos:", insumoResult.error);
-
-        // Guardar materiales
-        if (materialesSeleccionados) {
-          const materialResult = await productoMaterialService.guardarRelaciones(targetId, materialesSeleccionados);
-          if (!materialResult.success) console.error("Error guardando materiales:", materialResult.error);
-        }
-
-        const { categorias: categoriasData } =
-          await categoriaService.obtenerTodas();
-        const cat = categoriasData?.find(
-          c => c.id === productoActualizado?.id_categoria
-        );
-
-        setProductos(prev =>
-          prev.map(p =>
-            p.id === targetId
-              ? {
-                  id: productoActualizado?.id || targetId,
-                  nombre: productoActualizado?.nombre || "",
-                  precio: productoActualizado?.precio || 0,
-                  costo: productoActualizado?.costo || 0,
-                  costo_mayorista: productoActualizado?.costo_mayorista || 0,
-                  stock_actual: productoActualizado?.stock_actual || 0,
-                  stock_min: productoActualizado?.stock_min || 0,
-                  tiempo: productoActualizado?.tiempo,
-                  url_imagen: productoActualizado?.url_imagen,
-                  id_categoria: productoActualizado?.id_categoria,
-                  es_personalizable: productoActualizado?.es_personalizable,
-                  descripcion: productoActualizado?.descripcion || "",
-                  tipo: productoActualizado?.tipo || "fabricado",
-                  categoria: cat
-                    ? { id: cat.id, nombre: cat.nombre || "" }
-                    : { id: 0, nombre: "Sin categoría" },
-                }
-              : p
-          )
-        );
-      } else {
-        // ── Crear ───────────────────────────────────────────────────
-        const { producto: productoNuevo, error } = await productoService.crear(
-          dataConImagen as CreateProductoDTO
-        );
-
-        if (error) {
-          setError(error);
-          return;
-        } // ← verificar error ANTES de guardar opciones
-
-        // Guardar opciones usando el id del producto recién creado
-        if (data.es_personalizable && opciones?.length && productoNuevo?.id) {
-          await personalizacionService.guardarOpcionesProducto(
-            productoNuevo.id,
-            mapOpcionesParaServicio(opciones)
-          );
-        }
-
-        // Guardar relación proveedor si es revendido
-        if (data.tipo === "revendido" && relacionProveedor && productoNuevo?.id) {
-          const provResult = await productoProveedorService.guardarRelacion({
-            id_producto: productoNuevo.id,
-            id_proveedor: relacionProveedor.id_proveedor,
-            precio_compra: relacionProveedor.precio_compra,
-            tiempo_entrega: relacionProveedor.tiempo_entrega,
-          });
-          if (provResult?.error) console.error("Error guardando proveedor:", provResult.error);
-        }
-
-        // Guardar insumos siempre (lista vacía si es revendido, para limpiar)
-        if (productoNuevo?.id) {
-          const insumosParaGuardar = data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
-          const insumoResult = await productoInsumoService.guardarInsumosProducto(productoNuevo.id, insumosParaGuardar);
-          if (insumoResult && !insumoResult.success) console.error("Error guardando insumos:", insumoResult.error);
-          
-          if (materialesSeleccionados) {
-            const materialResult = await productoMaterialService.guardarRelaciones(productoNuevo.id, materialesSeleccionados);
-            if (!materialResult.success) console.error("Error guardando materiales:", materialResult.error);
-          }
-        }
-
-        const { categorias: categoriasData } =
-          await categoriaService.obtenerTodas();
-        const cat = categoriasData?.find(
-          c => c.id === productoNuevo?.id_categoria
-        );
-
-        setProductos(prev => [
-          ...prev,
-          {
-            id: productoNuevo?.id || 0,
-            nombre: productoNuevo?.nombre || "",
-            precio: productoNuevo?.precio || 0,
-            costo: productoNuevo?.costo || 0,
-            costo_mayorista: productoNuevo?.costo_mayorista || 0,
-            stock_actual: productoNuevo?.stock_actual || 0,
-            stock_min: productoNuevo?.stock_min || 0,
-            tiempo: productoNuevo?.tiempo,
-            url_imagen: productoNuevo?.url_imagen,
-            id_categoria: productoNuevo?.id_categoria,
-            es_personalizable: productoNuevo?.es_personalizable,
-            descripcion: productoNuevo?.descripcion || "",
-            tipo: productoNuevo?.tipo || "fabricado",
-            categoria: cat
-              ? { id: cat.id, nombre: cat.nombre || "" }
-              : { id: 0, nombre: "Sin categoría" },
-          },
-        ]);
-      }
-
-      handleCloseModal();
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Error al guardar producto"
-      );
-      console.error("Error guardando producto:", err);
-    } finally {
-      setFormLoading(false);
-    }
   };
   const handleDeleteProducto = (id: number, nombre?: string) => {
     setDeleteModal({ open: true, id, nombre: nombre || "este producto" });
@@ -567,7 +343,7 @@ export default function InventariosPage() {
                   <span className="sm:hidden">Etiquetas</span>
                 </button>
                 <button
-                  onClick={() => handleOpenModal()}
+                  onClick={() => router.push("/dashboard/inicio/inventarios/nuevo")}
                   className="
                     flex-1 lg:flex-none justify-center
                     text-white
@@ -589,26 +365,13 @@ export default function InventariosPage() {
             <ProductTable
               productos={productos}
               search={search}
-              onEdit={handleOpenModal}
+              onEdit={(p) => router.push(`/dashboard/inicio/inventarios/editar/${p.id}`)}
               onDelete={handleDeleteProducto}
               filtro={filtro}
             />
           </div>
         </div>
       </main>
-
-      {/* Modal de Producto */}
-      <ProductModalForm
-        isOpen={modalOpen}
-        producto={selectedProducto}
-        categorias={categorias}
-        proveedores={proveedores}
-        insumos={insumos}
-        materiales={materiales}
-        onSubmit={handleSubmitForm}
-        onClose={handleCloseModal}
-        loading={formLoading}
-      />
 
       <CategoryModal
         isOpen={categoryModalOpen}

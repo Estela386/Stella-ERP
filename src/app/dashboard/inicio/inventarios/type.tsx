@@ -1,27 +1,28 @@
 export type Categoria = {
   id: number;
-  nombre: string;
+  nombre: string | null;
 };
 
 export type Producto = {
   id: number;
   nombre: string | null;
   precio: number | null;
-  costo: number;
+  costo: number | null;
   costo_mayorista?: number | null;
-  stock_actual: number;
-  stock_min: number;
+  stock_actual: number | null;
+  stock_min: number | null;
   tiempo?: number | null;
   url_imagen?: string | null;
   id_categoria?: number | null;
-  categoria: Categoria;
+  categoria?: Categoria;
   es_personalizable?: boolean | null;
   descripcion?: string | null;
   tipo: "fabricado" | "revendido";
   opciones?: any[];
   ganancia?: number;
   roi_porcentaje?: number;
-  url_filtro_tiktok?: string;
+  url_filtro_tiktok?: string | null;
+  iva?: number | null;
 };
 
 export type HistorialProducto = {

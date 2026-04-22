@@ -366,8 +366,8 @@ function ProductListCard({ product, onClick }: { product: ProductoCard; onClick:
         cursor: "pointer",
         transition: "all 0.4s cubic-bezier(0.25, 1, 0.5, 1)",
         transform: hovered ? "translateY(-4px)" : "translateY(0)",
-        filter: lowStock ? "grayscale(70%)" : "none",
-        opacity: noStock ? 0.55 : lowStock ? 0.7 : 1,
+        filter: noStock ? "grayscale(100%)" : "none",
+        opacity: noStock ? 0.6 : 1,
       }}
     >
       {/* Imagen */}
@@ -428,7 +428,7 @@ function ProductListCard({ product, onClick }: { product: ProductoCard; onClick:
               color: noStock ? ROSE : lowStock ? SLATE : SAGE,
               border: `1px solid ${noStock ? "rgba(183,110,121,0.2)" : lowStock ? "rgba(112,128,144,0.2)" : "rgba(140,151,104,0.25)"}`,
             }}>
-              {noStock ? "Sin stock" : lowStock ? `¡Últimas ${(product as any).stock_actual}!` : `${(product as any).stock_actual} disponibles`}
+              {noStock ? "Sin stock" : lowStock ? "¡Últimas piezas!" : `${(product as any).stock_actual} disponibles`}
             </span>
           )}
         </div>
@@ -456,8 +456,8 @@ function ProductGridCard({ product, onClick }: { product: ProductoCard; onClick:
       onMouseLeave={() => setHovered(false)}
       style={{
         cursor: "pointer",
-        filter: lowStock ? "grayscale(70%)" : "none",
-        opacity: noStock ? 0.55 : lowStock ? 0.7 : 1,
+        filter: noStock ? "grayscale(100%)" : "none",
+        opacity: noStock ? 0.6 : 1,
         transition: "filter 0.3s ease, opacity 0.3s ease",
       }}
     >
@@ -507,7 +507,7 @@ function ProductGridCard({ product, onClick }: { product: ProductoCard; onClick:
               backdropFilter: "blur(4px)",
               letterSpacing: "0.02em",
             }}>
-              ¡Últimas {(product as any).stock_actual}!
+              ¡Últimas piezas!
             </span>
           </div>
         )}
@@ -689,20 +689,19 @@ function CatalogContent() {
 
     // 3. Aplicar Ordenamientos adicionales
     r.sort((a, b) => {
-      // Primero: productos con stock bajo y sin stock van al final
-      const aStock = (a as any).stock_actual;
-      const bStock = (b as any).stock_actual;
-      const aIsLow = aStock !== undefined && aStock >= 0 && aStock <= LOW_STOCK_THRESHOLD;
-      const bIsLow = bStock !== undefined && bStock >= 0 && bStock <= LOW_STOCK_THRESHOLD;
+      // Primero: productos sin stock van al final absoluto
+      const aStock = (a as any).stock_actual ?? 0;
+      const bStock = (b as any).stock_actual ?? 0;
+      const aOut = aStock === 0;
+      const bOut = bStock === 0;
+      
+      if (aOut !== bOut) return aOut ? 1 : -1;
+
+      // Luego: productos con stock bajo van al final (antes de los sin stock)
+      const aIsLow = aStock > 0 && aStock <= LOW_STOCK_THRESHOLD;
+      const bIsLow = bStock > 0 && bStock <= LOW_STOCK_THRESHOLD;
       
       if (aIsLow !== bIsLow) return aIsLow ? 1 : -1;
-      
-      // Dentro de los de stock bajo, sin stock va al final absoluto
-      if (aIsLow && bIsLow) {
-        const aOut = aStock === 0;
-        const bOut = bStock === 0;
-        if (aOut !== bOut) return aOut ? 1 : -1;
-      }
       
       // Luego por score (similitud)
       if (b._score !== a._score) return b._score - a._score;

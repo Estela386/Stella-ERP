@@ -43,6 +43,7 @@ export async function obtenerProductosCatalogo(): Promise<{
         valores: (o.valores || []).map((v: any) => ({ valor: v.valor })),
       })) || [],
       created_at: (p as any).created_at as string,
+      stock_actual: p.stock_actual ?? undefined,
     }));
 
     return { productos: productosFormatted, error: null };
@@ -91,6 +92,7 @@ export async function buscarProductosCatalogo(termino: string): Promise<{
       materiales: p.producto_material?.map((pm: any) => pm.materiales?.nombre).filter(Boolean) || [],
       es_personalizable: !!(p as any).es_personalizable,
       created_at: (p as any).created_at as string,
+      stock_actual: p.stock_actual ?? undefined,
     }));
 
     return { productos: productosFormatted, error: null };
@@ -136,6 +138,7 @@ export async function obtenerProductosPorCategoria(
       materiales: p.producto_material?.map((pm: any) => pm.materiales?.nombre).filter(Boolean) || [],
       es_personalizable: !!(p as any).es_personalizable,
       created_at: (p as any).created_at as string,
+      stock_actual: p.stock_actual ?? undefined,
     }));
 
     return { productos: productosFormatted, error: null };
@@ -203,4 +206,100 @@ export async function obtenerProductosMayoreo(): Promise<{
   }
 }
 
+/**
+ * Server Action para suscribirse a notificaciones de stock
+ */
+export async function suscribirStock(idProducto: number): Promise<{
+  success: boolean;
+  error: string | null;
+}> {
+  try {
+    const supabase = await createClient();
+    
+    // 1. Obtener el usuario de la sesión de Supabase
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return { success: false, error: "Sesión no encontrada. Por favor inicia sesión." };
+    }
 
+    // 2. Buscar el id del usuario en nuestra tabla 'usuario' usando el id_auth (uuid)
+    const { data: userData, error: userDataError } = await supabase
+      .from("usuario")
+      .select("id")
+      .eq("id_auth", user.id)
+      .single();
+
+    if (userDataError || !userData) {
+      return { success: false, error: "No se encontró tu perfil en la base de datos." };
+    }
+
+    // 3. Insertar o actualizar la suscripción (upsert)
+    // Esto evita el error de "duplicate key" si el SELECT previo falló por RLS
+    const { error: upsertError } = await supabase
+      .from("suscripciones_stock")
+      .upsert({ 
+        id_usuario: userData.id, 
+        id_producto: idProducto,
+        notificado: false 
+      }, {
+        onConflict: 'id_usuario,id_producto,notificado',
+        ignoreDuplicates: true
+      });
+ 
+    if (upsertError) {
+      console.error("Error al suscribir stock:", upsertError);
+      // Si el error es de RLS, dar un mensaje más claro
+      if (upsertError.code === '42501') {
+        return { success: false, error: "No tienes permisos para suscribirte. Contacta al administrador para revisar las políticas RLS." };
+      }
+      return { success: false, error: `Error de base de datos: ${upsertError.message}` };
+    }
+ 
+    return { success: true, error: null };
+  } catch (err) {
+    console.error("Error en suscribirStock:", err);
+    return { success: false, error: "Error inesperado al procesar la solicitud" };
+  }
+}
+
+/**
+ * Server Action para guardar suscripción a notificaciones push
+ */
+export async function guardarSuscripcionPush(subscription: any): Promise<{
+  success: boolean;
+  error: string | null;
+}> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return { success: false, error: "No autenticado" };
+
+    const { data: userData } = await supabase
+      .from("usuario")
+      .select("id")
+      .eq("id_auth", user.id)
+      .single();
+
+    if (!userData) return { success: false, error: "Perfil no encontrado" };
+
+    const { error } = await supabase
+      .from("push_subscriptions")
+      .upsert({
+        id_usuario: userData.id,
+        subscription: subscription
+      }, {
+        onConflict: 'id_usuario,subscription'
+      });
+
+    if (error) {
+      console.error("Error al guardar suscripción push:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, error: null };
+  } catch (err) {
+    console.error("Error en guardarSuscripcionPush:", err);
+    return { success: false, error: "Error inesperado" };
+  }
+}
