@@ -34,7 +34,7 @@ export default function LabelPrintModal({
   const filteredProducts = useMemo(() => {
     return productos.filter((p) =>
       p.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.categoria?.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      p.categoria?.nombre?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [productos, searchTerm]);
 
@@ -42,7 +42,13 @@ export default function LabelPrintModal({
   const updateQuantity = (producto: Producto, delta: number) => {
     setSelectedItems((prev) => {
       const current = prev[producto.id];
-      const newQuantity = (current?.cantidad || 0) + delta;
+      let newQuantity = (current?.cantidad || 0) + delta;
+      
+      // Cap at stock_actual
+      const maxStock = producto.stock_actual || 0;
+      if (newQuantity > maxStock) {
+        newQuantity = maxStock;
+      }
 
       if (newQuantity <= 0) {
         const newState = { ...prev };
@@ -58,7 +64,9 @@ export default function LabelPrintModal({
   };
 
   const handleManualQuantityChange = (producto: Producto, value: string) => {
-    const qty = parseInt(value, 10);
+    let qty = parseInt(value, 10);
+    const maxStock = producto.stock_actual || 0;
+
     if (isNaN(qty) || qty <= 0) {
       setSelectedItems((prev) => {
         const newState = { ...prev };
@@ -66,6 +74,10 @@ export default function LabelPrintModal({
         return newState;
       });
       return;
+    }
+
+    if (qty > maxStock) {
+      qty = maxStock;
     }
 
     setSelectedItems((prev) => ({
@@ -164,22 +176,51 @@ export default function LabelPrintModal({
           currentY = y + standardHeight + standardSpacingY;
 
           // -- DRAW STANDARD LABEL --
-          // (Copying current logic)
           doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.1); doc.rect(x, y, standardWidth, standardHeight);
           doc.setFillColor(183, 110, 121); doc.rect(x + 1, y + 1, standardWidth - 2, 4, "F");
           doc.setTextColor(255, 255, 255); doc.setFontSize(6); doc.setFont("helvetica", "bold");
           doc.text("S T E L L A", x + (standardWidth / 2), y + 3.8, { align: "center" });
-          doc.setTextColor(112, 128, 144); doc.setFontSize(8);
-          doc.text((item.producto.nombre || "PRODUCTO").substring(0, 28).toUpperCase(), x + 2.5, y + 9, { maxWidth: 24 });
+          
+          doc.setTextColor(112, 128, 144); 
+          const name = (item.producto.nombre || "PRODUCTO").toUpperCase();
+          // Dynamic font size for name
+          const nameFontSize = name.length > 22 ? 5 : name.length > 15 ? 6.5 : 8;
+          doc.setFontSize(nameFontSize);
+          doc.text(name, x + 2.5, y + 9, { maxWidth: 24 });
+
           doc.setTextColor(0, 0, 0); doc.setFontSize(14);
           const priceStr = item.producto.precio != null ? `$${item.producto.precio.toLocaleString('es-MX', { minimumFractionDigits: 2 })}` : "$0.00";
           doc.text(priceStr, x + 2.5, y + 16.5);
           doc.setDrawColor(240, 240, 240); doc.setLineWidth(0.3); doc.line(x + 2.5, y + 19, x + 24, y + 19);
+          
           doc.setTextColor(130, 130, 130); doc.setFontSize(5.5); doc.setFont("helvetica", "normal");
-          const mat = materialesMap[item.producto.id] || "VARIOS";
-          doc.text(`MATERIAL: ${mat.toUpperCase()}`, x + 2.5, y + 23, { maxWidth: 22 });
-          const cat = item.producto.categoria?.nombre || "GENERAL";
-          doc.text(`CAT: ${cat.toUpperCase()}`, x + 2.5, y + 26.5, { maxWidth: 22 });
+          
+          // Abbreviate Material - More aggressive
+          let matRaw = materialesMap[item.producto.id] || "VARIOS";
+          // Take only first two materials if there are many
+          const matParts = matRaw.split(',').map(m => m.trim());
+          const matToProcess = matParts.length > 2 ? `${matParts[0]}, ${matParts[1]}...` : matParts.join(', ');
+
+          const matAbbr = matToProcess
+            .replace(/plata/i, "PL")
+            .replace(/oro/i, "OR")
+            .replace(/acero/i, "AC")
+            .replace(/inoxidable/i, "INOX")
+            .replace(/chapa de oro/i, "CH ORO")
+            .replace(/chapado/i, "CH")
+            .replace(/quilates/i, "K")
+            .replace(/kilates/i, "K")
+            .replace(/perla de rio/i, "P. RIO")
+            .replace(/perla/i, "P.")
+            .replace(/cristal/i, "CRIST.");
+            
+          // Truncate to one line to prevent overlapping with Category and QR
+          const matFinal = matAbbr.length > 18 ? matAbbr.substring(0, 16) + "..." : matAbbr;
+          doc.text(`MAT: ${matFinal.toUpperCase()}`, x + 2.5, y + 23);
+
+          const catRaw = (item.producto.categoria?.nombre || "GENERAL").toUpperCase();
+          const catFinal = catRaw.length > 18 ? catRaw.substring(0, 16) + "..." : catRaw;
+          doc.text(`CAT: ${catFinal}`, x + 2.5, y + 26.5);
           if (!qrCache[item.producto.id]) {
             qrCache[item.producto.id] = await QRCode.toDataURL(`https://www.stellajoyeria.online/productos/${item.producto.id}`, { width: 80, margin: 0 });
           }
@@ -278,10 +319,23 @@ export default function LabelPrintModal({
 
           // Attributes next to QR in the face
           doc.setTextColor(112, 128, 144); doc.setFont("helvetica", "normal"); doc.setFontSize(3.8);
-          const cat = (item.producto.categoria?.nombre || "GRAL").substring(0, 15);
-          doc.text(cat.toUpperCase(), x + 50.5, y + 4.5, { maxWidth: 9 });
-          const mat = (materialesMap[item.producto.id] || "VAR").split(',')[0].substring(0, 12);
-          doc.text(mat.toUpperCase(), x + 50.5, y + 8.5, { maxWidth: 9 });
+          const cat = (item.producto.categoria?.nombre || "GRAL").substring(0, 15).toUpperCase();
+          doc.text(cat, x + 50.5, y + 4.5, { maxWidth: 9 });
+          
+          let matStr = (materialesMap[item.producto.id] || "VAR").split(',')[0].trim();
+          const matAbbr = matStr
+            .replace(/plata/i, "PL")
+            .replace(/oro/i, "OR")
+            .replace(/acero/i, "AC")
+            .replace(/inoxidable/i, "INOX")
+            .replace(/chapa de oro/i, "CH ORO")
+            .replace(/chapado/i, "CH")
+            .replace(/quilates/i, "K")
+            .replace(/kilates/i, "K");
+            
+          // Truncate to avoid overflow in jewelry tag face
+          const matFinal = matAbbr.length > 12 ? matAbbr.substring(0, 10) + ".." : matAbbr;
+          doc.text(matFinal.toUpperCase(), x + 50.5, y + 8.5, { maxWidth: 9 });
 
 
           jwlCountTotal++;
@@ -309,12 +363,12 @@ export default function LabelPrintModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="relative bg-white sm:rounded-3xl shadow-2xl w-full sm:w-full max-w-4xl h-full sm:h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
         {/* Accent line */}
         <div className="absolute inset-x-0 top-0 h-1 bg-[#b76e79]" />
 
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-black/5">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-black/5">
           <div className="space-y-1">
             <h2 className="text-2xl font-serif font-medium text-[#708090]">
               Imprimir Etiquetas
@@ -334,8 +388,8 @@ export default function LabelPrintModal({
         {/* Content */}
         <div className="flex-1 overflow-hidden flex flex-col sm:flex-row min-h-0">
           {/* Left panel: Product Selection */}
-          <div className="flex-1 flex flex-col border-b sm:border-b-0 sm:border-r border-black/5 bg-[#F6F3EF]/30">
-            <div className="p-4 border-b border-black/5">
+          <div className="flex-1 flex flex-col border-b sm:border-b-0 sm:border-r border-black/5 bg-[#F6F3EF]/30 min-h-0">
+            <div className="p-3 sm:p-4 border-b border-black/5">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -393,10 +447,15 @@ export default function LabelPrintModal({
                       <input
                         type="number"
                         min="0"
+                        max={p.stock_actual || undefined}
                         value={selectedItems[p.id]?.cantidad || ""}
                         onChange={(e) => handleManualQuantityChange(p, e.target.value)}
                         placeholder="0"
-                        className="w-12 text-center text-sm font-medium mx-1 py-1 border border-black/10 rounded-md focus:outline-none focus:ring-1 focus:ring-[#b76e79] hide-arrows"
+                        className={`w-12 text-center text-sm font-medium mx-1 py-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-[#b76e79] hide-arrows ${
+                          (selectedItems[p.id]?.cantidad || 0) >= (p.stock_actual || 0) && (p.stock_actual || 0) > 0
+                            ? "border-[#b76e79] bg-[#b76e79]/5 text-[#b76e79]"
+                            : "border-black/10"
+                        }`}
                       />
                       <button
                         onClick={() => updateQuantity(p, 1)}
@@ -412,10 +471,10 @@ export default function LabelPrintModal({
           </div>
 
           {/* Right panel: Summary */}
-          <div className="w-full sm:w-80 flex flex-col bg-white">
-            <div className="p-4 border-b border-black/5">
-              <h3 className="font-medium text-gray-800">Tipo de Etiqueta</h3>
-              <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="w-full sm:w-80 flex-1 sm:flex-none flex flex-col bg-white border-t sm:border-t-0 border-black/5 min-h-0">
+            <div className="p-3 sm:p-4 border-b border-black/5">
+              <h3 className="font-bold text-[10px] uppercase tracking-widest text-[#708090]">Tipo de Etiqueta</h3>
+              <div className="mt-2 grid grid-cols-2 gap-2">
                 <button
                   onClick={() => setLabelType("standard")}
                   className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
@@ -445,9 +504,9 @@ export default function LabelPrintModal({
               </div>
             </div>
 
-            <div className="p-4 border-b border-black/5 bg-gray-50/30">
-              <h3 className="font-medium text-gray-800">Resumen</h3>
-              <p className="text-sm text-gray-500 font-medium">{totalLabels} etiquetas seleccionadas</p>
+            <div className="p-3 sm:p-4 border-b border-black/5 bg-gray-50/30 flex items-center justify-between">
+              <h3 className="font-bold text-[10px] uppercase tracking-widest text-[#708090]">Resumen</h3>
+              <p className="text-[10px] text-[#b76e79] font-bold">{totalLabels} etiquetas</p>
             </div>
             
             <div className="flex-1 overflow-y-auto p-4 space-y-3">

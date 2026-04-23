@@ -42,8 +42,7 @@ export default function SalesByProductChart({
       boxShadow: "0 4px 12px rgba(0,0,0,0.04)",
       border: "1px solid rgba(0,0,0,0.04)",
       display: "flex", flexDirection: "column",
-      height: "100%",
-      minHeight: 320
+      height: 600,
     }}>
       <div style={{ marginBottom: 20 }}>
         <h3 style={{
@@ -60,9 +59,9 @@ export default function SalesByProductChart({
         </p>
       </div>
 
-      <div style={{ flex: 1, minHeight: 220 }}>
+      <div style={{ flex: 1, minHeight: 320 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
+          <BarChart data={chartData} layout="vertical" margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E2E8F0" />
             <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#8A94A6" }} />
             <YAxis 
@@ -77,7 +76,7 @@ export default function SalesByProductChart({
               cursor={{ fill: "rgba(0,0,0,0.04)" }}
               contentStyle={{ borderRadius: 8, border: "none", boxShadow: "0 4px 14px rgba(0,0,0,0.1)", fontFamily: "var(--font-poppins)", fontSize: "0.85rem" }}
             />
-            <Bar dataKey="Cantidad" radius={[0, 4, 4, 0]} barSize={24}>
+            <Bar dataKey="Cantidad" radius={[0, 4, 4, 0]} barSize={35}>
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}

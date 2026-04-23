@@ -11,6 +11,8 @@ export interface IVenta {
   id_pedido?: number | null; // pedidos.id (opcional)
   created_at?: string;
   detalles?: IDetalleVenta[]; // Relación con detallesventas
+  usuario?: { nombre: string | null; [key: string]: any } | null; // Relación con usuario
+  metodo_pago?: string | null;
 }
 
 import { IDetalleVenta } from "./DetalleVenta";
@@ -38,6 +40,8 @@ export class Venta implements IVenta {
   id_pedido?: number | null;
   created_at?: string;
   detalles?: IDetalleVenta[];
+  usuario?: { nombre: string | null; [key: string]: any } | null;
+  metodo_pago?: string | null;
 
   constructor(data: IVenta) {
     this.id = data.id;
@@ -50,6 +54,8 @@ export class Venta implements IVenta {
     this.estado = data.estado;
     this.id_pedido = data.id_pedido;
     this.created_at = data.created_at;
+    this.usuario = data.usuario;
+    this.metodo_pago = data.metodo_pago;
   }
   toJSON(): IVenta {
     return {
@@ -59,6 +65,8 @@ export class Venta implements IVenta {
       id_usuario: this.id_usuario,
       estado: this.estado,
       detalles: this.detalles,
+      usuario: this.usuario,
+      metodo_pago: this.metodo_pago,
     };
   }
 

@@ -11,6 +11,9 @@ import { toast } from "sonner";
 import { Sparkles, ScanFace } from "lucide-react";
 import SimilarProducts from "./_components/SimilarProducts";
 import AlsoBoughtProducts from "./_components/AlsoBoughtProducts";
+import { suscribirStock } from "@/app/dashboard/cliente/actions";
+import { useRouter } from "next/navigation";
+import { Bell, AlertTriangle, ArrowLeft } from "lucide-react";
 
 interface ProductoClientProps {
   id: string;
@@ -18,11 +21,13 @@ interface ProductoClientProps {
 
 export default function ProductoClient({ id }: ProductoClientProps) {
   const { usuario } = useAuth();
+  const router = useRouter();
   const { agregarAlCarrito } = useCart();
   const [producto, setProducto] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [agregandoCarrito, setAgregandoCarrito] = useState(false);
+  const [suscribiendo, setSuscribiendo] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [rating, setRating] = useState(5);
@@ -330,6 +335,13 @@ export default function ProductoClient({ id }: ProductoClientProps) {
           animation: "fadeIn 0.8s ease-out",
         }}
       >
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-[#708090] hover:text-[#b76e79] transition-colors mb-6 font-sans text-sm font-medium bg-transparent border-none cursor-pointer"
+        >
+          <ArrowLeft size={16} /> Volver al catálogo
+        </button>
+
         <div className="main-grid">
           {/* Columna Izquierda: Imagen */}
           <div className="sticky-container">
@@ -355,6 +367,12 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   alt={producto.nombre || "Imagen del producto"}
                   fill
                   className="object-cover transition-opacity duration-500"
+                  style={{
+                    filter:
+                      producto.stock_actual <= 0 ? "grayscale(100%)" : "none",
+                    opacity: producto.stock_actual <= 0 ? 0.8 : 1,
+                    transition: "all 0.5s ease",
+                  }}
                   priority
                 />
               ) : (
@@ -1071,6 +1089,119 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                   ? "Añadir al carrito"
                   : "Sin existencias"}
             </button>
+
+            {/* Alerta de Stock y Botón de Notificación */}
+            {producto.stock_actual <= 0 && (
+              <div
+                style={{
+                  marginTop: 16,
+                  padding: "20px",
+                  background: "rgba(183,110,121,0.05)",
+                  border: "1px solid rgba(183,110,121,0.2)",
+                  borderRadius: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <AlertTriangle size={20} style={{ color: "#b76e79" }} />
+                  <p
+                    style={{
+                      fontFamily: "var(--font-sans, Inter, sans-serif)",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#4a5568",
+                      margin: 0,
+                    }}
+                  >
+                    Este producto no tiene stock disponible
+                  </p>
+                </div>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
+                    fontSize: "0.82rem",
+                    color: "#708090",
+                    lineHeight: 1.5,
+                    margin: 0,
+                  }}
+                >
+                  ¡No te preocupes! Déjanos tu solicitud y te avisaremos
+                  inmediatamente cuando vuelva a estar disponible en nuestra
+                  colección.
+                </p>
+                <button
+                  disabled={suscribiendo}
+                  onClick={async () => {
+                    if (!usuario) {
+                      toast.error(
+                        "Debes iniciar sesión para activar las notificaciones",
+                        {
+                          description:
+                            "Te redirigiremos al inicio de sesión...",
+                          duration: 4000,
+                        }
+                      );
+                      setTimeout(() => router.push("/login"), 2000);
+                      return;
+                    }
+
+                    try {
+                      setSuscribiendo(true);
+                      const res = await suscribirStock(producto.id);
+                      if (res.success) {
+                        toast.success("¡Suscripción activada! 💎", {
+                          description:
+                            "Te enviaremos un aviso en cuanto tengamos stock disponible.",
+                        });
+                      } else {
+                        toast.error(
+                          res.error || "No se pudo activar la notificación"
+                        );
+                      }
+                    } catch (err) {
+                      toast.error("Error al procesar la solicitud");
+                    } finally {
+                      setSuscribiendo(false);
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    background: "white",
+                    color: "#b76e79",
+                    border: "1.5px solid #b76e79",
+                    borderRadius: 12,
+                    fontFamily: "var(--font-sans, Inter, sans-serif)",
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    marginTop: 4,
+                  }}
+                  onMouseOver={e => {
+                    if (!suscribiendo) {
+                      e.currentTarget.style.background = "#b76e79";
+                      e.currentTarget.style.color = "white";
+                    }
+                  }}
+                  onMouseOut={e => {
+                    if (!suscribiendo) {
+                      e.currentTarget.style.background = "white";
+                      e.currentTarget.style.color = "#b76e79";
+                    }
+                  }}
+                >
+                  <Bell size={16} />
+                  {suscribiendo ? "Procesando..." : "Avísenme cuando regrese"}
+                </button>
+              </div>
+            )}
             {producto.url_filtro_tiktok && (
               <a
                 href={producto.url_filtro_tiktok}

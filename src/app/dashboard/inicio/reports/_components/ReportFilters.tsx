@@ -12,12 +12,14 @@ interface ReportFiltersProps {
   endDate: string;
   onStartDateChange: (d: string) => void;
   onEndDateChange: (d: string) => void;
+  onExport?: () => void;
 }
 
 export default function ReportFilters({
   activeTab, onTabChange,
   startDate, endDate,
-  onStartDateChange, onEndDateChange
+  onStartDateChange, onEndDateChange,
+  onExport
 }: ReportFiltersProps) {
 
   const TABS: PeriodoTab[] = ["DIARIO", "SEMANAL", "MENSUAL", "ANUAL"];
@@ -51,7 +53,7 @@ export default function ReportFilters({
               fontSize: "0.75rem", fontWeight: activeTab === t ? 700 : 500,
               textTransform: "uppercase",
               letterSpacing: "0.05em",
-              color: activeTab === t ? "#11d198" : "#8A94A6",
+              color: activeTab === t ? "#b76e79" : "#8A94A6",
               background: "none", border: "none", cursor: "pointer",
               padding: "6px 10px",
             }}
@@ -61,8 +63,8 @@ export default function ReportFilters({
         ))}
       </div>
 
-      {/* Date Pickers */}
-      <div style={{ display: "flex", gap: 10 }}>
+      {/* Actions (Dates + Export) */}
+      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
         <input
           type="date"
           value={startDate}
@@ -89,6 +91,25 @@ export default function ReportFilters({
             background: "#fff"
           }}
         />
+        
+        {onExport && (
+          <button
+            onClick={onExport}
+            style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "8px 16px", borderRadius: 10,
+              background: "#2d3748", color: "#fff",
+              fontFamily: "var(--font-sans)", fontSize: "0.75rem", fontWeight: 700,
+              border: "none", cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+            onMouseOver={e => e.currentTarget.style.background = "#000"}
+            onMouseOut={e => e.currentTarget.style.background = "#2d3748"}
+          >
+            <Download size={16} />
+            EXCEL CONTABLE
+          </button>
+        )}
       </div>
     </div>
   );

@@ -12,12 +12,20 @@ import SalesByCategoryChart from "./_components/SalesByCategoryChart";
 import SalesByWholesalerChart from "./_components/SalesByWholesalerChart";
 import SalesVsConsignmentChart from "./_components/SalesVsConsignmentChart";
 import InventoryReportSection from "./_components/InventoryReportSection";
+import SalesGoals from "./_components/SalesGoals";
+import WholesalerGoal from "./_components/WholesalerGoal";
+import TopProfitProducts from "./_components/TopProfitProducts";
+import AverageTicket from "./_components/AverageTicket";
+import CollectionGoal from "./_components/CollectionGoal";
+import SalesVsCollection from "./_components/SalesVsCollection";
+import FinancialSummary from "./_components/FinancialSummary";
 import { motion } from "framer-motion";
 import Skeleton from "@/app/_components/ui/Skeleton";
 
 import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { IVenta, IDetalleVenta, ICuentasPorCobrar, IConsignacion, ICategoria, IProducto } from "@/lib/models";
+
 
 export default function ReportsPage() {
   const { usuario, loading: authLoading } = useAuth();
@@ -86,7 +94,7 @@ export default function ReportsPage() {
           detalles:detallesventas(
             cantidad,
             id_producto,
-            producto:id_producto(nombre, id_categoria, precio)
+            producto:id_producto(nombre, id_categoria, precio, costo)
           )
         `)
         .order("fecha", { ascending: false });
@@ -98,9 +106,9 @@ export default function ReportsPage() {
 
       // Fetch Cuentas por cobrar
       const cuentasQuery = supabase
-        .from('cuentas_por_cobrar')
-        .select('monto_pendiente, fecha_registro, id_venta')
-        .gt('monto_pendiente', 0); // Only bring debts
+        .from('cuentasporcobrar')
+        .select('monto_pendiente, monto_pagado, fecha_registro, id_venta')
+        .gt('monto_inicial', 0); // Corregido: usando monto_inicial según esquema
 
       // Fetch Consignaciones
       let consigQuery = supabase
@@ -123,7 +131,7 @@ export default function ReportsPage() {
 
       // Fetch Categorías & Productos Generales (para Inventario)
       const catQuery = supabase.from('categoria').select('id, nombre');
-      const prodQuery = supabase.from('producto').select('id, nombre, stock_actual, stock_min');
+      const prodQuery = supabase.from('producto').select('id, nombre, stock_actual, stock_min, precio, costo');
 
       const [resVentas, resCuentas, resConsig, resCat, resProd] = await Promise.all([
         query,
@@ -133,11 +141,11 @@ export default function ReportsPage() {
         prodQuery
       ]);
       
-      if (resVentas.error) console.error("Error fetching ventas:", resVentas.error);
-      if (resCuentas.error) console.error("Error fetching cuentas:", resCuentas.error);
-      if (resConsig.error) console.error("Error fetching consignaciones:", resConsig.error);
-      if (resCat.error) console.error("Error fetching categorias:", resCat.error);
-      if (resProd.error) console.error("Error fetching productos:", resProd.error);
+      if (resVentas.error) console.error("Error fetching ventas:", resVentas.error.message, resVentas.error);
+      if (resCuentas.error) console.error("Error fetching cuentas:", resCuentas.error.message, resCuentas.error);
+      if (resConsig.error) console.error("Error fetching consignaciones:", resConsig.error.message, resConsig.error);
+      if (resCat.error) console.error("Error fetching categorias:", resCat.error.message, resCat.error);
+      if (resProd.error) console.error("Error fetching productos:", resProd.error.message, resProd.error);
 
       if (!resVentas.error && resVentas.data) setVentas(resVentas.data as IVenta[]);
       if (!resCuentas.error && resCuentas.data) setCuentasPorCobrar(resCuentas.data as ICuentasPorCobrar[]);
@@ -164,8 +172,13 @@ export default function ReportsPage() {
   // Filter ventas by date range
   const filteredVentas = ventas.filter(v => {
     if (!v.fecha) return false;
-    const vDate = new Date(v.fecha).toISOString().split("T")[0];
-    return vDate >= startDate && vDate <= endDate;
+    try {
+      const vDate = new Date(v.fecha).toISOString().split("T")[0];
+      return vDate >= startDate && vDate <= endDate;
+    } catch (e) {
+      console.warn("Invalid sale date:", v.fecha);
+      return false;
+    }
   });
 
   // Approved Sales Data
@@ -205,8 +218,13 @@ export default function ReportsPage() {
   // Filter Cuentas Por Cobrar by Date
   const filteredCuentas = cuentasPorCobrar.filter(c => {
     if (!c.fecha_registro) return false;
-    const cDate = new Date(c.fecha_registro).toISOString().split("T")[0];
-    return cDate >= startDate && cDate <= endDate;
+    try {
+      const cDate = new Date(c.fecha_registro).toISOString().split("T")[0];
+      return cDate >= startDate && cDate <= endDate;
+    } catch (e) {
+      console.warn("Invalid account date:", c.fecha_registro);
+      return false;
+    }
   });
 
   // Calculate Cuentas Por Cobrar for Admin vs Mayorista
@@ -231,6 +249,19 @@ export default function ReportsPage() {
     }
   });
 
+  // Calculate Financial Summary for filtered sales
+  let totalCostVentas = 0;
+  filteredVentas.forEach(v => {
+    v.detalles?.forEach(det => {
+      // @ts-ignore
+      totalCostVentas += (Number(det.producto?.costo) || 0) * (det.cantidad || 0);
+    });
+  });
+  const totalProfitVentas = ventasTotales - totalCostVentas;
+
+  // Calculate Inventory Value
+  const valorTotalInventario = productosGlob.reduce((acc, p) => acc + ((p.stock_actual || 0) * (p.costo || 0)), 0);
+
   // Build KPI Cards List based on Role
   const kpiList: KPI[] = isAdmin ? [
     { label: "Ventas Totales", value: `$${ventasTotales.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`, icon: "dollar", bgStart: "#758390", bgEnd: "#6b7a88" },
@@ -244,6 +275,52 @@ export default function ReportsPage() {
     { label: "Stock Consignado", value: consignacionTotalAsignada, icon: "package", bgStart: "#D4A5A5", bgEnd: "#C07E88" },
   ];
   
+  // -- Exportar a Excel (Contador) --
+  const exportToExcel = async () => {
+    const XLSX = await import("xlsx");
+    if (filteredVentas.length === 0) return;
+    
+    // Preparar datos con estructura contable y de rentabilidad
+    const data = filteredVentas.map(v => {
+      const subtotalVenta = (v.total || 0) / 1.16;
+      const ivaVenta = (v.total || 0) * 0.16;
+      
+      // Calcular costo total de la venta sumando el costo de cada producto
+      const costoTotalVenta = v.detalles?.reduce((acc, det) => {
+        // @ts-ignore - el costo viene del fetch de producto
+        return acc + ((det.producto?.costo || 0) * (det.cantidad || 0));
+      }, 0) || 0;
+
+      const gananciaNeta = (v.total || 0) - costoTotalVenta;
+
+      return {
+        "Folio Stella": `V-${v.id}`,
+        "Fecha": v.fecha ? new Date(v.fecha).toLocaleDateString('es-MX') : "N/A",
+        "Cliente/Mayorista": v.usuario?.nombre || "Venta Directa",
+        "Total Bruto (Público)": v.total || 0,
+        "IVA (16%)": ivaVenta,
+        "Subtotal": subtotalVenta,
+        "Costo Total (Insumos/Labor)": costoTotalVenta,
+        "Ganancia Neta": gananciaNeta,
+        "Margen (%)": costoTotalVenta > 0 ? ((gananciaNeta / costoTotalVenta) * 100).toFixed(2) + "%" : "N/A",
+        "Metodo de Pago": (v.metodo_pago || "Efectivo").toUpperCase(),
+        "Estado": (v.estado || "Pendiente").toUpperCase(),
+        "Productos": v.detalles?.map(d => `${d.producto?.nombre} (x${d.cantidad})`).join(" | ") || "Sin detalle"
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Ventas_Stella_ERP");
+
+    // Estilo de columnas: Añadimos espacio para las nuevas columnas financieras
+    worksheet["!cols"] = [
+      { wch: 12 }, { wch: 15 }, { wch: 25 }, { wch: 18 }, { wch: 12 }, { wch: 12 }, { wch: 22 }, { wch: 18 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 50 }
+    ];
+
+    XLSX.writeFile(workbook, `Stella_Reporte_Rentabilidad_${startDate}_a_${endDate}.xlsx`);
+  };
+
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
       <SidebarMenu />
@@ -259,6 +336,7 @@ export default function ReportsPage() {
             activeTab={activeTab} onTabChange={handleTabChange}
             startDate={startDate} endDate={endDate}
             onStartDateChange={setStartDate} onEndDateChange={setEndDate}
+            onExport={exportToExcel}
           />
 
           {!loadingData ? (
@@ -287,6 +365,10 @@ export default function ReportsPage() {
                   @media (max-width: 1100px) { 
                     .reports-charts-row { grid-template-columns: 1fr !important; } 
                   }
+                  @media (max-width: 640px) {
+                    .reports-charts-row { gap: 16px !important; }
+                    main { padding: 16px 12px !important; }
+                  }
                 `}</style>
                 
                 <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} style={{ minWidth: 0 }}>
@@ -301,50 +383,83 @@ export default function ReportsPage() {
                   />
                 </motion.div>
                 <motion.div variants={{ hidden: { opacity: 0, x: 10 }, show: { opacity: 1, x: 0 } }}>
-                  <SalesStatusChart 
-                    aprobadas={aprobadasCount} 
-                    pendientes={pendientesCount} 
-                    canceladas={canceladasCount} 
-                    title={isAdmin ? "Rastreador de Estado (Global)" : "Mis Estadísticas de Envío"}
-                    subtitle={isAdmin ? "Operaciones en la empresa" : "Control de tus pedidos"}
-                  />
+                  <TopProfitProducts productos={productosGlob} />
                 </motion.div>
               </div>
 
-              {/* Bottom Row Charts */}
-              <div 
-                className="reports-bot-row"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 2fr",
-                  gap: 24,
-                  width: "100%",
-                }} 
-              >
-                <style>{`
-                  @media (max-width: 1100px) { 
-                    .reports-bot-row { grid-template-columns: 1fr !important; } 
-                  }
-                `}</style>
-                <motion.div variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }} style={{ minWidth: 0 }}>
+              {/* Charts Row - Responsive */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+                {/* Left Column: Top Products & Average Ticket */}
+                <motion.div 
+                  variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }} 
+                  className="lg:col-span-1 space-y-6"
+                >
                   <SalesByProductChart 
                     products={topProductsArray}
                     title={isAdmin ? "Top Productos Vendidos" : "Mis Productos Favoritos"}
                     subtitle={isAdmin ? "Artículos de mayor salida en la tienda" : "Artículos que más has comprado"}
                   />
+                  {isAdmin && (
+                    <AverageTicket 
+                      totalSales={ventasTotales} 
+                      orderCount={filteredVentas.length} 
+                    />
+                  )}
                 </motion.div>
-                <motion.div variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }} style={{ minWidth: 0 }}>
+
+                {/* Right Column: Main Sales Table */}
+                <motion.div 
+                  variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }} 
+                  className="lg:col-span-2"
+                >
                   <SalesTable ventas={filteredVentas} loading={loadingData} />
                 </motion.div>
               </div>
 
+            {/* Bottom Section: Goals & Intelligence - Responsive */}
+            {isAdmin && (
+              <div className="space-y-8 mt-4">
+                <motion.div 
+                  variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                    gap: 24
+                  }}
+                >
+                  <SalesGoals currentSales={ventasTotales} target={200000} />
+                  <WholesalerGoal currentCount={4} target={10} />
+                  <CollectionGoal 
+                    currentCollected={filteredCuentas.reduce((acc, c) => acc + (c.monto_pagado || 0), 0)} 
+                    totalPending={filteredCuentas.reduce((acc, c) => acc + (c.monto_pendiente || 0), 0)} 
+                  />
+                  <SalesVsCollection 
+                    totalSales={ventasTotales}
+                    totalCollected={filteredCuentas.reduce((acc, c) => acc + (c.monto_pagado || 0), 0)}
+                  />
+                </motion.div>
+
+                <motion.div 
+                  variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+                >
+                  <FinancialSummary 
+                    productos={productosGlob}
+                  />
+                </motion.div>
+
+                <motion.div 
+                  variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+                >
+                  <InventoryReportSection 
+                    productos={productosGlob} 
+                    ventas={filteredVentas} 
+                  />
+                </motion.div>
+              </div>
+            )}
+
               {/* Extra Analytics Row */}
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-                gap: 24,
-                width: "100%",
-              }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 <SalesByCategoryChart 
                   ventas={ventasAprobadas}
                   categorias={categorias}
@@ -368,15 +483,7 @@ export default function ReportsPage() {
                 )}
               </div>
 
-              {/* Seccion de Inventario */}
-              {isAdmin && (
-                <div style={{ marginTop: 8 }}>
-                  <InventoryReportSection 
-                    productos={productosGlob} 
-                    ventas={filteredVentas} 
-                  />
-                </div>
-              )}
+
             </motion.div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>

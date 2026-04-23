@@ -106,8 +106,13 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
       display: "flex", flexDirection: "column",
       height: "100%",
     }}>
-      {/* Header */}
-      <div style={{ marginBottom: 20 }}>
+        <style>{`
+          @media (max-width: 640px) {
+            .hide-mobile { display: none !important; }
+            .sales-table-container { padding: 16px !important; }
+          }
+        `}</style>
+        <div style={{ marginBottom: 20 }}>
         <h3 style={{
           fontFamily: "var(--font-marcellus)",
           fontSize: "1rem", fontWeight: 700, color: "#2A2E34", margin: 0,
@@ -196,15 +201,11 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
             <thead>
               <tr style={{ background: "#F8FAFC" }}>
                 <th style={{ width: 40 }}></th>
-                {["FOLIO", "CLIENTE", "FECHA", "MONTO ($)", "ESTADO"].map(th => (
-                  <th key={th} style={{
-                    textAlign: "left", padding: "14px 12px",
-                    fontFamily: "var(--font-sans)", fontSize: "0.7rem", fontWeight: 600, color: "#64748B",
-                    borderBottom: "1px solid #E2E8F0", borderTop: "1px solid #E2E8F0", letterSpacing: "0.02em"
-                  }}>
-                    {th}
-                  </th>
-                ))}
+                <th className="hide-mobile" style={{ textAlign: "left", padding: "14px 12px", fontFamily: "var(--font-sans)", fontSize: "0.7rem", fontWeight: 600, color: "#64748B", borderBottom: "1px solid #E2E8F0", borderTop: "1px solid #E2E8F0", letterSpacing: "0.02em" }}>FOLIO</th>
+                <th style={{ textAlign: "left", padding: "14px 12px", fontFamily: "var(--font-sans)", fontSize: "0.7rem", fontWeight: 600, color: "#64748B", borderBottom: "1px solid #E2E8F0", borderTop: "1px solid #E2E8F0", letterSpacing: "0.02em" }}>CLIENTE</th>
+                <th className="hide-mobile" style={{ textAlign: "left", padding: "14px 12px", fontFamily: "var(--font-sans)", fontSize: "0.7rem", fontWeight: 600, color: "#64748B", borderBottom: "1px solid #E2E8F0", borderTop: "1px solid #E2E8F0", letterSpacing: "0.02em" }}>FECHA</th>
+                <th style={{ textAlign: "left", padding: "14px 12px", fontFamily: "var(--font-sans)", fontSize: "0.7rem", fontWeight: 600, color: "#64748B", borderBottom: "1px solid #E2E8F0", borderTop: "1px solid #E2E8F0", letterSpacing: "0.02em" }}>MONTO ($)</th>
+                <th style={{ textAlign: "left", padding: "14px 12px", fontFamily: "var(--font-sans)", fontSize: "0.7rem", fontWeight: 600, color: "#64748B", borderBottom: "1px solid #E2E8F0", borderTop: "1px solid #E2E8F0", letterSpacing: "0.02em" }}>ESTADO</th>
               </tr>
             </thead>
             <tbody>
@@ -244,13 +245,13 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
                             <div style={{ width: 16, height: 16 }} />
                           )}
                         </td>
-                        <td style={{ padding: "16px 12px", fontFamily: "var(--font-poppins)", fontSize: "0.85rem", fontWeight: 600, color: "#2A2E34" }}>
+                        <td className="hide-mobile" style={{ padding: "16px 12px", fontFamily: "var(--font-poppins)", fontSize: "0.85rem", fontWeight: 600, color: "#2A2E34" }}>
                           #{v.id}
                         </td>
                         <td style={{ padding: "16px 12px", fontFamily: "var(--font-poppins)", fontSize: "0.85rem", color: "#4B5563" }}>
                           {customerDisplay.length > 20 ? customerDisplay.substring(0,20)+"..." : customerDisplay}
                         </td>
-                        <td style={{ padding: "16px 12px", fontFamily: "var(--font-sans)", fontSize: "0.85rem", color: "#64748B" }}>
+                        <td className="hide-mobile" style={{ padding: "16px 12px", fontFamily: "var(--font-sans)", fontSize: "0.85rem", color: "#64748B" }}>
                           {fDate}
                         </td>
                         <td style={{ padding: "16px 12px", fontFamily: "var(--font-poppins)", fontSize: "0.85rem", fontWeight: 600, color: "#2A2E34" }}>
@@ -283,23 +284,39 @@ export default function SalesTable({ ventas, loading }: SalesTableProps) {
                                     <tr>
                                       <th style={{ textAlign: "left", padding: "10px 14px", fontSize: "0.7rem", fontFamily: "var(--font-sans)", color: "#64748B", fontWeight: 600 }}>CANTIDAD</th>
                                       <th style={{ textAlign: "left", padding: "10px 14px", fontSize: "0.7rem", fontFamily: "var(--font-sans)", color: "#64748B", fontWeight: 600 }}>PRODUCTO</th>
+                                      <th style={{ textAlign: "right", padding: "10px 14px", fontSize: "0.7rem", fontFamily: "var(--font-sans)", color: "#64748B", fontWeight: 600 }}>COSTO U.</th>
+                                      <th style={{ textAlign: "right", padding: "10px 14px", fontSize: "0.7rem", fontFamily: "var(--font-sans)", color: "#64748B", fontWeight: 600 }}>UTILIDAD</th>
                                       <th style={{ textAlign: "right", padding: "10px 14px", fontSize: "0.7rem", fontFamily: "var(--font-sans)", color: "#64748B", fontWeight: 600 }}>SUBTOTAL</th>
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {items?.map((det: any, i: number) => (
-                                      <tr key={i} style={{ borderBottom: i === (items?.length ?? 0) - 1 ? "none" : "1px solid #E2E8F0" }}>
-                                        <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#2A2E34", fontFamily: "var(--font-poppins)" }}>
-                                          {det.cantidad || 0}x
-                                        </td>
-                                        <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#4B5563", fontFamily: "var(--font-sans)" }}>
-                                          {det.producto?.nombre || "Producto desconocido"}
-                                        </td>
-                                        <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#2A2E34", fontFamily: "var(--font-poppins)", textAlign: "right", fontWeight: 600 }}>
-                                          ${((Number(det.cantidad) || 0) * (Number(det.producto?.precio) || 0)).toLocaleString("es-MX", { minimumFractionDigits: 2 })}
-                                        </td>
-                                      </tr>
-                                    ))}
+                                    {items?.map((det: any, i: number) => {
+                                      const cost = Number(det.producto?.costo) || 0;
+                                      const price = Number(det.producto?.precio) || 0;
+                                      const qty = Number(det.cantidad) || 0;
+                                      const unitProfit = price - cost;
+                                      const totalProfit = unitProfit * qty;
+
+                                      return (
+                                        <tr key={i} style={{ borderBottom: i === (items?.length ?? 0) - 1 ? "none" : "1px solid #E2E8F0" }}>
+                                          <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#2A2E34", fontFamily: "var(--font-poppins)" }}>
+                                            {qty}x
+                                          </td>
+                                          <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#4B5563", fontFamily: "var(--font-sans)" }}>
+                                            {det.producto?.nombre || "Producto desconocido"}
+                                          </td>
+                                          <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#8A94A6", fontFamily: "var(--font-poppins)", textAlign: "right" }}>
+                                            ${cost.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+                                          </td>
+                                          <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#38A169", fontFamily: "var(--font-poppins)", textAlign: "right", fontWeight: 600 }}>
+                                            +${totalProfit.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+                                          </td>
+                                          <td style={{ padding: "10px 14px", fontSize: "0.8rem", color: "#2A2E34", fontFamily: "var(--font-poppins)", textAlign: "right", fontWeight: 600 }}>
+                                            ${(qty * price).toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
                                   </tbody>
                                 </table>
                               </div>

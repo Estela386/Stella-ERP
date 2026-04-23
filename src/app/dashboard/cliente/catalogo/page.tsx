@@ -16,6 +16,7 @@ import {
   Search,
   SlidersHorizontal,
   Sparkles,
+  ArrowUp,
 } from "lucide-react";
 import { createClient } from "@utils/supabase/client";
 import ChatbotPage from "@/app/chatbot/page";
@@ -571,7 +572,6 @@ function ProductListCard({
   const price = product.price;
   const lowStock = isLowStock(product);
   const noStock = isOutOfStock(product);
-  console.log("producto:", product);
 
   return (
     <motion.div
@@ -595,8 +595,8 @@ function ProductListCard({
         cursor: "pointer",
         transition: "all 0.4s cubic-bezier(0.25, 1, 0.5, 1)",
         transform: hovered ? "translateY(-4px)" : "translateY(0)",
-        filter: lowStock ? "grayscale(70%)" : "none",
-        opacity: noStock ? 0.55 : lowStock ? 0.7 : 1,
+        filter: noStock ? "grayscale(100%)" : "none",
+        opacity: noStock ? 0.6 : 1,
       }}
     >
       {/* Imagen */}
@@ -767,7 +767,7 @@ function ProductListCard({
               {noStock
                 ? "Sin stock"
                 : lowStock
-                  ? `¡Últimas ${(product as any).stock_actual}!`
+                  ? "¡Últimas piezas!"
                   : `${(product as any).stock_actual} disponibles`}
             </span>
           )}
@@ -802,8 +802,8 @@ function ProductGridCard({
       onMouseLeave={() => setHovered(false)}
       style={{
         cursor: "pointer",
-        filter: lowStock ? "grayscale(70%)" : "none",
-        opacity: noStock ? 0.55 : lowStock ? 0.7 : 1,
+        filter: noStock ? "grayscale(100%)" : "none",
+        opacity: noStock ? 0.6 : 1,
         transition: "filter 0.3s ease, opacity 0.3s ease",
       }}
     >
@@ -909,7 +909,7 @@ function ProductGridCard({
                 letterSpacing: "0.02em",
               }}
             >
-              ¡Últimas {(product as any).stock_actual}!
+              ¡Últimas piezas!
             </span>
           </div>
         )}
@@ -1021,6 +1021,24 @@ function CatalogContent() {
   const [sortBy, setSortBy] = useState("Novedades");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleProductClick = (id: number) => {
+    sessionStorage.setItem("catalogScrollPosition", window.scrollY.toString());
+    router.push(`/productos/${id}`);
+  };
 
   const [materiales, setMateriales] = useState<string[]>([]);
   const [categorias, setCategorias] = useState<string[]>([]);
@@ -1170,22 +1188,19 @@ function CatalogContent() {
 
     // 3. Aplicar Ordenamientos adicionales
     r.sort((a, b) => {
-      // Primero: productos con stock bajo y sin stock van al final
-      const aStock = (a as any).stock_actual;
-      const bStock = (b as any).stock_actual;
-      const aIsLow =
-        aStock !== undefined && aStock >= 0 && aStock <= LOW_STOCK_THRESHOLD;
-      const bIsLow =
-        bStock !== undefined && bStock >= 0 && bStock <= LOW_STOCK_THRESHOLD;
+      // Primero: productos sin stock van al final absoluto
+      const aStock = (a as any).stock_actual ?? 0;
+      const bStock = (b as any).stock_actual ?? 0;
+      const aOut = aStock === 0;
+      const bOut = bStock === 0;
+
+      if (aOut !== bOut) return aOut ? 1 : -1;
+
+      // Luego: productos con stock bajo van al final (antes de los sin stock)
+      const aIsLow = aStock > 0 && aStock <= LOW_STOCK_THRESHOLD;
+      const bIsLow = bStock > 0 && bStock <= LOW_STOCK_THRESHOLD;
 
       if (aIsLow !== bIsLow) return aIsLow ? 1 : -1;
-
-      // Dentro de los de stock bajo, sin stock va al final absoluto
-      if (aIsLow && bIsLow) {
-        const aOut = aStock === 0;
-        const bOut = bStock === 0;
-        if (aOut !== bOut) return aOut ? 1 : -1;
-      }
 
       // Luego por score (similitud)
       if (b._score !== a._score) return b._score - a._score;
@@ -1204,6 +1219,22 @@ function CatalogContent() {
 
     return r;
   }, [productos, searchTerm, activeFilters, priceFilter, sortBy]);
+
+  // Restaurar posición de scroll al volver del detalle de un producto
+  useEffect(() => {
+    if (!loading && filtered.length > 0) {
+      const savedScroll = sessionStorage.getItem("catalogScrollPosition");
+      if (savedScroll) {
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: parseInt(savedScroll, 10),
+            behavior: "instant",
+          });
+          sessionStorage.removeItem("catalogScrollPosition");
+        });
+      }
+    }
+  }, [loading, filtered.length]);
 
   const toggleFilter = (category: FilterCategory, value: string) => {
     const exists = activeFilters.find(
@@ -1289,6 +1320,7 @@ function CatalogContent() {
                 />
               </div>
             </aside>
+
             {/* 2. AREA DE PRODUCTOS */}
             <div className="flex-1 min-w-0">
               {/* BANNER DE CAMPAÑA */}
@@ -1696,7 +1728,7 @@ function CatalogContent() {
                         >
                           <ProductGridCard
                             product={p}
-                            onClick={() => router.push(`/productos/${p.id}`)}
+                            onClick={() => handleProductClick(p.id)}
                           />
                         </div>
                       ))}
@@ -1722,7 +1754,7 @@ function CatalogContent() {
                         >
                           <ProductListCard
                             product={p}
-                            onClick={() => router.push(`/productos/${p.id}`)}
+                            onClick={() => handleProductClick(p.id)}
                           />
                         </div>
                       ))}
@@ -1730,10 +1762,8 @@ function CatalogContent() {
                   </motion.div>
                 )}
               </section>
-            </div>{" "}
-            {/* Cierre flex-1 área de productos */}
-          </div>{" "}
-          {/* Cierre flex flex-col md:flex-row gap-8 */}
+            </div>
+          </div>
         </main>
         <Footer />
       </div>
@@ -1870,6 +1900,21 @@ function CatalogContent() {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            onClick={scrollToTop}
+            className="fixed z-[90] flex items-center justify-center rounded-full bg-[#b76e79] text-white cursor-pointer shadow-[0_4px_14px_rgba(183,110,121,0.4)] transition-colors hover:bg-[#a45f69] bottom-[120px] right-4 w-10 h-10 md:bottom-[110px] md:right-8 md:w-12 md:h-12"
+            aria-label="Ir arriba"
+          >
+            <ArrowUp size={24} />
+          </motion.button>
         )}
       </AnimatePresence>
     </>

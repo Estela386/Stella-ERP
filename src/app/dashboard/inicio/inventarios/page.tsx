@@ -15,6 +15,7 @@ import { type OpcionForm } from "./_components/ProductForm";
 import { FileText } from "lucide-react";
 import Skeleton from "@/app/_components/ui/Skeleton";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 import {
   ProductoService,
@@ -180,11 +181,6 @@ export default function InventariosPage() {
       cargarDatos();
     }
   }, [usuario, loadingUser]);
-
-  const handleOpenModal = (producto?: Producto) => {
-    setSelectedProducto(producto);
-    setModalOpen(true);
-  };
 
   const handleOpenCategoryModal = () => {
     setCategoryModalOpen(true);
@@ -624,7 +620,9 @@ export default function InventariosPage() {
                   <span className="sm:hidden">Etiquetas</span>
                 </button>
                 <button
-                  onClick={() => handleOpenModal()}
+                  onClick={() =>
+                    router.push("/dashboard/inicio/inventarios/nuevo")
+                  }
                   className="
                     flex-1 lg:flex-none justify-center
                     text-white
@@ -649,26 +647,15 @@ export default function InventariosPage() {
             <ProductTable
               productos={productos}
               search={search}
-              onEdit={handleOpenModal}
+              onEdit={p =>
+                router.push(`/dashboard/inicio/inventarios/editar/${p.id}`)
+              }
               onDelete={handleDeleteProducto}
               filtro={filtro}
             />
           </div>
         </div>
       </main>
-
-      {/* Modal de Producto */}
-      <ProductModalForm
-        isOpen={modalOpen}
-        producto={selectedProducto}
-        categorias={categorias}
-        proveedores={proveedores}
-        insumos={insumos}
-        materiales={materiales}
-        onSubmit={handleSubmitForm}
-        onClose={handleCloseModal}
-        loading={formLoading}
-      />
 
       <CategoryModal
         isOpen={categoryModalOpen}
