@@ -1,7 +1,7 @@
-import { Resend } from 'resend';
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import webpush from 'web-push';
+import { Resend } from "resend";
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import webpush from "web-push";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = createClient(
@@ -9,41 +9,43 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Configurar web-push con las llaves VAPID
-webpush.setVapidDetails(
-  'mailto:notificaciones@stellajoyeria.online',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
-
 export async function POST(req: Request) {
   try {
+    // Configurar web-push con las llaves VAPID
+    webpush.setVapidDetails(
+      "mailto:notificaciones@stellajoyeria.online",
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+      process.env.VAPID_PRIVATE_KEY!
+    );
     const payload = await req.json();
-    
+
     // El payload de Supabase Webhook contiene la fila insertada en 'record'
     const notificacion = payload.record;
 
-    if (!notificacion || notificacion.tipo !== 'stock_resurtido') {
-      return NextResponse.json({ message: 'Ignorado: tipo no soportado' });
+    if (!notificacion || notificacion.tipo !== "stock_resurtido") {
+      return NextResponse.json({ message: "Ignorado: tipo no soportado" });
     }
 
     // 1. Obtener información del usuario y del producto
     const { data: userData, error: userError } = await supabase
-      .from('usuario')
-      .select('nombre, correo')
-      .eq('id', notificacion.id_usuario)
+      .from("usuario")
+      .select("nombre, correo")
+      .eq("id", notificacion.id_usuario)
       .single();
 
     if (userError || !userData?.correo) {
-      console.error('Error al obtener correo del usuario:', userError);
-      return NextResponse.json({ error: 'Usuario no encontrado o sin correo' }, { status: 404 });
+      console.error("Error al obtener correo del usuario:", userError);
+      return NextResponse.json(
+        { error: "Usuario no encontrado o sin correo" },
+        { status: 404 }
+      );
     }
 
     // 2. Enviar el correo con Resend
     const { error: resendError } = await resend.emails.send({
-      from: 'Stella Joyería <notificaciones@stellajoyeria.online>', // Usa tu dominio verificado
+      from: "Stella Joyería <notificaciones@stellajoyeria.online>", // Usa tu dominio verificado
       to: [userData.correo],
-      subject: '¡Tu joya favorita vuelve a estar disponible! 💎',
+      subject: "¡Tu joya favorita vuelve a estar disponible! 💎",
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f0f0f0; border-radius: 10px;">
           <h2 style="color: #B76E79; text-align: center;">¡Hola, ${userData.nombre}!</h2>
@@ -71,40 +73,44 @@ export async function POST(req: Request) {
     });
 
     if (resendError) {
-      console.error('Error de Resend:', resendError);
+      console.error("Error de Resend:", resendError);
     }
 
     // 3. Enviar notificaciones Push del navegador
     const { data: pushSubs } = await supabase
-      .from('push_subscriptions')
-      .select('subscription')
-      .eq('id_usuario', notificacion.id_usuario);
+      .from("push_subscriptions")
+      .select("subscription")
+      .eq("id_usuario", notificacion.id_usuario);
 
     if (pushSubs && pushSubs.length > 0) {
       const pushPayload = JSON.stringify({
-        title: '¡Ya hay stock! 💎',
+        title: "¡Ya hay stock! 💎",
         body: notificacion.mensaje,
-        url: `${process.env.NEXT_PUBLIC_APP_URL}/productos/${notificacion.referencia_id}`
+        url: `${process.env.NEXT_PUBLIC_APP_URL}/productos/${notificacion.referencia_id}`,
       });
 
       // Enviar a todas las suscripciones del usuario (varios navegadores)
-      const pushPromises = pushSubs.map(sub => 
-        webpush.sendNotification(sub.subscription as any, pushPayload)
+      const pushPromises = pushSubs.map(sub =>
+        webpush
+          .sendNotification(sub.subscription as any, pushPayload)
           .catch((err: any) => {
-            console.error('Error al enviar push:', err);
+            console.error("Error al enviar push:", err);
             // Si la suscripción ya no es válida (410 Gone), deberíamos borrarla
             if (err.statusCode === 410 || err.statusCode === 404) {
-              return supabase.from('push_subscriptions').delete().eq('subscription', sub.subscription);
+              return supabase
+                .from("push_subscriptions")
+                .delete()
+                .eq("subscription", sub.subscription);
             }
           })
       );
-      
+
       await Promise.all(pushPromises);
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error en webhook de notificaciones:', error);
-    return NextResponse.json({ error: 'Error interno' }, { status: 500 });
+    console.error("Error en webhook de notificaciones:", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
