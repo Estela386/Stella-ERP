@@ -2,6 +2,8 @@
  * Tipos compartidos para el dashboard de cliente
  */
 
+import { IProductoImagen } from "../inicio/inventarios/type";
+
 export interface OpcionPersonalizacion {
   id: number;
   nombre: string;
@@ -17,7 +19,7 @@ export interface ProductoCard {
   costo_mayorista?: number;
   descripcion?: string;
   image?: string;
-  category?: string;   // nombre de categoría real
+  category?: string; // nombre de categoría real
   rating?: number;
   es_personalizable?: boolean;
   materiales?: string[];
@@ -25,4 +27,6 @@ export interface ProductoCard {
   stock_actual?: number;
   stock_min?: number;
   created_at?: string;
+  images?: IProductoImagen[];
+  url_filtro_tiktok?: string;
 }

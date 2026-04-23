@@ -61,10 +61,10 @@ export default function InventariosPage() {
   const [filtro, setFiltro] = useState<"todos" | "bajo" | "agotados">("todos");
 
   // Estado para el modal de confirmación de eliminación
-  const [deleteModal, setDeleteModal] = useState({ 
-    open: false, 
-    id: 0, 
-    nombre: "" 
+  const [deleteModal, setDeleteModal] = useState({
+    open: false,
+    id: 0,
+    nombre: "",
   });
 
   // Verificar rol en cliente
@@ -89,6 +89,7 @@ export default function InventariosPage() {
         const productoService = new ProductoService(supabase);
         const { productos: productosData, error: errorProductos } =
           await productoService.obtenerTodos();
+        // console.log("Productos cargados:", productosData);
 
         if (errorProductos) {
           setError(errorProductos);
@@ -109,15 +110,16 @@ export default function InventariosPage() {
         const proveedorService = new ProveedorService(supabase);
         const { proveedores: proveedoresData, error: errorProveedores } =
           await proveedorService.obtenerTodos();
-        
+
         if (errorProveedores) {
           setError(errorProveedores);
           return;
         }
-        
+
         // Cargar insumos
         const insumoService = new InsumoService(supabase);
-        const { insumos: insumosData, error: errorInsumos } = await insumoService.obtenerTodos();
+        const { insumos: insumosData, error: errorInsumos } =
+          await insumoService.obtenerTodos();
 
         if (errorInsumos) {
           setError(errorInsumos);
@@ -126,7 +128,8 @@ export default function InventariosPage() {
 
         // Cargar materiales
         const materialService = new MaterialService(supabase);
-        const { materiales: materialesData, error: errorMateriales } = await materialService.obtenerTodos();
+        const { materiales: materialesData, error: errorMateriales } =
+          await materialService.obtenerTodos();
 
         if (errorMateriales) {
           setError(errorMateriales);
@@ -154,6 +157,7 @@ export default function InventariosPage() {
               categoria: cat
                 ? { id: cat.id, nombre: cat.nombre }
                 : { id: 0, nombre: "Sin categoría" },
+              imagenes: p.imagenes || [],
             } as Producto;
           });
           setProductos(productosConCategoria as unknown as Producto[]);
@@ -202,9 +206,15 @@ export default function InventariosPage() {
     }));
   const handleSubmitForm = async (
     data: CreateProductoDTO | UpdateProductoDTO,
-    imagenFile?: File,
+    imagenesNuevasFiles?: File[],
+    imagenesAEliminar?: number[],
+    ordenImagenesExistentes?: number[],
     opciones?: OpcionForm[],
-    relacionProveedor?: { id_proveedor: number; precio_compra: number; tiempo_entrega: number },
+    relacionProveedor?: {
+      id_proveedor: number;
+      precio_compra: number;
+      tiempo_entrega: number;
+    },
     insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[],
     materialesSeleccionados?: number[],
     id_actualizar?: number
@@ -214,183 +224,185 @@ export default function InventariosPage() {
       const supabase = createClient();
       const productoService = new ProductoService(supabase);
       const categoriaService = new CategoriaService(supabase);
-      const imageUploadService = new ImageUploadService(supabase);
-      const personalizacionService = new ProductoPersonalizacionService(supabase);
+      const personalizacionService = new ProductoPersonalizacionService(
+        supabase
+      );
       const productoProveedorService = new ProductoProveedorService(supabase);
       const productoInsumoService = new ProductoInsumoService(supabase);
       const productoMaterialService = new ProductoMaterialService(supabase);
 
-      let urlImagen: string | undefined = undefined;
+      const targetId = id_actualizar || selectedProducto?.id;
+      let productoOperado: any = null;
 
-      if (imagenFile) {
-        const { url, error: uploadError } =
-          await imageUploadService.uploadImage(
-            imagenFile,
-            selectedProducto?.id
-          );
-        if (uploadError) {
-          setError(uploadError);
+      // ── 1. CREAR O ACTUALIZAR PRODUCTO BASE ──────────────────────
+      if (targetId) {
+        const { producto: productoActualizado, error } =
+          await productoService.actualizar(targetId, data as UpdateProductoDTO);
+        if (error) {
+          setError(error);
           return;
         }
-        urlImagen = url || undefined;
+        productoOperado = productoActualizado;
+      } else {
+        const { producto: productoNuevo, error } = await productoService.crear(
+          data as CreateProductoDTO
+        );
+        if (error) {
+          setError(error);
+          return;
+        }
+        productoOperado = productoNuevo;
       }
 
-      const dataConImagen = urlImagen
-        ? { ...data, url_imagen: urlImagen }
-        : data;
+      const idProductoFinal = productoOperado.id;
 
-      const targetId = id_actualizar || selectedProducto?.id;
+      // ── 2. PROCESAR GALERÍA DE IMÁGENES ──────────────────────────
+      if (idProductoFinal) {
+        // A. Eliminar imágenes marcadas
+        if (imagenesAEliminar && imagenesAEliminar.length > 0) {
+          // Buscamos las URLs en la BD para poder borrarlas del Storage
+          const { data: imgsToDelete } = await supabase
+            .from("producto_imagenes")
+            .select("id, url_imagen")
+            .in("id", imagenesAEliminar);
 
-      if (targetId) {
-        // ── Actualizar ──────────────────────────────────────────────
-        const { producto: productoActualizado, error } =
-          await productoService.actualizar(
-            targetId,
-            dataConImagen as UpdateProductoDTO
-          );
-
-        if (error) {
-          setError(error);
-          return;
-        } // ← verificar error ANTES de guardar opciones
-
-        // Luego en ambos bloques (actualizar y crear):
-        // Sincronizar Opciones de Personalización (Elimina anteriores y guarda nuevas)
-        // Se llama siempre que sea personalizable, o si deja de serlo para limpiar
-        if (data.es_personalizable) {
-          await personalizacionService.guardarOpcionesProducto(
-            targetId,
-            mapOpcionesParaServicio(opciones || [])
-          );
-        } else {
-          const personalizacionSvc = new ProductoPersonalizacionService(supabase);
-          await personalizacionSvc.eliminarOpcionesDeProducto(targetId);
-        }
-
-        // Guardar relación proveedor si es revendido
-        if (data.tipo === "revendido" && relacionProveedor) {
-          const provResult = await productoProveedorService.guardarRelacion({
-            id_producto: targetId,
-            id_proveedor: relacionProveedor.id_proveedor,
-            precio_compra: relacionProveedor.precio_compra,
-            tiempo_entrega: relacionProveedor.tiempo_entrega,
-          });
-          if (provResult?.error) console.error("Error guardando proveedor:", provResult.error);
-        } else if (data.tipo === "fabricado") {
-          // Si cambia de revendido a fabricado, eliminar relación proveedor
-          await productoProveedorService.eliminarPorProducto(targetId);
-        }
-
-        // Guardar insumos: siempre, ya sea lista llena o vacía (para borrar al cambiar tipo)
-        const insumosParaGuardar = data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
-        const insumoResult = await productoInsumoService.guardarInsumosProducto(targetId, insumosParaGuardar);
-        if (insumoResult && !insumoResult.success) console.error("Error guardando insumos:", insumoResult.error);
-
-        // Guardar materiales
-        if (materialesSeleccionados) {
-          const materialResult = await productoMaterialService.guardarRelaciones(targetId, materialesSeleccionados);
-          if (!materialResult.success) console.error("Error guardando materiales:", materialResult.error);
-        }
-
-        const { categorias: categoriasData } =
-          await categoriaService.obtenerTodas();
-        const cat = categoriasData?.find(
-          c => c.id === productoActualizado?.id_categoria
-        );
-
-        setProductos(prev =>
-          prev.map(p =>
-            p.id === targetId
-              ? {
-                  id: productoActualizado?.id || targetId,
-                  nombre: productoActualizado?.nombre || "",
-                  precio: productoActualizado?.precio || 0,
-                  costo: productoActualizado?.costo || 0,
-                  costo_mayorista: productoActualizado?.costo_mayorista || 0,
-                  stock_actual: productoActualizado?.stock_actual || 0,
-                  stock_min: productoActualizado?.stock_min || 0,
-                  tiempo: productoActualizado?.tiempo,
-                  url_imagen: productoActualizado?.url_imagen,
-                  id_categoria: productoActualizado?.id_categoria,
-                  es_personalizable: productoActualizado?.es_personalizable,
-                  descripcion: productoActualizado?.descripcion || "",
-                  tipo: productoActualizado?.tipo || "fabricado",
-                  categoria: cat
-                    ? { id: cat.id, nombre: cat.nombre || "" }
-                    : { id: 0, nombre: "Sin categoría" },
-                }
-              : p
-          )
-        );
-      } else {
-        // ── Crear ───────────────────────────────────────────────────
-        const { producto: productoNuevo, error } = await productoService.crear(
-          dataConImagen as CreateProductoDTO
-        );
-
-        if (error) {
-          setError(error);
-          return;
-        } // ← verificar error ANTES de guardar opciones
-
-        // Guardar opciones usando el id del producto recién creado
-        if (data.es_personalizable && opciones?.length && productoNuevo?.id) {
-          await personalizacionService.guardarOpcionesProducto(
-            productoNuevo.id,
-            mapOpcionesParaServicio(opciones)
-          );
-        }
-
-        // Guardar relación proveedor si es revendido
-        if (data.tipo === "revendido" && relacionProveedor && productoNuevo?.id) {
-          const provResult = await productoProveedorService.guardarRelacion({
-            id_producto: productoNuevo.id,
-            id_proveedor: relacionProveedor.id_proveedor,
-            precio_compra: relacionProveedor.precio_compra,
-            tiempo_entrega: relacionProveedor.tiempo_entrega,
-          });
-          if (provResult?.error) console.error("Error guardando proveedor:", provResult.error);
-        }
-
-        // Guardar insumos siempre (lista vacía si es revendido, para limpiar)
-        if (productoNuevo?.id) {
-          const insumosParaGuardar = data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
-          const insumoResult = await productoInsumoService.guardarInsumosProducto(productoNuevo.id, insumosParaGuardar);
-          if (insumoResult && !insumoResult.success) console.error("Error guardando insumos:", insumoResult.error);
-          
-          if (materialesSeleccionados) {
-            const materialResult = await productoMaterialService.guardarRelaciones(productoNuevo.id, materialesSeleccionados);
-            if (!materialResult.success) console.error("Error guardando materiales:", materialResult.error);
+          if (imgsToDelete) {
+            for (const img of imgsToDelete) {
+              await productoService.eliminarImagenProducto(
+                img.id,
+                img.url_imagen
+              );
+            }
           }
         }
 
-        const { categorias: categoriasData } =
-          await categoriaService.obtenerTodas();
-        const cat = categoriasData?.find(
-          c => c.id === productoNuevo?.id_categoria
-        );
+        // B. Subir imágenes nuevas
+        if (imagenesNuevasFiles && imagenesNuevasFiles.length > 0) {
+          await productoService.agregarImagenesAProducto(
+            idProductoFinal,
+            imagenesNuevasFiles
+          );
+        }
 
-        setProductos(prev => [
-          ...prev,
-          {
-            id: productoNuevo?.id || 0,
-            nombre: productoNuevo?.nombre || "",
-            precio: productoNuevo?.precio || 0,
-            costo: productoNuevo?.costo || 0,
-            costo_mayorista: productoNuevo?.costo_mayorista || 0,
-            stock_actual: productoNuevo?.stock_actual || 0,
-            stock_min: productoNuevo?.stock_min || 0,
-            tiempo: productoNuevo?.tiempo,
-            url_imagen: productoNuevo?.url_imagen,
-            id_categoria: productoNuevo?.id_categoria,
-            es_personalizable: productoNuevo?.es_personalizable,
-            descripcion: productoNuevo?.descripcion || "",
-            tipo: productoNuevo?.tipo || "fabricado",
-            categoria: cat
-              ? { id: cat.id, nombre: cat.nombre || "" }
-              : { id: 0, nombre: "Sin categoría" },
+        // C. Reordenar imágenes existentes (Drag & Drop / Favorito)
+        if (ordenImagenesExistentes && ordenImagenesExistentes.length > 0) {
+          const cambiosOrden = ordenImagenesExistentes.map((idImg, index) => ({
+            id: idImg,
+            id_producto: idProductoFinal, // Requerido para el upsert
+            orden: index,
+          }));
+          await productoService.reordenarImagenes(cambiosOrden);
+        }
+
+        // D. Retrocompatibilidad: Sincronizar la portada con `url_imagen`
+        const { data: portada } = await supabase
+          .from("producto_imagenes")
+          .select("url_imagen")
+          .eq("id_producto", idProductoFinal)
+          .order("orden", { ascending: true })
+          .limit(1)
+          .single();
+
+        if (portada) {
+          await productoService.actualizar(idProductoFinal, {
+            url_imagen: portada.url_imagen,
+          });
+          productoOperado.url_imagen = portada.url_imagen;
+        } else if (
+          !portada &&
+          imagenesAEliminar &&
+          imagenesAEliminar.length > 0
+        ) {
+          // Si se borraron todas las fotos, limpiamos la portada
+          await productoService.actualizar(idProductoFinal, {
+            url_imagen: null,
+          });
+          productoOperado.url_imagen = null;
+        }
+      }
+
+      // ── 3. GUARDAR RELACIONES (Opciones, Proveedor, Insumos) ─────
+      if (data.es_personalizable) {
+        // Transformamos el OpcionForm del frontend al formato que exige tu servicio
+        const opcionesMapeadas = (opciones || []).map(op => ({
+          opcion: {
+            nombre: op.nombre,
+            tipo: op.tipo,
+            obligatorio: op.obligatorio,
           },
-        ]);
+          valores: op.valores,
+        }));
+
+        await personalizacionService.guardarOpcionesProducto(
+          idProductoFinal,
+          opcionesMapeadas
+        );
+      } else {
+        await personalizacionService.eliminarOpcionesDeProducto(
+          idProductoFinal
+        );
+      }
+
+      if (data.tipo === "revendido" && relacionProveedor) {
+        const provResult = await productoProveedorService.guardarRelacion({
+          id_producto: idProductoFinal,
+          id_proveedor: relacionProveedor.id_proveedor,
+          precio_compra: relacionProveedor.precio_compra,
+          tiempo_entrega: relacionProveedor.tiempo_entrega,
+        });
+        if (provResult?.error)
+          console.error("Error proveedor:", provResult.error);
+      } else if (data.tipo === "fabricado") {
+        await productoProveedorService.eliminarPorProducto(idProductoFinal);
+      }
+
+      const insumosParaGuardar =
+        data.tipo === "fabricado" ? (insumosSeleccionados ?? []) : [];
+      await productoInsumoService.guardarInsumosProducto(
+        idProductoFinal,
+        insumosParaGuardar
+      );
+
+      if (materialesSeleccionados) {
+        await productoMaterialService.guardarRelaciones(
+          idProductoFinal,
+          materialesSeleccionados
+        );
+      }
+
+      // ── 4. ACTUALIZAR ESTADO LOCAL (UI) ──────────────────────────
+      const { categorias: categoriasData } =
+        await categoriaService.obtenerTodas();
+      const cat = categoriasData?.find(
+        c => c.id === productoOperado.id_categoria
+      );
+
+      const productoParaEstado = {
+        id: productoOperado.id,
+        nombre: productoOperado.nombre || "",
+        precio: productoOperado.precio || 0,
+        costo: productoOperado.costo || 0,
+        costo_mayorista: productoOperado.costo_mayorista || 0,
+        stock_actual: productoOperado.stock_actual || 0,
+        stock_min: productoOperado.stock_min || 0,
+        tiempo: productoOperado.tiempo,
+        url_imagen: productoOperado.url_imagen,
+        url_filtro_tiktok: productoOperado.url_filtro_tiktok, // <-- TikTok Filter sincronizado localmente
+        id_categoria: productoOperado.id_categoria,
+        es_personalizable: productoOperado.es_personalizable,
+        descripcion: productoOperado.descripcion || "",
+        tipo: productoOperado.tipo || "fabricado",
+        categoria: cat
+          ? { id: cat.id, nombre: cat.nombre || "" }
+          : { id: 0, nombre: "Sin categoría" },
+      };
+
+      if (targetId) {
+        setProductos(prev =>
+          prev.map(p => (p.id === targetId ? productoParaEstado : p))
+        );
+      } else {
+        setProductos(prev => [...prev, productoParaEstado]);
       }
 
       handleCloseModal();
@@ -464,12 +476,30 @@ export default function InventariosPage() {
   // Mostrar carga mientras se verifica el usuario
   if (loadingUser || loading) {
     return (
-      <section className="min-h-screen flex items-center justify-center" style={{ background: "var(--beige)" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 32, width: "100%", maxWidth: 1200, padding: 40 }}>
+      <section
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "var(--beige)" }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 32,
+            width: "100%",
+            maxWidth: 1200,
+            padding: 40,
+          }}
+        >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Skeleton width={120} height={40} borderRadius={12} />
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: 24,
+            }}
+          >
             <Skeleton height={140} borderRadius={24} />
             <Skeleton height={140} borderRadius={24} />
             <Skeleton height={140} borderRadius={24} />
@@ -487,17 +517,32 @@ export default function InventariosPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
+    <div
+      className="flex h-screen overflow-hidden"
+      style={{ background: "var(--beige)" }}
+    >
       <SidebarMenu />
 
-      <main className="flex-1 px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto" style={{ background: "var(--beige)" }}>
+      <main
+        className="flex-1 px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto"
+        style={{ background: "var(--beige)" }}
+      >
         <div className="mx-auto max-w-[1440px] space-y-8">
           {/* Header */}
           <header className="space-y-6">
             {/* Línea editorial */}
             <div className="flex items-center gap-4">
-              <span className="h-px w-12" style={{ background: "var(--rose-gold)" }} />
-              <span className="text-xs tracking-[0.4em] uppercase font-medium" style={{ color: "var(--rose-gold)", fontFamily: "var(--font-marcellus)" }}>
+              <span
+                className="h-px w-12"
+                style={{ background: "var(--rose-gold)" }}
+              />
+              <span
+                className="text-xs tracking-[0.4em] uppercase font-medium"
+                style={{
+                  color: "var(--rose-gold)",
+                  fontFamily: "var(--font-marcellus)",
+                }}
+              >
                 Inventarios
               </span>
             </div>
@@ -511,15 +556,21 @@ export default function InventariosPage() {
             style={{
               background: "var(--white)",
               border: "1px solid var(--border-subtle)",
-              boxShadow: "var(--shadow-md)"
+              boxShadow: "var(--shadow-md)",
             }}
           >
             {/* Accent line */}
-            <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl" style={{ background: "var(--rose-gold)" }} />
+            <div
+              className="absolute inset-x-0 top-0 h-1 rounded-t-3xl"
+              style={{ background: "var(--rose-gold)" }}
+            />
 
             {/* Error message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" style={{ fontFamily: "var(--font-sans)" }}>
+              <div
+                className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
+                style={{ fontFamily: "var(--font-sans)" }}
+              >
                 {error}
               </div>
             )}
@@ -543,7 +594,10 @@ export default function InventariosPage() {
                     transition duration-300
                     hover:scale-[1.02]
                   "
-                  style={{ background: "var(--rose-gold)", fontFamily: "var(--font-sans)" }}
+                  style={{
+                    background: "var(--rose-gold)",
+                    fontFamily: "var(--font-sans)",
+                  }}
                 >
                   + Categoría
                 </button>
@@ -560,7 +614,10 @@ export default function InventariosPage() {
                     hover:scale-[1.02]
                     flex items-center gap-2
                   "
-                  style={{ background: "var(--rose-gold)", fontFamily: "var(--font-sans)" }}
+                  style={{
+                    background: "var(--rose-gold)",
+                    fontFamily: "var(--font-sans)",
+                  }}
                 >
                   <FileText size={18} />
                   <span className="hidden sm:inline">Imprimir Etiquetas</span>
@@ -579,7 +636,10 @@ export default function InventariosPage() {
                     hover:scale-[1.02]
                     whitespace-nowrap
                   "
-                  style={{ background: "var(--rose-gold)", fontFamily: "var(--font-sans)" }}
+                  style={{
+                    background: "var(--rose-gold)",
+                    fontFamily: "var(--font-sans)",
+                  }}
                 >
                   + Producto
                 </button>

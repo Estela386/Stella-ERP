@@ -12,11 +12,18 @@ interface ProductModalProps {
   materiales?: any[];
   onSubmit: (
     data: CreateProductoDTO | UpdateProductoDTO,
-    imagenFile?: File,
+    imagenesNuevas?: File[],
+    imagenesAEliminar?: number[],
+    ordenImagenesExistentes?: number[],
     opciones?: OpcionForm[],
-    relacionProveedor?: { id_proveedor: number; precio_compra: number; tiempo_entrega: number },
+    relacionProveedor?: {
+      id_proveedor: number;
+      precio_compra: number;
+      tiempo_entrega: number;
+    },
     insumosSeleccionados?: { id_insumo: number; cantidad_necesaria: number }[],
-    materialesSeleccionados?: number[]
+    materialesSeleccionados?: number[],
+    id_actualizar?: number
   ) => Promise<void>;
   onClose: () => void;
   loading?: boolean;
@@ -38,27 +45,41 @@ export default function ProductModal({
   return (
     <div className="fixed inset-0 z-[100] flex items-start sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-[#4a5568]/40 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="fixed inset-0 bg-[#4a5568]/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
       {/* Modal Container — responsive */}
       <div
         className="relative bg-[#f6f4ef] rounded-none sm:rounded-[24px] w-full z-10 flex flex-col overflow-hidden"
         style={{
-          maxWidth: 'min(680px, 100vw)',
-          height: '100dvh',
-          maxHeight: '100dvh',
+          maxWidth: "min(680px, 100vw)",
+          height: "100dvh",
+          maxHeight: "100dvh",
           // en desktop limitamos a 92vh
-          ...(typeof window !== 'undefined' && window.innerWidth >= 640 ? { height: 'auto', maxHeight: '92vh' } : {}),
+          ...(typeof window !== "undefined" && window.innerWidth >= 640
+            ? { height: "auto", maxHeight: "92vh" }
+            : {}),
           boxShadow: "0 20px 56px rgba(140,151,104,0.22)",
-          border: "1px solid rgba(112,128,144,0.18)"
+          border: "1px solid rgba(112,128,144,0.18)",
         }}
       >
         {/* Header compacto pegado arriba */}
         <div className="flex items-center justify-between px-5 py-4 bg-white border-b border-[rgba(112,128,144,0.12)] flex-shrink-0">
           <div>
-            <p className="text-[0.7rem] text-[#8c9768] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-sans)" }}>Stella ERP — Inventario</p>
-            <h2 className="text-base font-black text-[#4a5568] leading-tight" style={{ fontFamily: "var(--font-marcellus)" }}>
-              {producto ? "Editar" : "Nuevo"} <span className="text-[#b76e79]">Producto</span>
+            <p
+              className="text-[0.7rem] text-[#8c9768] font-bold uppercase tracking-widest"
+              style={{ fontFamily: "var(--font-sans)" }}
+            >
+              Stella ERP — Inventario
+            </p>
+            <h2
+              className="text-base font-black text-[#4a5568] leading-tight"
+              style={{ fontFamily: "var(--font-marcellus)" }}
+            >
+              {producto ? "Editar" : "Nuevo"}{" "}
+              <span className="text-[#b76e79]">Producto</span>
             </h2>
           </div>
           <button

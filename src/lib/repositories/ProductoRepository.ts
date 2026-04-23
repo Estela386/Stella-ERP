@@ -14,39 +14,52 @@ export class ProductoRepository extends BaseRepository<IProducto> {
   constructor(client: SupabaseClient) {
     super(client, "producto");
   }
+  async getById(
+    id: number
+  ): Promise<{ data: IProducto | null; error: string | null }> {
+    try {
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select(
+          `
+          *,
+          categoria:id_categoria(id, nombre),
+          producto_material:producto_material(id, material:id_material(id, nombre)),
+          opciones:producto_opciones(*, valores:producto_opcion_valores(*)),
+          imagenes:producto_imagenes(id, url_imagen, orden) 
+        `
+        )
+        .eq("id", id)
+        .order("orden", {
+          referencedTable: "producto_imagenes",
+          ascending: true,
+        }) // Ordenar la galería
+        .single();
+
+      if (error) throw error;
+      return { data: data as unknown as IProducto, error: null };
+    } catch (err: any) {
+      return { data: null, error: err.message };
+    }
+  }
 
   /**
    * Obtiene todos los productos con su información de categoría
    */
-  async getAllWithCategoria(): Promise<{
-    data:
-      | (IProducto & { categoria?: { id: number; nombre: string | null } })[]
-      | null;
-    error: string | null;
-  }> {
-    try {
-      const { data, error } = await this.client.from(this.tableName).select(
+  async getAllWithCategoria() {
+    const { data, error } = await this.client
+      .from("producto")
+      .select(
         `
-          *,
-          categoria:id_categoria(id, nombre),
-          producto_material(materiales(nombre)),
-          opciones:producto_opciones(*, valores:producto_opcion_valores(*))
-        `
+        *,
+        categoria:id_categoria(id, nombre),
+        imagenes:producto_imagenes(id, url_imagen, orden)
+      `
       )
-      .eq("activo", true);
+      .order("id", { ascending: false });
 
-      if (error) {
-        return { data: null, error: error.message };
-      }
-
-      return { data, error: null };
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      return { data: null, error: errorMessage };
-    }
+    return { data, error };
   }
-
   /**
    * Obtiene un producto por ID con su información de categoría
    */
@@ -91,11 +104,13 @@ export class ProductoRepository extends BaseRepository<IProducto> {
     try {
       const { data, error } = await this.client
         .from(this.tableName)
-        .select(`
+        .select(
+          `
           *,
           categoria:id_categoria(id, nombre),
           producto_material(materiales(nombre))
-        `)
+        `
+        )
         .eq("id_categoria", idCategoria)
         .eq("activo", true);
 
@@ -121,11 +136,13 @@ export class ProductoRepository extends BaseRepository<IProducto> {
     try {
       const { data, error } = await this.client
         .from(this.tableName)
-        .select(`
+        .select(
+          `
           *,
           categoria:id_categoria(id, nombre),
           producto_material(materiales(nombre))
-        `)
+        `
+        )
         .eq("activo", true)
         .lt("stock_actual", "stock_min");
 
@@ -151,11 +168,13 @@ export class ProductoRepository extends BaseRepository<IProducto> {
     try {
       const { data, error } = await this.client
         .from(this.tableName)
-        .select(`
+        .select(
+          `
           *,
           categoria:id_categoria(id, nombre),
           producto_material(materiales(nombre))
-        `)
+        `
+        )
         .eq("activo", true)
         .ilike("nombre", `%${nombre}%`);
 

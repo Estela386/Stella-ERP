@@ -29,6 +29,7 @@ import {
   X as FiX,
   Palette,
   ScanFace,
+  Star,
 } from "lucide-react";
 
 const LUXURY_PALETTE = [
@@ -65,6 +66,12 @@ export interface OpcionForm {
   obligatorio: boolean;
   valores: { valor: string; stock: number }[];
 }
+interface VistaImagen {
+  idUnico: string; // ID temporal de React
+  idDb?: number; // ID real si viene de Supabase
+  file?: File; // El archivo si es nuevo
+  url: string; // URL para previsualizar
+}
 
 interface ProductFormProps {
   producto?: Producto;
@@ -74,7 +81,9 @@ interface ProductFormProps {
   materialesDisponibles?: IMaterial[];
   onSubmit: (
     data: CreateProductoDTO | UpdateProductoDTO,
-    imagenFile?: File,
+    imagenesNuevas?: File[],
+    imagenesAEliminar?: number[],
+    ordenImagenesExistentes?: number[],
     opciones?: OpcionForm[],
     relacionProveedor?: {
       id_proveedor: number;
@@ -124,6 +133,26 @@ export default function ProductForm({
     tiempo_entrega: 0,
   });
 
+  const [galeria, setGaleria] = useState<VistaImagen[]>(() => {
+    const inicial: VistaImagen[] = [];
+    // Si trae imágenes de la nueva tabla relacional
+
+    if (producto?.imagenes && producto.imagenes.length > 0) {
+      producto.imagenes.forEach((img: any) => {
+        inicial.push({
+          idUnico: `db-${img.id}`,
+          idDb: img.id,
+          url: img.url_imagen,
+        });
+      });
+    }
+    // Retrocompatibilidad con la imagen vieja (opcional)
+    else if (producto?.url_imagen) {
+      inicial.push({ idUnico: "retro", url: producto.url_imagen });
+    }
+    return inicial;
+  });
+  const [imagenesAEliminar, setImagenesAEliminar] = useState<number[]>([]);
   const [opciones, setOpciones] = useState<OpcionForm[]>([]);
   const [imagenFile, setImagenFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null | undefined>(
@@ -264,7 +293,52 @@ export default function ProductForm({
 
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
   };
+  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 1. Extraemos TODOS los archivos seleccionados, no solo el primero
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
+    // 2. Filtramos los que pesan más de 5MB
+    const validFiles = files.filter(f => f.size <= 5 * 1024 * 1024);
+    if (validFiles.length < files.length) {
+      setErrors(prev => ({
+        ...prev,
+        imagen: "Algunas imágenes superan los 5MB y fueron ignoradas.",
+      }));
+    }
+
+    // 3. Creamos las vistas previas para cada imagen nueva
+    const nuevasVistas: VistaImagen[] = validFiles.map((file, index) => ({
+      // Agregamos el index al ID para asegurar que no haya duplicados si se suben al mismo milisegundo
+      idUnico: `new-${Date.now()}-${index}-${file.name}`,
+      file,
+      url: URL.createObjectURL(file),
+    }));
+
+    // 4. Las AGREGAMOS a las que ya estaban en la galería
+    setGaleria(prev => [...prev, ...nuevasVistas]);
+
+    e.target.value = "";
+  };
+  const handleRemoveImage = (img: VistaImagen) => {
+    // Si viene de la base de datos, lo anotamos para borrarlo en el backend
+    if (img.idDb) {
+      setImagenesAEliminar(prev => [...prev, img.idDb!]);
+    } else if (img.url.startsWith("blob:")) {
+      // Liberar memoria del navegador
+      URL.revokeObjectURL(img.url);
+    }
+    setGaleria(prev => prev.filter(i => i.idUnico !== img.idUnico));
+  };
+
+  const handleSetCover = (index: number) => {
+    setGaleria(prev => {
+      const arr = [...prev];
+      const [item] = arr.splice(index, 1);
+      arr.unshift(item); // Lo ponemos al principio (índice 0)
+      return arr;
+    });
+  };
   const handleInsumoChange = (idx: number, field: string, value: number) => {
     setInsumosSeleccionados(prev =>
       prev.map((item, i) => (i === idx ? { ...item, [field]: value } : item))
@@ -486,11 +560,21 @@ export default function ProductForm({
         opcionesFinales.push(opcionJuego);
       }
     }
+    // 🔥 PREPARAR IMÁGENES PARA EL SERVICIO
+    const imagenesNuevasFiles = galeria
+      .filter(g => g.file)
+      .map(g => g.file) as File[];
+    // Pasamos el orden de los IDs que ya existen en DB, para que el backend sepa cómo quedaron ordenadas
+    const ordenImagenesExistentes = galeria
+      .filter(g => g.idDb)
+      .map(g => g.idDb!);
 
     try {
       await onSubmit(
         dataToSave as CreateProductoDTO | UpdateProductoDTO,
-        imagenFile || undefined,
+        imagenesNuevasFiles, // Pasamos los archivos nuevos
+        imagenesAEliminar, // Pasamos los IDs a borrar
+        ordenImagenesExistentes, // Pasamos el nuevo orden de los existentes
         opcionesFinales,
         formData.tipo === "revendido" ? proveedorRelacion : undefined,
         formData.tipo === "fabricado" ? insumosSeleccionados : undefined,
@@ -1695,78 +1779,111 @@ export default function ProductForm({
       </div>
 
       {/* SECCIÓN 6: IMAGEN Y DESCRIPCIÓN */}
-      <div className="p-6 bg-[#ffffff] rounded-[24px] border-2 border-[rgba(112,128,144,0.12)] shadow-md">
-        <div className="flex items-start gap-6">
-          {/* Imagen preview + upload — columna izquierda fija */}
-          <div
-            className="flex-shrink-0 flex flex-col gap-3"
-            style={{ width: "160px" }}
-          >
-            <p className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest">
-              Imagen
-            </p>
-            <div className="w-full aspect-square bg-[#f6f4ef] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] overflow-hidden relative group">
-              {previewUrl ? (
-                <Image
-                  src={previewUrl}
-                  alt="Preview"
-                  width={160}
-                  height={160}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#708090]/30">
-                  <ImageIcon size={28} strokeWidth={1} />
-                  <p className="text-[0.7rem] font-bold uppercase tracking-widest">
-                    Sin imagen
-                  </p>
-                </div>
-              )}
-              {previewUrl && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPreviewUrl(null);
-                    setImagenFile(null);
-                  }}
-                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 text-rose-500 shadow flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"
-                >
-                  <Trash2 size={14} />
-                </button>
-              )}
-            </div>
-            <label className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-dashed border-[rgba(112,128,144,0.2)] rounded-[14px] cursor-pointer hover:bg-[#b76e79]/5 hover:border-[#b76e79]/30 transition-all">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <Plus size={14} className="text-[#b76e79]" />
-              <span className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">
-                Subir
-              </span>
-            </label>
-          </div>
 
-          {/* Descripción — columna derecha */}
+      {/* 🔥 SECCIÓN 6: GALERÍA DE IMÁGENES Y DESCRIPCIÓN (NUEVA) */}
+      <div className="p-6 bg-[#ffffff] rounded-[24px] border-2 border-[rgba(112,128,144,0.12)] shadow-md">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Descripción (Movida a la izquierda o arriba) */}
           <div className="flex-1 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <p className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">
-                Descripción
+                Descripción de la Pieza
               </p>
-              <span className="text-[0.7rem] text-[#708090]/50">Opcional</span>
             </div>
             <textarea
               name="descripcion"
               value={formData.descripcion}
               onChange={handleChange}
-              rows={6}
-              placeholder="Describe el producto..."
-              className="w-full h-full bg-[#f6f4ef]/30 border-2 border-transparent rounded-[16px] p-4 text-sm text-[#4a5568] focus:border-[#b76e79] focus:bg-white outline-none transition-all resize-none shadow-inner"
+              rows={5}
+              placeholder="Describe los detalles de la pieza, inspiración, medidas..."
+              className="w-full bg-[#f6f4ef]/30 border-2 border-[rgba(112,128,144,0.1)] rounded-[16px] p-4 text-sm text-[#4a5568] focus:border-[#b76e79] focus:bg-white outline-none transition-all resize-none"
               style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}
             />
           </div>
+        </div>
+        <div className="mt-8 border-t border-[rgba(112,128,144,0.1)] pt-6">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">
+              Galería de Imágenes
+            </p>
+            <span className="text-[0.7rem] text-[#708090]/50 bg-[#f6f4ef] px-3 py-1 rounded-full">
+              Formatos: JPG, PNG, WEBP (Max 5MB)
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {/* Imágenes Actuales */}
+            {galeria.map((img, idx) => (
+              <div
+                key={img.idUnico}
+                className="relative aspect-square rounded-[16px] border-2 border-[rgba(112,128,144,0.1)] overflow-hidden group bg-[#f6f4ef]"
+              >
+                <Image
+                  src={img.url}
+                  alt={`Imagen ${idx + 1}`}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+
+                {/* Overlay de acciones */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-2">
+                  {idx !== 0 && (
+                    <button
+                      type="button"
+                      onClick={() => handleSetCover(idx)}
+                      className="bg-white/90 text-[#b76e79] text-xs font-bold px-3 py-1.5 rounded-full hover:scale-105 transition-transform flex items-center gap-1"
+                    >
+                      <Star size={12} fill="currentColor" /> Hacer Portada
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(img)}
+                    className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center hover:scale-105 transition-transform shadow-lg"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+
+                {/* Badge de Portada */}
+                {idx === 0 && (
+                  <div className="absolute top-2 left-2 bg-[#b76e79] text-white text-[0.6rem] font-black uppercase tracking-widest px-2 py-1 rounded-md shadow-md flex items-center gap-1">
+                    <Star size={10} fill="currentColor" /> Portada
+                  </div>
+                )}
+
+                {/* Badge de Nueva */}
+                {img.file && (
+                  <div className="absolute bottom-2 right-2 bg-[#8c9768] text-white text-[0.6rem] font-black uppercase px-2 py-1 rounded-md shadow-md">
+                    Nueva
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Botón Upload (Añadir más) */}
+            <label className="aspect-square rounded-[16px] border-2 border-dashed border-[rgba(112,128,144,0.3)] hover:border-[#b76e79] hover:bg-[#b76e79]/5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleGalleryUpload}
+                className="hidden"
+              />
+              <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#b76e79]">
+                <Plus size={20} strokeWidth={2.5} />
+              </div>
+              <span className="text-[0.7rem] font-bold text-[#708090] uppercase tracking-widest">
+                Añadir Fotos
+              </span>
+            </label>
+          </div>
+
+          {errors.imagen && (
+            <p className="text-rose-500 text-xs font-medium mt-3">
+              {errors.imagen}
+            </p>
+          )}
         </div>
       </div>
 

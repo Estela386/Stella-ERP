@@ -28,7 +28,10 @@ export class ProductoService {
     const { data, error } = await this.repository.getAllWithCategoria();
 
     if (error || !data) {
-      return { productos: null, error };
+      return {
+        productos: null,
+        error: error?.message || "Error desconocido al obtener productos",
+      };
     }
 
     const productos = data.map(item => new Producto(item as IProducto));
@@ -42,10 +45,13 @@ export class ProductoService {
     producto: Producto | null;
     error: string | null;
   }> {
-    const { data, error } = await this.repository.getByIdWithCategoria(id);
-
+    const { data, error } = await this.repository.getById(id);
+    console.log("Data obtenida por ID:", data);
     if (error || !data) {
-      return { producto: null, error };
+      return {
+        producto: null,
+        error: error || "Error desconocido al obtener el producto",
+      };
     }
 
     const producto = new Producto(data as IProducto);
@@ -62,10 +68,13 @@ export class ProductoService {
     const { data, error } = await this.repository.getByCategoria(idCategoria);
 
     if (error || !data) {
-      return { productos: null, error };
+      return {
+        productos: null,
+        error: error || "Error desconocido al obtener productos por categoría",
+      };
     }
 
-    const productos = data.map(item => new Producto(item));
+    const productos = data.map(item => new Producto(item as IProducto));
     return { productos, error: null };
   }
 
@@ -86,10 +95,13 @@ export class ProductoService {
     const { data, error } = await this.repository.searchByNombre(nombre);
 
     if (error || !data) {
-      return { productos: null, error };
+      return {
+        productos: null,
+        error: error || "Error desconocido al buscar productos",
+      };
     }
 
-    const productos = data.map(item => new Producto(item));
+    const productos = data.map(item => new Producto(item as IProducto));
     return { productos, error: null };
   }
 
@@ -103,10 +115,13 @@ export class ProductoService {
     const { data, error } = await this.repository.getProductosStockBajo();
 
     if (error || !data) {
-      return { productos: null, error };
+      return {
+        productos: null,
+        error: error || "Error desconocido al obtener productos con stock bajo",
+      };
     }
 
-    const productos = data.map(item => new Producto(item));
+    const productos = data.map(item => new Producto(item as IProducto));
     return { productos, error: null };
   }
 
@@ -147,7 +162,7 @@ export class ProductoService {
       return { producto: null, error };
     }
 
-    const producto = new Producto(result);
+    const producto = new Producto(result as IProducto);
     return { producto, error: null };
   }
 
@@ -172,7 +187,7 @@ export class ProductoService {
     const productoActualizado = new Producto({
       ...productoExistente.toJSON(),
       ...data,
-    });
+    } as IProducto);
 
     const validacion = productoActualizado.validar();
     if (!validacion.valid) {
@@ -185,7 +200,7 @@ export class ProductoService {
       return { producto: null, error };
     }
 
-    const producto = new Producto(result);
+    const producto = new Producto(result as IProducto);
     return { producto, error: null };
   }
 
@@ -201,7 +216,9 @@ export class ProductoService {
       return { success: false, error: "Producto no encontrado" };
     }
 
-    const { data: success, error } = await this.repository.update(id, { activo: false });
+    const { data: success, error } = await this.repository.update(id, {
+      activo: false,
+    });
     return { success: !!success, error };
   }
 
@@ -225,7 +242,7 @@ export class ProductoService {
       return { producto: null, error };
     }
 
-    const producto = new Producto(result);
+    const producto = new Producto(result as IProducto);
     return { producto, error: null };
   }
 
@@ -280,5 +297,134 @@ export class ProductoService {
       },
       error: null,
     };
+  }
+
+  // =========================================================================
+  // 🔥 NUEVOS MÉTODOS PARA GALERÍA DE IMÁGENES 🔥
+  // =========================================================================
+
+  /**
+   * Sube múltiples archivos de imagen a Supabase Storage y los asocia al producto.
+   */
+  async agregarImagenesAProducto(
+    productoId: number,
+    archivos: File[]
+  ): Promise<{ success: boolean; error: string | null }> {
+    const urlsPublicas: string[] = [];
+
+    try {
+      // 1. Subir cada archivo al bucket
+      for (const file of archivos) {
+        // Generar un nombre único para evitar colisiones de caché
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `${productoId}/${fileName}`;
+
+        // Asumimos que creaste un bucket llamado "imagenes_productos" configurado como "Public"
+        const { data: uploadData, error: uploadError } = await this.repository[
+          "client"
+        ].storage
+          .from("imagenes_productos")
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error("Error subiendo imagen individual:", uploadError);
+          continue; // Si una falla, intentamos seguir con las demás
+        }
+
+        if (uploadData) {
+          const { data: publicUrlData } = this.repository["client"].storage
+            .from("imagenes_productos")
+            .getPublicUrl(filePath);
+
+          urlsPublicas.push(publicUrlData.publicUrl);
+        }
+      }
+
+      // 2. Guardar las URLs en la tabla 'producto_imagenes'
+      if (urlsPublicas.length > 0) {
+        // Consultamos cuál es el orden actual más alto para agregar las nuevas al final
+        const { data: existingImages } = await this.repository["client"]
+          .from("producto_imagenes")
+          .select("orden")
+          .eq("id_producto", productoId)
+          .order("orden", { ascending: false })
+          .limit(1);
+
+        const startOrder =
+          existingImages && existingImages.length > 0
+            ? existingImages[0].orden + 1
+            : 0;
+
+        const inserts = urlsPublicas.map((url, index) => ({
+          id_producto: productoId,
+          url_imagen: url,
+          orden: startOrder + index,
+        }));
+
+        const { error: dbError } = await this.repository["client"]
+          .from("producto_imagenes")
+          .insert(inserts);
+
+        if (dbError) throw dbError;
+      }
+
+      return { success: true, error: null };
+    } catch (error: any) {
+      console.error("Error en agregarImagenesAProducto:", error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Elimina una imagen tanto de la base de datos como del Storage.
+   */
+  async eliminarImagenProducto(
+    idImagenBd: number,
+    urlImagen: string
+  ): Promise<{ success: boolean; error: string | null }> {
+    try {
+      // 1. Eliminar el registro de la tabla relacional
+      const { error: dbError } = await this.repository["client"]
+        .from("producto_imagenes")
+        .delete()
+        .eq("id", idImagenBd);
+
+      if (dbError) throw dbError;
+
+      // 2. Extraer la ruta real del archivo para borrarlo del Bucket
+      // URL típica: https://[tu-proyecto].supabase.co/storage/v1/object/public/imagenes_productos/123/archivo.jpg
+      const urlParts = urlImagen.split("/imagenes_productos/");
+      if (urlParts.length === 2) {
+        const filePath = urlParts[1];
+        await this.repository["client"].storage
+          .from("imagenes_productos")
+          .remove([filePath]);
+      }
+
+      return { success: true, error: null };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Actualiza el orden (drag & drop) de la galería.
+   */
+  async reordenarImagenes(
+    cambiosOrden: { id: number; orden: number }[]
+  ): Promise<{ success: boolean; error: string | null }> {
+    try {
+      // Supabase permite upsert múltiple si le pasamos la llave primaria
+      const { error } = await this.repository["client"]
+        .from("producto_imagenes")
+        .upsert(cambiosOrden);
+
+      if (error) throw error;
+
+      return { success: true, error: null };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
   }
 }

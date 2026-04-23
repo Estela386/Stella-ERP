@@ -2,7 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 
 export class ImageUploadService {
   private client: SupabaseClient;
-  private bucketName = "product_images";
+  private bucketName = "imagenes_productos";
 
   constructor(client: SupabaseClient) {
     this.client = client;

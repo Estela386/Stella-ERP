@@ -35,6 +35,12 @@ export default function ProductoClient({ id }: ProductoClientProps) {
   const [erroresPersonalizacion, setErroresPersonalizacion] = useState<
     Record<number, string>
   >({});
+  const [imagenActiva, setImagenActiva] = useState(
+    producto?.imagenes && producto.imagenes.length > 0
+      ? producto.imagenes.sort((a: any, b: any) => a.orden - b.orden)[0]
+          .url_imagen
+      : producto?.url_imagen
+  );
   const validarPersonalizacion = (): boolean => {
     if (!producto.es_personalizable || opciones.length === 0) return true;
 
@@ -70,7 +76,14 @@ export default function ProductoClient({ id }: ProductoClientProps) {
         }
 
         setProducto(productoData);
-        console.log("Producto cargado:", productoData);
+        setImagenActiva(
+          productoData.imagenes && productoData.imagenes.length > 0
+            ? productoData.imagenes.sort(
+                (a: any, b: any) => a.orden - b.orden
+              )[0].url_imagen
+            : productoData.url_imagen
+        );
+
         if (usuario?.id) {
           // Insertamos silenciosamente sin bloquear la carga visual
           supabase
@@ -92,7 +105,6 @@ export default function ProductoClient({ id }: ProductoClientProps) {
         setLoading(false);
       }
     };
-    console.log("id:", id);
     if (!isNaN(Number(id))) {
       cargarProducto();
     } else {
@@ -119,14 +131,12 @@ export default function ProductoClient({ id }: ProductoClientProps) {
     if (id) cargarReviews();
 
     const verificarYaComento = async () => {
-      console.log("Verificando si el usuario ya comentó:", { id, usuario });
       if (usuario?.id_auth) {
         const reviewService = new ReviewService(createClient());
         const { yaComento, error } = await reviewService.yaComento(
           id,
           usuario.id_auth
         );
-        console.log("Resultado de yaComento:", { yaComento, error });
         if (!error) {
           setYaComento(yaComento);
         }
@@ -323,6 +333,7 @@ export default function ProductoClient({ id }: ProductoClientProps) {
         <div className="main-grid">
           {/* Columna Izquierda: Imagen */}
           <div className="sticky-container">
+            {/* Imagen Principal en Grande */}
             <div
               style={{
                 position: "relative",
@@ -332,14 +343,18 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                 overflow: "hidden",
                 boxShadow: "0 20px 40px rgba(112,128,144,0.08)",
                 border: "1px solid rgba(112,128,144,0.05)",
+                marginBottom:
+                  producto.imagenes && producto.imagenes.length > 1
+                    ? "16px"
+                    : "0",
               }}
             >
-              {producto.url_imagen ? (
+              {imagenActiva ? (
                 <Image
-                  src={producto.url_imagen}
+                  src={imagenActiva}
                   alt={producto.nombre || "Imagen del producto"}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-opacity duration-500"
                   priority
                 />
               ) : (
@@ -379,6 +394,64 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                 </div>
               )}
             </div>
+
+            {/* Carrusel de Miniaturas (Solo aparece si hay 2 o más fotos) */}
+            {producto.imagenes && producto.imagenes.length > 1 && (
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  overflowX: "auto",
+                  paddingBottom: "8px",
+                  // Estilos para ocultar la barra de scroll nativa pero permitir el deslizamiento
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
+                className="[&::-webkit-scrollbar]:hidden"
+              >
+                {producto.imagenes
+                  .sort((a: any, b: any) => a.orden - b.orden)
+                  .map((img: any) => (
+                    <button
+                      key={img.id}
+                      onClick={() => setImagenActiva(img.url_imagen)}
+                      style={{
+                        position: "relative",
+                        width: "80px",
+                        height: "80px",
+                        flexShrink: 0,
+                        borderRadius: "16px",
+                        overflow: "hidden",
+                        border:
+                          imagenActiva === img.url_imagen
+                            ? "2px solid #b76e79"
+                            : "2px solid transparent",
+                        opacity: imagenActiva === img.url_imagen ? 1 : 0.6,
+                        transition: "all 0.3s ease",
+                        cursor: "pointer",
+                        background: "#f6f4ef",
+                      }}
+                      onMouseOver={e => {
+                        if (imagenActiva !== img.url_imagen) {
+                          e.currentTarget.style.opacity = "0.9";
+                        }
+                      }}
+                      onMouseOut={e => {
+                        if (imagenActiva !== img.url_imagen) {
+                          e.currentTarget.style.opacity = "0.6";
+                        }
+                      }}
+                    >
+                      <Image
+                        src={img.url_imagen}
+                        alt="Miniatura"
+                        fill
+                        className="object-cover"
+                      />
+                    </button>
+                  ))}
+              </div>
+            )}
 
             {/* Badges de Calidad */}
             <div
@@ -428,7 +501,6 @@ export default function ProductoClient({ id }: ProductoClientProps) {
               </div>
             </div>
           </div>
-
           {/* Columna Derecha: Información */}
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
             <header>

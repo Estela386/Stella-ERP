@@ -1,3 +1,9 @@
+export interface IProductoImagen {
+  id: number;
+  id_producto: number;
+  url_imagen: string;
+  orden: number;
+}
 /**
  * Modelo de Producto
  * Representa la estructura de datos de un producto en la base de datos
@@ -21,6 +27,7 @@ export interface IProducto {
   activo: boolean;
   opciones?: any[];
   url_filtro_tiktok?: string | null; // <-- Nueva propiedad
+  imagenes?: IProductoImagen[]; // <-- Nueva propiedad para imágenes adicionales
 }
 
 /**
@@ -81,6 +88,7 @@ export class Producto implements IProducto {
   activo: boolean;
   opciones?: any[];
   url_filtro_tiktok?: string | null;
+  imagenes?: IProductoImagen[] | undefined;
 
   constructor(data: IProducto) {
     this.id = data.id;
@@ -101,6 +109,7 @@ export class Producto implements IProducto {
     this.activo = data.activo ?? true;
     this.opciones = data.opciones;
     this.url_filtro_tiktok = data.url_filtro_tiktok ?? null;
+    this.imagenes = data.imagenes ?? [];
   }
 
   /**

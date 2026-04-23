@@ -3,6 +3,13 @@ export type Categoria = {
   nombre: string;
 };
 
+export type IProductoImagen = {
+  id: number;
+  id_producto: number;
+  url_imagen: string;
+  orden: number;
+};
+
 export type Producto = {
   id: number;
   nombre: string | null;
@@ -22,6 +29,7 @@ export type Producto = {
   ganancia?: number;
   roi_porcentaje?: number;
   url_filtro_tiktok?: string;
+  imagenes?: IProductoImagen[];
 };
 
 export type HistorialProducto = {
