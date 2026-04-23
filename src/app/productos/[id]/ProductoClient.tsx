@@ -13,7 +13,7 @@ import SimilarProducts from "./_components/SimilarProducts";
 import AlsoBoughtProducts from "./_components/AlsoBoughtProducts";
 import { suscribirStock } from "@/app/dashboard/cliente/actions";
 import { useRouter } from "next/navigation";
-import { Bell, AlertTriangle } from "lucide-react";
+import { Bell, AlertTriangle, ArrowLeft } from "lucide-react";
 
 interface ProductoClientProps {
   id: string;
@@ -325,6 +325,13 @@ export default function ProductoClient({ id }: ProductoClientProps) {
           animation: "fadeIn 0.8s ease-out",
         }}
       >
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-[#708090] hover:text-[#b76e79] transition-colors mb-6 font-sans text-sm font-medium bg-transparent border-none cursor-pointer"
+        >
+          <ArrowLeft size={16} /> Volver al catálogo
+        </button>
+
         <div className="main-grid">
           {/* Columna Izquierda: Imagen */}
           <div className="sticky-container">

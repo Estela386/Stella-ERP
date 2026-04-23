@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { X, Save, Calendar, Link as LinkIcon, ImageIcon, Tag, Sparkles, Clock, ArrowRight, Eye, AlertCircle } from "lucide-react";
+import { X, Save, Calendar, Link as LinkIcon, ImageIcon, Tag, Sparkles, Clock, ArrowRight, Eye, AlertCircle, Upload, Trash2 } from "lucide-react";
 import { createClient } from "@utils/supabase/client";
 
 interface Campana {
@@ -80,10 +80,56 @@ const inputStyle: React.CSSProperties = {
   boxSizing: "border-box",
 };
 
+// Convierte una fecha ISO a formato aceptado por datetime-local input: "YYYY-MM-DDTHH:MM"
+function toDatetimeLocal(iso: string): string {
+  if (!iso) return "";
+  try {
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  } catch {
+    return iso.slice(0, 16);
+  }
+}
+
+function normalizeCampana(c: Campana): Campana {
+  return {
+    ...c,
+    fecha_inicio: toDatetimeLocal(c.fecha_inicio),
+    fecha_fin: toDatetimeLocal(c.fecha_fin),
+  };
+}
+
 export default function EditCampaignModal({ campana, onClose, onSaved }: Props) {
-  const [form, setForm] = useState<Campana>(campana ?? defaultForm);
+  const [form, setForm] = useState<Campana>(campana ? normalizeCampana(campana) : defaultForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleImageUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Solo se permiten archivos de imagen.");
+      return;
+    }
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const supabase = createClient();
+      const ext = file.name.split(".").pop();
+      const path = `campanas/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("product_images")
+        .upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data } = supabase.storage.from("product_images").getPublicUrl(path);
+      setForm(prev => ({ ...prev, url_imagen: data.publicUrl }));
+    } catch (e: any) {
+      setUploadError(e.message || "Error al subir imagen");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const set = (field: keyof Campana, value: string | boolean) =>
     setForm(prev => ({ ...prev, [field]: value }));
@@ -339,6 +385,95 @@ export default function EditCampaignModal({ campana, onClose, onSaved }: Props) 
                       placeholder="Ej: Piezas únicas con hasta 20% de descuento"
                     />
                   </Field>
+                </div>
+              </section>
+
+              {/* ────── SECCIÓN: IMAGEN ────── */}
+              <section>
+                <SectionTitle icon={<ImageIcon size={14} />} title="Imagen del Banner" />
+                <div style={{
+                  borderRadius: 20, border: "2px dashed rgba(183,110,121,0.2)",
+                  background: "rgba(246,244,239,0.5)", padding: "20px",
+                  display: "flex", flexDirection: "column", gap: 14
+                }}>
+                  {/* Preview */}
+                  {form.url_imagen ? (
+                    <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", height: 160 }}>
+                      <img
+                        src={form.url_imagen}
+                        alt="Preview banner"
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                      <button
+                        onClick={() => setForm(prev => ({ ...prev, url_imagen: "" }))}
+                        style={{
+                          position: "absolute", top: 8, right: 8,
+                          background: "rgba(183,110,121,0.9)", border: "none", borderRadius: "50%",
+                          width: 30, height: 30, display: "flex", alignItems: "center",
+                          justifyContent: "center", cursor: "pointer", color: "white"
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <label
+                      htmlFor="banner-upload"
+                      style={{
+                        display: "flex", flexDirection: "column", alignItems: "center",
+                        justifyContent: "center", gap: 10, padding: "28px 20px",
+                        borderRadius: 14, cursor: uploading ? "not-allowed" : "pointer",
+                        background: "rgba(183,110,121,0.03)",
+                        border: "1.5px dashed rgba(183,110,121,0.25)",
+                        transition: "all 0.2s",
+                        opacity: uploading ? 0.6 : 1,
+                      }}
+                    >
+                      {uploading ? (
+                        <div className="animate-spin-custom" />
+                      ) : (
+                        <Upload size={28} style={{ color: "#b76e79", opacity: 0.6 }} />
+                      )}
+                      <span style={{
+                        fontFamily: "var(--font-poppins)", fontSize: "0.78rem",
+                        color: "#708090", textAlign: "center"
+                      }}>
+                        {uploading ? "Subiendo imagen..." : "Haz clic o arrastra una imagen aquí"}
+                      </span>
+                      <span style={{ fontSize: "0.65rem", color: "#9E9A95" }}>PNG, JPG, WEBP · Máx 5MB</span>
+                      <input
+                        id="banner-upload"
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        disabled={uploading}
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(file);
+                        }}
+                      />
+                    </label>
+                  )}
+
+                  {/* Also allow URL manually */}
+                  <Field label="O pega una URL de imagen">
+                    <input
+                      value={form.url_imagen || ""}
+                      onChange={e => set("url_imagen", e.target.value)}
+                      style={inputStylePremium}
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                    />
+                  </Field>
+
+                  {uploadError && (
+                    <div style={{
+                      display: "flex", alignItems: "center", gap: 8,
+                      fontSize: "0.78rem", color: "#b76e79", fontWeight: 600,
+                      background: "rgba(183,110,121,0.05)", padding: "8px 14px", borderRadius: 10
+                    }}>
+                      <AlertCircle size={14} /> {uploadError}
+                    </div>
+                  )}
                 </div>
               </section>
 

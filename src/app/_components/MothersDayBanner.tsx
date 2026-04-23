@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Clock, ArrowRight, Gem } from "lucide-react";
+import { Clock as ClockIcon, ArrowRight as ArrowRightIcon } from "lucide-react";
 
 interface Campana {
   id: number;
@@ -46,48 +46,15 @@ function useCountdown(fechaFin: string): TimeLeft {
   return timeLeft;
 }
 
-function CountdownUnit({ value, label }: { value: number; label: string }) {
+function CountdownSquare({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-0.5">
-      <div
-        className="relative overflow-hidden group"
-        style={{
-          background: "rgba(255, 255, 255, 0.45)",
-          border: "1px solid rgba(255, 255, 255, 0.6)",
-          borderRadius: 12,
-          padding: "clamp(6px, 1vw, 10px) clamp(10px, 1.5vw, 15px)",
-          minWidth: "clamp(44px, 6vw, 65px)",
-          textAlign: "center",
-          backdropFilter: "blur(10px)",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-        }}
-      >
-        <span
-          style={{
-            fontFamily: "var(--font-marcellus), 'Marcellus', serif",
-            fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
-            fontWeight: 400,
-            color: "#4a5568", 
-            lineHeight: 1,
-            display: "block",
-            letterSpacing: "-0.01em"
-          }}
-        >
+    <div className="flex flex-col items-center gap-1.5">
+      <div className="w-12 h-14 md:w-14 md:h-18 bg-white rounded-2xl shadow-md border border-white/80 flex items-center justify-center">
+        <span className="text-2xl md:text-3xl font-serif text-[#4a5568]" style={{ fontFamily: "var(--font-marcellus), serif" }}>
           {String(value).padStart(2, "0")}
         </span>
       </div>
-      <span
-        style={{
-          fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-          fontSize: "0.55rem",
-          fontWeight: 600,
-          letterSpacing: "0.15em",
-          textTransform: "uppercase",
-          color: "rgba(74, 85, 104, 0.6)",
-        }}
-      >
-        {label}
-      </span>
+      <span className="text-[0.6rem] md:text-[0.65rem] font-bold text-[#4a5568]/70 uppercase tracking-widest">{label}</span>
     </div>
   );
 }
@@ -110,231 +77,115 @@ export default function MothersDayBanner() {
 
   if (!mounted || !campana || isExpired) return null;
 
-  // Design Tokens
-  const ROSE = "#b76e79";
-  const BEIGE = "#f6f4ef";
-
   return (
     <AnimatePresence>
       <motion.section
-        key="compact-striking-banner"
-        initial={{ opacity: 0, y: 40, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -20, scale: 0.98 }}
-        whileHover={{ y: -4, boxShadow: "0 30px 60px rgba(183, 110, 121, 0.15)" }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          borderRadius: "clamp(20px, 3vw, 32px)",
-          marginBottom: "clamp(20px, 4vw, 32px)",
-          // Altura compacta
-          minHeight: "clamp(180px, 22vw, 240px)",
-          background: BEIGE,
-          display: "flex",
-          alignItems: "center",
-          cursor: "pointer",
-          border: "1px solid rgba(183, 110, 121, 0.12)",
-          boxShadow: "0 15px 40px rgba(112, 128, 144, 0.06)",
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative w-full overflow-hidden rounded-[32px] md:rounded-[50px] shadow-2xl border border-white/50 cursor-pointer mb-10 group"
+        style={{ 
+          minHeight: "180px",
+          background: "#fdfaf5"
         }}
         onClick={() => router.push(campana.cta_href || "/productos")}
       >
-        {/* ── 1. Animated Mesh Background ── */}
-        <div style={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none" }}>
-          {/* Layer 1: Base Linear Gradient */}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, #f6f4ef 0%, #fff 50%, #fdfbf7 100%)" }} />
+        {/* ── Background: Ultra-Vibrant Colorful Orbs ── */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 bg-[#fdfaf5]" />
 
-          {/* Layer 2: Moving Radial Blurs */}
           <motion.div 
             animate={{ 
-              x: [0, 100, 0, -100, 0], 
-              y: [0, -50, 50, -50, 0],
-              scale: [1, 1.2, 0.9, 1.1, 1]
-            }} 
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            style={{
-              position: "absolute", top: "10%", left: "20%", width: "60%", height: "80%",
-              background: "radial-gradient(circle, rgba(183, 110, 121, 0.1) 0%, transparent 60%)",
-              filter: "blur(60px)",
+              x: [0, 50, 0],
+              y: [0, -30, 0],
+              scale: [1, 1.2, 1]
             }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[-10%] right-[0%] w-[500px] h-[500px] bg-[radial-gradient(circle,#ff9a9e_0%,#fecfef_30%,transparent_70%)] opacity-50 blur-[60px]"
           />
           <motion.div 
             animate={{ 
-              x: [0, -80, 80, -40, 0], 
-              y: [0, 60, -60, 40, 0],
-              scale: [1, 0.8, 1.3, 0.9, 1]
-            }} 
-            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-            style={{
-              position: "absolute", bottom: "10%", right: "10%", width: "50%", height: "70%",
-              background: "radial-gradient(circle, rgba(140, 151, 104, 0.08) 0%, transparent 60%)",
-              filter: "blur(60px)",
+              x: [0, -60, 0],
+              y: [0, 40, 0],
             }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-[-10%] right-[10%] w-[400px] h-[400px] bg-[radial-gradient(circle,#a1c4fd_0%,#c2e9fb_40%,transparent_70%)] opacity-40 blur-[70px]"
           />
-
-          {/* Layer 3: Noise Texture Overlay */}
-          <div style={{
-            position: "absolute", inset: 0, opacity: 0.04, mixBlendMode: "multiply", pointerEvents: "none",
-            backgroundImage: `url("https://www.transparenttextures.com/patterns/felt.png")`, // Sutil textura de grano
-          }} />
-
-          {/* Layer 4: Shimmer Sweep Animation */}
-          <motion.div
-            initial={{ x: "-150%" }}
-            animate={{ x: "250%" }}
-            transition={{ duration: 3, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
-            style={{
-              position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 5,
-              background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)",
-              transform: "skewX(-25deg)",
-              pointerEvents: "none"
-            }}
+          <motion.div 
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[20%] right-[25%] w-64 h-64 bg-[radial-gradient(circle,#fed06e_0%,transparent_70%)] opacity-40 blur-[50px]"
           />
         </div>
 
-        {/* ── 2. Decorative Image (If exists) ── */}
-        {campana.url_imagen && (
-          <div style={{
-            position: "absolute", right: 0, top: 0, bottom: 0, width: "45%",
-            zIndex: 1, pointerEvents: "none",
-            maskImage: "linear-gradient(to left, black 60%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to left, black 60%, transparent 100%)",
-          }}>
-            <img 
-              src={campana.url_imagen} 
-              alt="" 
-              style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-            />
-          </div>
-        )}
-
-        {/* ── 3. Content ── */}
-        <div style={{
-          position: "relative", zIndex: 10, width: "100%",
-          padding: "clamp(20px, 3vw, 32px) clamp(24px, 5vw, 64px)",
-          display: "grid",
-          gridTemplateColumns: "1fr auto",
-          gap: "24px",
-          alignItems: "center",
-        }} className="banner-compact-grid">
+        <div className="relative z-10 w-full h-full flex flex-col md:flex-row items-center justify-between px-10 md:px-16 py-8 md:py-10 gap-10 md:gap-4">
           
-          {/* Left Side: Info */}
-          {/* Left Side: Info */}
-          <div className="banner-info-container" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <motion.div
-              initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-              className="banner-badge"
-              style={{ display: "flex", alignItems: "center", gap: 6 }}
-            >
-              <div style={{ width: 12, height: 1.5, background: ROSE }} />
-              <span style={{
-                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.25em",
-                textTransform: "uppercase", color: ROSE
-              }}>
-                {campana.tipo_promocion || "Solo por hoy"}
+          {/* 1. Left: Bold Text Content */}
+          <div className="flex-[1.5] flex flex-col items-center md:items-start space-y-1 md:space-y-2">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-6 h-[2px] bg-[#b76e79]" />
+              <span className="text-[0.7rem] tracking-[0.3em] uppercase text-[#b76e79] font-black">
+                {campana.tipo_promocion || "EDICIÓN ESPECIAL"}
               </span>
-            </motion.div>
-
-            <motion.h2
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              style={{
-                fontFamily: "var(--font-marcellus), 'Marcellus', serif",
-                fontSize: "clamp(1.5rem, 3.5vw, 2.8rem)",
-                fontWeight: 400, color: "#4a5568", lineHeight: 1.1, margin: 0,
-                letterSpacing: "-0.02em"
-              }}
+            </div>
+            <h2 
+              className="text-2xl md:text-3xl lg:text-5xl font-serif text-[#4a5568] leading-tight"
+              style={{ fontFamily: "var(--font-marcellus), serif" }}
             >
               {campana.titulo}
-            </motion.h2>
-
-            <motion.p
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-              style={{
-                fontFamily: "var(--font-lora), 'Lora', serif",
-                fontStyle: "italic", fontSize: "clamp(0.85rem, 1.5vw, 1.05rem)",
-                color: "#708090", margin: 0, opacity: 0.9, maxWidth: "400px"
-              }}
+            </h2>
+            <p 
+              className="text-xs md:text-sm lg:text-base text-[#708090] font-serif italic opacity-90"
+              style={{ fontFamily: "var(--font-lora), serif" }}
             >
               {campana.subtitulo}
-            </motion.p>
-            
-            <div className="banner-cta" style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{
-                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontSize: "0.8rem", fontWeight: 700, color: ROSE,
-                letterSpacing: "0.05em", borderBottom: `1.5px solid ${ROSE}`,
-                paddingBottom: 2, display: "flex", alignItems: "center", gap: 8
-              }}>
-                {campana.cta_texto || "Ver más"}
-                <ArrowRight size={14} />
-              </span>
-            </div>
+            </p>
           </div>
 
-          {/* Right Side: Simple Countdown */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-            style={{
-              background: "rgba(255, 255, 255, 0.4)",
-              border: "1px solid rgba(255, 255, 255, 0.7)",
-              borderRadius: 24,
-              padding: "clamp(12px, 2vw, 20px) clamp(16px, 2.5vw, 24px)",
-              backdropFilter: "blur(12px)",
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-              alignItems: "center"
-            }}
-            className="compact-countdown"
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <Clock size={12} color="#708090" />
-              <span style={{
-                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontSize: "0.6rem", fontWeight: 600, letterSpacing: "0.1em",
-                textTransform: "uppercase", color: "#708090"
-              }}>
-                Termina en:
+          {/* 2. Center: Product Image */}
+          <div className="flex-1 flex items-center justify-center">
+            {campana.url_imagen && (
+              <motion.div 
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="relative w-36 h-36 md:w-48 md:h-48 lg:w-56 lg:h-56"
+              >
+                <img 
+                  src={campana.url_imagen} 
+                  alt={campana.titulo}
+                  className="w-full h-full object-contain drop-shadow-2xl group-hover:scale-110 transition-transform duration-1000"
+                />
+              </motion.div>
+            )}
+          </div>
+
+          {/* 3. Right: Vibrant Glassmorphism Countdown Area */}
+          <div className="flex-[1.5] flex flex-col items-center md:items-end gap-6">
+            <div className="bg-white/30 backdrop-blur-3xl border border-white/60 p-8 md:p-10 rounded-[40px] shadow-2xl flex flex-col items-center gap-6">
+              <div className="flex items-center gap-2 text-[#4a5568] font-bold">
+                <ClockIcon size={16} />
+                <span className="text-[0.65rem] md:text-[0.75rem] uppercase tracking-[0.3em]">TERMINA EN:</span>
+              </div>
+              
+              <div className="flex gap-3 md:gap-4 lg:gap-5">
+                <CountdownSquare value={timeLeft.dias} label="D" />
+                <CountdownSquare value={timeLeft.horas} label="H" />
+                <CountdownSquare value={timeLeft.minutos} label="M" />
+                <CountdownSquare value={timeLeft.segundos} label="S" />
+              </div>
+            </div>
+
+            <motion.div 
+              whileHover={{ x: 10 }}
+              className="border-b-2 border-[#b76e79]/30 pb-1.5 group mr-4"
+            >
+              <span className="text-[#b76e79] font-black text-xs md:text-sm tracking-[0.25em] uppercase flex items-center gap-2">
+                {campana.cta_texto || "Ver Regalos"}
+                <ArrowRightIcon size={18} className="group-hover:translate-x-2 transition-transform" />
               </span>
-            </div>
+            </motion.div>
+          </div>
 
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
-              <CountdownUnit value={timeLeft.dias}     label="D" />
-              <CountdownUnit value={timeLeft.horas}    label="H" />
-              <CountdownUnit value={timeLeft.minutos}  label="M" />
-              <CountdownUnit value={timeLeft.segundos} label="S" />
-            </div>
-          </motion.div>
         </div>
-
-        {/* CSS TWEAKS */}
-        <style>{`
-          @media (max-width: 860px) {
-            .banner-compact-grid {
-              grid-template-columns: 1fr !important;
-              text-align: center;
-              justify-items: center;
-              padding: 24px 16px !important;
-              gap: 20px !important;
-            }
-            .banner-info-container {
-              align-items: center !important;
-            }
-            .banner-badge {
-              justify-content: center !important;
-            }
-            .banner-cta {
-              justify-content: center !important;
-            }
-          }
-          @media (max-width: 480px) {
-            .compact-countdown {
-              width: 100%;
-              transform: scale(0.95);
-            }
-          }
-        `}</style>
       </motion.section>
     </AnimatePresence>
   );

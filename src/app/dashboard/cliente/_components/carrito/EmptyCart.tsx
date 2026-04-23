@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function EmptyCart() {
   return (
     <div className="flex flex-col items-center justify-center py-20">
@@ -17,9 +19,12 @@ export default function EmptyCart() {
       </p>
 
       {/* Action Button */}
-      <button className="bg-[#b8696c] hover:bg-[#9d5559] text-white font-medium py-2 px-6 rounded-lg transition-colors">
+      <Link
+        href="/dashboard/cliente/catalogo?categoria=accesorios"
+        className="bg-[#b8696c] hover:bg-[#9d5559] text-white font-medium py-2 px-6 rounded-lg transition-colors"
+      >
         Añadir compras
-      </button>
+      </Link>
     </div>
   );
 }
