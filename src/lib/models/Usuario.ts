@@ -46,6 +46,13 @@ export class Usuario implements IUsuario {
   esAdmin(): boolean {
     return this.id_rol === 1;
   }
+  esMayorista(): boolean {
+    return this.id_rol === 3;
+  }
+
+  esCliente(): boolean {
+    return this.id_rol === 2;
+  }
 
   /**
    * Verifica si el usuario tiene un rol específico

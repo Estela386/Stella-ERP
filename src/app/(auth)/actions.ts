@@ -3,6 +3,14 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@utils/supabase/server";
 
+export function validateEmail(email: string) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+export function validateRequired(value: string) {
+  return value.trim() !== "";
+}
+
 export async function login(prevState: any, formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -26,7 +34,8 @@ export async function login(prevState: any, formData: FormData) {
 
   if (userError || !user) {
     console.log("Error al obtener usuario:", userError);
-    redirect("/dashboard/cliente"); // Redirección por defecto
+    redirect("/dashboard/cliente");
+    return;
   }
 
   // Redirigir según el id_rol
