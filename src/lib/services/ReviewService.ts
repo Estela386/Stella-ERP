@@ -37,6 +37,41 @@ export class ReviewService {
     );
     return { reviews, error: null };
   }
+  async puedeComentar(
+    productId: string,
+    userId: string,
+    uuidUsuario?: string
+  ): Promise<{
+    puede: boolean;
+    razon: "NO_LOGUEADO" | "NO_COMPRADO" | "YA_COMENTO" | "ELIGIBLE";
+    error: string | null;
+  }> {
+    if (!userId) return { puede: false, razon: "NO_LOGUEADO", error: null };
+    if (!uuidUsuario)
+      return { puede: false, razon: "NO_LOGUEADO", error: null };
+    // 1. Verificamos si ya comentó
+    const { yaComento, error: comentoError } =
+      await this.reviewRepository.yaComento(productId, uuidUsuario);
+    if (comentoError)
+      return { puede: false, razon: "NO_COMPRADO", error: comentoError };
+
+    if (yaComento) {
+      return { puede: false, razon: "YA_COMENTO", error: null };
+    }
+
+    // 2. Verificamos si lo compró
+    const { haComprado, error: compraError } =
+      await this.reviewRepository.haComprado(productId, userId);
+    if (compraError)
+      return { puede: false, razon: "NO_COMPRADO", error: compraError };
+
+    if (!haComprado) {
+      return { puede: false, razon: "NO_COMPRADO", error: null };
+    }
+
+    // Si pasó ambas validaciones, puede comentar
+    return { puede: true, razon: "ELIGIBLE", error: null };
+  }
 
   async yaComento(
     productId: string,
