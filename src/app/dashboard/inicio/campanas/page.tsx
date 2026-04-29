@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Edit3, Trash2, ToggleLeft, ToggleRight, Calendar, Tag } from "lucide-react";
+import { Plus, Edit3, Trash2, ToggleLeft, ToggleRight, Calendar, Tag, Gift, Layout, Trophy, Search, AlertCircle } from "lucide-react";
 import SidebarMenu from "@/app/_components/SideBarMenu";
 import { useAuth } from "@lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { createClient } from "@utils/supabase/client";
-import EditCampaignModal from "./_components/EditCampaignModal";
+import CampanaFormModal from "./_components/CampanaFormModal";
+import GestionSorteosModal from "./_components/GestionSorteosModal";
 import Skeleton from "@/app/_components/ui/Skeleton";
 
 interface Campana {
@@ -29,34 +30,37 @@ export default function CampanasPage() {
   const [campanas, setCampanas] = useState<Campana[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showGestionModal, setShowGestionModal] = useState(false);
   const [selected, setSelected] = useState<Campana | null>(null);
+  const [selectedBannerId, setSelectedBannerId] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Guard: solo admin
   useEffect(() => {
     if (!loadingUser && usuario && !usuario.esAdmin()) {
       router.push("/dashboard/inicio");
     }
   }, [usuario, loadingUser, router]);
 
-  // Cargar campañas
   const cargarCampanas = async () => {
     setLoading(true);
-    const supabase = createClient();
-    const { data } = await supabase
-      .from("campana_banner")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setCampanas(data ?? []);
-    setLoading(false);
+    try {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("campana_banner")
+        .select("*")
+        .order("created_at", { ascending: false });
+      setCampanas(data ?? []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const init = async () => {
-      if (!loadingUser && usuario?.esAdmin()) {
-        await cargarCampanas();
-      }
-    };
-    init();
+    if (!loadingUser && usuario?.esAdmin()) {
+      cargarCampanas();
+    }
   }, [loadingUser, usuario]);
 
   const toggleActivo = async (campana: Campana) => {
@@ -65,250 +69,220 @@ export default function CampanasPage() {
       .from("campana_banner")
       .update({ activo: !campana.activo })
       .eq("id", campana.id);
+    
+    // Si es sorteo, también actualizar la tabla sorteos
+    if (campana.tipo_promocion === "sorteo") {
+      await supabase
+        .from("sorteos")
+        .update({ activo: !campana.activo })
+        .eq("id_banner", campana.id);
+    }
+
     setCampanas(prev =>
       prev.map(c => c.id === campana.id ? { ...c, activo: !c.activo } : c)
     );
   };
 
-  const eliminar = async (id: number) => {
+  const eliminar = async (id: number, tipo: string) => {
+    if (!confirm("¿Estás seguro de eliminar esta campaña?")) return;
+    
     const supabase = createClient();
+    if (tipo === "sorteo") {
+      // Eliminar sorteo primero por constraints
+      await supabase.from("sorteos").delete().eq("id_banner", id);
+    }
     await supabase.from("campana_banner").delete().eq("id", id);
     setCampanas(prev => prev.filter(c => c.id !== id));
   };
 
   const now = new Date();
-  const isLive = (c: Campana) =>
-    c.activo && new Date(c.fecha_inicio) <= now && new Date(c.fecha_fin) >= now;
+  const getStatus = (c: Campana) => {
+    if (!c.activo) return "inactive";
+    if (new Date(c.fecha_inicio) > now) return "pending";
+    if (new Date(c.fecha_fin) < now) return "expired";
+    return "live";
+  };
+
+  const filteredCampanas = campanas.filter(c => 
+    c.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.tipo_promocion.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loadingUser) return null;
   if (!usuario?.esAdmin()) return null;
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "var(--beige)" }}>
+    <div className="flex h-screen overflow-hidden bg-[#fdfaf5]">
       <SidebarMenu />
 
-      <main className="flex-1 px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto" style={{ background: "var(--beige)" }}>
-        <div className="mx-auto max-w-[1440px] space-y-10">
+      <main className="flex-1 px-4 sm:px-8 py-8 overflow-y-auto">
+        <div className="mx-auto max-w-6xl space-y-8">
 
-          {/* ── Header ── */}
-          <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b" style={{ borderColor: "var(--border-subtle)" }}>
-            <div className="space-y-3">
-              <div className="flex items-center gap-4">
-                <span className="h-px w-12" style={{ background: "var(--rose-gold)" }} />
-                <span className="text-xs tracking-[0.4em] uppercase font-medium" style={{ color: "var(--rose-gold)", fontFamily: "var(--font-marcellus)" }}>
-                  Marketing · ERP
-                </span>
+          {/* ── Header Unificado ── */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-[2px] bg-[#b76e79]" />
+                <span className="text-[10px] tracking-[0.3em] uppercase font-bold text-[#b76e79] font-serif">Marketing Hub</span>
               </div>
-              <h1 className="text-4xl sm:text-5xl" style={{
-                fontFamily: "var(--font-marcellus)",
-                fontWeight: 400,
-                color: "var(--charcoal)",
-                margin: 0,
-                lineHeight: 1.1,
-              }}>
-                Campañas <span style={{ color: "var(--rose-gold)", fontStyle: "italic" }}>Especiales</span>
-              </h1>
+              <h1 className="text-4xl font-serif text-[#4a5568]">Gestión de <span className="italic text-[#b76e79]">Campañas</span></h1>
             </div>
 
             <motion.button
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => { setSelected(null); setShowModal(true); }}
-              className="px-8 py-4 rounded-2xl flex items-center gap-3 font-bold transition duration-300 shadow-sm hover:shadow-lg"
-              style={{
-                background: "var(--rose-gold)",
-                color: "var(--beige)",
-                fontSize: "0.85rem",
-                letterSpacing: "0.05em",
-              }}
+              className="px-8 py-4 bg-[#b76e79] text-white rounded-2xl font-bold shadow-xl shadow-[#b76e79]/20 flex items-center gap-3 transition-all"
             >
-              <Plus size={16} />
-              Nueva Campaña
+              <Plus size={20} /> Nueva Campaña
             </motion.button>
-          </header>
+          </div>
 
-          {loading ? (
-            <div className="flex flex-col gap-6">
-              <Skeleton height={140} borderRadius={24} />
-              <Skeleton height={140} borderRadius={24} />
-              <Skeleton height={140} borderRadius={24} />
+          {/* ── Filtros y Buscador ── */}
+          <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <input 
+                className="w-full pl-12 pr-4 py-3 bg-transparent outline-none text-sm text-gray-600"
+                placeholder="Buscar por título o tipo..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
             </div>
-          ) : campanas.length === 0 ? (
-            <div className="text-center p-20 border-2 border-dashed rounded-3xl" style={{
-              borderColor: "var(--border-subtle)",
-              background: "var(--white)"
-            }}>
-              <Tag size={48} style={{ color: "var(--rose-gold)", opacity: 0.2, marginBottom: 20 }} />
-              <p style={{
-                fontFamily: "var(--font-marcellus)",
-                fontSize: "1.5rem", color: "var(--charcoal)", margin: "0 0 8px",
-              }}>No hay campañas creadas</p>
-              <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.9rem", color: "var(--slate-light)" }}>
-                Crea tu primera campaña de visualización para la tienda.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-6">
+          </div>
+
+          {/* ── Lista Consolidada ── */}
+          <div className="space-y-4">
+            {loading ? (
+              <div className="space-y-4">
+                <Skeleton height={120} borderRadius={24} />
+                <Skeleton height={120} borderRadius={24} />
+              </div>
+            ) : filteredCampanas.length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-gray-200">
+                 <Layout size={48} className="mx-auto text-gray-200 mb-4" />
+                 <p className="text-xl font-serif text-gray-400">No hay campañas que coincidan</p>
+              </div>
+            ) : (
               <AnimatePresence>
-                {campanas.map((c) => {
-                  const live = isLive(c);
-                  const pasada = new Date(c.fecha_fin) < now;
+                {filteredCampanas.map((c) => {
+                  const status = getStatus(c);
+                  const isSorteo = c.tipo_promocion === "sorteo";
+                  
                   return (
-                      <motion.div
-                        key={c.id}
-                        variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
-                        className="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border relative overflow-hidden"
-                        style={{
-                          background: "var(--white)",
-                          borderRadius: 24,
-                          borderColor: live ? "rgba(183,110,121,0.3)" : "var(--border-subtle)",
-                          boxShadow: live ? "0 8px 32px rgba(183,110,121,0.08)" : "var(--shadow-sm)"
-                        }}
-                      >
-                      {/* Live glow */}
-                      {live && (
-                        <div style={{
-                          position: "absolute", top: 0, left: 0, width: "100%", height: 3,
-                          background: "linear-gradient(90deg, #b76e79, #d4a5a5, #b76e79)",
-                        }} />
-                      )}
-
-                      {/* Left: Info */}
-                      <div style={{ display: "flex", gap: 20, alignItems: "center", minWidth: 0 }}>
-                        {/* Status pill */}
-                        <div style={{
-                          flexShrink: 0,
-                          padding: "6px 14px",
-                          borderRadius: 100,
-                          background: live
-                            ? "rgba(183,110,121,0.1)"
-                            : pasada
-                              ? "rgba(112,128,144,0.08)"
-                              : "rgba(140,151,104,0.1)",
-                          border: live
-                            ? "1px solid rgba(183,110,121,0.25)"
-                            : pasada
-                              ? "1px solid rgba(112,128,144,0.15)"
-                              : "1px solid rgba(140,151,104,0.2)",
-                          display: "flex", alignItems: "center", gap: 6,
-                        }}>
-                          <div style={{
-                            width: 7, height: 7, borderRadius: "50%",
-                            background: live ? "#b76e79" : pasada ? "#708090" : "#8c9768",
-                            animation: live ? "ringPulse 2s ease-out infinite" : "none",
-                          }} />
-                          <span style={{
-                            fontFamily: "var(--font-poppins), sans-serif",
-                            fontSize: "0.6rem", fontWeight: 700,
-                            letterSpacing: "0.12em", textTransform: "uppercase",
-                            color: live ? "#b76e79" : pasada ? "#708090" : "#8c9768",
-                          }}>
-                            {live ? "En vivo" : pasada ? "Finalizada" : "Pendiente"}
-                          </span>
-                        </div>
-
-                        {/* Text info */}
-                        <div style={{ minWidth: 0 }}>
-                          <p style={{
-                            fontFamily: "var(--font-marcellus), 'Marcellus', serif",
-                            fontSize: "clamp(1rem, 2vw, 1.25rem)",
-                            color: "#4a5568", margin: "0 0 4px",
-                            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                          }}>
-                            {c.titulo}
-                          </p>
-                          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-                            <span style={{
-                              fontFamily: "var(--font-poppins), sans-serif",
-                              fontSize: "0.72rem", color: "#708090",
-                              display: "flex", alignItems: "center", gap: 4,
-                            }}>
-                              <Calendar size={11} />
-                              {new Date(c.fecha_inicio).toLocaleDateString("es-MX", { day:"numeric", month:"short" })}
-                              {" → "}
-                              {new Date(c.fecha_fin).toLocaleDateString("es-MX", { day:"numeric", month:"short" })}
-                            </span>
-                            <span style={{
-                              fontFamily: "var(--font-poppins), sans-serif",
-                              fontSize: "0.72rem", color: "#8c9768",
-                              display: "flex", alignItems: "center", gap: 4,
-                            }}>
-                              <Tag size={11} />
-                              {c.tipo_promocion}
-                            </span>
+                    <motion.div
+                      key={c.id}
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="group bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#b76e79]/20 transition-all flex flex-col md:flex-row items-center gap-6"
+                    >
+                      {/* Thumbnail */}
+                      <div className="w-24 h-24 rounded-2xl bg-gray-50 overflow-hidden relative flex-shrink-0 border border-gray-50">
+                        {c.url_imagen ? (
+                          <img src={c.url_imagen} alt={c.titulo} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-300">
+                            {isSorteo ? <Trophy size={32} /> : <Layout size={32} />}
                           </div>
+                        )}
+                        {status === "live" && (
+                          <div className="absolute top-2 right-2 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 text-center md:text-left space-y-1">
+                        <div className="flex items-center justify-center md:justify-start gap-2">
+                           <span className={`px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${isSorteo ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
+                             {isSorteo ? "Sorteo de Leads" : "Banner Informativo"}
+                           </span>
+                           <span className={`px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                             status === 'live' ? 'bg-green-100 text-green-600' : 
+                             status === 'expired' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
+                           }`}>
+                             {status === 'live' ? 'En vivo' : status === 'expired' ? 'Finalizada' : 'Pendiente/Inactiva'}
+                           </span>
+                        </div>
+                        <h3 className="text-xl font-serif text-[#4a5568]">{c.titulo}</h3>
+                        <p className="text-xs text-gray-400 font-medium italic">{c.subtitulo}</p>
+                        
+                        <div className="flex items-center justify-center md:justify-start gap-4 pt-2">
+                           <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400">
+                              <Calendar size={12} className="text-[#b76e79]" />
+                              {new Date(c.fecha_inicio).toLocaleDateString()} - {new Date(c.fecha_fin).toLocaleDateString()}
+                           </div>
                         </div>
                       </div>
 
-                      {/* Right: Actions */}
-                      <div style={{ display: "flex", gap: 10, alignItems: "center", flexShrink: 0 }}>
-                        {/* Toggle activo */}
-                        <button
+                      {/* Acciones */}
+                      <div className="flex items-center gap-2">
+                        <button 
                           onClick={() => toggleActivo(c)}
-                          style={{ background: "none", border: "none", cursor: "pointer", padding: 6 }}
-                          title={c.activo ? "Desactivar" : "Activar"}
+                          className={`p-2 rounded-xl transition-colors ${c.activo ? 'text-[#b76e79] hover:bg-red-50' : 'text-gray-300 hover:bg-gray-50'}`}
                         >
-                          {c.activo
-                            ? <ToggleRight size={28} color="#b76e79" />
-                            : <ToggleLeft size={28} color="#708090" />
-                          }
+                          {c.activo ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
                         </button>
 
-                        {/* Editar */}
-                        <motion.button
-                          whileHover={{ scale: 1.08 }}
-                          whileTap={{ scale: 0.95 }}
+                        <button 
                           onClick={() => { setSelected(c); setShowModal(true); }}
-                          style={{
-                            background: "rgba(112,128,144,0.08)", border: "1.5px solid rgba(112,128,144,0.15)",
-                            borderRadius: 10, padding: "8px 10px", cursor: "pointer",
-                            display: "flex", alignItems: "center", gap: 6,
-                            fontFamily: "var(--font-poppins), sans-serif",
-                            fontSize: "0.72rem", fontWeight: 600, color: "#708090",
-                          }}
+                          className="p-3 bg-gray-50 text-gray-500 hover:bg-[#b76e79] hover:text-white rounded-xl transition-all"
+                          title="Editar"
                         >
-                          <Edit3 size={14} /> Editar
-                        </motion.button>
+                          <Edit3 size={18} />
+                        </button>
 
-                        {/* Eliminar */}
-                        <motion.button
-                          whileHover={{ scale: 1.08 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => eliminar(c.id)}
-                          style={{
-                            background: "rgba(183,110,121,0.06)", border: "1.5px solid rgba(183,110,121,0.15)",
-                            borderRadius: 10, padding: "8px 10px", cursor: "pointer",
-                            display: "flex", alignItems: "center",
-                            color: "#b76e79",
-                          }}
+                        {isSorteo && (
+                          <button 
+                            onClick={() => { setSelectedBannerId(c.id); setShowGestionModal(true); }}
+                            className="p-3 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl transition-all"
+                            title="Gestionar Ganadores"
+                          >
+                            <Trophy size={18} />
+                          </button>
+                        )}
+
+                        <button 
+                          onClick={() => eliminar(c.id, c.tipo_promocion)}
+                          className="p-3 bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white rounded-xl transition-all"
+                          title="Eliminar"
                         >
-                          <Trash2 size={14} />
-                        </motion.button>
+                          <Trash2 size={18} />
+                        </button>
                       </div>
                     </motion.div>
                   );
                 })}
               </AnimatePresence>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </main>
 
-      {/* Modal de edición */}
+      {/* Modal Unificado */}
       <AnimatePresence>
         {showModal && (
-          <EditCampaignModal
+          <CampanaFormModal 
             campana={selected}
             onClose={() => setShowModal(false)}
-            onSaved={() => { setShowModal(false); cargarCampanas(); }}
+            onSaved={() => {
+              setShowModal(false);
+              cargarCampanas();
+            }}
           />
         )}
       </AnimatePresence>
 
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .animate-spin { animation: spin 0.9s linear infinite; }
-      `}</style>
+      {/* Modal de Ganadores */}
+      <AnimatePresence>
+        {showGestionModal && selectedBannerId && (
+          <GestionSorteosModal 
+            bannerId={selectedBannerId}
+            onClose={() => setShowGestionModal(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

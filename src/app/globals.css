@@ -189,6 +189,11 @@ table, th, td {
   100% { transform: translateY(0px);  }
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 @layer utilities {
   .preserve-3d  { transform-style: preserve-3d; }
   .rotate-x-6   { transform: rotateX(6deg); }

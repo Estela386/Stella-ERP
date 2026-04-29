@@ -20,3 +20,4 @@ export { ProductoMaterialService } from "./ProductoMaterialService";
 export { ConsignacionService } from "./ConsignacionService";
 export { SolicitudMayoristaService } from "./SolicitudMayoristaService";
 export { UsuarioService } from "./UsuarioService";
+export { SorteoService } from "./SorteoService";
