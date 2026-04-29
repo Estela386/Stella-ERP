@@ -302,7 +302,7 @@ export default function SorteoWidget({ onRegistroExitoso, allProducts = [], part
 
                    <div className="space-y-4">
                       <a 
-                        href="https://www.instagram.com/stellajoyeriar" 
+                        href="https://www.instagram.com/_u/stellajoyeriar" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         onClick={() => setHasClickedInstagram(true)}
