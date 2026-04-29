@@ -30,6 +30,7 @@ const TIPO_CONFIG: Record<TipoNotificacion, { icon: React.ReactNode; color: stri
   consignacion_nueva:  { icon: <Truck size={14} />,      color: "#27AE60", bg: "rgba(39,174,96,0.08)" },
   insight_ia:          { icon: <Plus size={14} />,       color: "#B76E79", bg: "rgba(183,110,121,0.08)" },
   venta_alerta:        { icon: <Bell size={14} />,      color: "#F39C12", bg: "rgba(243,156,18,0.08)" },
+  stock_resurtido:     { icon: <Package size={14} />,    color: "#16A085", bg: "rgba(22,160,133,0.08)" },
 };
 
 function tiempoRelativo(fechaStr: string): string {

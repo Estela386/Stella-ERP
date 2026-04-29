@@ -19,8 +19,10 @@ import {
   HelpCircle,
   MessageCircle,
   MessageSquare,
+  Bell,
 } from "lucide-react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useNotificaciones } from "@/lib/hooks/useNotificaciones";
 import CartIcon from "@auth/_components/CartIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import LogoM from "@assets/LogoM.svg";
@@ -142,6 +144,140 @@ function NavBtn({
 
 function Divider() {
   return <div className="h-px my-1.5" style={{ background: "#EDE9E3" }} />;
+}
+
+function NotificationBell({ router, id_rol }: { router: any; id_rol: number }) {
+  const { notificaciones, noLeidas, marcarLeida, loading } = useNotificaciones();
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        btnRef.current &&
+        !btnRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const filteredNotificaciones = notificaciones.filter(n => {
+    if (id_rol === 2 || id_rol === 3) {
+      return n.tipo === 'stock_resurtido' || n.tipo === 'pedido_estado';
+    }
+    return true;
+  });
+
+  const filteredNoLeidas = filteredNotificaciones.filter(n => !n.leida).length;
+
+  return (
+    <div className="relative">
+      <button
+        ref={btnRef}
+        className="relative flex items-center justify-center cursor-pointer border-none bg-transparent transition-transform hover:scale-105 active:scale-95"
+        style={{ color: SLATE, width: 40, height: 40 }}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <Bell size={20} />
+        {filteredNoLeidas > 0 && (
+          <span
+            className="absolute top-1 right-1 text-[10px] font-bold rounded-full text-center"
+            style={{
+              background: ROSE,
+              color: WHITE,
+              padding: "1px 5px",
+              minWidth: 18,
+            }}
+          >
+            {filteredNoLeidas}
+          </span>
+        )}
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            ref={menuRef}
+            initial={{ opacity: 0, y: -8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.96 }}
+            transition={{ type: "spring", damping: 24, stiffness: 300 }}
+            style={{
+              position: "absolute",
+              top: "calc(100% + 10px)",
+              right: 0,
+              width: 320,
+              background: WHITE,
+              border: `1px solid ${BORDER}`,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+              borderRadius: 16,
+              overflow: "hidden",
+              zIndex: 9999,
+            }}
+          >
+            <div
+              className="flex items-center justify-between p-4"
+              style={{ borderBottom: `1px solid ${BORDER}`, background: "#FAFAF8" }}
+            >
+              <h3 className="m-0 font-bold text-sm" style={{ color: DARK }}>Notificaciones</h3>
+              <button
+                className="text-xs bg-transparent border-none cursor-pointer hover:underline p-0 m-0"
+                style={{ color: ROSE }}
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/dashboard/cliente/notificaciones");
+                }}
+              >
+                Ver todas
+              </button>
+            </div>
+            
+            <div className="max-h-[300px] overflow-y-auto">
+              {loading ? (
+                 <div className="p-4 text-center text-sm" style={{ color: MUTED }}>Cargando...</div>
+              ) : filteredNotificaciones.length === 0 ? (
+                 <div className="p-4 text-center text-sm" style={{ color: MUTED }}>No tienes notificaciones.</div>
+              ) : (
+                filteredNotificaciones.slice(0, 5).map((n) => (
+                  <div
+                    key={n.id}
+                    className="p-3 flex gap-3 hover:bg-slate-50 transition-colors cursor-pointer"
+                    style={{ borderBottom: `1px solid ${BORDER}`, background: n.leida ? "transparent" : ROSE_BG }}
+                    onClick={() => {
+                      if (!n.leida) marcarLeida(n.id);
+                      setIsOpen(false);
+                      if (n.referencia_id) {
+                        router.push(`/productos/${n.referencia_id}`);
+                      } else {
+                        router.push("/dashboard/cliente/notificaciones");
+                      }
+                    }}
+                  >
+                    <div className="flex-1">
+                      <p className="m-0 text-sm font-semibold" style={{ color: DARK }}>{n.titulo}</p>
+                      <p className="m-0 text-xs mt-1" style={{ color: SLATE }}>{n.mensaje}</p>
+                      <p className="m-0 text-[10px] mt-2" style={{ color: MUTED }}>
+                         {n.created_at ? new Date(n.created_at).toLocaleDateString() : ''}
+                      </p>
+                    </div>
+                    {!n.leida && (
+                      <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: ROSE }}></div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 interface HeaderClientProps {
@@ -293,7 +429,8 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
         {/* ── TOP BAR ── */}
         <div className="flex items-center justify-between px-4 md:px-8 py-3 gap-2">
           {/* Menu / Spacer fixed width to help centering */}
-          <div className="flex items-center w-[40px] md:w-[260px] md:flex-shrink-0">
+          {/* Menu / Spacer fixed width to help centering */}
+          <div className="flex items-center w-auto md:w-[260px] md:flex-shrink-0">
             <button
               className="flex md:hidden items-center justify-center rounded-xl border cursor-pointer flex-shrink-0"
               style={{
@@ -324,7 +461,7 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
           </div>
 
           {/* Acciones derecha - Fixed width matching left on desktop for centering */}
-          <div className="flex items-center justify-end gap-2 sm:gap-3 md:w-[260px] md:flex-shrink-0">
+          <div className="flex items-center justify-end gap-2 sm:gap-3 w-auto md:w-[260px] md:flex-shrink-0">
             {/* Botón ERP (Admin y Mayoristas) */}
             {(id_rol === 1 || id_rol === 3) && (
               <button
@@ -353,6 +490,11 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                 <LayoutDashboard size={16} />
                 ERP
               </button>
+            )}
+
+            {/* Notificaciones (Solo si está logueado) */}
+            {isUserLoaded && isClientDashboard && (
+              <NotificationBell router={router} id_rol={id_rol} />
             )}
 
             {/* Carrito (Solo si está logueado) */}
@@ -518,8 +660,13 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                   )}
                 </AnimatePresence>
               </div>
-            ) : (
+            ) : loading ? (
               <div className="flex items-center gap-2">
+                <div className="w-24 h-9 rounded-full bg-gray-200 animate-pulse" />
+                <div className="w-24 h-9 rounded-full bg-gray-200 animate-pulse" />
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-2">
                 <button
                   className="px-4 py-2 text-sm font-semibold rounded-full border transition-all"
                   style={{ borderColor: ROSE, color: ROSE, background: WHITE }}
@@ -771,7 +918,12 @@ export default function HeaderClient({ user: userProp }: HeaderClientProps) {
                   </div>
                 </div>
 
-                {!isUserLoaded && (
+                {loading ? (
+                  <div className="p-4 bg-white space-y-2 border-t border-[#8C9796]/10">
+                    <div className="w-full py-3 rounded-xl bg-gray-200 animate-pulse h-11" />
+                    <div className="w-full py-3 rounded-xl bg-gray-200 animate-pulse h-11" />
+                  </div>
+                ) : !isUserLoaded && (
                   <div className="p-4 bg-white space-y-2 border-t border-[#8C9796]/10">
                     <button
                       className="w-full py-3 rounded-xl font-bold text-sm transition-all"
