@@ -112,8 +112,8 @@ export class ProductoRepository extends BaseRepository<IProducto> {
           producto_material(materiales(nombre))
         `
         )
-        .eq("id_categoria", idCategoria)
-        .eq("activo", true);
+        .eq("activo", true)
+        .eq("id_categoria", idCategoria);
 
       if (error) {
         return { data: null, error: error.message };
