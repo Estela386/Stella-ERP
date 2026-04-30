@@ -257,7 +257,7 @@ export default function ProductForm({
         ? tallaOp.valores.map(v => v.valor).join(", ")
         : "No especificado";
 
-      const res = await fetch("http://localhost:4000/api/generar-producto", {
+      const res = await fetch("http://127.0.0.1:4000/api/generar-producto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
