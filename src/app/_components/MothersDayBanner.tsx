@@ -48,13 +48,13 @@ function useCountdown(fechaFin: string): TimeLeft {
 
 function CountdownSquare({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1.5">
-      <div className="w-12 h-14 md:w-14 md:h-18 bg-white rounded-2xl shadow-md border border-white/80 flex items-center justify-center">
-        <span className="text-2xl md:text-3xl font-serif text-[#4a5568]" style={{ fontFamily: "var(--font-marcellus), serif" }}>
+    <div className="flex flex-col items-center gap-0.5 md:gap-1.5">
+      <div className="w-8 h-9 md:w-14 md:h-18 bg-white rounded-lg md:rounded-2xl shadow-sm md:shadow-md border border-white/80 flex items-center justify-center">
+        <span className="text-base md:text-3xl font-serif text-[#4a5568]" style={{ fontFamily: "var(--font-marcellus), serif" }}>
           {String(value).padStart(2, "0")}
         </span>
       </div>
-      <span className="text-[0.6rem] md:text-[0.65rem] font-bold text-[#4a5568]/70 uppercase tracking-widest">{label}</span>
+      <span className="text-[0.4rem] md:text-[0.65rem] font-bold text-[#4a5568]/70 uppercase tracking-widest">{label}</span>
     </div>
   );
 }
@@ -82,9 +82,8 @@ export default function MothersDayBanner() {
       <motion.section
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative w-full overflow-hidden rounded-[32px] md:rounded-[50px] shadow-2xl border border-white/50 cursor-pointer mb-10 group"
+        className="relative w-full overflow-hidden rounded-2xl md:rounded-[50px] shadow-lg md:shadow-2xl border border-white/50 cursor-pointer mb-4 group min-h-0 md:min-h-[180px]"
         style={{ 
-          minHeight: "180px",
           background: "#fdfaf5"
         }}
         onClick={() => router.push(campana.cta_href || "/productos")}
@@ -117,37 +116,47 @@ export default function MothersDayBanner() {
           />
         </div>
 
-        <div className="relative z-10 w-full h-full flex flex-col md:flex-row items-center justify-between px-10 md:px-16 py-8 md:py-10 gap-10 md:gap-4">
+        <div className="relative z-10 w-full h-full flex flex-row items-center justify-between px-3 md:px-16 py-1.5 md:py-10 gap-3 md:gap-8">
           
-          {/* 1. Left: Bold Text Content */}
-          <div className="flex-[1.5] flex flex-col items-center md:items-start space-y-1 md:space-y-2">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-6 h-[2px] bg-[#b76e79]" />
-              <span className="text-[0.7rem] tracking-[0.3em] uppercase text-[#b76e79] font-black">
-                {campana.tipo_promocion || "EDICIÓN ESPECIAL"}
-              </span>
-            </div>
-            <h2 
-              className="text-2xl md:text-3xl lg:text-5xl font-serif text-[#4a5568] leading-tight"
-              style={{ fontFamily: "var(--font-marcellus), serif" }}
-            >
-              {campana.titulo}
-            </h2>
-            <p 
-              className="text-xs md:text-sm lg:text-base text-[#708090] font-serif italic opacity-90"
-              style={{ fontFamily: "var(--font-lora), serif" }}
-            >
-              {campana.subtitulo}
-            </p>
+          {/* 1. Left: Text Content */}
+          <div className="flex-1 md:flex-[1.5] flex flex-col items-center md:items-start text-center md:text-left min-w-0">
+             <div className="hidden md:flex items-center gap-2 mb-2">
+               <div className="w-6 h-[2px] bg-[#b76e79]" />
+               <span className="text-[0.7rem] tracking-[0.3em] uppercase text-[#b76e79] font-black">
+                 {campana.tipo_promocion || "EDICIÓN ESPECIAL"}
+               </span>
+             </div>
+             
+             {/* En móvil: Imagen + Título en una fila. En laptop: Título solo. */}
+             <div className="flex items-center gap-3 md:block w-full">
+                {campana.url_imagen && (
+                  <div className="md:hidden relative w-10 h-10 flex-shrink-0">
+                    <img src={campana.url_imagen} alt={campana.titulo} className="w-full h-full object-contain drop-shadow-md rounded-lg" />
+                  </div>
+                )}
+                <h2 
+                  className="text-[14px] md:text-3xl lg:text-5xl font-serif text-[#4a5568] leading-tight truncate md:whitespace-normal"
+                  style={{ fontFamily: "var(--font-marcellus), serif" }}
+                >
+                  {campana.titulo}
+                </h2>
+             </div>
+
+             <p 
+               className="hidden md:block text-xs md:text-sm lg:text-base text-[#708090] font-serif italic opacity-90 mt-2"
+               style={{ fontFamily: "var(--font-lora), serif" }}
+             >
+               {campana.subtitulo}
+             </p>
           </div>
 
-          {/* 2. Center: Product Image */}
-          <div className="flex-1 flex items-center justify-center">
+          {/* 2. Center: Product Image (Solo en laptop/monitor) */}
+          <div className="hidden md:flex flex-1 items-center justify-center">
             {campana.url_imagen && (
               <motion.div 
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="relative w-36 h-36 md:w-48 md:h-48 lg:w-56 lg:h-56"
+                className="relative md:w-40 md:h-40 lg:w-56 lg:h-56"
               >
                 <img 
                   src={campana.url_imagen} 
@@ -158,15 +167,24 @@ export default function MothersDayBanner() {
             )}
           </div>
 
-          {/* 3. Right: Vibrant Glassmorphism Countdown Area */}
-          <div className="flex-[1.5] flex flex-col items-center md:items-end gap-6">
-            <div className="bg-white/30 backdrop-blur-3xl border border-white/60 p-8 md:p-10 rounded-[40px] shadow-2xl flex flex-col items-center gap-6">
+          {/* 3. Right: Area de Acción / Temporizador */}
+          <div className="flex-shrink-0 md:flex-[1.5] flex flex-row md:flex-col items-center md:items-end gap-3 md:gap-6">
+            
+            {/* Temporizador digital en móvil */}
+            <div className="flex items-center gap-1.5 text-[#4a5568] font-bold md:hidden">
+              <ClockIcon size={12} className="text-[#b76e79]" />
+              <span className="text-[11px] font-serif tracking-tight text-[#4a5568]">
+                {timeLeft.dias}d {timeLeft.horas}h {timeLeft.minutos}m {timeLeft.segundos}s
+              </span>
+            </div>
+
+            {/* Temporizador premium en laptop */}
+            <div className="hidden md:flex bg-white/30 backdrop-blur-3xl border border-white/60 p-6 lg:p-10 rounded-[40px] shadow-2xl flex-col items-center gap-4 lg:gap-6">
               <div className="flex items-center gap-2 text-[#4a5568] font-bold">
                 <ClockIcon size={16} />
-                <span className="text-[0.65rem] md:text-[0.75rem] uppercase tracking-[0.3em]">TERMINA EN:</span>
+                <span className="text-[0.75rem] uppercase tracking-[0.3em]">TERMINA EN:</span>
               </div>
-              
-              <div className="flex gap-3 md:gap-4 lg:gap-5">
+              <div className="flex gap-4 lg:gap-5">
                 <CountdownSquare value={timeLeft.dias} label="D" />
                 <CountdownSquare value={timeLeft.horas} label="H" />
                 <CountdownSquare value={timeLeft.minutos} label="M" />
@@ -176,12 +194,15 @@ export default function MothersDayBanner() {
 
             <motion.div 
               whileHover={{ x: 10 }}
-              className="border-b-2 border-[#b76e79]/30 pb-1.5 group mr-4"
+              className="flex-shrink-0"
             >
-              <span className="text-[#b76e79] font-black text-xs md:text-sm tracking-[0.25em] uppercase flex items-center gap-2">
-                {campana.cta_texto || "Ver Regalos"}
-                <ArrowRightIcon size={18} className="group-hover:translate-x-2 transition-transform" />
-              </span>
+              <div className="bg-[#b76e79] md:bg-transparent p-2 md:p-0 rounded-full text-white md:text-[#b76e79] shadow-md md:shadow-none">
+                <span className="hidden md:flex font-black text-xs md:text-sm tracking-[0.25em] uppercase items-center gap-2 border-b-2 border-[#b76e79]/30 pb-1">
+                  {campana.cta_texto || "Ver Regalos"}
+                  <ArrowRightIcon size={18} className="group-hover:translate-x-2 transition-transform" />
+                </span>
+                <ArrowRightIcon size={16} className="md:hidden" />
+              </div>
             </motion.div>
           </div>
 

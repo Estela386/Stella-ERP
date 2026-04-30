@@ -3,11 +3,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@utils/supabase/server";
 
-export function validateEmail(email: string) {
+export async function validateEmail(email: string) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
-export function validateRequired(value: string) {
+export async function validateRequired(value: string) {
   return value.trim() !== "";
 }
 

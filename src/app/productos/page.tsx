@@ -134,57 +134,57 @@ export default async function ProductosPage() {
         <HeaderClient />
 
         {/* ── 1. HERO (Impacto Inmediato) ── */}
-        <header className="relative pt-16 pb-10 px-8 overflow-hidden bg-[#f6f4ef]">
+        <header className="relative pt-10 pb-6 sm:pt-16 sm:pb-10 px-6 sm:px-8 overflow-hidden bg-[#f6f4ef]">
 
            {/* ── ESTRELLAS GIRATORIAS DEL HERO ── */}
            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-             {/* Fila superior */}
+             {/* Filtramos algunas estrellas en móvil para que no se vea saturado */}
              {[
-               { top:"4%",  left:"3%",  size:44, dur:"18s", rev:false, op:"0.45" },
-               { top:"2%",  left:"14%", size:20, dur:"10s", rev:true,  op:"0.35" },
-               { top:"6%",  left:"25%", size:32, dur:"22s", rev:false, op:"0.40" },
-               { top:"1%",  left:"38%", size:16, dur:"8s",  rev:true,  op:"0.45" },
-               { top:"5%",  left:"52%", size:28, dur:"20s", rev:false, op:"0.38" },
-               { top:"3%",  left:"65%", size:18, dur:"12s", rev:true,  op:"0.42" },
-               { top:"7%",  left:"76%", size:36, dur:"25s", rev:false, op:"0.36" },
-               { top:"2%",  left:"88%", size:22, dur:"14s", rev:true,  op:"0.48" },
-               { top:"8%",  left:"96%", size:40, dur:"19s", rev:false, op:"0.33" },
+               { top:"4%",  left:"3%",  size:32, dur:"18s", rev:false, op:"0.45", hideMobile: false },
+               { top:"2%",  left:"14%", size:16, dur:"10s", rev:true,  op:"0.35", hideMobile: true },
+               { top:"6%",  left:"25%", size:24, dur:"22s", rev:false, op:"0.40", hideMobile: false },
+               { top:"1%",  left:"38%", size:14, dur:"8s",  rev:true,  op:"0.45", hideMobile: true },
+               { top:"5%",  left:"52%", size:20, dur:"20s", rev:false, op:"0.38", hideMobile: false },
+               { top:"3%",  left:"65%", size:14, dur:"12s", rev:true,  op:"0.42", hideMobile: true },
+               { top:"7%",  left:"76%", size:28, dur:"25s", rev:false, op:"0.36", hideMobile: false },
+               { top:"2%",  left:"88%", size:18, dur:"14s", rev:true,  op:"0.48", hideMobile: true },
+               { top:"8%",  left:"96%", size:32, dur:"19s", rev:false, op:"0.33", hideMobile: false },
                // Fila media-alta
-               { top:"22%", left:"1%",  size:26, dur:"16s", rev:true,  op:"0.38" },
-               { top:"18%", left:"10%", size:48, dur:"30s", rev:false, op:"0.30" },
-               { top:"25%", left:"20%", size:14, dur:"9s",  rev:true,  op:"0.50" },
-               { top:"20%", left:"32%", size:30, dur:"21s", rev:false, op:"0.35" },
-               { top:"28%", left:"44%", size:20, dur:"13s", rev:true,  op:"0.42" },
-               { top:"19%", left:"56%", size:38, dur:"26s", rev:false, op:"0.33" },
-               { top:"26%", left:"70%", size:16, dur:"11s", rev:true,  op:"0.46" },
-               { top:"21%", left:"82%", size:44, dur:"28s", rev:false, op:"0.30" },
-               { top:"30%", left:"93%", size:22, dur:"15s", rev:true,  op:"0.40" },
+               { top:"22%", left:"1%",  size:20, dur:"16s", rev:true,  op:"0.38", hideMobile: true },
+               { top:"18%", left:"10%", size:36, dur:"30s", rev:false, op:"0.30", hideMobile: false },
+               { top:"25%", left:"20%", size:12, dur:"9s",  rev:true,  op:"0.50", hideMobile: true },
+               { top:"20%", left:"32%", size:24, dur:"21s", rev:false, op:"0.35", hideMobile: false },
+               { top:"28%", left:"44%", size:16, dur:"13s", rev:true,  op:"0.42", hideMobile: true },
+               { top:"19%", left:"56%", size:30, dur:"26s", rev:false, op:"0.33", hideMobile: false },
+               { top:"26%", left:"70%", size:12, dur:"11s", rev:true,  op:"0.46", hideMobile: true },
+               { top:"21%", left:"82%", size:34, dur:"28s", rev:false, op:"0.30", hideMobile: false },
+               { top:"30%", left:"93%", size:18, dur:"15s", rev:true,  op:"0.40", hideMobile: true },
                // Fila media
-               { top:"45%", left:"4%",  size:18, dur:"12s", rev:false, op:"0.44" },
-               { top:"48%", left:"16%", size:34, dur:"23s", rev:true,  op:"0.32" },
-               { top:"50%", left:"88%", size:30, dur:"20s", rev:false, op:"0.38" },
-               { top:"43%", left:"96%", size:16, dur:"9s",  rev:true,  op:"0.50" },
+               { top:"45%", left:"4%",  size:14, dur:"12s", rev:false, op:"0.44", hideMobile: false },
+               { top:"48%", left:"16%", size:28, dur:"23s", rev:true,  op:"0.32", hideMobile: true },
+               { top:"50%", left:"88%", size:24, dur:"20s", rev:false, op:"0.38", hideMobile: false },
+               { top:"43%", left:"96%", size:12, dur:"9s",  rev:true,  op:"0.50", hideMobile: true },
                // Fila media-baja
-               { top:"64%", left:"2%",  size:40, dur:"27s", rev:true,  op:"0.30" },
-               { top:"68%", left:"12%", size:20, dur:"13s", rev:false, op:"0.44" },
-               { top:"62%", left:"23%", size:28, dur:"18s", rev:true,  op:"0.37" },
-               { top:"70%", left:"35%", size:14, dur:"8s",  rev:false, op:"0.50" },
-               { top:"65%", left:"48%", size:36, dur:"24s", rev:true,  op:"0.33" },
-               { top:"72%", left:"60%", size:22, dur:"16s", rev:false, op:"0.42" },
-               { top:"63%", left:"73%", size:42, dur:"29s", rev:true,  op:"0.30" },
-               { top:"68%", left:"85%", size:18, dur:"11s", rev:false, op:"0.46" },
-               { top:"66%", left:"95%", size:26, dur:"17s", rev:true,  op:"0.38" },
+               { top:"64%", left:"2%",  size:32, dur:"27s", rev:true,  op:"0.30", hideMobile: false },
+               { top:"68%", left:"12%", size:16, dur:"13s", rev:false, op:"0.44", hideMobile: true },
+               { top:"62%", left:"23%", size:22, dur:"18s", rev:true,  op:"0.37", hideMobile: false },
+               { top:"70%", left:"35%", size:12, dur:"8s",  rev:false, op:"0.50", hideMobile: true },
+               { top:"65%", left:"48%", size:28, dur:"24s", rev:true,  op:"0.33", hideMobile: false },
+               { top:"72%", left:"60%", size:18, dur:"16s", rev:false, op:"0.42", hideMobile: true },
+               { top:"63%", left:"73%", size:34, dur:"29s", rev:true,  op:"0.30", hideMobile: false },
+               { top:"68%", left:"85%", size:14, dur:"11s", rev:false, op:"0.46", hideMobile: true },
+               { top:"66%", left:"95%", size:20, dur:"17s", rev:true,  op:"0.38", hideMobile: false },
                // Fila inferior
-               { top:"85%", left:"5%",  size:30, dur:"20s", rev:false, op:"0.38" },
-               { top:"88%", left:"17%", size:16, dur:"10s", rev:true,  op:"0.50" },
-               { top:"82%", left:"30%", size:44, dur:"32s", rev:false, op:"0.30" },
-               { top:"90%", left:"44%", size:20, dur:"13s", rev:true,  op:"0.44" },
-               { top:"84%", left:"58%", size:32, dur:"22s", rev:false, op:"0.36" },
-               { top:"89%", left:"70%", size:18, dur:"11s", rev:true,  op:"0.46" },
-               { top:"83%", left:"82%", size:38, dur:"26s", rev:false, op:"0.33" },
-               { top:"91%", left:"93%", size:24, dur:"15s", rev:true,  op:"0.42" },
+               { top:"85%", left:"5%",  size:24, dur:"20s", rev:false, op:"0.38", hideMobile: false },
+               { top:"88%", left:"17%", size:12, dur:"10s", rev:true,  op:"0.50", hideMobile: true },
+               { top:"82%", left:"30%", size:36, dur:"32s", rev:false, op:"0.30", hideMobile: false },
+               { top:"90%", left:"44%", size:16, dur:"13s", rev:true,  op:"0.44", hideMobile: true },
+               { top:"84%", left:"58%", size:24, dur:"22s", rev:false, op:"0.36", hideMobile: false },
+               { top:"89%", left:"70%", size:14, dur:"11s", rev:true,  op:"0.46", hideMobile: true },
+               { top:"83%", left:"82%", size:30, dur:"26s", rev:false, op:"0.33", hideMobile: false },
+               { top:"91%", left:"93%", size:20, dur:"15s", rev:true,  op:"0.42", hideMobile: true },
              ].map((s, i) => (
-               <div key={i} className="absolute" style={{ top: s.top, left: s.left, width: s.size, height: s.size, opacity: s.op }}>
+               <div key={i} className={`absolute ${s.hideMobile ? 'hidden sm:block' : 'block'}`} style={{ top: s.top, left: s.left, width: s.size, height: s.size, opacity: s.op }}>
                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" style={{ animation: `spin ${s.dur} linear infinite ${s.rev ? "reverse" : ""}` }}>
                    <path d="M50 0L52.5 47.5L100 50L52.5 52.5L50 100L47.5 52.5L0 50L47.5 47.5L50 0Z M50 18L51.2 48.8L82 50L51.2 51.2L50 82L48.8 51.2L18 50L48.8 48.8L50 18Z" fill="#b76e79"/>
                  </svg>
@@ -193,36 +193,36 @@ export default async function ProductosPage() {
            </div>
 
            {/* Texto central */}
-           <div className="max-w-2xl mx-auto relative z-10 text-center space-y-6">
-              <div className="flex justify-center items-center gap-4 animate-fade-in">
-                 <div className="h-[1px] w-16 bg-[#b76e79] opacity-50" />
-                 <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#b76e79] flex items-center gap-2">
-                    <Crown size={14} /> Edición Limitada
+           <div className="max-w-2xl mx-auto relative z-10 text-center space-y-4 sm:space-y-6">
+              <div className="flex justify-center items-center gap-3 sm:gap-4 animate-fade-in">
+                 <div className="h-[1px] w-12 sm:w-16 bg-[#b76e79] opacity-50" />
+                 <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] text-[#b76e79] flex items-center gap-2">
+                    <Crown size={12} className="sm:w-3.5 sm:h-3.5" /> Edición Limitada
                  </span>
-                 <div className="h-[1px] w-16 bg-[#b76e79] opacity-50" />
+                 <div className="h-[1px] w-12 sm:w-16 bg-[#b76e79] opacity-50" />
               </div>
             
               
               <div className="flex justify-center gap-1">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} size={16} fill="#b76e79" className="text-[#b76e79]" />
+                  <Star key={i} size={14} fill="#b76e79" className="text-[#b76e79] sm:w-4 sm:h-4" />
                 ))}
               </div>
 
-              <h1 className="text-5xl sm:text-6xl md:text-7xl leading-[1.05] text-[#2d3748] tracking-tight" style={{ fontFamily: "var(--font-marcellus), serif" }}>
-                Gana piezas <br />
+              <h1 className="text-4xl sm:text-6xl md:text-7xl leading-[1.1] sm:leading-[1.05] text-[#2d3748] tracking-tight" style={{ fontFamily: "var(--font-marcellus), serif" }}>
+                Gana piezas <br className="sm:block" />
                 <span className="italic font-light text-[#b76e79]" style={{ fontFamily: "var(--font-lora), serif" }}>exclusivas</span>
               </h1>
-              <p className="max-w-md mx-auto text-[#708090] font-sans text-sm md:text-base leading-relaxed" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
+              <p className="max-w-xs sm:max-w-md mx-auto text-[#708090] font-sans text-xs sm:text-base leading-relaxed" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
                 Participa gratis y descubre diseños únicos hechos para tu estilo. Únete a nuestra comunidad hoy mismo.
               </p>
               
               <div className="pt-2 animate-fade-in" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
-                 <a href="#sorteo-seccion" className="inline-flex items-center gap-3 px-10 py-5 bg-[#b76e79] text-white rounded-[2rem] text-xs font-bold uppercase tracking-widest shadow-xl shadow-[#b76e79]/20 hover:bg-[#a45f69] hover:-translate-y-1 transition-all">
+                 <a href="#sorteo-seccion" className="inline-flex items-center gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-[#b76e79] text-white rounded-[2rem] text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-xl shadow-[#b76e79]/20 hover:bg-[#a45f69] hover:-translate-y-1 transition-all">
                     Participar ahora
                  </a>
               </div>
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold animate-fade-in" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-gray-400 font-bold animate-fade-in" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
                 ⭐ 3 premios disponibles
               </p>
            </div>
@@ -230,7 +230,7 @@ export default async function ProductosPage() {
            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
         </header>
 
-        <main className="max-w-7xl mx-auto px-8 py-8 flex flex-col gap-10">
+        <main className="max-w-7xl mx-auto px-4 sm:px-8 py-4 sm:py-8 flex flex-col gap-6 sm:gap-10">
           
           {/* ── 7. URGENCIA (FOMO) ── */}
           <div className="max-w-md mx-auto -mt-8 relative z-20">

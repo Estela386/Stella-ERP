@@ -31,8 +31,12 @@ import {
   ScanFace,
   Star,
   Crop,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import ImageCropper from "./ImageCropper";
+import { motion, AnimatePresence } from "framer-motion";
 
 const LUXURY_PALETTE = [
   { name: "Verde Bandera", hex: "#006847" },
@@ -181,6 +185,115 @@ export default function ProductForm({
   );
   const [newMaterialName, setNewMaterialName] = useState("");
   const [isCreatingMaterial, setIsCreatingMaterial] = useState(false);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [aiConfig, setAiConfig] = useState({
+    tipo: "",
+    material: "",
+    estilo: "Elegante y Moderno",
+    detalles: "",
+  });
+
+  // Sincronizar aiConfig con los datos del formulario base
+  useEffect(() => {
+    const cat = categorias.find(c => c.id === formData.id_categoria)?.nombre || "";
+    const mats = localMateriales
+      .filter(m => materialesSeleccionados.includes(m.id))
+      .map(m => m.nombre)
+      .join(", ");
+    
+    setAiConfig(prev => ({
+      ...prev,
+      tipo: cat,
+      material: mats,
+    }));
+  }, [formData.id_categoria, materialesSeleccionados, categorias, localMateriales]);
+
+  const handleGenerateAI = async () => {
+    if (galeria.length === 0) {
+      toast.error("Debes subir al menos una imagen en la galería para que la IA la analice.");
+      return;
+    }
+
+    setIsGeneratingAI(true);
+    try {
+      const firstImage = galeria[0];
+      let base64 = "";
+
+      if (firstImage.file) {
+        base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(firstImage.file!);
+          reader.onload = () =>
+            resolve(reader.result?.toString().split(",")[1] || "");
+          reader.onerror = reject;
+        });
+      } else {
+        const response = await fetch(firstImage.url);
+        const blob = await response.blob();
+        base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onload = () =>
+            resolve(reader.result?.toString().split(",")[1] || "");
+          reader.onerror = reject;
+        });
+      }
+
+      const colorOp = opciones.find(
+        o =>
+          o.nombre.toLowerCase().includes("color") ||
+          o.nombre.toLowerCase().includes("metal")
+      );
+      const colorStr = colorOp
+        ? colorOp.valores.map(v => v.valor.split("|")[0]).join(", ")
+        : "No especificado";
+
+      const tallaOp = opciones.find(
+        o =>
+          o.nombre.toLowerCase().includes("talla") ||
+          o.nombre.toLowerCase().includes("medida")
+      );
+      const tallaStr = tallaOp
+        ? tallaOp.valores.map(v => v.valor).join(", ")
+        : "No especificado";
+
+      const res = await fetch("http://localhost:4000/api/generar-producto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imagenBase64: base64,
+          tipo: aiConfig.tipo || "Producto",
+          material: aiConfig.material || "Premium",
+          color: colorStr,
+          dimensiones: tallaStr,
+          estilo: aiConfig.estilo,
+          detallesAdicionales: aiConfig.detalles || formData.descripcion || "Ninguno",
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.details || errData.error || "Error en el servidor de IA");
+      }
+
+      const data = await res.json();
+
+      setFormData(prev => ({
+        ...prev,
+        nombre: data.nombre || prev.nombre,
+        descripcion: data.descripcion || prev.descripcion,
+      }));
+
+      toast.success("¡Contenido generado con éxito! ✨");
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        err instanceof Error ? err.message : "Error al conectar con el servidor de IA."
+      );
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
 
   // Sincronizar materiales si cambian las props
   useEffect(() => {
@@ -914,64 +1027,81 @@ export default function ProductForm({
           <div className="h-px w-full bg-[rgba(112,128,144,0.1)]" />
 
           {/* IMAGEN PREVIEW + UPLOAD */}
-          <div
-            className="flex flex-col gap-3 w-full mx-auto"
-            style={{ maxWidth: "220px" }}
-          >
-            <p className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-widest text-center">
-              Imagen Principal
-            </p>
-            <div className="w-full aspect-[3/4] bg-[#f6f4ef] rounded-[20px] border-2 border-[rgba(112,128,144,0.12)] overflow-hidden relative group shadow-inner">
-              {previewUrl ? (
-                <Image
-                  src={previewUrl}
-                  alt="Preview"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#708090]/30">
-                  <ImageIcon size={32} strokeWidth={1} />
-                  <p className="text-[0.7rem] font-bold uppercase tracking-widest text-center px-4">
-                    Subir foto
-                  </p>
-                </div>
-              )}
-              {previewUrl && (
-                <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPreviewUrl(null);
-                      setImagenFile(null);
-                    }}
-                    className="w-8 h-8 rounded-full bg-white/90 text-rose-500 shadow flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setImageToCrop(previewUrl)}
-                    className="w-8 h-8 rounded-full bg-white/90 text-[#b76e79] shadow flex items-center justify-center hover:bg-[#b76e79] hover:text-white transition-all"
-                    title="Ajustar recorte"
-                  >
-                    <Crop size={14} />
-                  </button>
-                </div>
-              )}
-            </div>
-            <label className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#f6f4ef]/50 border-2 border-dashed border-[rgba(112,128,144,0.2)] rounded-[14px] cursor-pointer hover:bg-[#b76e79]/5 hover:border-[#b76e79]/30 transition-all text-[#708090] hover:text-[#b76e79]">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <Plus size={14} />
-              <span className="text-[0.75rem] font-bold uppercase tracking-widest">
-                {previewUrl ? "Cambiar" : "Seleccionar"}
+          {/* GALERÍA DE IMÁGENES (ESTILO GRID) */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between px-1">
+              <label className="text-[0.7rem] font-black text-[#708090] uppercase tracking-[0.2em]">
+                Galería Multimedia
+              </label>
+              <span className="text-[0.6rem] text-[#b76e79] font-black bg-[#b76e79]/10 px-2 py-0.5 rounded-md uppercase">
+                {galeria.length} Fotos
               </span>
-            </label>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <AnimatePresence mode="popLayout">
+                {galeria.map((img, idx) => (
+                  <motion.div 
+                    key={img.idUnico} 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    className={`group relative aspect-square rounded-[20px] overflow-hidden border-2 transition-all shadow-sm ${
+                      idx === 0 ? 'border-[#b76e79] ring-2 ring-[#b76e79]/10' : 'border-transparent bg-white'
+                    }`}
+                  >
+                    <img 
+                      src={img.url} 
+                      alt={`Imagen ${idx + 1}`} 
+                      className="w-full h-full object-cover"
+                    />
+                    
+                    {/* ACCIONES FLOTANTES */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(img)}
+                        className="p-2 bg-white/90 text-rose-500 rounded-full hover:bg-rose-500 hover:text-white transition-all shadow-md"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+
+                      {idx !== 0 && (
+                        <button
+                          type="button"
+                          onClick={() => handleSetCover(idx)}
+                          className="px-3 py-1 bg-white/90 text-[#708090] rounded-full text-[0.6rem] font-bold uppercase tracking-wider hover:bg-[#b76e79] hover:text-white transition-all shadow-md"
+                        >
+                          Hacer Principal
+                        </button>
+                      )}
+                    </div>
+
+                    {/* BADGE PRINCIPAL */}
+                    {idx === 0 && (
+                      <div className="absolute top-2 left-2 bg-[#b76e79] text-white text-[0.55rem] font-black uppercase tracking-widest px-2 py-1 rounded-md shadow-sm">
+                        Principal
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {/* BOTÓN AÑADIR */}
+              <label className="aspect-square rounded-[20px] border-2 border-dashed border-[#708090]/30 hover:border-[#b76e79] hover:bg-[#b76e79]/5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group/add">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleGalleryUpload}
+                  className="hidden"
+                />
+                <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#b76e79] group-hover/add:scale-110 transition-transform">
+                  <Plus size={20} strokeWidth={3} />
+                </div>
+                <span className="text-[0.6rem] font-bold text-[#708090] uppercase tracking-wider">Añadir</span>
+              </label>
+            </div>
           </div>
 
           <div className="h-px w-full bg-[rgba(112,128,144,0.1)]" />
@@ -2003,107 +2133,143 @@ export default function ProductForm({
         <div className="p-6 bg-[#ffffff] rounded-[24px] border-2 border-[rgba(112,128,144,0.12)] shadow-md">
           <div className="flex flex-col md:flex-row gap-8">
             {/* Descripción (Movida a la izquierda o arriba) */}
-            <div className="flex-1 flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <p className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">
-                  Descripción de la Pieza
-                </p>
-              </div>
-              <textarea
-                name="descripcion"
-                value={formData.descripcion}
-                onChange={handleChange}
-                rows={5}
-                placeholder="Describe los detalles de la pieza, inspiración, medidas..."
-                className="w-full bg-[#f6f4ef]/30 border-2 border-[rgba(112,128,144,0.1)] rounded-[16px] p-4 text-sm text-[#4a5568] focus:border-[#b76e79] focus:bg-white outline-none transition-all resize-none"
-                style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}
-              />
-            </div>
-          </div>
-          <div className="mt-8 border-t border-[rgba(112,128,144,0.1)] pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest">
-                Galería de Imágenes
-              </p>
-              <span className="text-[0.7rem] text-[#708090]/50 bg-[#f6f4ef] px-3 py-1 rounded-full">
-                Formatos: JPG, PNG, WEBP (Max 5MB)
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {/* Imágenes Actuales */}
-              {galeria.map((img, idx) => (
-                <div
-                  key={img.idUnico}
-                  className="relative aspect-square rounded-[16px] border-2 border-[rgba(112,128,144,0.1)] overflow-hidden group bg-[#f6f4ef]"
-                >
-                  <Image
-                    src={img.url}
-                    alt={`Imagen ${idx + 1}`}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-
-                  {/* Overlay de acciones */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-2">
-                    {idx !== 0 && (
-                      <button
-                        type="button"
-                        onClick={() => handleSetCover(idx)}
-                        className="bg-white/90 text-[#b76e79] text-xs font-bold px-3 py-1.5 rounded-full hover:scale-105 transition-transform flex items-center gap-1"
-                      >
-                        <Star size={12} fill="currentColor" /> Hacer Portada
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(img)}
-                      className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center hover:scale-105 transition-transform shadow-lg"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+            <div className="flex-1 flex flex-col gap-6">
+              {/* PANEL DE CONFIGURACIÓN IA */}
+              <div className="p-5 bg-[#f6f4ef]/50 rounded-[24px] border-2 border-dashed border-[#b76e79]/20 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={16} className="text-[#b76e79]" />
+                    <span className="text-[0.7rem] font-black text-[#4a5568] uppercase tracking-widest">Configuración para la IA</span>
                   </div>
-
-                  {/* Badge de Portada */}
-                  {idx === 0 && (
-                    <div className="absolute top-2 left-2 bg-[#b76e79] text-white text-[0.6rem] font-black uppercase tracking-widest px-2 py-1 rounded-md shadow-md flex items-center gap-1">
-                      <Star size={10} fill="currentColor" /> Portada
-                    </div>
-                  )}
-
-                  {/* Badge de Nueva */}
-                  {img.file && (
-                    <div className="absolute bottom-2 right-2 bg-[#8c9768] text-white text-[0.6rem] font-black uppercase px-2 py-1 rounded-md shadow-md">
-                      Nueva
-                    </div>
-                  )}
+                  <button
+                    type="button"
+                    onClick={handleGenerateAI}
+                    disabled={isGeneratingAI || galeria.length === 0}
+                    className="relative flex items-center gap-2 px-6 py-2 rounded-full bg-[#2d3748] text-white text-[0.7rem] font-black uppercase tracking-widest hover:bg-black transition-all disabled:opacity-50 shadow-lg overflow-hidden"
+                  >
+                    <AnimatePresence mode="wait">
+                      {isGeneratingAI ? (
+                        <motion.div
+                          key="loading"
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -20, opacity: 0 }}
+                          className="flex items-center gap-2"
+                        >
+                          <Loader2 size={12} className="animate-spin text-[#b76e79]" />
+                          <span>Analizando...</span>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="idle"
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -20, opacity: 0 }}
+                          className="flex items-center gap-2"
+                        >
+                          <span>Generar descripción</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    {isGeneratingAI && (
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent w-full h-full"
+                        animate={{ x: ["-100%", "100%"] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                      />
+                    )}
+                  </button>
                 </div>
-              ))}
 
-              {/* Botón Upload (Añadir más) */}
-              <label className="aspect-square rounded-[16px] border-2 border-dashed border-[rgba(112,128,144,0.3)] hover:border-[#b76e79] hover:bg-[#b76e79]/5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleGalleryUpload}
-                  className="hidden"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[0.6rem] font-bold text-[#708090] uppercase px-1">Tipo de Producto</label>
+                    <input 
+                      type="text" 
+                      value={aiConfig.tipo}
+                      onChange={(e) => setAiConfig(prev => ({ ...prev, tipo: e.target.value }))}
+                      placeholder="Ej: Anillo de Compromiso"
+                      className="bg-white border-2 border-transparent focus:border-[#b76e79] rounded-xl px-4 py-2 text-xs font-bold text-[#4a5568] outline-none"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[0.6rem] font-bold text-[#708090] uppercase px-1">Material</label>
+                    <input 
+                      type="text" 
+                      value={aiConfig.material}
+                      onChange={(e) => setAiConfig(prev => ({ ...prev, material: e.target.value }))}
+                      placeholder="Ej: Oro Blanco 14k"
+                      className="bg-white border-2 border-transparent focus:border-[#b76e79] rounded-xl px-4 py-2 text-xs font-bold text-[#4a5568] outline-none"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[0.6rem] font-bold text-[#708090] uppercase px-1">Estilo</label>
+                    <input 
+                      type="text" 
+                      value={aiConfig.estilo}
+                      onChange={(e) => setAiConfig(prev => ({ ...prev, estilo: e.target.value }))}
+                      placeholder="Ej: Minimalista y Sofisticado"
+                      className="bg-white border-2 border-transparent focus:border-[#b76e79] rounded-xl px-4 py-2 text-xs font-bold text-[#4a5568] outline-none"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[0.6rem] font-bold text-[#708090] uppercase px-1">Detalles Extra</label>
+                    <input 
+                      type="text" 
+                      value={aiConfig.detalles}
+                      onChange={(e) => setAiConfig(prev => ({ ...prev, detalles: e.target.value }))}
+                      placeholder="Ej: Piedra central de 1ct"
+                      className="bg-white border-2 border-transparent focus:border-[#b76e79] rounded-xl px-4 py-2 text-xs font-bold text-[#4a5568] outline-none"
+                    />
+                  </div>
+                </div>
+                
+                {galeria.length === 0 && (
+                  <p className="text-[0.6rem] text-rose-500 font-bold animate-pulse italic">
+                    ⚠️ Sube una imagen primero para habilitar la IA.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <p className="text-[0.75rem] font-bold text-[#708090] uppercase tracking-widest px-1">Resultado Final</p>
+              
+              <div className="relative">
+                <textarea
+                  name="descripcion"
+                  value={formData.descripcion}
+                  onChange={handleChange}
+                  rows={8}
+                  placeholder="Describe los detalles de la pieza, inspiración, medidas..."
+                  className={`w-full bg-[#f6f4ef]/30 border-2 rounded-[20px] p-6 text-sm text-[#4a5568] outline-none transition-all resize-none shadow-inner ${
+                    isGeneratingAI 
+                      ? "border-[#b76e79] animate-pulse cursor-wait" 
+                      : "border-[rgba(112,128,144,0.1)] focus:border-[#b76e79] focus:bg-white"
+                  }`}
+                  style={{ fontFamily: "var(--font-sans, Inter, sans-serif)" }}
                 />
-                <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#b76e79]">
-                  <Plus size={20} strokeWidth={2.5} />
-                </div>
-                <span className="text-[0.7rem] font-bold text-[#708090] uppercase tracking-widest">
-                  Añadir Fotos
-                </span>
-              </label>
+                
+                {isGeneratingAI && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/40 rounded-[20px] backdrop-blur-[1px]">
+                    <motion.div 
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="bg-white px-4 py-2 rounded-full shadow-md flex items-center gap-3 border border-[#b76e79]/20"
+                    >
+                      <div className="flex gap-1">
+                        <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 bg-[#b76e79] rounded-full" />
+                        <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 bg-[#b76e79] rounded-full" />
+                        <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 bg-[#b76e79] rounded-full" />
+                      </div>
+                      <span className="text-[0.65rem] font-bold text-[#708090] uppercase tracking-tighter">Escribiendo descripción mágica...</span>
+                    </motion.div>
+                  </div>
+                )}
+              </div>
             </div>
-
-            {errors.imagen && (
-              <p className="text-rose-500 text-xs font-medium mt-3">
-                {errors.imagen}
-              </p>
-            )}
           </div>
+        </div>
+
         </div>
 
         {/* FOOTER */}

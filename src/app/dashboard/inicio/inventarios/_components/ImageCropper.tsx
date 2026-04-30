@@ -98,6 +98,7 @@ export default function ImageCropper({
             <p className="text-xs text-[#708090] font-medium uppercase tracking-widest mt-1">Proporción 3:4 establecida</p>
           </div>
           <button 
+            type="button"
             onClick={onCancel}
             className="w-10 h-10 rounded-full flex items-center justify-center text-[#708090] hover:bg-gray-100 transition-colors"
           >
@@ -141,12 +142,14 @@ export default function ImageCropper({
 
           <div className="flex gap-4">
             <button
+              type="button"
               onClick={onCancel}
               className="flex-1 py-4 px-6 rounded-2xl border-2 border-gray-100 text-[#708090] font-bold text-sm hover:bg-gray-50 transition-all uppercase tracking-widest"
             >
               Cancelar
             </button>
             <button
+              type="button"
               onClick={handleDone}
               className="flex-2 py-4 px-10 rounded-2xl bg-[#b76e79] text-white font-bold text-sm hover:shadow-lg hover:shadow-[#b76e79]/20 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
             >
