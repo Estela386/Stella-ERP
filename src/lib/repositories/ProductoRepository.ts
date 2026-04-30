@@ -56,6 +56,7 @@ export class ProductoRepository extends BaseRepository<IProducto> {
         imagenes:producto_imagenes(id, url_imagen, orden)
       `
       )
+      .eq("activo", true)
       .order("id", { ascending: false });
 
     return { data, error };
