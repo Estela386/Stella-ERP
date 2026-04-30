@@ -34,6 +34,9 @@ export default function ProductoClient({ id }: ProductoClientProps) {
   const [comment, setComment] = useState("");
   const [enviandoReview, setEnviandoReview] = useState(false);
   const [yaComento, setYaComento] = useState(false);
+  const [estadoReview, setEstadoReview] = useState<
+    "LOADING" | "NO_LOGUEADO" | "NO_COMPRADO" | "YA_COMENTO" | "ELIGIBLE"
+  >("LOADING");
   const [opciones, setOpciones] = useState<any[]>([]);
   const [configuracion, setConfiguracion] = useState<Record<number, any>>({});
   const [loadingOpciones, setLoadingOpciones] = useState(true);
@@ -135,20 +138,23 @@ export default function ProductoClient({ id }: ProductoClientProps) {
 
     if (id) cargarReviews();
 
-    const verificarYaComento = async () => {
-      if (usuario?.id_auth) {
-        const reviewService = new ReviewService(createClient());
-        const { yaComento, error } = await reviewService.yaComento(
-          id,
-          usuario.id_auth
-        );
-        if (!error) {
-          setYaComento(yaComento);
-        }
-      }
-    };
+    if (usuario) {
+      const verificarElegibilidad = async () => {
+        const supabase = createClient();
+        const reviewService = new ReviewService(supabase);
 
-    verificarYaComento();
+        const res = await reviewService.puedeComentar(
+          id.toString(),
+          usuario.id,
+          usuario.uid
+        );
+        setEstadoReview(res.razon);
+      };
+      verificarElegibilidad();
+    } else {
+      setEstadoReview("NO_LOGUEADO");
+    }
+
     const cargarOpciones = async () => {
       try {
         setLoadingOpciones(true);
@@ -1402,8 +1408,9 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                 </div>
               )}
 
-              {/* FORM SOLO SI LOGUEADO */}
-              {usuario && !yaComento && (
+              {/* ESCENARIO 1: PUEDE COMENTAR (Lo compró y no ha comentado) */}
+              {/* ESCENARIO 1: PUEDE COMENTAR (Lo compró y no ha comentado) */}
+              {estadoReview === "ELIGIBLE" && (
                 <div
                   style={{
                     marginTop: 32,
@@ -1479,7 +1486,53 @@ export default function ProductoClient({ id }: ProductoClientProps) {
                 </div>
               )}
 
-              {!usuario && (
+              {/* ESCENARIO 2: NO LO HA COMPRADO */}
+              {estadoReview === "NO_COMPRADO" && (
+                <div
+                  style={{
+                    marginTop: 32,
+                    padding: 24,
+                    background: "#f9fafb",
+                    borderRadius: 20,
+                    textAlign: "center",
+                  }}
+                >
+                  <p
+                    style={{ fontSize: "0.95rem", color: "#708090", margin: 0 }}
+                  >
+                    Solo los clientes que han comprado este producto pueden
+                    dejar una reseña. ¡Anímate a probarlo!
+                  </p>
+                </div>
+              )}
+
+              {/* ESCENARIO 3: YA COMENTÓ */}
+              {estadoReview === "YA_COMENTO" && (
+                <div
+                  style={{
+                    marginTop: 32,
+                    padding: 24,
+                    background: "#f6f4ef",
+                    borderRadius: 20,
+                    textAlign: "center",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "0.95rem",
+                      color: "#b76e79",
+                      fontWeight: 500,
+                      margin: 0,
+                    }}
+                  >
+                    ¡Gracias por tu reseña! Ya has compartido tu opinión sobre
+                    este producto.
+                  </p>
+                </div>
+              )}
+
+              {/* ESCENARIO 4: NO LOGUEADO */}
+              {estadoReview === "NO_LOGUEADO" && (
                 <p
                   style={{
                     marginTop: 20,

@@ -28,6 +28,29 @@ export class ReviewRepository {
 
     return { data, error: error?.message || null };
   }
+  // Agrégalo dentro de tu clase ReviewRepository
+  async haComprado(
+    productId: string,
+    userId: string
+  ): Promise<{ haComprado: boolean; error: string | null }> {
+    const { data, error } = await this.client
+      .from("detallesventas")
+      .select(
+        `
+        id_venta,
+        ventas!inner(id_usuario)
+      `
+      )
+      .eq("id_producto", productId)
+      .eq("ventas.id_usuario", userId)
+      .limit(1);
+
+    if (error) {
+      return { haComprado: false, error: error.message };
+    }
+
+    return { haComprado: data && data.length > 0, error: null };
+  }
   async yaComento(
     productId: string,
     userId: string
